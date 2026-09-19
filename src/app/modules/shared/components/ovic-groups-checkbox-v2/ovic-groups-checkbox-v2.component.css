@@ -1,0 +1,163 @@
+.group-radio-text-v2 {
+    font-size: 14px;
+}
+
+.radio-item-item-v2 {
+    display: flex;
+    align-items: flex-start;
+    cursor: pointer;
+}
+
+.radio-item-v2 input {
+    margin-right: 10px;
+    cursor: pointer;
+    align-self: center;
+}
+
+.group-radio-text-v2 {
+    cursor: pointer;
+}
+
+.radio-item-v2 {
+    display: inline-block;
+    /* margin-bottom: 20px; */
+
+}
+
+.group-radio-text-v2 {
+    flex: 1;
+}
+
+/* .hoziron-radio {
+    display: flex;
+} */
+
+
+
+
+.hoziron-radio-1 {
+    width: 100%;
+}
+
+.hoziron-radio-2 {
+    width: 50%;
+    padding-right: 30px;
+}
+
+.hoziron-radio-3 {
+    width: 33.33%;
+    padding-right: 30px;
+}
+
+.hoziron-radio-4 {
+    width: 25%;
+    padding-right: 30px;
+}
+
+.hoziron-radio-6 {
+    width: 16.66%;
+    padding-right: 15px;
+}
+
+.hoziron-radio-0 {
+    width: auto;
+    padding-right: 20px;
+}
+
+.radio-show-image-active {
+    flex-direction: column;
+    /* align-items: center; */
+    padding: 5px;
+}
+
+.radio-show-image-active input {
+    margin: 0px;
+}
+
+.radio-item-image {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.radio-item-image image img {
+    margin-bottom: 10px;
+}
+
+.radio-item-v2 {
+    margin: 7.5px 0px;
+}
+
+/* .radio-show-image-active .radio-item-image {
+    align-items: normal;
+} */
+
+.radio-show-image-active input {
+    margin-top: 5px;
+}
+
+.hoziron-radio-1 .radio-item-image {
+    direction: rtl;
+    flex-direction: row;
+}
+
+.hoziron-radio-1 .radio-item-image input {
+    margin: 0px;
+    margin-right: 10px;
+}
+
+.pointer-events-none {
+    pointer-events: none;
+}
+
+.fade-label .group-radio-text-v2 {
+    color: #bdbdbd !important;
+}
+
+
+.abc-type-radio {
+    position: relative;
+}
+
+.abc-type-radio input[type="checkbox"] {
+    display: none;
+}
+
+.custom-label-abc {
+    font-weight: bold;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    margin-right: 10px;
+    margin-top: -5px;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+/* .abc-type-radio input[type="checkbox"]:checked + .custom-label-abc {
+  border-color: #007bff;
+  background-color: #e6f0ff;
+} */
+/* .radio-item-v2:last-child {
+    margin-bottom: 0px;
+} */
+
+/* Dấu tích hiển thị bằng ::after */
+/* .abc-type-radio input[type="checkbox"]:checked+.custom-label-abc::after {
+    content: "✓";
+    position: absolute;
+    font-size: 18px;
+    color: #28a745;
+    font-weight: bold;
+} */
+
+/* Optional: thay đổi border và background khi chọn */
+.abc-type-radio input[type="checkbox"]:checked+.custom-label-abc {
+    border-color: #007bff;
+    background-color: #e6f0ff;
+}
+
+/*  */

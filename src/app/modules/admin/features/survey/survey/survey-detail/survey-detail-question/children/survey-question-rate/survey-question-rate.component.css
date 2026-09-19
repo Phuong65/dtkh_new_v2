@@ -1,0 +1,48 @@
+.layout-component-container-survey-question-rate {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    gap: 10px;
+    padding: 0px 10px;
+}
+
+.survey-question-rate-title {
+    display: flex;
+    flex-direction: column;
+}
+
+.survey-question-rate-answer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.survey-question-rate-rating {
+    display: flex;
+    justify-content: space-between;
+    width: 350px;
+}
+
+.survey-question-rate-rating__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.survey-question-rate-rating__number {
+    font-size: 14px;
+    color: #374151;
+}
+
+.survey-question-rate-rating__star {
+    font-size: 22px;
+    color: #6b7280;
+    color: #f59e0b;
+}
+
+
+.survey-question-rate-title__preview {
+    min-height: 42px;
+}

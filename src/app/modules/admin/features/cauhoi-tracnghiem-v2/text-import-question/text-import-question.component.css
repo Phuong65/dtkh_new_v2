@@ -1,0 +1,959 @@
+:host {
+    --primary: #4361ee;
+    --primary-light: #eef0ff;
+    --primary-dark: #3a56d4;
+    --success: #16a34a;
+    --warning: #f59e0b;
+    --danger: #dc2626;
+    --gray-50: #f8f9fa;
+    --gray-100: #f1f3f5;
+    --gray-200: #e9ecef;
+    --gray-300: #dee2e6;
+    --gray-400: #ced4da;
+    --gray-500: #adb5bd;
+    --gray-600: #6c757d;
+    --gray-700: #495057;
+    --gray-800: #343a40;
+    --gray-900: #212529;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, .08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, .1);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, .12);
+    --transition: .2s ease;
+
+    display: block;
+    height: 100%;
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* Empty state trong preview-panel */
+.preview-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 100%;
+    min-height: 320px;
+    padding: 32px 24px;
+    color: var(--gray-600);
+}
+
+.preview-empty__icon {
+    font-size: 48px;
+    background: linear-gradient(135deg, var(--primary), #a855f7);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 16px;
+}
+
+.preview-empty__title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0 0 8px;
+}
+
+.preview-empty__hint {
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 360px;
+    margin: 0;
+}
+
+.preview-empty__hint strong {
+    color: var(--primary);
+}
+
+/* ===== HEADER SECTION ===== */
+.section-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    padding: 18px 24px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+}
+
+.section-header::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: rgba(255, 255, 255, .4);
+    border-radius: 0 2px 2px 0;
+}
+
+.section-header__icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, .2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.section-header__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.section-header__sub {
+    font-size: 12px;
+    color: rgba(255, 255, 255, .75);
+    margin: 0;
+    line-height: 1.3;
+}
+
+/* ===== SINGLE COLUMN MODE ===== */
+.single-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ===== SPLIT LAYOUT ===== */
+.split-layout {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    min-height: 0;
+    height: 100%;
+}
+
+.editor-panel {
+    width: 560px;
+    flex-shrink: 0;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    min-height: 0;
+    height: 100%;
+}
+
+.preview-panel {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    background: var(--gray-50);
+    min-height: 0;
+    height: 100%;
+}
+
+/* ===== DRAG DIVIDER ===== */
+.drag-divider {
+    width: 6px;
+    cursor: col-resize;
+    background: var(--gray-200);
+    position: relative;
+    flex-shrink: 0;
+    transition: background .15s ease;
+    z-index: 1;
+}
+
+.drag-divider:hover,
+.drag-divider:active {
+    background: var(--primary);
+}
+
+.drag-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 24px;
+    background: var(--gray-400);
+    border-radius: 1px;
+    transition: background .15s ease;
+}
+
+.drag-divider:hover::after,
+.drag-divider:active::after {
+    background: #fff;
+}
+
+/* ===== SCROLLABLE CONTENT (editor) ===== */
+.scrollable-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    min-height: 0;
+}
+
+/* ===== CKEDITOR CONTAINER — A4 Portrait ===== */
+.editor-wrapper {
+    max-width: 210mm;
+    margin: 0 auto;
+    height: calc(100% - 30px);
+    display: flex;
+    flex-direction: column;
+}
+
+.editor-wrapper .form-group {
+    margin-bottom: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+}
+
+.editor-wrapper form{
+    height: 100%;
+}
+
+.editor-wrapper label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 8px;
+    flex-shrink: 0;
+}
+
+.editor-frame {
+    background: #fff;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: border-color var(--transition), box-shadow var(--transition);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.editor-frame:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(67, 110, 238, .15);
+}
+
+:host ::ng-deep .text-import-editor .ck-content {
+    min-height: 297mm !important;
+    max-width: 190mm !important;
+    margin: 0 auto !important;
+    padding: 20mm 15mm !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    background: #fff !important;
+    box-sizing: border-box !important;
+}
+
+/* Full-height editor chain — mỗi thẻ cần height:100% để flex con có baseline */
+:host ::ng-deep .editor-frame app-input-question-direction {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+:host ::ng-deep .editor-frame .input-question-direction {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+:host ::ng-deep .editor-frame .document-editor_basic {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+:host ::ng-deep .editor-frame .ck-editor {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+:host ::ng-deep .editor-frame .ck-editor__main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+:host ::ng-deep .editor-frame .ck-editor__editable_inline {
+    flex: 1;
+    height: 100%;
+    min-height: 0 !important;
+}
+
+:host ::ng-deep .text-import-editor .ck.ck-editor__editable_inline {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+:host ::ng-deep .text-import-editor .ck.ck-toolbar {
+    border: none !important;
+    border-bottom: 1px solid var(--gray-200) !important;
+    background: var(--gray-50) !important;
+}
+
+/* ===== ACTION BAR ===== */
+.action-bar {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 0 4px;
+    flex-wrap: wrap;
+}
+
+.action-bar .btn-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 28px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: #fff;
+    cursor: pointer;
+    transition: transform var(--transition), box-shadow var(--transition);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+}
+
+.action-bar .btn-submit:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.action-bar .btn-submit:active:not(:disabled) {
+    transform: scale(.97);
+}
+
+.action-bar .btn-submit:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+.action-bar .btn-submit i {
+    font-size: 16px;
+}
+
+.action-bar .btn-edit-again {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid var(--gray-300);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--gray-700);
+    cursor: pointer;
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.action-bar .btn-edit-again:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* ===== PREVIEW SCROLL ===== */
+.preview-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 0;
+}
+
+/* ===== PREVIEW CARD ===== */
+.preview-card {
+    width: 210mm;
+    max-width: 100%;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition);
+}
+
+.preview-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+/* Card header — toolbar */
+.preview-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.preview-card__header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ===== HEADER PILLS — shared base (đồng bộ question-header chi tiết) ===== */
+.header-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.584em 12px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    border-radius: 6px;
+    border: 1px solid transparent;
+}
+
+.preview-card__number {
+    background: #f1f5f9;
+    color: #475569;
+    padding: 5px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+    height: 30px;
+    border: 1px solid var(--blue-gray-100);
+}
+
+.preview-card__header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Toolbar buttons — interactive pills */
+.toolbar-btn {
+    gap: 5px;
+    border-color: var(--gray-300);
+    border-radius: 6px !important;
+    background: #fff;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.toolbar-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.toolbar-btn.active {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.toolbar-btn i {
+    font-size: 13px;
+    margin-right: 5px;
+}
+
+/* CDR badge — giống tag-bloom (dùng khi week !== 100) */
+.toolbar-cdr-badge {
+    background: #f3f0ff;
+    color: #5f3dc4;
+    border-color: #d0bfff;
+}
+
+/* CDR dropdown container — đồng bộ toolbar pills */
+.toolbar-cdr-dropdown {
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Override p-dropdown trong preview card header — nhỏ gọn, đồng bộ toolbar-btn */
+:host ::ng-deep .toolbar-cdr-select {
+    display: inline-flex;
+    align-items: center;
+}
+
+:host ::ng-deep .toolbar-cdr-select.p-dropdown {
+    border: 1px solid var(--gray-300);
+    border-radius: 6px !important;
+    background: #fff;
+    min-width: 90px;
+    max-width: 140px;
+    height: 30px;
+    transition: all var(--transition);
+}
+
+:host ::ng-deep .toolbar-cdr-select.p-dropdown:hover {
+    border-color: var(--primary);
+}
+
+:host ::ng-deep .toolbar-cdr-select.p-dropdown .p-dropdown-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gray-600);
+    padding: 4px 8px;
+    line-height: 1.2;
+}
+
+:host ::ng-deep .toolbar-cdr-select.p-dropdown .p-dropdown-trigger {
+    width: 24px;
+}
+
+:host ::ng-deep .toolbar-cdr-select.p-dropdown .p-dropdown-trigger .p-dropdown-trigger-icon {
+    font-size: 10px;
+    color: var(--gray-500);
+}
+
+:host ::ng-deep .toolbar-cdr-select.p-dropdown:not(.p-disabled).p-focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(67, 110, 238, .15);
+}
+
+/* Dropdown panel — filter input nhỏ gọn */
+:host ::ng-deep .toolbar-cdr-select .p-dropdown-panel {
+    min-width: 160px;
+}
+
+:host ::ng-deep .toolbar-cdr-select .p-dropdown-panel .p-dropdown-header {
+    padding: 4px 8px;
+}
+
+:host ::ng-deep .toolbar-cdr-select .p-dropdown-panel .p-dropdown-filter-container .p-dropdown-filter {
+    font-size: 12px;
+    padding: 4px 8px;
+    height: 28px;
+}
+
+:host ::ng-deep .toolbar-cdr-select .p-dropdown-panel .p-dropdown-items-wrapper .p-dropdown-item {
+    font-size: 12px;
+    padding: 6px 10px;
+}
+
+/* Question direction in preview */
+.preview-card__direction {
+    font-size: 14px;
+    color: var(--gray-800);
+    line-height: 1.6;
+    padding: 12px 16px 8px;
+}
+
+/* Question type render area */
+.preview-card__type-render {
+    padding: 4px 16px 12px;
+}
+
+/* Legacy tags — đồng bộ question-code / stat-tag */
+.question-card__number,
+.question-card__type {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.584em 12px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    border-radius: 6px;
+    border: 1px solid transparent;
+}
+
+.question-card__number {
+    background: #f1f5f9;
+    color: #475569;
+    padding: 5px 6px;
+    border-radius: 4px;
+    height: 30px;
+    border: 1px solid var(--blue-gray-100);
+}
+
+.question-card__type {
+    background: var(--gray-100);
+    color: var(--gray-600);
+}
+
+/* ===== RAW JSON ===== */
+.raw-json {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 16px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    max-height: 480px;
+    overflow-y: auto;
+}
+
+/* ===== LOADING ===== */
+.loading-overlay {
+    text-align: center;
+    padding: 40px 0;
+}
+
+.loading-overlay .spinner {
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--gray-200);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-overlay p {
+    margin-top: 12px;
+    color: var(--gray-500);
+    font-size: 14px;
+}
+
+/* ===== ERROR ===== */
+.alert-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+    font-size: 13px;
+    margin-bottom: 16px;
+}
+
+.alert-error i {
+    font-size: 16px;
+    margin-top: 1px;
+    flex-shrink: 0;
+}
+
+/* ===== RESULTS SECTION (legacy single-column) ===== */
+.results-section {
+    margin-top: 24px;
+    border-top: 1px solid var(--gray-200);
+    padding-top: 20px;
+}
+
+.results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.results-count {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.results-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.question-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 16px 18px;
+    transition: box-shadow var(--transition), transform var(--transition);
+}
+
+.question-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+.question-card__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.question-card__direction {
+    font-size: 14px;
+    color: var(--gray-800);
+    line-height: 1.6;
+    padding: 10px 14px;
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--primary);
+    margin-bottom: 10px;
+}
+
+.question-card__answers {
+    margin-left: 20px;
+}
+
+.answer-item {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin: 5px 0;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.answer-label {
+    font-weight: 700;
+    color: var(--gray-700);
+    flex-shrink: 0;
+    min-width: 20px;
+}
+
+.answer-value {
+    color: var(--gray-800);
+}
+
+.answer-value.correct-answer {
+    color: #16a34a;
+    font-weight: 600;
+}
+
+.question-card__correct {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--gray-300);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.correct-label {
+    font-weight: 600;
+    color: #dc2626;
+}
+
+.correct-value {
+    color: #16a34a;
+    font-weight: 700;
+}
+
+.question-card__children {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 2px solid var(--gray-200);
+}
+
+.child-question {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    margin-bottom: 8px;
+}
+
+.child-question:last-child {
+    margin-bottom: 0;
+}
+
+.child-question__header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+/* ===== SCROLLBAR ===== */
+.scrollable-content::-webkit-scrollbar,
+.raw-json::-webkit-scrollbar,
+.preview-scroll::-webkit-scrollbar,
+.editor-panel::-webkit-scrollbar,
+.preview-panel::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.scrollable-content::-webkit-scrollbar-track,
+.raw-json::-webkit-scrollbar-track,
+.preview-scroll::-webkit-scrollbar-track,
+.editor-panel::-webkit-scrollbar-track,
+.preview-panel::-webkit-scrollbar-track {
+    background: var(--gray-100);
+    border-radius: 4px;
+}
+
+.scrollable-content::-webkit-scrollbar-thumb,
+.raw-json::-webkit-scrollbar-thumb,
+.preview-scroll::-webkit-scrollbar-thumb,
+.editor-panel::-webkit-scrollbar-thumb,
+.preview-panel::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--gray-400) 0%, var(--gray-500) 100%);
+    border-radius: 4px;
+    border: 1.5px solid var(--gray-100);
+    min-height: 40px;
+}
+
+.scrollable-content::-webkit-scrollbar-thumb:hover,
+.raw-json::-webkit-scrollbar-thumb:hover,
+.preview-scroll::-webkit-scrollbar-thumb:hover,
+.editor-panel::-webkit-scrollbar-thumb:hover,
+.preview-panel::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--gray-500) 0%, var(--gray-600) 100%);
+}
+
+/* Firefox scrollbar */
+.scrollable-content,
+.raw-json,
+.preview-scroll,
+.editor-panel,
+.preview-panel {
+    scrollbar-width: thin;
+    scrollbar-color: var(--gray-400) var(--gray-100);
+}
+
+/* ===== RESPONSIVE ===== */
+/* ≥1400px: side-by-side, ẩn single-column */
+@media (min-width: 1400px) {
+    .single-column {
+        display: none !important;
+    }
+}
+
+/* <1400px: ẩn split-layout để dùng single-column mode */
+@media (max-width: 1399px) {
+    .split-layout {
+        display: none !important;
+    }
+
+    .editor-panel {
+        width: 45% !important;
+        flex: none !important;
+    }
+
+    .preview-panel {
+        width: 55%;
+    }
+}
+
+@media (max-width: 992px) {
+    .scrollable-content {
+        padding: 16px;
+    }
+
+    .editor-wrapper {
+        max-width: 100%;
+    }
+
+    :host ::ng-deep .text-import-editor .ck-content {
+        min-height: 400px !important;
+        max-width: 100% !important;
+        padding: 16px !important;
+    }
+
+    .section-header {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 576px) {
+    .section-header {
+        padding: 14px 16px;
+    }
+
+    .scrollable-content {
+        padding: 12px;
+    }
+
+    .question-card {
+        padding: 12px 14px;
+    }
+}
+
+/* ===== TABVIEW OVERRIDE ===== */
+
+:host ::ng-deep .test-tabview {
+    height: calc(100% - 72.39px) !important;
+}
+
+:host ::ng-deep .p-tabview {
+    height: 100%;
+}
+
+:host ::ng-deep .test-tabview.p-tabview {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+    height: 100%;
+}
+
+:host ::ng-deep .test-tabview .p-tabview-panels {
+    flex: 1;
+    min-height: 0;
+    padding: 0 !important;
+    overflow: hidden;
+    height: calc(100% - 40px);
+}
+
+:host ::ng-deep .test-tabview .p-tabview-panel {
+    height: 100%;
+    overflow: auto;
+}
+
+:host ::ng-deep .test-tabview .p-tabview-nav {
+    padding: 0 16px;
+    background: #fff;
+}
+
+:host ::ng-deep .test-tabview .p-tabview-nav li .p-tabview-nav-link {
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+:host ::ng-deep .test-tabview p-tabpanel {
+    height: 100%;
+}
+
+/* ===== OVERRIDE ROOT FLEX DIV ===== */
+:host ::ng-deep .ovic-is-loading--size-normal.d-flex.flex-column.h-100 {
+    overflow: hidden;
+    min-height: 0;
+    position: relative;
+}
+
+::ng-deep .create-question-tabs .p-tabview-nav {
+    justify-content: center;
+}

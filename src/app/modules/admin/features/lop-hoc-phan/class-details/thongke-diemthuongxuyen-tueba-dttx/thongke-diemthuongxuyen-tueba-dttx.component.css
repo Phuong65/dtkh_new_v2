@@ -1,0 +1,107 @@
+.layout_component_container {
+    display: flex;
+    flex-direction: column;
+}
+
+.layout_component_container-bottom {
+    flex: 1 1 auto;
+    height: 1%;
+    overflow: hidden;
+    overflow-y: auto;
+}
+
+.layout_component_container-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 6px;
+    height: 60px;
+}
+
+.loading-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #393939;
+    background: #fbfbfb;
+
+}
+
+.loading-container i {
+    font-size: 30px;
+}
+
+.dongbo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    font-size: 14px;
+    gap: 4px;
+}
+
+.container-top-right {
+    padding: 6px;
+    height: 50px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+.container-top-right button {
+    height: 100%;
+}
+
+/*----------------import data cc*/
+.btn_upload_excel {
+    width: 200px;
+    height: 100%;
+    background: none;
+    border: 2px dashed #ccc;
+}
+
+.text_in_line {
+    display: block;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.lock_20_pecent:hover {
+    cursor: pointer;
+}
+
+.lock_20_pecent i {
+    font-size: 18px;
+    opacity: 0.4;
+}
+
+.lock_20_pecent .active {
+    color: red;
+    opacity: 1;
+}
+
+.lock_20_pecent .active-true {
+    color: #0caa30;
+    opacity: 1;
+}
+
+.is-false {
+    color: red !important;
+
+}
+
+.is-true {
+    color: #0caa30 !important;
+
+}

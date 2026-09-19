@@ -1,0 +1,20 @@
+.editable-text {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #dadce0;
+  font-size: 14px;
+  padding: 10px;
+  resize: none;
+  overflow: hidden;
+  outline: none;
+  background: transparent;
+}
+
+.editable-text:focus {
+  background: #f2f2f2;
+  border-bottom: 2px solid #673ab7;
+}
+.editable-text-title {
+  background: #f2f2f2;
+  border-bottom: 2px solid #673ab7;
+}

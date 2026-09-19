@@ -1,0 +1,68 @@
+.image-viewer {
+    width: 100%;
+    position: relative;
+    margin: 0 auto;
+    background-position: center center;
+    background-size: cover;
+    height: fit-content;
+    overflow: hidden;
+    text-align: center;
+}
+
+.border-img {
+    border: 1px solid #c8c8c8;
+}
+
+.image-viewer img {
+    display: inline-block;
+    width: 100%;
+}
+
+.tool-button {
+    position: absolute;
+    bottom: 0;
+    text-align: right;
+    left: 0;
+    display: inline-block;
+}
+
+.tool-button .btn {
+    box-shadow: none !important;
+}
+
+.img-picker {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    height: auto;
+    line-height: 1;
+
+}
+
+.img-picker:hover .tool-button {
+    display: block;
+}
+
+.file-name {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.file-name p {
+    word-break: break-all;
+}
+
+.change-image {
+    width: 100%;
+}
+
+.fileManager {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    width: 160px;
+    margin: 0 auto;
+    display: block;
+    height: 100%;
+}

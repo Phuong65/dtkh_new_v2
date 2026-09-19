@@ -1,0 +1,16 @@
+.giangvienkhac-layout {
+    padding: 5px;
+    height: 100%;
+    overflow: auto;
+}
+
+
+.info-none-manage_id{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--orange-500);
+    font-size: 20px;
+    height: 100%;
+    font-weight: 500;
+}

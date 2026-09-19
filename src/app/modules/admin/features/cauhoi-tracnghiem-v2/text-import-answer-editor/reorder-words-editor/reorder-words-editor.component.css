@@ -1,0 +1,240 @@
+/* TOÀN BỘ FONT 13PX & KHÔNG SHADOW */
+.quiz-viewport,
+.quiz-viewport * {
+    font-size: 14px !important;
+    
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.quiz-viewport {
+    background-color: #ffffff;
+    margin: 0;
+    padding: 1rem;
+}
+
+.question-block {
+    margin-bottom: 40px;
+}
+
+/* CĂN LỀ TRÁI */
+.q-index-tag {
+    font-weight: 800;
+    color: #4f46e5;
+    margin-top: 2px;
+    display: inline-block;
+}
+
+.q-content-text {
+    color: #1e293b;
+    line-height: 1.5;
+}
+
+/* STYLE PART TIẾNG ANH */
+.part-header {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-left: 1px solid #e0e7ff;
+    border-radius: 4px;
+}
+
+.part-title-text {
+    font-weight: 800;
+    color: #4f46e5;
+    text-transform: uppercase;
+}
+
+.part-desc-text {
+    color: #6c757d;
+}
+
+/* KHU VỰC SẮP XẾP */
+.sentence-box {
+    min-height: 40px;
+    padding: 3px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 4px;
+    background-color: #f8fafc;
+}
+
+.sentence-box.is-active {
+    border: 1px solid #3b82f6;
+    background-color: #eff6ff;
+}
+
+.placeholder-txt {
+    color: #94a3b8;
+    font-style: italic;
+}
+
+/* THẺ TỪ (CHIPS) */
+.word-chip,
+.word-btn {
+    padding: 3px 10px;
+    margin: 3px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background-color: #ffffff;
+    color: #334155;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.word-chip.active {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+    color: #ffffff;
+}
+
+.word-btn:disabled {
+    opacity: 0.3;
+    cursor: default;
+    background-color: #f1f5f9;
+}
+
+/* ĐÁP ÁN ĐÚNG (GREEN) */
+.correct-box {
+    margin-top: 8px;
+    padding: 10px 14px;
+    background-color: #f0fdf4;
+    border: 1px solid #22c55e;
+    border-radius: 4px;
+}
+
+.audio-custom {
+    height: 30px;
+}
+
+@media (max-width: 1024px) {
+    .pl-md-5 {
+        padding-left: 0 !important;
+    }
+}
+
+.ans-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.584em 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    line-height: 1;
+}
+
+.question-block:last-child {
+    margin-bottom: 0px;
+}
+
+/* --- PHẦN CÂU HỎI --- */
+.question-header-section {
+    background-color: #f5f5f5;
+    /* Màu xám xanh cực nhạt để tách biệt */
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.q-index-tag {
+    color: #4f46e5;
+    /* Blue Indigo */
+    font-weight: 800;
+    /* Chỉ dùng đậm cho số thứ tự để nhận diện */
+    margin-right: 10px;
+    margin-top: 2px;
+}
+
+.q-content-text {
+    color: #475569;
+    /* Màu chữ xám sâu, không dùng đậm để nhẹ mắt */
+    line-height: 1.5;
+}
+
+.quiz-viewport {
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+}
+
+.part-header,
+.question-header-section {
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid #e0e7ff;
+    border-left: 1px solid #e0e7ff;
+    border-radius: 14px;
+}
+
+.question-header-section {
+    padding: 12px 14px !important;
+}
+
+.sentence-box,
+.correct-box {
+    border-radius: 14px;
+}
+
+.word-chip,
+.word-btn,
+.ans-tag {
+    border-radius: 6px !important;
+}
+
+.word-btn:not(:disabled):hover {
+    border-color: #818cf8;
+    background: #eef2ff;
+}
+
+.part-header {
+    background: #f3f6fb !important;
+    border: 1px solid #e5e7eb !important;
+    border-left: 1px solid #e5e7eb !important;
+    border-radius: 6px !important;
+}
+
+.question-block {
+    background: #ffffff;
+    margin-bottom: 24px;
+    padding: 10px 0 0 0px;
+}
+
+.question-header-section {
+    background: #f8fbff !important;
+    border: 1px solid #eef2ff !important;
+    border-left: 1px solid #eef2ff !important;
+    border-radius: 6px !important;
+    padding: 10px 12px !important;
+}
+
+.answer-body-section,
+.sentence-list,
+.sentence-box,
+.correct-box,
+.correct-box-list,
+.ans-card,
+.ans-label,
+.answer-input,
+.form-control,
+.sentence-item,
+.custom-placeholder,
+.cdk-drag-preview,
+.correct-feedback {
+    border-radius: 6px !important;
+}
+
+.answer-body-section,
+.sentence-list,
+.sentence-box {
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: #ffffff !important;
+    border: 1px solid #E0E0E0 !important;
+}
+
+.ans-card,
+.sentence-item,
+.word-chip,
+.word-btn,
+.form-control,
+.answer-input {
+    background: #ffffff;
+    border-color: #e5e7eb !important;
+}

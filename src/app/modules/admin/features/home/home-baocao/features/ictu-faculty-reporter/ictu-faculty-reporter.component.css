@@ -1,0 +1,53 @@
+.ictu-faulty-reporter__tbl-heading {
+    display: block;
+    font-family: "Roboto", sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    line-height: 1.5;
+    margin: 0 0 15px;
+    color: #333333;
+    padding: 0;
+}
+
+.ictu-faculty-reporter__teacher-assignment {
+    line-height: 1.2;
+}
+
+.ictu-faculty-reporter__teacher-assignment__col-index {
+    width: 50px;
+}
+
+.ictu-faculty-reporter__teacher-assignment__col-total-students,
+.ictu-faculty-reporter__teacher-assignment__col-total-hours,
+.ictu-faculty-reporter__teacher-assignment__col-total-classes {
+    width: 100px;
+}
+
+.ictu-faculty-reporter__courses-grade-tbl + .ictu-pagination-widget,
+.ictu-faculty-reporter__teacher-assignment + .ictu-pagination-widget {
+    margin: 30px 0;
+}
+
+.ictu-faculty-reporter__courses-grade-tbl__col-rejected {
+    width: 85px;
+}
+
+.ictu-faculty-reporter__courses-grade-tbl__col-score-number,
+.ictu-faculty-reporter__courses-grade-tbl__col-score-percent {
+    width: 63px;
+}
+
+.ictu-faculty-reporter__courses-grade-tbl__col-code {
+    width: 80px;
+}
+
+.ictu-faculty-reporter__courses-grade-tbl__col-classes,
+.ictu-faculty-reporter__courses-grade-tbl__col-students {
+    width: 52px;
+}
+
+.ictu-faculty-reporter__courses-grade-tbl__col-index {
+    width: 47px;
+}

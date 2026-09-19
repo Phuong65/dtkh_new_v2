@@ -1,0 +1,328 @@
+/* TOÀN BỘ FONT SIZE 13PX */
+.quiz-viewport,
+.quiz-viewport button,
+.quiz-viewport span,
+.quiz-viewport div {
+    font-size: 14px !important;
+    
+    box-shadow: none !important;
+
+}
+
+.quiz-viewport {
+    background-color: #ffffff;
+    margin: 0;
+    padding: 1rem;
+}
+
+/* STYLE PHẦN PART */
+.part-header {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-left: 1px solid #e0e7ff;
+    border-radius: 4px;
+}
+
+.part-title-text {
+    font-weight: 800;
+    color: #4f46e5;
+    text-transform: uppercase;
+}
+
+.part-desc-text {
+    color: #6c757d;
+}
+
+.question-block {
+    margin-bottom: 28px;
+}
+
+.answer-action-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.q-index-tag {
+    font-weight: 800;
+    color: #4f46e5;
+    margin-top: 2px;
+    display: inline-block;
+}
+
+.q-content-text {
+    color: #212529;
+    line-height: 1.5;
+}
+
+.ans-card {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+    height: 100%;
+}
+
+.ans-card:not(.state-readonly):hover {
+    background-color: #f8fafc;
+    border-color: #93c5fd;
+}
+
+.ans-card.state-readonly {
+    cursor: default;
+}
+
+.ans-label {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    background: #f8f9fa;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    border: 1px solid #dee2e6;
+    line-height: 1;
+}
+
+/* PHÂN BIỆT TRÒN / VUÔNG */
+.type-circle .ans-label {
+    border-radius: 50%!important;
+}
+
+.type-square .ans-label {
+    border-radius: 4px!important;
+}
+
+/* MÀU ĐỒNG NHẤT CHO TRẠNG THÁI CHỌN & ĐÚNG */
+.state-active {
+    background-color: #eff6ff !important;
+    border-color: #3b82f6 !important;
+}
+
+.state-active .ans-label {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+    border-color: #3b82f6 !important;
+}
+
+.state-active .ans-txt {
+    /* color: #1d4ed8 !important;
+    font-weight: 700; */
+}
+
+/* MODE SWITCH */
+.mode-switch {
+    width: 160px;
+    height: 32px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    background: #fff;
+}
+
+.switch-knob {
+    width: 26px;
+    height: 26px;
+    background: #6366f1;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    left: 2px;
+    transition: 0.3s ease;
+}
+
+.readonly-on .switch-knob {
+    left: 130px;
+    background: #3b82f6;
+}
+
+.text-mode {
+    width: 100%;
+    text-align: center;
+    font-weight: 700;
+    color: #495057;
+    padding-left: 15px;
+}
+
+/* AUDIO PLAYER & IMAGE */
+.audio-custom {
+    height: 32px;
+    border-radius: 4px;
+}
+
+.ans-img {
+    max-height: 100px;
+    margin-top: 8px;
+}
+
+/* TỐI ƯU 1024PX */
+@media (max-width: 1024px) {
+    .col-3 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    .question-block {
+        margin-bottom: 24px;
+    }
+}
+
+@media (max-width: 576px) {
+    .quiz-viewport {
+        padding: 0.75rem;
+    }
+
+    .col-3,
+    .col-4,
+    .col-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .ans-card {
+        padding: 10px 12px;
+    }
+
+    .answer-action-bar {
+        justify-content: stretch;
+    }
+
+    .answer-action-bar button {
+        width: 100%;
+    }
+}
+
+.question-block:last-child {
+    margin-bottom: 0px;
+}
+
+/* --- PHẦN CÂU HỎI --- */
+.question-header-section {
+    background-color: #f5f5f5;
+    /* Màu xám xanh cực nhạt để tách biệt */
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.q-index-tag {
+    color: #4f46e5;
+    /* Blue Indigo */
+    font-weight: 800;
+    /* Chỉ dùng đậm cho số thứ tự để nhận diện */
+    margin-right: 10px;
+    margin-top: 2px;
+}
+
+.q-content-text {
+    color: #475569;
+    /* Màu chữ xám sâu, không dùng đậm để nhẹ mắt */
+    line-height: 1.5;
+}
+
+.quiz-viewport {
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+}
+
+.part-header,
+.question-header-section {
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid #e0e7ff;
+    border-left: 1px solid #e0e7ff;
+    border-radius: 14px;
+}
+
+.question-header-section {
+    padding: 12px 14px !important;
+}
+
+.part-title-text,
+.q-index-tag {
+    color: #4338ca;
+}
+
+.ans-card {
+    border-color: #e2e8f0;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.92);
+}
+
+.ans-card:not(.state-readonly):hover {
+    background: #f8fafc;
+    border-color: #818cf8;
+    transform: translateY(-1px);
+}
+
+.state-active {
+    background: linear-gradient(135deg, #eef2ff 0%, #eff6ff 100%) !important;
+    border-color: #6366f1 !important;
+}
+
+.answer-action-bar button {
+    border-radius: 6px !important;
+    padding-inline: 18px;
+}
+
+.part-header {
+    background: #f3f6fb !important;
+    border: 1px solid #e5e7eb !important;
+    border-left: 1px solid #e5e7eb !important;
+    border-radius: 6px !important;
+}
+
+.question-block {
+    background: #ffffff;
+    margin-bottom: 24px;
+    padding: 10px 0 0 0px;
+}
+
+.question-header-section {
+    background: #f8fbff !important;
+    border: 1px solid #eef2ff !important;
+    border-left: 1px solid #eef2ff !important;
+    border-radius: 6px !important;
+    padding: 10px 12px !important;
+}
+
+.ans-card,
+.ans-label,
+.ans-tag,
+.ans-tag-correct,
+.answer-input,
+.form-control,
+.sentence-item,
+.word-chip,
+.word-btn,
+.custom-placeholder,
+.cdk-drag-preview,
+.correct-feedback {
+    border-radius: 6px !important;
+}
+
+.answer-body-section,
+.sentence-list,
+.sentence-box {
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: #ffffff !important;
+    border: 1px solid #E0E0E0 !important;
+}
+
+.ans-card,
+.sentence-item,
+.word-chip,
+.word-btn,
+.form-control,
+.answer-input {
+    background: #ffffff;
+    border-color: #e5e7eb !important;
+}

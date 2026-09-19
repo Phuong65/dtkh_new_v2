@@ -1,0 +1,114 @@
+.grouping-question__section__text-guide {
+	display: block;
+	margin-top: 5px;
+	color: #888888;
+}
+
+.grouping-question__disturbed-answers {
+	width: 100%;
+}
+
+.grouping-question__disturbed-answers__heading {
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 1.2;
+	display: block;
+	margin: 25px 0 5px 0;
+	color: #444444;
+}
+
+.drag-and-drop-question__list__input__question-number,
+.drag-and-drop-question__list__input__answer-correct,
+.drag-and-drop-question__list__input__direction,
+.grouping-question__disturbed-answers__input {
+	font-family: 'Roboto', sans-serif;
+	font-size: 14px;
+	line-height: 1.5 !important;
+	padding: 10px !important;
+	border-radius: 0 !important;
+	outline: none !important;
+	box-shadow: none !important;
+	font-weight: 400;
+	margin: 0;
+	width: 100%;
+	height: auto !important;
+}
+
+.drag-and-drop-question__list__input__direction::placeholder {
+	color: #888888;
+}
+
+.drag-and-drop-question__list__input__direction {
+	font-weight: 500;
+	width: calc(100% - 317px - 30px);
+	min-height: 39px;
+}
+
+.drag-and-drop-question__list__input__answer-correct {
+	font-weight: 400;
+	width: calc(317px - 50px);
+	margin: 0 auto 0 30px;
+	min-height: 39px;
+}
+
+.drag-and-drop-question__list {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+}
+
+.drag-and-drop-question__list__btn-add {
+	font-family: 'Roboto', sans-serif;
+	font-size: 14px;
+	line-height: 1.5;
+	outline: none;
+	box-shadow: none !important;
+	color: #333333;
+	font-weight: 500;
+	background-color: #e8e5e5;
+	padding: 10px;
+	height: auto;
+	border: 1px dashed #bbbbbb;
+}
+
+.drag-and-drop-question__list__btn-add i {
+	margin-right: 5px;
+}
+
+.drag-and-drop-question__list__btn-add:hover {
+	background-color: #e3e3e3;
+}
+
+.drag-and-drop-question__list__input {
+	display: flex;
+	justify-content: flex-start;
+	align-items: flex-start;
+	margin-bottom: 10px;
+}
+
+.drag-and-drop-question__list__input__btn-delete {
+	width: 39px;
+	height: 39px !important;
+}
+
+.drag-and-drop-question__list__input__question-number {
+	width: 43px;
+	max-width: 43px;
+	min-width: 43px;
+	height: 43px !important;
+	margin-right: 10px;
+	text-align: center;
+	font-weight: 500;
+	padding: 10px 2px !important;
+}
+
+.drag-and-drop-question__list__input__question-number + .drag-and-drop-question__list__input__direction {
+	width: calc(100% - 317px - 30px - 43px - 5px);
+}
+
+.drag-and-drop-question__list__input__answer-correct::placeholder,
+.drag-and-drop-question__list__input__question-number::placeholder,
+.drag-and-drop-question__list__input__direction::placeholder,
+.grouping-question__disturbed-answers__input::placeholder {
+	color: #999999;
+}

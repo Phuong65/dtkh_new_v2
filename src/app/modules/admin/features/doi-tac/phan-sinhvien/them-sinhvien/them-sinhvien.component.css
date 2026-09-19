@@ -1,0 +1,58 @@
+.themsv-container{
+    display: flex;
+    flex-direction: column;
+    height:100%;
+    width:100%;
+
+}
+.themsv-head{
+    height:50px;
+    border:1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding:0 10px;
+}
+
+.themsv-head_r{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.themsv-body{
+    flex :1 1 auto;
+    height:1%;
+    border:1px solid #ccc;
+
+}
+.themsv-bottom{
+    height:50px;
+    border:1px solid #ccc;
+    display: flex;
+    flex-direction: row;
+    align-items:center;
+    justify-content: space-between;
+}
+.btn_upload_excel{
+    width: 200px;
+    height: 30px;
+    background: none;
+    border: 2px dashed #ccc;
+    font-size: 14px;
+    font-family: "Roboto", sans-serif;
+}
+.text_in_line{
+    line-height: 1;
+    display: block;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.have-use{
+    /*background: #ffc5c5;*/
+}
+.have-use> td{
+    color: red !important;
+}

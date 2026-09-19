@@ -1,0 +1,48 @@
+.sl-cm-container{
+    border: 1px solid #ccc;
+    padding: 8px;
+}
+.list-sl {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    padding-top: 10px;
+    border-top: 1px solid #ccc;
+}
+
+.item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 13px;
+    background: #dcecf7;
+    padding: 6px 14px;
+    border-radius: 50px;
+    position: relative;
+}
+
+
+.item .title {
+    font-size: 14px;
+}
+.item .bt-times{
+    /*position: absolute;*/
+    /*top:0;*/
+    /*right:0;*/
+
+}
+.item .bt-times button{
+    width:20px;
+    height:20px;
+    border-radius: 50px !important;
+}
+.checkbox-layout-form-parent{
+    display:flex;
+    flex-wrap: wrap;
+    gap:10px;
+    width:100%;
+}
+.checkbox-layout-form{
+    width: calc(100% / 4);
+}
+

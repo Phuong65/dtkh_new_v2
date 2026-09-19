@@ -1,0 +1,16 @@
+﻿import { Component, DragAndDropBaseComponent , IctuTestQuestionTypeComponentBase   , OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import {RouterModule} from '@angular/router';
+
+@Component({
+    selector: 'question-type-drag-drop',
+    templateUrl: './question-type-drag-drop.component.html',
+    styleUrls: [ './question-type-drag-drop.component.css' ],
+})
+export class QuestionTypeDragDropComponent implements OnInit {
+    constructor() {}
+    ngOnInit(): void {}
+}
+
+
+

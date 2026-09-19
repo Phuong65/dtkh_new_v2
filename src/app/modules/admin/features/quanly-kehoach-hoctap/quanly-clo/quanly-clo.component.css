@@ -1,0 +1,155 @@
+.clo-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+
+.clo-container-left {
+    height: 100%;
+    width: 500px;
+    border-right: 1px solid #c8c8c8;
+    background-color: #EEEEEE;
+    overflow: auto;
+}
+
+.clo-container-right {
+    height: 100%;
+    width: calc(100% - 500px);
+    border-right: 1px solid #c8c8c8;
+    display: flex;
+    flex-direction: column;
+}
+
+.info-course {
+    padding: 10px;
+}
+
+.info-course-content {
+    background-color: #faedc4;
+    padding: 10px;
+    font-size: 14px;
+}
+
+.info-course-content label {
+    width: 150px;
+    margin: 0px;
+    font-weight: 500;
+}
+
+.info-course-item {
+    margin-bottom: 10px;
+}
+
+.form-add-clo {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.menu-clo {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.button-parent-clo {
+    width: 30px;
+    height: 30px !important;
+}
+
+.parent-lesson-layout {
+    border: 1px solid #dee2e6;
+
+}
+
+.parent-lesson-layout:first-child {
+    margin-top: 0px;
+}
+
+.parent-lesson-layout {
+    margin: 10px;
+    background-color: #fff;
+    margin-left: 0px;
+    margin-right: 0px;
+    border-left: none;
+    border-right: none;
+}
+
+.parent-name {
+    border-color: #dee2e6;
+    color: #343a40;
+    /* padding: 1rem; */
+    border-bottom: 1px solid #dee2e6;
+    background: #f5f9ff;
+    font-weight: 700;
+    transition: box-shadow 0.2s;
+    font-size: 14px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    display: flex;
+    padding: 0 6px;
+    align-items: center;
+}
+
+.parent-name-layout {
+    padding: 1rem;
+    flex: 1;
+    cursor: pointer;
+}
+
+.parent-desc-content {
+    background: #caf1d8;
+    border-left: 3px solid #004ef9;
+}
+
+.parent-name .action-menu {
+    padding-right: 5px;
+}
+
+.action-menu .fa.fa-trash {
+    color: red;
+}
+
+.action-menu {
+    display: flex;
+    align-items: center;
+    line-height: 1;
+    background-color: transparent;
+}
+
+.parent-name .action-menu {
+    background-color: transparent;
+}
+
+.parent-name-layout .action-menu {
+    padding-left: 10px;
+}
+
+.action-menu .action-icon:last-child {
+    margin-right: 5px;
+}
+
+.action-icon {
+    cursor: pointer;
+    background-color: transparent;
+}
+
+.action-icon {
+    margin-left: 5px;
+    padding: 5px;
+}
+
+.action-icon .fa-pencil {
+    color: #007bff;
+}
+
+.clo-container-right-bottom {
+    border-top: 1px solid #c8c8c8;
+    padding: 5px;
+    text-align: right;
+    background: #fff;
+}
+
+.clo-container-right-top {
+    padding: 10px;
+    height: calc(100% - 41px);
+    overflow: auto;
+}

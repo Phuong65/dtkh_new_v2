@@ -1,0 +1,20 @@
+.imgchecksize {
+    max-height: 100%;
+    width: auto;
+}
+.btn-avata {
+    height: 100%;
+    border: 2px dashed #ccc;
+}
+@media(max-width:1024px) {
+    .imgchecksize {
+        max-height: unset;
+        width: 100%;
+    }
+
+    .imgchecksize.vertical {
+        width: unset;
+        height: 100%;
+    }
+
+}

@@ -1,0 +1,106 @@
+.box-dashed-setting {
+    padding: 15px;
+    padding-left: 30px;
+}
+
+.form-add-chucnang {
+    padding: 15px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    margin-bottom: 15px;
+}
+
+input[type=file] {
+    max-width: 100%;
+    color: #444;
+    padding: 5px !important;
+    background: #fff;
+    line-height: 1 !important;
+}
+
+input[type=file]::file-selector-button {
+    border: 1px solid #c8c8c8;
+    background-color: #058bff;
+    height: 100%;
+    color: #fff;
+}
+
+input{
+    height: 35px!important;
+}
+
+.ovic-media-files .call-file-picker {
+    color: #212529;
+    background-color: #f6f6f6;
+    border-color: #eeeeee;
+    font-size: 13px;
+}
+
+.files-list {
+    border: solid 1px #c8c8c8;
+    display: block;
+    padding: 15px;
+    background: #fff;
+}
+
+.call-file-picker {
+    width: 100%;
+    margin-left: 0px !important;
+
+}
+
+.files-list .single-file {
+    display: flex;
+    padding: 0 0 15px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-grow: 1;
+    border-bottom: dashed 1px #979797;
+}
+
+.files-list .single-file:last-child {
+    border: none;
+    padding-bottom: 0;
+}
+
+.files-list .single-file .btn-delete {
+    margin-left: 8px;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    font-size: 17px;
+    color: #aaaaaa;
+}
+
+.files-list .single-file .btn-delete:hover {
+    color: #e45045;
+}
+
+.files-list .single-file .name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #353f4a;
+    margin: 0;
+}
+
+.files-list .single-file>img {
+    width: 34px;
+}
+
+.files-list .single-file .size {
+    font-size: 12px;
+    font-weight: 500;
+    color: #a4a4a4;
+    margin: 0;
+}
+
+.files-list .single-file .info {
+    width: 100%;
+    padding-left: 7px;
+}
+
+.single-file{
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}

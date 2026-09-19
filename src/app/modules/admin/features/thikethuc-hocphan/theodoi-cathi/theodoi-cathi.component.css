@@ -1,0 +1,156 @@
+.layout_component_container-header {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    border-bottom: 1px solid #c8c8c8;
+}
+
+.layout_component_container-header-action {
+    display: flex;
+    align-items: center;
+}
+
+
+.layout_component_container-header-action ovic-dropdown {
+    margin-left: 5px;
+}
+
+.layout_component_container-bottom-table {
+    padding: 5px;
+    height: calc(100% - 40px);
+    overflow: auto;
+}
+
+.shift-name {
+    display: flex;
+    align-items: center;
+}
+
+.layout_component_container-bottom {
+    height: calc(100% - 41px);
+}
+
+.status-shift {
+    padding: 5px 8px;
+    width: 100%;
+    display: block;
+}
+
+.status-deactive {
+    background-color: #E0E0E0;
+}
+
+.status-activite {
+    color: #fff;
+    background-color: #1da750;
+}
+
+.status-done {
+    color: #333;
+    background-color: orange;
+}
+
+.layout-password-shift {
+    position: relative;
+    margin: 0 auto;
+    width: 300px;
+    /* padding: 20px; */
+    padding: 5px;
+    border: 1px solid #dee2e6;
+    background: rgba(0, 0, 0, .1);
+}
+
+.btn-refresh-password {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+}
+
+.password-shift-show {
+    text-align: center;
+    padding: 20px;
+    font-weight: 500;
+    letter-spacing: 5px;
+}
+
+.margin-right-10px {
+    margin-right: 10px;
+}
+
+.fa-plus.margin-right-10px,
+.fa-check-circle-o.margin-right-10px {
+    color: #28a745;
+}
+
+
+.fa-pencil.margin-right-10px {
+    color: #004ef9;
+}
+
+.fa-trash.margin-right-10px {
+    color: red;
+}
+
+.fa-circle.margin-right-10px {
+    color: orange;
+}
+
+.width-16px {
+    width: 16px;
+    display: inline-block;
+}
+
+.room-table-phanquyencoithi {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    transition: all 0.3s;
+    overflow: hidden;
+}
+
+.room-table-phanquyencoithi-left {
+    height: 100%;
+    width: 700px;
+    padding: 10px;
+    overflow: auto;
+}
+
+.room-table-phanquyencoithi-rigth {
+    height: 100%;
+    width: 300px;
+    margin-right: -300px;
+    border-left: 1px solid #c8c8c8;
+    overflow: hidden;
+    line-height: 1.25;
+}
+
+.show-list-teacher {
+    margin-right: 0px;
+}
+
+.room-table-phanquyencoithi-rigth-header {
+    padding: 5px;
+    border-bottom: 1px solid #c8c8c8;
+    font-weight: 600;
+    font-size: 14px;
+    background-color: #3b82f6;
+    color: #fff;
+    /* height: 30px; */
+    display: flex;
+    align-items: center;
+}
+
+.room-table-phanquyencoithi-rigth-body {
+    height: calc(100% - 82px);
+}
+
+.item-teacher {
+    padding: 5px;
+    /* background: #c0dd7ad6; */
+    border-bottom: 1px dashed #c8c8c8;
+}
+
+.item-teacher:last-child {
+    border-bottom: 0px;
+    margin-bottom: 0px;
+}

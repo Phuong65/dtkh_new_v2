@@ -1,0 +1,16 @@
+.view-test-body {
+    height: 100%;
+    overflow: auto;
+    width: 100%;
+    background-color: #eaeaea;
+    padding: 15px;
+}
+
+.view-test-body-content {
+    font-size: 14px;
+    width: 21cm;
+    margin: 0 auto;
+    padding: 1cm;
+    background-color: #fff;
+    box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em, rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
+}

@@ -1,0 +1,364 @@
+.mail-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 60px);
+    padding: 20px;
+    background: #fbfbfb;
+
+}
+
+.mail-head {
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.mail-head_l {
+
+}
+
+
+.mail-head_r {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+
+}
+
+.mail-head_r button {
+    width: 160px;
+    height: 100%;
+    border-radius: 10px !important;
+}
+
+.mail-head_l .input {
+    height: 40px;
+    border-radius: 10px;
+}
+
+.mail-head_l .input input {
+    width: 200px;
+    border-radius: 10px !important;
+}
+.mail-head_r .icon {
+    padding: 10px;
+    background: #f3f1f1;
+    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mail-head_r .icon.active {
+    background: #d4d4d4;
+}
+
+
+.mail-head_r .icon:hover {
+    cursor: pointer;
+    background: #d4d4d4;
+
+}
+
+.mail-head_r .pani {
+    height: 40px;
+}
+
+.mail-body {
+    height: 1%;
+    flex: 1 1 auto;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #dedede;
+    border-radius: 10px;
+}
+
+/*------------------form----------------*/
+.role-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.role-item {
+
+}
+
+.role-item button {
+    border-radius: 20px !important;
+    height: 40px;
+}
+
+.send-form {
+    display: flex;
+    flex-direction: row-reverse;
+    width: 100%;
+    height: 100%;
+    gap: 14px;
+}
+
+.send-form_l {
+    width: 400px;
+}
+
+.send-form_r {
+    width: 1%;
+    flex: 1 1 auto;
+}
+.item-for-select {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.checkbox-layout-form-parent {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+    font-size: 14px;
+    margin-top: 10px;
+}
+.selectCLass{
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    line-height: 1;
+    margin-top: 10px;
+}
+/*-----------------------Data--------------------*/
+.list-data{
+    height: 100%;
+    padding: 20px 10px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: hidden;
+    overflow-y: scroll;
+}
+.list-data .item{
+    height: 64px;
+    display: flex;
+    flex-direction: row;
+    border: 1px solid #dfdfdf;
+    /* text-align: center; */
+    border-radius: 10px;
+    align-items: center;
+    /*padding: 12px;*/
+    width:100%;
+}
+.list-data .item:hover{
+    cursor: pointer;
+    background: #c2e7ff !important;
+}
+.list-data .item:nth-child(even){
+    background: #f7f7f7;
+}
+.item .item-btn{
+    position: absolute;
+    gap:10px;
+
+    z-index: 10;
+    background: #fff;
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    /*height: 50px;*/
+    right: 10px;
+    display: none;
+    box-shadow: 0 8px 24px rgba(27, 46, 94, .12);
+}
+.item .item-btn button{
+    width: 40px;
+    height: 40px;
+    border-radius: 6px !important;
+}
+
+.item:hover .item-btn{
+    display: flex;
+}
+.item .item-l ,.item .item-r{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.item .item-r{
+    flex: 1 1 auto;
+    width: 1%;
+
+}
+
+.item .check-box{
+    height: 100%;
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.item .user{
+    padding: 12px;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    max-width: 200px;
+    width: 100%;
+    align-items: center;
+    gap: 10px;
+    font-size: 13.5px;
+    font-weight: 500;
+
+}
+.item .user img{
+    width:30px;
+    height:30px;
+    border-radius:10px;
+}
+
+.item .start{
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ccc;
+}
+.item .start i{
+    font-size: 16px;
+}
+.item .content{
+    width: 1%;
+    flex: 1 1 auto;
+
+}
+.content_title{
+    font-size: 13.5px;
+    /* font-weight: 500; */
+    line-height: 1;
+    height: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #4a4a4a;
+}
+.item .file{
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #eee;
+    border-radius: 10px;
+
+}
+.item .user_seen{
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #eee;
+    border-radius: 10px;
+    color:#000000;
+    font-size:14px;
+
+
+}
+.item .date{
+    /*width:200px;*/
+    text-align: end;
+    padding: 20px;
+    font-size: 13.5px;
+    font-family: Roboto, sans-serif;
+    font-style: italic;
+}
+/*---------------info---------------------*/
+.view-container{
+    padding:25px;
+    display: flex;
+    flex-direction: column;
+    height:100%;
+    width:100%;
+}
+.view-h{
+    height: 60px;
+    border: 1px solid #ededed;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-radius: 10px;
+    align-items: center;
+    padding: 12px;
+}
+.view-h_l{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+}
+.view-h_l button ,
+.view-h_r button{
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+    border-radius: 12px !important;
+}
+
+.view-h_l-user{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.view-h_l-user_avatar{
+    width:30px;
+    height:30px;
+}
+.view-h_l-user_avatar img{
+    width: 100%;
+    border-radius: 50%;
+}
+
+.view-h_l-user_name{
+    font-size:14px;
+}
+
+.view-h_r{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    font-size: 13.5px;
+    font-style: italic;
+    color: #5d5d5d;
+}
+.view-body{
+    overflow: hidden;
+    overflow-y: scroll;
+}
+
+
+.view-body_content{
+    padding:10px 0;
+}
+
+.view-body_file{
+    border-top: 1px solid #e7e7e7;
+    padding-top: 20px;
+    margin-top: 20px;
+
+}
+
+.view-body_file-title{
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom:10px;
+}

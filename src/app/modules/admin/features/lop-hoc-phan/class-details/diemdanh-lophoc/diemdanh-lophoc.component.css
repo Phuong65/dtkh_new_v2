@@ -1,0 +1,22 @@
+.diemdanh-layout {
+    height: 100%;
+    width: 100%;
+}
+
+.normal-td-diem-danh {
+    transition: all 0.3s;
+}
+
+.diemdanh-activity {
+    width: 250px !important;
+}
+
+.diemdanh-P{
+    color:#0caa30;
+}
+.diemdanh-K{
+    color:#ff494b;
+}
+.diemdanh-M{
+    color:#F59E0B;
+}

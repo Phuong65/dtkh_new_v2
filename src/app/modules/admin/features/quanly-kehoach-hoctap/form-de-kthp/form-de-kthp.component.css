@@ -1,0 +1,75 @@
+.layout-form-details {
+    height: 100%;
+}
+
+.layout-form-details-body {
+    height: calc(100% - 51px);
+    padding: 10px;
+    overflow: auto;
+}
+
+.layout-form-details-footer {
+    padding: 10px;
+    text-align: right;
+    border-top: 1px solid #c8c8c8;
+}
+
+.form-detail-summary {
+    text-align: right;
+}
+
+
+.display-none {
+    display: none;
+}
+
+.tag-cdr-cauhoi-percent {
+    padding: 0px;
+    border-radius: 0px;
+    border-left: none;
+    width: 60px;
+}
+
+.require-cdr-backgroud-color th,
+.require-cdr-backgroud-color input,
+.require-cdr-backgroud-color span,
+.require-cdr-backgroud-color td {
+    color: red !important;
+}
+
+.no-question-input {
+    display: flex;
+    height: 30px;
+    justify-content: center;
+    align-items: center;
+}
+
+.public-class-question {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    background: #e9ecef;
+    min-width: 70px;
+    justify-content: center;
+}
+
+.private-class-question {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    background: #fa8e42;
+    justify-content: center;
+    min-width: 70px;
+}
+
+.private-color {
+    background-color: #fa8e42;
+    color: #333;
+}
+
+.question_take_total {
+    display: flex;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+}

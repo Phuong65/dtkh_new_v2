@@ -1,0 +1,31 @@
+<div class="redirect-uri-call-back-layout d-flex">
+	<div class="redirect-uri-call-back-layout__inside d-flex justify-content-center align-items-center">
+		<ng-container [ngSwitch]="state">
+			<ng-container *ngSwitchCase="'loading'">
+				<div
+					class="redirect-uri-call-back-layout__content d-flex justify-content-center align-items-center flex-column">
+					<h4 class="redirect-uri-call-back-layout__heading font-roboto f-14 fw-normal">Loading...</h4>
+					<p-progressBar mode="indeterminate" [style]="{ height: '6px' }"></p-progressBar>
+				</div>
+			</ng-container>
+			<ng-container *ngSwitchCase="'checking'">
+				<div
+					class="redirect-uri-call-back-layout__content d-flex justify-content-center align-items-center flex-column">
+					<h4 class="redirect-uri-call-back-layout__heading font-roboto f-14 fw-normal">Processing...</h4>
+					<p-progressBar mode="indeterminate" [style]="{ height: '6px' }"></p-progressBar>
+				</div>
+			</ng-container>
+			<ng-container *ngSwitchCase="'invalid'">
+				<div class="alert alert-danger m-0" style="border-radius: 4px;">
+					<h4 class="redirect-uri-call-back-layout__heading font-roboto f-14 fw-normal m-0">Invalid</h4>
+				</div>
+			</ng-container>
+			<ng-container *ngSwitchCase="'error'">
+				<div class="alert alert-danger m-0" style="border-radius: 4px;">
+					<h4 class="redirect-uri-call-back-layout__heading font-roboto f-14 fw-normal m-0">Không thể kết nối
+						với máy chủ.</h4>
+				</div>
+			</ng-container>
+		</ng-container>
+	</div>
+</div>

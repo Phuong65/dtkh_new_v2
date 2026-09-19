@@ -1,0 +1,127 @@
+.cdr-container {}
+
+.cdr_hd {
+    font-family: Roboto, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.table-thamdinh {
+    font-family: Roboto, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.table-thamdinh td {
+    padding: 12px 8px;
+}
+
+td, th {
+    border: 1px solid #D8c8c8;
+    text-align: left;
+    padding: 8px;
+}
+
+
+.table_header {
+    background: #E6EDFB;
+}
+
+.table_header th:first-child,
+.table_header th:nth-child(2) {
+    width: 130px;
+}
+
+.table_header th:first-child,
+.table_header th:nth-child(3) {
+    width: 130px;
+}
+
+
+.table_body-item td {
+    text-align: center;
+
+}
+
+.table_body-item.orther td:first-child {
+    text-align: start;
+}
+
+.table_body-item .Dat {
+    color: #0085FF;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.table_body-item .choduyet {}
+
+.table_body-item .chuadat {
+    color: #FF0000;
+
+}
+
+.table_header .th_tb_all {
+    width: calc(100% / 5);
+    height: 40px;
+}
+
+td.DAT {
+    color: #0085FF;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+
+.dasua {
+    color: #8f48d2;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.chuanhanxet {
+    color: #9e9e9e;
+}
+
+.danhanxet {
+    color: #188a42;
+}
+
+.date_duyet {
+    font-size: 11px;
+    color: #6c757d;
+}
+
+
+.action-icon {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    margin-left: 5px;
+    padding: 3px;
+    cursor: pointer;
+}
+
+.action-icon i {
+    font-size: 16px;
+}
+
+.status-is-active {
+    color: #0085FF;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.status-is-deactive {
+    /* font-size: 16px;
+    font-weight: 500; */
+}
+
+.status-is-redo {
+    color: red;
+    font-weight: 500;
+}
+
+.status-is-require {
+    color: #8f48d2;
+    font-weight: 500;
+}

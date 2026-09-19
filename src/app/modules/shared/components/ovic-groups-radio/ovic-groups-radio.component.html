@@ -1,0 +1,10 @@
+<ul  class="ovic-radios {{classes + ' '+ classOrther}} " [ngClass]="verticalMode ? 'ovic-radios--vertical': 'ovic-radios--horizontal'">
+    <li *ngFor="let elm of options ; let i=index" class="{{setActiveLi(i)}}" 
+        [ngClass]="verticalMode ? 'ovic-radios__elm' : ''.concat('ovic-radios__elm ','layout-',columns.toString(),'-columns')">
+        <button [disabled]="disabled" class="ov-btn-radio" [ngClass]="index === i ? 'active' : null " (click)="updateValue(elm[optionId],i)">
+            <span class="ov-prefix"></span>
+            <span class="ovic-radios__text" *ngIf="!rawHtml">{{elm[optionLabel]}}</span>
+            <p class="ovic-radios__text" *ngIf="rawHtml" [innerHTML]="transform(elm[optionLabel])"></p>
+        </button>
+    </li>
+</ul>

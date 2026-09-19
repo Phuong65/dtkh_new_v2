@@ -1,0 +1,75 @@
+.layout_component_container-header {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    border-bottom: 1px solid #c8c8c8;
+}
+
+.layout_component_container-header-action {
+    display: flex;
+    align-items: center;
+}
+
+
+.layout_component_container-header-action ovic-dropdown {
+    margin-left: 5px;
+}
+
+.layout_component_container-bottom-table {
+    padding: 5px;
+    height: calc(100% - 40px);
+    overflow: auto;
+}
+
+.layout_component_container-bottom {
+    height: calc(100% - 41px);
+}
+
+.shift-name {
+    display: flex;
+    align-items: center;
+}
+
+.status-deactive {
+    background-color: #E0E0E0;
+}
+
+.status-activite {
+    color: #fff;
+    background-color: #1da750;
+}
+
+.margin-right-10px {
+    margin-right: 10px;
+}
+
+.fa-plus.margin-right-10px,
+.fa-check-circle-o.margin-right-10px {
+    color: #28a745;
+}
+
+.fa-pencil.margin-right-10px {
+    color: #004ef9;
+}
+
+.fa-trash.margin-right-10px {
+    color: red;
+}
+
+.width-16px {
+    width: 16px;
+    display: inline-block;
+}
+
+.status-shift {
+    padding: 5px 8px;
+    width: 100%;
+    display: block;
+}
+
+.layout-info-form-de {
+    border-radius: 6px;
+    background-color: var(--green-100);
+    padding: 15px;
+    font-size: 14px;
+}

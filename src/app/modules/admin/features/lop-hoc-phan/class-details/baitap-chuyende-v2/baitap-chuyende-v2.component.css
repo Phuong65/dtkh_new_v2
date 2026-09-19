@@ -1,0 +1,28 @@
+.baitap-chuyende-layout {
+    background-color: #eee;
+    height: 100%;
+    /* padding: 15px; */
+}
+
+.step-sync-plans {
+    background: #fff;
+    /* padding: 15px; */
+    border: 1px solid var(--primary);
+    border-radius: 6px;
+}
+
+.step-sync-plans-header {
+    padding: 10px;
+    background: var(--blue-500);
+    color: #fff;
+    font-weight: 600;
+}
+
+.step-sync-plans-body {
+    padding: 10px;
+}
+
+.step-sync-plans-body-step-content {
+    padding: 10px;
+    margin-top: 20px;
+}

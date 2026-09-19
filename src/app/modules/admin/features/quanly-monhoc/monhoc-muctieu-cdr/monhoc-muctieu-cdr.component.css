@@ -1,0 +1,84 @@
+.layout_component_container {
+    background-color: #f2f2f2;
+}
+
+.editor-in-table {
+    border: none;
+    width: 100%;
+    box-shadow: none;
+    outline: none;
+    line-height: 1.5;
+    padding: 5px;
+}
+
+.text-innerhtml-raw {
+    white-space: pre-wrap
+}
+
+.check-course-muctieu {
+    cursor: pointer;
+}
+
+.check-course-muctieu i {
+    font-size: 16px;
+}
+
+.check-course-muctieu .fa-square-o {
+    color: #E0E0E0;
+}
+
+.plo-container {
+    font-size: 13px;
+    /* Font size theo yêu cầu */
+    overflow: auto;
+    height: 100%;
+    padding: 10px!important;
+}
+
+.plo-container .card {
+    border: 1px solid #dee2e6;
+}
+
+.plo-container .card-header {
+    border-bottom: 1px solid #dee2e6;
+}
+
+.plo-container input[type=checkbox] {
+    width: 14px;
+    box-shadow: none;
+    outline: none;
+}
+
+/* Loại bỏ margin thừa từ thẻ <p> trong noidung (từ CKEditor/HTML) */
+::ng-deep .plo-container .plo-content p,
+::ng-deep .plo-container .pi-content p {
+    display: inline;
+    margin-bottom: 0;
+}
+
+.plo-container .custom-control-label {
+    cursor: pointer;
+    padding-top: 2px;
+    margin-bottom: 0px;
+}
+
+.plo-container .list-group-item {
+    border-color: #f1f1f1;
+    transition: background 0.2s;
+}
+
+.plo-container .list-group-item:hover {
+    background-color: #fcfcfc;
+}
+
+.plo-container .badge {
+    font-size: 11px;
+}
+
+::ng-deep .overlay-ctdt-cdr .p-overlaypanel-content {
+    padding: 10px;
+}
+
+.activity-cell-clo {
+    background-color: #faedc4;
+}

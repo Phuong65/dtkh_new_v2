@@ -1,0 +1,26 @@
+.status-is-active {
+    color: #28a745;
+}
+
+.status-is-deactive {
+    color: #BDBDBD;
+}
+
+.status-is-redo {
+    color: red;
+}
+
+.status-is-require {
+    color: #8f48d2;
+}
+
+.layout-ketqua-duyet {
+    padding: 15px;
+    height: 100%;
+    overflow: auto;
+}
+
+tr, td, th {
+    border: 1px solid #dee2e6;
+    border-width: 1px 1px 1px 1px !important;
+}

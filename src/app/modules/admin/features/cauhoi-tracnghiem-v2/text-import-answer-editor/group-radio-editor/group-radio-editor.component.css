@@ -1,0 +1,167 @@
+/* FONT 14PX */
+.quiz-viewport,
+.quiz-viewport button,
+.quiz-viewport span,
+.quiz-viewport div {
+    font-size: 14px !important;
+    box-shadow: none !important;
+}
+
+.quiz-viewport {
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    margin: 0;
+    padding: 1rem;
+}
+
+/* PART HEADER */
+.part-header {
+    background: #f3f6fb !important;
+    border: 1px solid #e5e7eb !important;
+    border-left: 1px solid #e5e7eb !important;
+    border-radius: 6px !important;
+}
+
+.part-title-text {
+    font-weight: 800;
+    color: #4338ca;
+    text-transform: uppercase;
+}
+
+.part-desc-text {
+    color: #6c757d;
+}
+
+/* QUESTION BLOCK */
+.question-block {
+    background: #ffffff;
+    margin-bottom: 24px;
+    padding: 10px 0 0 0;
+}
+
+.question-block:last-child {
+    margin-bottom: 0;
+}
+
+/* QUESTION HEADER */
+.question-header-section {
+    background: #f8fbff !important;
+    border: 1px solid #eef2ff !important;
+    border-left: 1px solid #eef2ff !important;
+    border-radius: 6px !important;
+    padding: 10px 12px !important;
+}
+
+.q-index-tag {
+    color: #4338ca;
+    margin-right: 5px;
+    margin-top: 2px;
+    display: inline-block;
+    font-weight: normal;
+}
+
+.q-content-text {
+    color: #475569;
+    line-height: 1.5;
+}
+
+::ng-deep .question-header-section-group-radio .ck-editor__editable p:first-child {
+    margin-top: 0 !important;
+}
+
+::ng-deep .question-header-section-group-radio .ck-editor__editable p:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* AUDIO */
+.audio-custom {
+    height: 32px;
+    border-radius: 4px;
+}
+
+/* ANSWER CARD */
+.ans-card,
+.ans-label {
+    border-radius: 6px !important;
+}
+
+.ans-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+    height: 100%;
+}
+
+.ans-card:hover {
+    background: #f8fafc;
+    border-color: #818cf8;
+    transform: translateY(-1px);
+}
+
+.ans-label {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    background: #f8f9fa;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    border: 1px solid #dee2e6;
+    line-height: 1;
+}
+
+/* TRÒN / VUÔNG */
+.type-circle .ans-label {
+    border-radius: 50%!important;
+}
+
+.type-square .ans-label {
+    border-radius: 4px!important;
+}
+
+/* STATE ACTIVE */
+.state-active {
+    background: linear-gradient(135deg, #eef2ff 0%, #eff6ff 100%) !important;
+    border-color: #6366f1 !important;
+}
+
+.state-active .ans-label {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+    border-color: #3b82f6 !important;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+    .col-3 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    .question-block {
+        margin-bottom: 24px;
+    }
+}
+
+@media (max-width: 576px) {
+    .quiz-viewport {
+        padding: 0.75rem;
+    }
+
+    .col-3,
+    .col-4,
+    .col-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .ans-card {
+        padding: 10px 12px;
+    }
+}

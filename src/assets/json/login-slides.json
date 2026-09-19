@@ -1,0 +1,30 @@
+[
+  { 
+    "btnLabel"   : "Xem chi tiết",
+    "btnLink"    : "https://hcmcons.vn/tin-tuc/chuong-trinh-khai-giang-dao-tao-trinh-do-thac-si-khoa-31-645.html",
+    "heading"    : "LỄ KHAI GIẢNG 2023",
+    "subHeading" : "Lễ khai giảng trình độ thạc sĩ khoá 31 - năm 2023",
+    "src"        : "assets/images/login-lcms/slides/khaigiang_01.jpg"
+  },
+  { 
+    "btnLabel"   : "Xem chi tiết",
+    "btnLink"    : "https://hcmcons.vn/tin-tuc/chuong-trinh-khai-giang-dao-tao-trinh-do-thac-si-khoa-31-645.html",
+    "heading"    : "Đêm nhạc Rachmaninoff và Brahms",
+    "subHeading" : "ối 21/10/2023, tại phòng hòa nhạc Nhạc viện TP. Hồ Chí Minh diễn ra chương trình hòa nhạc...",
+    "src"        : "assets/images/login-lcms/slides/hoanhac_02.jpg"
+  },
+  { 
+    "btnLabel"   : "Xem chi tiết",
+    "btnLink"    : "https://hcmcons.vn/tin-tuc/chuong-trinh-khai-giang-dao-tao-trinh-do-thac-si-khoa-31-645.html",
+    "heading"    : "Đêm nhạc Rachmaninoff và Brahms",
+    "subHeading" : "Tối 21/10/2023, tại phòng hòa nhạc Nhạc viện TP. Hồ Chí Minh diễn ra chương trình hòa nhạc...",
+    "src"        : "assets/images/login-lcms/slides/hoanhac_03.jpg"
+  },
+  { 
+    "btnLabel"   : "Xem chi tiết",
+    "btnLink"    : "https://hcmcons.vn/tin-tuc/chuong-trinh-khai-giang-dao-tao-trinh-do-thac-si-khoa-31-645.html",
+    "heading"    : "Đêm nhạc Rachmaninoff và Brahms",
+    "subHeading" : "Tối 21/10/2023, tại phòng hòa nhạc Nhạc viện TP. Hồ Chí Minh diễn ra chương trình hòa nhạc...",
+    "src"        : "assets/images/login-lcms/slides/hoanhac_04.jpg"
+  }
+]

@@ -1,0 +1,9 @@
+<audio #audioRef *ngIf="hasMedia && type === 'audio'" class="chamthi-audio-speaking" controls>
+    <source [src]="src" type="audio/mpeg">
+    Your browser does not support the audio tag.
+</audio>
+<div *ngIf="hasMedia && type === 'video'">
+    <video #video (seeking)="seeking(video)" [src]="src" [width]="width" [height]="height" controls>
+        Your browser does not support the video tag.
+    </video>
+</div>

@@ -1,0 +1,16 @@
+<div class="group-radio-v2 {{styleClass}} {{show_image?'group-radio-image':''}}"
+    [ngClass]="verticalMode? 'vertical-radio':'hoziron-radio'">
+    <div [ngClass]="!verticalMode || show_image?'hoziron-radio-'.concat(columns.toString()):''"
+        class="radio-item-v2 {{disabled || item['disabled']?'pointer-events-none':''}} {{ item['disabled']?'fade-label':''}}"
+        *ngFor="let item of options, index as i">
+        <div [ngClass]="abc_type?'abc-type-radio':''" class="radio-item-item-v2" (click)="onChooseItem(item[optionId])">
+            <input [checked]="default.includes(item[optionId].toString())? true: false"
+                style="width: 18px; height: 18px!important;" type="checkbox" [value]="item[optionId]"
+                [name]="group_name">
+            <span *ngIf="abc_type" class="custom-label-abc">{{key_answer[i]['key']}}.</span>
+            <div [appLoadMediaOnText]="item[optionId]" #answerRadio class="group-radio-text-v2"
+                [innerHTML]="item[optionLabel] | safeHtml">
+            </div>
+        </div>
+    </div>
+</div>

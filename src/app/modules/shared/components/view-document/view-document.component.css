@@ -1,0 +1,91 @@
+.viewGoogleDoc-section {
+    height: calc(100vh - 0px) !important;
+}
+
+.viewGoogleDoc-body {
+    padding: 0px !important;
+    height: calc(100vh - 120px) !important;
+}
+
+.bottom-google-driver {
+    height: calc(100% - 41px);
+}
+
+.top-google-driver {
+    padding: 5px;
+}
+
+.top-google-driver-name-file {
+    flex: 1;
+    margin-right: 5px;
+    font-size: 14px;
+}
+
+.top-google-driver-name-file .icon-in-open-download-file {
+    margin-right: 5px;
+    font-size: 20px !important;
+}
+
+.top-google-driver .ui-inputgroup {
+    align-items: center;
+}
+
+.top-google-driver .ui-inputgroup {
+    align-items: center;
+}
+
+.top-google-driver .nextbutton {
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    margin-left: 5px;
+}
+
+.top-google-driver .backbutton {
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+
+.popup-waiting-loading {
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    flex-direction: column;
+}
+
+.popup-waiting-loading .tn-import-student-progressbar {
+    width: 100%;
+}
+
+.popup-waiting-loading label {
+    font-size: 15px;
+    color: red;
+}
+
+.no-files-doc-google {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.no-files-doc-google span {
+    color: crimson;
+    font-size: 18px !important;
+}
+
+.top-google-driver-name-file {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-all;
+}
+
+.flex-view-file {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

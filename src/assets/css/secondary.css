@@ -1,0 +1,103 @@
+.ovic-modal-class.not-result .avatar-picker__section--left {
+    width: 100%;
+}
+
+.ovic-modal-class.not-result .avatar-picker__section--right {
+    display: none;
+}
+
+.ovic-modal-class.not-result .avatar-maker__section-content {
+    flex: 1 1 auto;
+    height: 1%;
+}
+
+/*avatar-picker__section avatar-picker__section--left*/
+
+.ck-edit-height-350 .ck-content {
+    min-height: 350px !important;
+}
+
+.ed-help .ck-content .image img {
+    border: 1px solid #6a81a7 !important;
+}
+
+
+.table-duyet .p-datatable-wrapper table {
+    width: 100%;
+}
+
+.table-duyet .p-datatable-wrapper table {
+    min-width: 900px;
+}
+.viewTooltip td .ovic-tooltip__content {
+    display: block !important;
+}
+.tbl-hvu-diemdanh{
+    background: #f8f9fb;
+}
+.tbl-hvu-diemdanh .p-datatable-header{
+    border: 1px solid #dee2e6;
+}
+.tbl-hvu-diemdanh .p-datatable-wrapper{
+    max-width: 800px;
+    margin: 0 auto;
+
+}
+.khoalop-listRadio>.p-radiobutton-label{
+    font-size:14px;
+}
+/*--------------------------------------*/
+.btn-menu-material{
+    background: #fff;
+    border: none;
+    width: 100%;
+    text-align: start !important;
+    font-size: 15px;
+    display: flex !important;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8px;
+    min-height: 30px;
+    padding:6px 10px !important;
+    cursor: pointer;
+}
+.btn-menu-material i{
+    font-size:1.2rem;
+}
+.btn-menu-material.excel:hover{
+    background: #6aba4a !important;
+    color:#fff;
+}
+.btn-menu-material.acsses:hover{
+    background: #5387e5  !important;
+    color:#fff;
+}
+.btn-menu-material.cancel:hover{
+    background: #494949 !important;
+    color:#fff;
+}
+.btn-menu-material.warning:hover{
+    background: #e6922f !important;
+    color:#fff;
+}
+.btn-menu-material.delete:hover{
+    background: tomato !important;
+    color:#fff;
+}
+
+.gvcn-form p-calendar > span.p-calendar{
+    width: 100%;
+}
+.view-full-width{
+    max-width:100vw !important;
+    width:100%;
+}
+/*----------------------------------------*/
+
+.notifi-pani .p-paginator.p-component{
+    border-radius:10px !important;
+    height:40px;
+}
+.notifi-pani .p-paginator.p-component button{
+    height:40px;
+}

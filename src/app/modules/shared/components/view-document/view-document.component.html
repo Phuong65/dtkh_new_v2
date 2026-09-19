@@ -1,0 +1,41 @@
+<div style="width: auto; height: 100%;" [ngSwitch]="fileView['type']">
+    <div class="flex-view-file" *ngSwitchCase="'image'" style="overflow: auto;">
+        <p-image *ngIf="src" [src]="src" alt="Image" width="500" [preview]="true"></p-image>
+    </div>
+    <div class="flex-view-file file-default" *ngSwitchCase="'video'" style="overflow: auto;">
+        <video *ngIf="src" height="100%" style="max-width: 100%;" controls>
+            <source [src]="src">
+        </video>
+    </div>
+    <div class="flex-view-file file-default" *ngSwitchCase="'audio'">
+        <audio *ngIf="src" style="width:500px; height: 30px;" controls>
+            <source [src]="src">
+        </audio>
+    </div>
+    <div class="flex-view-file file-default" *ngSwitchDefault>
+        <div class="popup-waiting-loading" *ngIf="startProgress"
+            style="height: 100%; width: 100%; display: flex; flex-direction: column; justify-content: center; align-self: center;">
+            <label>Vui lòng chờ...</label>
+            <div class="tn-import-student-progressbar">
+                <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+            </div>
+        </div>
+        <div *ngIf="src && fileView" style="width: 100%; height: 100%;">
+            <div style="height: 100%;" *ngIf="fileView['source'] &&  fileView['type']">
+                <div style="height: 100%;" [ngSwitch]="fileView['type']">
+                    <div style="height: 100%;" class="flex-view-file" *ngSwitchCase="'pdf'">
+                        <iframe width="100%" height="100%" [src]="src" frameborder="0"></iframe>
+                    </div>
+                    <div style="height: 100%;" class="flex-view-file" *ngSwitchDefault>
+                        <ngx-doc-viewer *ngIf="!download" [url]="src" viewer="office"
+                            style="width:100%;height:100%;"></ngx-doc-viewer>
+                        <div style="color: #495057; font-size: 18px;font-weight: 300;" *ngIf="download">File này không
+                            được hỗ trợ xem trước, vui lòng <a download="true" [href]="src">tải
+                                về</a></div>
+                        <!-- <iframe width="100%" height="100%" [src]="fileUrlView" frameborder="0"></iframe> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

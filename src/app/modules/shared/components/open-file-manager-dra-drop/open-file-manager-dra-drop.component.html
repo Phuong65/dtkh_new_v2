@@ -1,0 +1,54 @@
+<div class="ovic-media-files">
+    <div class="files-list" (cdkDropListDropped)="onDragStartParent($event)" cdkDropList
+         [cdkDropListData]="selectedFiles">
+
+        <div cdkDrag class="file-dradrop" *ngFor="let item of selectedFiles , index as i">
+<!--            <div class="example-custom-placeholder" *cdkDragPlaceholder></div>-->
+            <div class="file-dradrop_head">
+                <div class="file-dradrop_head-left">
+                    <button type="button" class="ng-star-inserted">
+                        <i class="fi-rr-menu-burger d-flex justify-content-center align-items-center">
+                        </i></button>
+                </div>
+
+                <div class="file-dradrop_head-title">
+                    <input class="file-dradrop_head-title_input" type="text" placeholder="Nhập tiêu đề video..." [(ngModel)]="item.title">
+                </div>
+                <div class="file-dradrop_head-btn">
+                    <button *ngIf="showDelete" (click)="deleteFileChoosed(i)" type="button"
+                            class="btn btn-delete">
+                        <i class="fa fa-trash-o"></i></button>
+                    <button cdkDragHandle class=" btn status-is-deactive"
+                            style="cursor: all-scroll; touch-action: none; -webkit-user-drag: none; -webkit-tap-highlight-color: transparent; user-select: none;">
+                        <i class="fa fa-arrows" style="color: #333;"></i></button>
+
+
+                </div>
+            </div>
+            <div class="file-dradrop_body">
+                <div class="single-file m-0" style="">
+                    <i class="icon-in-open-download-file" [ngClass]="item.file | ovicFileIcon"></i>
+                    <div class="info">
+                        <h4 class="name">{{ item.file.title }}</h4>
+                        <p class="size">{{ item.file['file_size'] }}</p>
+                    </div>
+
+                    <button (click)="actionDownload(i)" style="padding: 0 5px;" type="button"
+                            class="btn btn-success btn-download"
+                            [ngbTooltip]="item.file['download']?'Cho phép tải tài liệu học tập':'Không cho phép tải tài liệu học tâp'"
+                            container="body" placement="left">
+                        <i class="fa fa-download"
+                           [ngClass]="item.file['download']? 'download-true':'download-false'"></i>
+                    </button>
+
+                </div>
+            </div>
+
+        </div>
+
+
+        <button style="line-height: 1.25;" (click)="openFileManager()" type="button"
+                class="btn btn-outline-success call-file-picker">{{ buttonLabel }}
+        </button>
+    </div>
+</div>

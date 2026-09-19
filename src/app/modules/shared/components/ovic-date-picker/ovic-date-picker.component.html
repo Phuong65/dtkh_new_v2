@@ -1,0 +1,18 @@
+<label *ngIf="label">{{label}}</label>
+<p-calendar
+  [dateFormat]="dateFormat"
+  [locale]="locale"
+  [placeholder]="placeholder"
+  (onInput)="input($event)"
+  (onSelect)="change($event)"
+  [(ngModel)]="value"
+  [showTime]="showTime"
+  [monthNavigator]="monthNavigator"
+  [yearNavigator]="yearNavigator"
+  [yearRange]="yearRange"
+  [showTransitionOptions]="'0ms'" 
+  [hideTransitionOptions]="'0ms'"
+  [disabled]="disabled"
+  appendTo="body"
+  [baseZIndex]="1999"
+></p-calendar>

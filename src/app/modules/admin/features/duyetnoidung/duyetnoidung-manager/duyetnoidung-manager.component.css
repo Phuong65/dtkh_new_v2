@@ -1,0 +1,67 @@
+.hoidong-layout-top {
+    padding: 5px;
+    border-bottom: 1px solid #c8c8c8;
+    display: flex;
+    align-items: center;
+}
+
+.hoidong-layout-bottom {
+    padding: 5px;
+    overflow: auto;
+    height: calc(100% - 81px);
+}
+
+.box-span {
+    padding: 5px 8px;
+    border-radius: 6px;
+    width: 100%;
+    display: block;
+}
+
+.cho-duyet-box {
+    background-color: var(--gray-300);
+    color: var(--gray-600);
+    font-weight: 600;
+}
+
+.dat-box {
+    background-color: var(--green-100);
+    color: var(--green-700);
+    font-weight: 600;
+
+}
+
+.yeu-cau-sua-box {
+    background-color: var(--red-100);
+    color: var(--red-600);
+    font-weight: 600;
+}
+
+.da-sua-box {
+    background-color: var(--indigo-200);
+    color: var(--indigo-700);
+    font-weight: 600;
+}
+
+.dang-caidat {
+    background-color: var(--yellow-200);
+    color: var(--yellow-800);
+    font-weight: 600;
+}
+
+.box-span-inline {
+    padding: 3px 5px;
+    border-radius: 6px;
+    /* width: 100%; */
+    width: fit-content;
+    display: inline-block;
+}
+
+.top-layout-action{
+    display: flex;
+    align-items: center;
+}
+
+.check-box-by-hoidong{
+    margin-right: 10px;
+}

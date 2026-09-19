@@ -1,0 +1,427 @@
+.detail-shell {
+    padding: 16px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* ── Sticky Header ──────────────────────────────────────── */
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 20px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.question-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.question-code {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    background: #3b82f6;
+    padding: 2px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.question-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    line-height: 1.3;
+}
+
+.question-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.header-actions .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+
+.header-actions .btn .pi-angle-double-right {
+    margin-left: 5px;
+    margin-right: 0px;
+}
+
+.action-edit-layout {
+    justify-content: space-around;
+}
+
+.card.chairman-card button {
+    line-height: 1;
+}
+
+.card.chairman-card .card-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+/* ── Stat tags ──────────────────────────────────────────── */
+.stat-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.tag-approved {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.tag-pending {
+    background: #fef9c3;
+    color: #854d0e;
+}
+
+.tag-reject {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.tag-require {
+    background: #ffedd5;
+    color: #9a3412;
+}
+
+/* ── Loading / Empty ────────────────────────────────────── */
+.loading-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+}
+
+.spinner {
+    text-align: center;
+    color: #64748b;
+}
+
+.spinner p {
+    margin-top: 8px;
+}
+
+.empty-state {
+    text-align: center;
+    max-width: 640px;
+    padding: 48px 24px;
+    margin: 48px auto;
+}
+
+.empty-state h3 {
+    margin: 0 0 8px;
+    color: #1e293b;
+}
+
+.empty-state p {
+    color: #64748b;
+    margin-bottom: 16px;
+}
+
+/* ── 2-column body ──────────────────────────────────────── */
+.detail-body {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 16px;
+    align-items: start;
+}
+
+@media (max-width: 1024px) {
+    .detail-body {
+        grid-template-columns: 1fr;
+    }
+}
+
+.col-left {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.col-right {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ── Cards ──────────────────────────────────────────────── */
+.card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f8fafc;
+    border-radius: 6px 6px 0 0;
+}
+
+.card-header h5,
+.card-header h6 {
+    margin: 0;
+    color: #1e293b;
+}
+
+.card-body {
+    padding: 16px;
+}
+
+/* ── Question card ──────────────────────────────────────── */
+.question-card {
+    min-height: 200px;
+}
+
+/* ── Tiêu chí chấm ─────────────────────────────────────── */
+.tieuchicham-section {
+    margin-top: 16px;
+}
+
+.tieuchicham-section:first-child {
+    margin-top: 0;
+}
+
+.tieuchicham-item {
+    padding: 0 0.6em;
+    font-size: 14px;
+    padding-bottom: 15px;
+}
+
+.header-tieuchicham {
+    margin-bottom: 4px;
+}
+
+/* ── Undo banner ────────────────────────────────────────── */
+.undo-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid #facc15;
+    border-radius: 6px;
+    background: #fef9c3;
+    color: #713f12;
+}
+
+.undo-banner .btn {
+    flex-shrink: 0;
+}
+
+/* ── Comment form ───────────────────────────────────────── */
+.comment-card textarea.form-control {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    resize: vertical;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.action-edit-layout {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.action-edit-layout button {
+    line-height: 1;
+}
+
+/* ── Comments list ──────────────────────────────────────── */
+.comments-list-card,
+.comments-list-card .card-body {
+    max-height: none;
+    height: auto;
+    overflow: visible;
+}
+
+.comment-box {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.comment-box:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.comment-header {
+    margin-bottom: 8px;
+}
+
+.comment-author {
+    font-weight: 600;
+    color: #1e293b;
+    text-decoration: underline;
+}
+
+.comment-child {
+    margin-top: 8px;
+}
+
+.content-comment-box {
+    padding: 10px 14px;
+    border-radius: 6px;
+    background: #f8fafc;
+}
+
+.duyet-comment {
+    border-left: 3px solid #22c55e;
+}
+
+.yeucausua-comment {
+    border-left: 3px solid #ef4444;
+}
+
+.content-comment-inner-box {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #374151;
+}
+
+.comment-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 6px;
+    margin-left: 14px;
+}
+
+.comment-date {
+    font-size: 12px;
+    color: #898989;
+    font-style: italic;
+}
+
+.comment-reply-btn {
+    font-size: 13px;
+    color: #3b82f6;
+    cursor: pointer;
+}
+
+.comment-reply-btn:hover {
+    text-decoration: underline;
+}
+
+/* ── Reply section ──────────────────────────────────────── */
+.reply-layout {
+    margin-top: 12px;
+    margin-left: 14px;
+}
+
+.reply-item {
+    margin-bottom: 12px;
+}
+
+.reply-author {
+    text-align: right;
+    font-size: 13px;
+    font-weight: 500;
+    color: #4b5563;
+}
+
+.content-comment-box-left {
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: #f0f9ff;
+}
+
+.my-reply-comment {
+    background: #e0f2fe;
+}
+
+.content-comment-inner-box-left {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #374151;
+}
+
+.reply-date {
+    font-size: 12px;
+    color: #898989;
+    font-style: italic;
+    margin-top: 4px;
+    margin-left: 10px;
+}
+
+.reply-form {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    margin-top: 12px;
+}
+
+.reply-textarea {
+    flex: 1;
+    min-height: 36px;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
+    resize: none;
+}
+
+/* ── Chairman card ──────────────────────────────────────── */
+.chairman-card .card-body {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+/* ── Request change box ────────────────────────────────────── */
+.request-change-box {
+    margin-top: 14px;
+    padding: 12px;
+    border: 1px dashed #f97316;
+    border-radius: 6px;
+    background: #fff7ed;
+}
+
+.request-change-box label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #9a3412;
+}

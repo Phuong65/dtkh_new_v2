@@ -1,0 +1,58 @@
+<app-login-template-ictu
+    *ngIf="acceptDivi && (key_server === 'ictu' || key_server === 'dttx' || key_server === 'dev')"></app-login-template-ictu>
+<app-login-template-v4 *ngIf="acceptDivi && key_server === 'tueba_dttx'"></app-login-template-v4>
+<app-login-template-ictu-dttx *ngIf="acceptDivi && key_server === 'dttx-ictu'"></app-login-template-ictu-dttx>
+<app-login-template-nvhcm *ngIf="acceptDivi && key_server === 'nvhcm'"></app-login-template-nvhcm>
+<app-login-template-vhhcm *ngIf="acceptDivi && key_server === 'vhhcm'"></app-login-template-vhhcm>
+<app-login-template-hvu *ngIf="acceptDivi && key_server === 'hvu'"></app-login-template-hvu>
+<div class="login-main-grid" *ngIf="!acceptDivi">
+    <div class="login-container">
+        <img class="bg-auth-circle-shape" style="max-width: 250px; height: auto"
+            src="../../../../../assets/images/login-v4/bg-shape.752db224.png" alt="" width="500" height="526">
+        <img class="bg-auth-circle-shape-2" style="max-width: 150px; height: auto"
+            src="../../../../../assets/images/login-v4/shape-1.cd2c960d.png" alt="" width="200" height="242">
+        <div class="login-card">
+            <!-- <div class="login-section__left">
+                <div class="login-section__wrap-text--top-left">
+                    <div class="bg-holder bg-auth-card-shape"
+                        style="background-image: url('../../../../../assets/images/login-v4/half-circle.77f5fada.png');">
+                    </div>
+                    <div class="z-index-1 position-relative light">
+                        <div class="login-form-wrap__logo" style="width: 100px; margin: 50px auto;margin-top: 0px;">
+                            <img style="width: 100%;" src="../../../../../assets/images/ICTU-LOGO-WHITE.png">
+                        </div>
+                        <p style="text-transform:uppercase ;" class="text-white">HỆ THỐNG HỌC TRỰC TUYẾN
+                            <br> TRƯỜNG ĐẠI HỌC CÔNG NGHỆ THÔNG TIN VÀ TRUYỀN THÔNG
+                        </p>
+                    </div>
+                </div>
+                <div class="login-section__wrap-text--bottom color_white">
+                    <p class="text-white" style="margin: 0 auto;">Copyright © 2023 by
+                        <a href="https://ictu.vn">ICTU.VN</a>
+                    </p>
+                </div>
+
+            </div> -->
+            <div class="login-section__right">
+                <form class="login-section__right-inner">
+                    <div class="z-index-1 position-relative light --mobile-element">
+                        <div class="login-form-wrap__logo" style="width: 100px; margin: 50px auto;margin-top: 0px;">
+                            <img style="width: 100%;" src="../../../../../assets/images/ICTU-LOGO-WHITE.png">
+                        </div>
+                        <p class="text-white">HỆ THỐNG HỌC TRỰC TUYẾN
+                            <br> TRƯỜNG ĐẠI HỌC CÔNG NGHỆ THÔNG TIN VÀ TRUYỀN THÔNG
+                    </div>
+                    <div class="login-section__wrap-text--top-right --mobile-element">
+                        <p>Hệ thống không hỗ trợ thiết bị có màn hình nhỏ, vui lòng đăng nhập bằng thiết có
+                            màn hình lớn hơn</p>
+                    </div>
+                    <div class="login-section__wrap-text--bottom --mobile-element color_white">
+                        <p class="text-white" style="margin: 0 auto;">Copyright © 2023 by
+                            <a href="https://ictu.vn">ICTU.VN</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

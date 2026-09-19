@@ -1,0 +1,11 @@
+.layout_component_container {
+    background-color: #f2f2f2;
+}
+
+.ovic-vertical__inputs .form-row+.form-row {
+    margin-top: 20px;
+}
+
+:host ::ng-deep .p-multiselect-token-label {
+    line-height: 1.2;
+}

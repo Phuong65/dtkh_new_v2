@@ -1,0 +1,129 @@
+.diemdanh_loading{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+.diemdanh-error{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+
+}
+
+/*---------------------------------------*/
+.diemdanh-container{
+    background: #f8f5f5;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.diemdanh-l{
+    height:1%;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    background: #fafafa;
+    /*box-shadow: 1px 0 0 0 #cccccc;*/
+}
+
+.diemdanh-l_head{
+    height:50px;
+    background: #fbfbfb;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 5px;
+    box-shadow: 0px 2px 0 0 #ededed;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.diemdanh-l_head button{
+    width:30px;
+    height:30px;
+}
+.diemdanh-l_body{
+    flex: 1 1 auto;
+    height: 1%;
+    width: 100%;
+    overflow: hidden;
+    overflow-y: auto;
+    padding: 5px;
+
+}
+.dayList {
+    padding:20px 10px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.day-item{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px;
+    /* width: calc(100% - 20px); */
+    /* margin: 0 10px; */
+    background: #f2f2f2;
+    padding: 10px;
+    border-radius: 8px;
+}
+.day-item .title{
+    font-size: 14px;
+    line-height: 15px;
+    font-weight:500;
+
+}
+.day-item:hover {
+    cursor: pointer;
+    background: bisque;
+    color: black;
+
+}
+
+.day-item.active  {
+    background: bisque;
+    color: black;
+}
+
+
+.keydiemdanh-K{
+    color: #ff494b;
+}
+.keydiemdanh-P{
+    color: #0caa30;
+}
+.keydiemdanh-M{
+    color: orange;
+}
+.keydiemdanh-DD{
+    color: #0b69e3;
+}
+.-no-attended{
+    /*color: #0b69e3;*/
+    color:#ccc;
+}
+.is-big{
+    display: flex;
+}
+.is-smaller{
+    display: none;
+}
+
+@media (max-width: 1200px) {
+    .is-smaller{
+        display: block;
+    }
+    .is-big{
+        display: none;
+    }
+}

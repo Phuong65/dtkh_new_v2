@@ -1,0 +1,58 @@
+.layout_component_container {
+	position: relative;
+}
+
+.backgound-home {
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	z-index: 0;
+}
+
+.image-background-home {
+	width: 100%;
+	height: 100%;
+}
+
+.main-home-layout {
+	z-index: 1;
+	position: relative;
+}
+
+.main-home-layout-content {
+	display: flex;
+	flex-direction: column;
+	padding: 10px;
+	margin: 60px auto;
+	width: fit-content;
+}
+
+.title-home {
+	font-size: 18px;
+	font-weight: bold;
+	text-align: center;
+}
+
+.logo-home {
+	margin-top: 60px;
+	text-align: center;
+}
+
+.group-image {
+	margin-top: 60px;
+	display: flex;
+	flex-direction: row;
+	align-items: baseline;
+
+}
+.sup-title-home{
+	margin-top: 60px;
+	font-size: 16px;
+	text-align: center;
+}
+
+.mid-img{
+	margin: 0px 50px;
+}

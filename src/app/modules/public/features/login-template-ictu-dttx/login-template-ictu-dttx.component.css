@@ -1,0 +1,504 @@
+/* ===== LAYOUT 2 CỘT - FULL MÀN HÌNH ===== */
+.dttx-login-page {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    background-color: #ffffff;
+    font-family: 'Inter', 'Roboto', sans-serif;
+}
+
+/* ===== CỘT TRÁI - BRAND ===== */
+.dttx-brand {
+    flex: 1.2;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(37, 99, 235, 0.85)),
+                url('/assets/images/login-v4/dttx_background.avif') center/cover no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 60px;
+    color: #ffffff;
+    position: relative;
+}
+
+.dttx-brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.dttx-brand-logo .dttx-icon-cap {
+    height: 60px;
+    width: auto;
+    display: block;
+}
+
+.dttx-brand-name {
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #ffffff;
+}
+
+.dttx-brand-welcome h1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 20px;
+    color: #ffffff;
+}
+
+.dttx-brand-welcome p {
+    color: #cbd5e1;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    max-width: 500px;
+    margin: 0;
+}
+
+.dttx-brand-footer {
+    font-size: 0.85rem;
+    color: #94a3b8;
+}
+
+/* ===== CỘT PHẢI - FORM ===== */
+.dttx-login-form {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background-color: #ffffff;
+}
+
+.dttx-form-box {
+    width: 100%;
+    max-width: 420px;
+}
+
+.dttx-form-header {
+    margin-bottom: 40px;
+}
+
+.dttx-form-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 10px;
+}
+
+.dttx-form-header p {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* ===== FIELD ===== */
+.dttx-field {
+    margin-bottom: 24px;
+}
+
+.dttx-field label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #0f172a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dttx-input-wrap {
+    position: relative;
+}
+
+/* Icon bên trái (user / lock) */
+.dttx-input-wrap .dttx-icon-left {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 1.1rem;
+    pointer-events: none;
+    z-index: 3;
+}
+
+/* Eye toggle bên phải */
+.dttx-input-wrap .dttx-toggle-pwd {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 1.1rem;
+    z-index: 3;
+    cursor: pointer;
+}
+
+.dttx-input-wrap .dttx-toggle-pwd:hover {
+    color: #0f172a;
+}
+
+.dttx-input-wrap input {
+    display: block;
+    width: 100%;
+    height: 50px !important;
+    padding: 14px 48px 14px 48px !important;
+    line-height: normal !important;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px !important;
+    font-size: 1rem;
+    color: #0f172a;
+    background-color: #f8fafc;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: none !important;
+}
+
+.dttx-input-wrap input:focus {
+    border-color: #2563eb;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
+}
+
+.dttx-input-wrap input:focus ~ .dttx-icon-left {
+    color: #2563eb;
+}
+
+.dttx-input-wrap input.is-invalid {
+    border-color: #dc3545 !important;
+    background-color: #fff5f5 !important;
+}
+
+.dttx-input-wrap input.is-invalid:focus {
+    box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.1) !important;
+}
+
+.dttx-field .invalid-feedback {
+    display: none;
+    margin-top: 5px;
+    font-size: 12px;
+    color: #dc3545;
+}
+
+.dttx-field .invalid-feedback:not(:empty) {
+    display: block;
+}
+
+/* ===== FORM OPTIONS ===== */
+.dttx-form-options {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 30px;
+}
+
+.dttx-remember {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: #334155;
+    font-size: 0.9rem;
+}
+
+.dttx-remember input[type="checkbox"] {
+    accent-color: #2563eb;
+    width: 16px;
+    height: 16px;
+    box-shadow: none !important;
+}
+
+a.dttx-forgot {
+    color: #2563eb !important;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+a.dttx-forgot:hover {
+    text-decoration: underline;
+}
+
+/* ===== NÚT ĐĂNG NHẬP ===== */
+.dttx-btn-login {
+    width: 100%;
+    height: 50px !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px !important;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.dttx-btn-login:hover:not(:disabled) {
+    background-color: #1d4ed8 !important;
+    filter: none;
+}
+
+.dttx-btn-login:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.dttx-btn-login:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.dttx-btn-login .fa-spinner {
+    font-size: 1rem;
+}
+
+/* ===== DIVIDER ===== */
+.dttx-divider {
+    display: block;
+    text-align: center;
+    position: relative;
+    width: 100%;
+    margin: 24px 0;
+}
+
+.dttx-divider::before {
+    content: '';
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    border-top: 1px solid #b1b1b1;
+    position: absolute;
+    display: block;
+    z-index: 2;
+}
+
+.dttx-divider-text {
+    font-size: 14px;
+    color: #444444;
+    display: inline-block;
+    position: relative;
+    line-height: 1;
+    padding: 10px;
+    font-weight: 400;
+    background: #ffffff;
+    z-index: 12;
+}
+
+/* ===== GOOGLE ===== */
+.dttx-google-wrap {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.dttx-google-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 240px;
+    height: 40px !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+    background-color: #4285f4;
+    color: #ffffff;
+    border: none;
+    border-radius: 2px !important;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25) !important;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'Roboto', arial, sans-serif;
+    text-align: center;
+}
+
+.dttx-google-btn:hover {
+    box-shadow: 0 0 3px 3px rgba(66, 133, 244, 0.3) !important;
+    background-color: #4285f4 !important;
+}
+
+.dttx-google-btn:active {
+    background-color: #3367d6 !important;
+}
+
+.dttx-google-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 8px;
+    background: #ffffff;
+    border-radius: 1px;
+    flex-shrink: 0;
+    margin: 1px;
+}
+
+.dttx-google-icon svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+.dttx-google-text {
+    flex: 1;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.21px;
+    padding: 0 8px;
+    white-space: nowrap;
+}
+
+/* ===== SUPPORT ===== */
+.dttx-support {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.dttx-support a {
+    color: #0f172a !important;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.dttx-support a:hover {
+    text-decoration: underline;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 968px) {
+    .dttx-brand {
+        display: none;
+    }
+}
+
+/* ===== MODAL RESET PASSWORD ===== */
+.ovic-request-reset-password__form {
+    padding: 20px 30px;
+}
+
+.ovic-form-rsp__title {
+    display: block;
+    text-align: center;
+    font-size: 18px;
+    text-transform: uppercase;
+    font-weight: 400;
+    color: #444444;
+    margin: 30px 0 15px;
+}
+
+.ovic-form-rsp__subtitle {
+    display: block;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 400;
+    color: #888888;
+    margin: 0 0 20px;
+}
+
+.ovic-form-rsp__lbl-input {
+    display: block;
+    margin: 0 0 20px;
+    position: relative;
+    width: 100%;
+}
+
+.ovic-form-rsp__lbl-input input {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 400;
+    border: 1px solid #ededed;
+    background-color: #ffffff;
+    width: 100%;
+    border-radius: 999px;
+    line-height: 1;
+    padding: 12px 15px;
+    color: #444444;
+    margin: 0;
+}
+
+.ovic-form-rsp__lbl-input .fa-spinner {
+    position: absolute;
+    z-index: 1;
+    margin: 0;
+    top: 11.5px;
+    right: 11px;
+    line-height: 1;
+    width: auto;
+    font-size: 20px;
+    color: #444444;
+}
+
+.ovic-form-rsp__form input::placeholder {
+    color: #aaaaaa;
+}
+
+.ovic-form-rsp__form .btn-request {
+    border: none;
+    border-radius: 999px;
+    font-size: 14px;
+    width: 100%;
+}
+
+.ovic-form-rsp__close-form {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 99;
+    font-size: 20px;
+    line-height: 1;
+    padding: 4px;
+    width: 30px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 999px;
+    color: #aaaaaa;
+}
+
+.ovic-form-rsp__close-form:hover {
+    background-color: #c73000;
+    color: #ffffff;
+}
+
+.ovic-form-rsp__f-message {
+    bottom: calc(100% + 11px);
+    z-index: 5;
+    left: 20px;
+    display: inline-block;
+    font-size: 12px;
+    padding: 6px;
+    transition: all 250ms ease 0s;
+    opacity: 1;
+    visibility: visible;
+    line-height: 1;
+    color: #f9f9f9;
+    background-color: #dc3545;
+    position: absolute;
+}
+
+.ovic-form-rsp__f-message::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-top: 7px solid #dc3545;
+    border-right: 7px solid transparent;
+}
+
+.ovic-form-rsp__f-message:not(.showed) {
+    display: none;
+}
+
+.ovic-form-rsp__thumb {
+    text-align: center;
+}

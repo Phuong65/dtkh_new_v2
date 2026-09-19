@@ -1,0 +1,28 @@
+.layout_component_container {
+    background-color: #f2f2f2;
+}
+
+.action-table-list-cauhoi {
+    margin: 0 5px;
+}
+
+.action-table-list-cauhoi button {
+    height: 30px;
+    width: 30px;
+}
+
+.status-is-active {
+    color: #28a745;
+}
+
+.status-is-deactive {
+    color: #BDBDBD;
+}
+
+.status-is-redo {
+    color: red;
+}
+
+.status-is-require {
+    color: #8f48d2;
+}

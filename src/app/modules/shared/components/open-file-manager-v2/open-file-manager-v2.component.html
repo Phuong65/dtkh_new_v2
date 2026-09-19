@@ -1,0 +1,42 @@
+<div class="ovic-media-files">
+    <div class="files-list">
+        <div class="single-file" style="" *ngFor="let file of selectedFiles, index as i">
+            <i class="icon-in-open-download-file" [ngClass]="file | ovicFileIcon"></i>
+            <div class="info">
+                <h4 class="name">{{file.title}}</h4>
+                <p class="size">{{file['file_size']}}</p>
+            </div>
+            <button (click)="onSelectFileReview(file)" style="padding: 0 5px;" type="button" class="btn btn-primary">
+                <i class="fa fa-eye"></i>
+            </button>
+            <button (click)="actionDownload(i)" style="padding: 0 5px;" type="button"
+                class="btn btn-success btn-download"
+                [ngbTooltip]="file['download']?'Cho phép tải tài liệu học tập':'Không cho phép tải tài liệu học tâp'"
+                container="body" placement="left">
+                <i aria-hidden=" true" class="fa fa-download"
+                    [ngClass]="file['download']? 'download-true':'download-false'"></i>
+            </button>
+            <button *ngIf="showDelete" (click)="deleteFileChoosed(i)" style="padding: 0 5px;" type="button"
+                class="btn btn-delete">
+                <i class="fa fa-trash-o"></i>
+            </button>
+        </div>
+        <button style="line-height: 1.25;" (click)="openFileManager()" type="button"
+            class="btn btn-outline-success call-file-picker">{{buttonLabel}}</button>
+    </div>
+</div>
+
+<ng-template #filesLessonReview let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section" style="height: 100vh;">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">View</h3>
+            <button class="btn ovic-over-right-section__close-button" (click)="d(true)"></button>
+        </div>
+        <div class="ovic-over-right-section__body footer-no-hint no-footer" style="padding: 0px;">
+            <div class="ovic-vertical__inputs back-ground-info" style="height: 100%;">
+                <view-document [file]="selectedFileReview?selectedFileReview:null">
+                </view-document>
+            </div>
+        </div>
+    </div>
+</ng-template>

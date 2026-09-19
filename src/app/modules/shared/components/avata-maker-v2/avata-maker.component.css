@@ -1,0 +1,25 @@
+.img-preview{
+  border: 1px solid #333333;
+}
+.vt-shotcut-button-in-heading{
+	float: right;
+}
+.result{
+  display: block;
+  margin-top: 30px;
+  margin-bottom: 40px;
+}
+image-cropper{
+	
+}
+.vt-area-button{
+	text-align:right;
+}
+.vt-area-button button{
+	right: 0px;
+	margin-left: 5px;
+}
+.text-center{
+	display: flex;
+    align-items: center;
+}

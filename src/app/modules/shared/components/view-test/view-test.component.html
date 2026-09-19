@@ -1,0 +1,8 @@
+<div #bodyTest class="view-test-body">
+    <div class="view-test-body-content">
+        <p style="margin-bottom: 20px;"><strong>Sinh viên trả lời đúng</strong>: {{_ans_correc}}/{{question_count}}</p>
+        <div [appKatexImg]="_id" [innerHTML]="_test_body | safeHtml">
+
+        </div>
+    </div>
+</div>

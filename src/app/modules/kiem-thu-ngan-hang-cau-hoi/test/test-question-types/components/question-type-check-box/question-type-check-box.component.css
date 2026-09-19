@@ -1,0 +1,35 @@
+.question-type-check-box__group {
+	--mdc-typography-body2-font-family: var(--primary-font);
+	--mdc-typography-body2-font-size: 14px;
+	--mdc-typography-body2-line-height: 24px;
+	--mdc-typography-body2-font-weight: 400;
+	--mdc-typography-body2-letter-spacing: normal;
+	--mdc-typography-body2-text-decoration: none;
+	--mdc-typography-body2-text-transform: none;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	--question-type-check-box-gap: 10px;
+	margin-top: calc(-1 * var(--question-type-check-box-gap));
+	margin-left: calc(-1 * var(--question-type-check-box-gap));
+	margin-right: calc(-1 * var(--question-type-check-box-gap));
+}
+
+.question-type-check-box__option {
+	display: inline-flex;
+	flex-basis: 100%;
+	padding: var(--question-type-check-box-gap);
+}
+
+.question-type-check-box__option--layout-2 {
+	flex-basis: 50%;
+}
+
+.question-type-check-box__option--layout-3 {
+	flex-basis: calc(100% / 3);
+}
+
+.question-type-check-box__option--layout-4 {
+	flex-basis: 25%;
+}

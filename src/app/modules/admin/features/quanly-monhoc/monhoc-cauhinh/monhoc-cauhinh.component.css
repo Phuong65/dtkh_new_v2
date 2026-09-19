@@ -1,0 +1,258 @@
+.layout_component_container {
+    background-color: #f2f2f2;
+}
+
+.layout_component_container .document-type-a4-vertical {
+    background: transparent;
+    margin: 0px auto;
+    padding: 10px;
+    width: 800px;
+}
+
+.box-span {
+    padding: 5px 8px;
+    border-radius: 6px;
+    margin-left: 5px;
+}
+
+.cho-duyet-box {
+    background-color: var(--gray-300);
+    color: var(--gray-600);
+    font-weight: 600;
+}
+
+.dat-box {
+    background-color: var(--green-100);
+    color: var(--green-700);
+    font-weight: 600;
+}
+
+.box-panel-setting {
+    margin-bottom: 10px;
+}
+
+.box-panel-setting:last-child {
+    margin-bottom: 0px;
+}
+
+.flex {
+    display: flex;
+}
+
+.span-box-input {
+    height: 100%;
+    /* padding: 5px; */
+    border: 1px solid #ced4da;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0px 5px;
+    background: #e9ecef;
+}
+
+.input-group-span {
+    width: 50% !important;
+    flex: 1
+}
+
+.no-border-right {
+    border-right: 0px;
+}
+
+.no-border-left {
+    border-left: 0px;
+}
+
+.width-30px {
+    width: 30px;
+}
+
+.text-align-center {
+    text-align: center;
+}
+
+.layout-setting-course .form-row-flex-row {
+    margin-top: 30px;
+}
+
+.layout-setting-course .form-row-flex-row:first-child {
+    margin-top: 0px;
+}
+
+/* ----- */
+.layout-setting-course * {
+    box-sizing: border-box;
+    /*  */
+}
+
+.layout-setting-course {
+    /* background: #f4f6f8;
+    padding: 40px 0; */
+}
+
+.layout-setting-course .container {
+    padding: 0px;
+    margin: auto;
+}
+
+.layout-setting-course .card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 0px 24px;
+    border: 0px;
+}
+
+.layout-setting-course .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.layout-setting-course .row:last-child {
+    border-bottom: none;
+}
+
+.layout-setting-course label {
+    font-weight: 600;
+    display: block;
+}
+
+.layout-setting-course .value {
+    margin: 6px 0;
+}
+
+.layout-setting-course small {
+    color: #777;
+}
+
+.layout-setting-course .edit {
+    cursor: pointer;
+    color: #888;
+}
+
+.layout-setting-course .pending {
+    background: #f5f7f9;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 16px 0;
+}
+
+.layout-setting-course .pending a {
+    color: #2e7d32;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.layout-setting-course select {
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+/* Toggle Switch */
+.layout-setting-course .switch {
+    position: relative;
+    width: 42px;
+    height: 22px;
+}
+
+.layout-setting-course .switch input {
+    display: none;
+}
+
+.layout-setting-course .slider {
+    position: absolute;
+    inset: 0;
+    background: #ccc;
+    border-radius: 22px;
+    transition: .3s;
+}
+
+.layout-setting-course .slider::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 2px;
+    top: 2px;
+    background: white;
+    border-radius: 50%;
+    transition: .3s;
+}
+
+.layout-setting-course .switch input:checked+.slider {
+    background: #4caf50;
+}
+
+.layout-setting-course .switch input:checked+.slider::before {
+    transform: translateX(20px);
+}
+
+/* Buttons */
+.layout-setting-course .actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.layout-setting-course .accept {
+    background: #2e7d32;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.layout-setting-course .dismiss {
+    background: #eee;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.layout-setting-course .item-child {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.layout-setting-course .item-child:first-child {
+    margin-top: 0px;
+}
+
+.layout-setting-course .item-child-title {
+    flex: 1;
+}
+
+.layout-setting-course .item-child input {
+    text-align: center;
+    /* background: var(--gray-200); */
+    width: 100px;
+    border-bottom: 1px solid #c8c8c8;
+}
+
+.width-60px {
+    width: 60px;
+}
+
+.setting-date-test-weeks {
+    transition: all 0.3s;
+    max-height: 0px;
+    overflow: hidden;
+}
+
+.activity-setting-date-weeks.setting-date-test-weeks {
+    max-height: 500px;
+}
+
+.box-time-for-weeks {
+    padding: 15px;
+    background: var(--gray-200);
+    border-radius: 6px;
+    margin-top: 15px;
+}

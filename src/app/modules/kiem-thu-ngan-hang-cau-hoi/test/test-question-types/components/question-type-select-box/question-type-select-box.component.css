@@ -1,0 +1,11 @@
+.question-type-select-box {
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-items: stretch;
+}
+
+.question-type-select-box__selector {
+	border: 1px solid #ced4da;
+	border-radius: 4px;
+}

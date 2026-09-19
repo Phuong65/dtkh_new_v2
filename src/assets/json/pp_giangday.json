@@ -1,0 +1,18 @@
+[
+    {
+        "key": 1,
+        "label": "Giảng dạy lý thuyết"
+    },
+    {
+        "key": 2,
+        "label": "Hướng dẫn thực hành, làm bài tập"
+    },
+    {
+        "key": 3,
+        "label": "Thảo luận"
+    },
+    {
+        "key": 4,
+        "label": "Kiểm tra, đánh giá"
+    }
+]

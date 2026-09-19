@@ -1,0 +1,23 @@
+/* CSS cho Skeleton Load */
+.editor-skeleton {
+    border: 1px solid #ccced1;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.skeleton-toolbar {
+    height: 40px;
+    background: #eee;
+    border-bottom: 1px solid #ccced1;
+}
+
+.skeleton-content {
+    height: 150px;
+    /* Độ cao tương đương với editor bình thường */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 0.9rem;
+    background: #fff;
+}

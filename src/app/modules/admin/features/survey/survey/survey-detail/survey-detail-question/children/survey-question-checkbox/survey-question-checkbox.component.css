@@ -1,0 +1,65 @@
+.layout-component-container-survey-question-checkbox {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    gap: 10px;
+    padding: 0px 10px;
+}
+
+.survey-question-checkbox-title {
+    display: flex;
+    flex-direction: column;
+}
+
+.survey-question-checkbox-answer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.survey-question-checkbox-answer--columns {
+    display: grid;
+    gap: 10px;
+    align-items: start;
+}
+
+.survey-question-checkbox-answer__add {
+    grid-column: 1 / -1;
+    justify-self: center;
+}
+
+.survey-question-checkbox-answer__list-option-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.survey-question-square-number {
+    width: 36px;
+    height: 36px;
+    background: #989fff;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.survey-question-checkbox-view{
+  width:18px;
+  min-width:18px;
+  height:18px;
+  border:2px solid #9ca3af;
+  border-radius:4px;
+  display:inline-block;
+}
+
+@media (max-width: 767px) {
+    .survey-question-checkbox-answer--columns {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+}

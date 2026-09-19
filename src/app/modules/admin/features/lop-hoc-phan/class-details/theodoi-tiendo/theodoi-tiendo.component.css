@@ -1,0 +1,34 @@
+.theodoi-tiendo-layout {
+    height: 100%;
+    width: 100%;
+}
+
+.theodoi-tiendo-top {
+    padding: 5px;
+    border-bottom: 1px solid #c8c8c8;
+}
+
+.theodoi-tiendo-bottom {
+    height: calc(100% - 41px);
+}
+
+.theodoi-tiendo-bottom-list {
+    height: calc(100% - 40px);
+    padding: 10px;
+    overflow: auto;
+}
+
+.student-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.theodoi-tiendo-top {
+    display: flex;
+}
+
+.theodoi-tiendo-top-left{
+    flex: 1;
+    margin-right: 10px;
+    
+}

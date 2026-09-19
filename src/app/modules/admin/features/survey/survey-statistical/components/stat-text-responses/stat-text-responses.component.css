@@ -1,0 +1,154 @@
+.stat-text-responses {
+    width: 100%;
+}
+
+.no-data {
+    text-align: center;
+    color: #999;
+    padding: 20px;
+}
+
+.no-data p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.text-responses__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.response-count {
+    font-size: 13px;
+    color: #666;
+}
+
+.view-toggle {
+    display: inline-flex;
+    border: 1px solid #d4d4d8;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.view-toggle__btn {
+    background: #fff;
+    border: none;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.view-toggle__btn:hover {
+    background: #f4f4f5;
+}
+
+.view-toggle__btn.active {
+    background: #4361ee;
+    color: #fff;
+    font-weight: 500;
+}
+
+.view-toggle__btn + .view-toggle__btn {
+    border-left: 1px solid #d4d4d8;
+}
+
+.text-center {
+    text-align: center;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+    background: #f8f9fa;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px 12px;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+    font-size: 14px;
+    padding: 10px 12px;
+}
+
+:host ::ng-deep .p-paginator {
+    font-size: 13px;
+}
+
+.row-clickable {
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.row-clickable:hover {
+    background: #f0f4ff !important;
+}
+
+.btn-option-teacher {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border: 1px solid #d8dee9;
+    background: #fff;
+    border-radius: 6px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.btn-option-teacher:hover {
+    background: #eef2ff;
+    border-color: #4361ee;
+    color: #4361ee;
+}
+
+.btn-option-teacher--active {
+    background: #4361ee;
+    border-color: #4361ee;
+    color: #fff;
+}
+
+.dialog-content {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.dialog-count {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.table-detail {
+    width: 100%;
+    font-size: 14px;
+    border-collapse: collapse;
+}
+
+.table-detail th {
+    background: #f8f9fa;
+    padding: 8px 12px;
+    font-weight: 600;
+    color: #555;
+    border-bottom: 2px solid #e8e8e8;
+}
+
+.table-detail td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #555;
+}
+
+.no-data-msg {
+    text-align: center;
+    color: #999;
+    padding: 20px;
+}

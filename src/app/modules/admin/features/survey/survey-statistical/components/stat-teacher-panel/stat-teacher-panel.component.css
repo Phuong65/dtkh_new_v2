@@ -1,0 +1,137 @@
+:host {
+    display: block;
+    height: 100%;
+}
+
+.teacher-panel {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-top: 1px solid #e8e8e8;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.teacher-panel__header {
+    height: 40px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    padding: 4px 12px;
+    background: #f8f9fa;
+    border-bottom: 2px solid #e8e8e8;
+    overflow: hidden;
+}
+
+.compare-toggle {
+    display: inline-flex;
+    border: 1px solid #d4d4d8;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.compare-toggle__btn {
+    min-width: 86px;
+    padding: 5px 12px;
+    background: #fff;
+    border: 0;
+    color: #555;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.compare-toggle__btn + .compare-toggle__btn {
+    border-left: 1px solid #d4d4d8;
+}
+
+.compare-toggle__btn:hover {
+    background: #f0f4ff;
+}
+
+.compare-toggle__btn.active {
+    background: #4361ee;
+    color: #fff;
+    font-weight: 600;
+}
+
+.teacher-panel__placeholder,
+.teacher-panel__empty {
+    flex: 1;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 24px 16px;
+    text-align: center;
+    color: #999;
+    font-size: 13px;
+}
+
+.teacher-panel__placeholder p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.teacher-panel__table-wrap {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+}
+
+.teacher-panel__table {
+    width: 100%;
+    font-size: 14px;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+.teacher-panel__table th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #f8f9fa;
+    padding: 8px 12px;
+    font-weight: 600;
+    color: #555;
+    border-bottom: 2px solid #e8e8e8;
+    white-space: nowrap;
+}
+
+.teacher-panel__table td {
+    padding: 8px 12px;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+.teacher-panel__table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.teacher-panel__table th:not(:first-child),
+.teacher-panel__table td:not(:first-child) {
+    width: 90px;
+    white-space: nowrap;
+}
+
+.teacher-panel__name {
+    max-width: 210px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.teacher-panel__average {
+    color: #92400e;
+    font-weight: 700;
+}
+
+.text-center {
+    text-align: center;
+}

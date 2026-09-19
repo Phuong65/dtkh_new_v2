@@ -1,0 +1,33 @@
+.p-button-custom-ad {
+    --p-button-label-font-weight: inherit;
+
+    .p-button-label {
+        font-weight: var(--p-button-label-font-weight);
+    }
+}
+
+.cdk-overlay-pane--full-size {
+    width: 100%;
+    max-width: 100% !important;
+
+    .mat-dialog-container {
+        border-radius: 0;
+        padding: 0;
+        height: var(--max-screen-height);
+        max-height: var(--max-screen-height);
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+}
+
+.ictu-admin-dashboard-school-years-menu-panel {
+    &.mat-menu-panel {
+        border-radius: 0;
+        min-height: auto;
+    }
+
+    .mat-menu-content {
+        padding: 0 !important;
+    }
+}
+

@@ -1,0 +1,300 @@
+/* TOÀN BỘ FONT 13PX & KHÔNG SHADOW */
+.quiz-viewport,
+.quiz-viewport input,
+.quiz-viewport span,
+.quiz-viewport div {
+    font-size: 14px !important;
+
+    box-shadow: none !important;
+}
+
+.quiz-viewport {
+    background-color: #ffffff;
+    max-width: 1000px;
+    padding: 1rem;
+    margin: 0;
+}
+
+/* KHOẢNG CÁCH */
+.question-block {
+    margin-bottom: 40px;
+    /* Khoảng cách giữa các câu */
+}
+
+/* CĂN LỀ TRÁI THẲNG HÀNG */
+.q-index-tag {
+    font-weight: 800;
+    color: #4f46e5;
+    margin-top: 2px;
+    display: inline-block;
+}
+
+.q-content-text {
+    color: #1e293b;
+    line-height: 1.5;
+}
+
+/* STYLE PHẦN PART (MÔN TIẾNG ANH) */
+.part-header {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-left: 1px solid #e0e7ff;
+    border-radius: 4px;
+}
+
+.part-title-text {
+    font-weight: 800;
+    color: #4f46e5;
+    text-transform: uppercase;
+}
+
+.part-desc-text {
+    color: #6c757d;
+}
+
+/* STYLE Ô NHẬP LIỆU */
+.input-container {
+    max-width: 500px;
+    width: 100%;
+}
+
+.answer-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background-color: #ffffff;
+    color: #334155;
+    outline: none;
+    transition: all 0.15s ease;
+}
+
+/* Khi người dùng nhập bài (Focus) - Màu Blue Indigo đồng nhất */
+.answer-input:focus {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+}
+
+/* TRẠNG THÁI XEM ĐÁP ÁN (READONLY) - Màu Green đồng nhất */
+.is-readonly .answer-input {
+    background-color: #f8f9fa;
+    border-color: #e2e8f0;
+}
+
+.correct-feedback {
+    margin-top: 8px;
+    padding: 10px 14px;
+    background-color: #f0fdf4;
+    /* Green pastel */
+    border: 1px solid #22c55e;
+    border-radius: 4px;
+}
+
+.label-ans {
+    font-weight: 800;
+    color: #166534;
+    margin-right: 6px;
+}
+
+.text-ans {
+    font-weight: 700;
+    color: #15803d;
+}
+
+/* MODE SWITCH */
+.mode-switch {
+    width: 160px;
+    height: 32px;
+    border: 1px solid #dee2e6;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    background: #fff;
+}
+
+.switch-knob {
+    width: 26px;
+    height: 26px;
+    background: #6366f1;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    left: 2px;
+    transition: 0.3s ease;
+}
+
+.readonly-on .switch-knob {
+    left: 130px;
+    background: #22c55e;
+}
+
+.text-mode {
+    width: 100%;
+    text-align: center;
+    font-weight: 700;
+    color: #495057;
+    padding-left: 15px;
+}
+
+/* AUDIO PLAYER */
+.audio-custom {
+    height: 30px;
+    border-radius: 4px;
+}
+
+@media (max-width: 1024px) {
+    .pl-md-5 {
+        padding-left: 0 !important;
+    }
+}
+
+.ans-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.584em 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    line-height: 1;
+}
+
+.ans-tag-correct {
+    background-color: #eff6ff;
+    color: #333;
+    border-color: #3b82f6;
+    margin-right: 5px;
+}
+
+.ans-tag-correct:last-child {
+    margin-right: 0px;
+}
+
+.question-block:last-child {
+    margin-bottom: 0px;
+}
+
+/* --- PHẦN CÂU HỎI --- */
+.question-header-section {
+    background-color: #f5f5f5;
+    /* Màu xám xanh cực nhạt để tách biệt */
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.q-index-tag {
+    color: #4f46e5;
+    /* Blue Indigo */
+    font-weight: 800;
+    /* Chỉ dùng đậm cho số thứ tự để nhận diện */
+    margin-right: 10px;
+    margin-top: 2px;
+}
+
+.q-content-text {
+    color: #475569;
+    /* Màu chữ xám sâu, không dùng đậm để nhẹ mắt */
+    line-height: 1.5;
+}
+
+.quiz-viewport {
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+}
+
+.part-header,
+.question-header-section {
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid #e0e7ff;
+    border-left: 1px solid #e0e7ff;
+    border-radius: 14px;
+}
+
+.question-header-section {
+    padding: 12px 14px !important;
+}
+
+.answer-input,
+.form-control {
+    border-radius: 12px;
+    border-color: #dbe4ff;
+}
+
+.answer-input:focus,
+.form-control:focus {
+    border-color: #6366f1;
+    background-color: #f8fbff;
+}
+
+.ans-tag,
+.ans-tag-correct,
+.correct-feedback {
+    border-radius: 6px !important;
+}
+
+.part-header {
+    background: #f3f6fb !important;
+    border: 1px solid #e5e7eb !important;
+    border-left: 1px solid #e5e7eb !important;
+    border-radius: 6px !important;
+}
+
+.question-block {
+    background: #ffffff;
+    margin-bottom: 24px;
+    padding: 10px 0 0 0px;
+}
+
+.question-header-section {
+    background: #f8fbff !important;
+    border: 1px solid #eef2ff !important;
+    border-left: 1px solid #eef2ff !important;
+    border-radius: 6px !important;
+    padding: 10px 12px !important;
+}
+
+.answer-body-section,
+.sentence-list,
+.sentence-box,
+.correct-box,
+.correct-box-list,
+.ans-card,
+.ans-label,
+.answer-input,
+.form-control,
+.sentence-item,
+.word-chip,
+.word-btn,
+.custom-placeholder,
+.cdk-drag-preview {
+    border-radius: 6px !important;
+}
+
+.answer-body-section,
+.sentence-list,
+.sentence-box {
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: #ffffff !important;
+    border: 1px solid #E0E0E0 !important;
+}
+
+.ans-card,
+.sentence-item,
+.word-chip,
+.word-btn,
+.form-control,
+.answer-input {
+    background: #ffffff;
+    border-color: #e5e7eb !important;
+}
+
+.ans-tag-correct{
+    margin-bottom: 5px
+}

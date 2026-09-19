@@ -1,0 +1,9 @@
+.acttive-class {
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.bg-gray{
+    background-color: #F2f2f2;
+}

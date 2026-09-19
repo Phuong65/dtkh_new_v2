@@ -1,0 +1,122 @@
+:host {
+    display: block;
+    width: 100%;
+}
+
+.dropdown-wrapper {
+    position: relative;
+    font-family: sans-serif;
+}
+
+.dropdown-header {
+    padding: 10px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+    min-height: 40px;
+}
+
+.dropdown-header.active {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.dropdown-header.has-value .label-text {
+    color: #212529;
+    font-weight: 500;
+}
+
+.label-text {
+    color: #6c757d;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 10px;
+}
+
+.arrow-icon {
+    font-size: 10px;
+    transition: transform 0.2s;
+    color: #666;
+}
+
+.arrow-icon.rotated {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 1050;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    margin: 4px 0;
+}
+
+.dropdown-menu.drop-up {
+    bottom: 100%;
+    top: auto;
+}
+
+.dropdown-menu:not(.drop-up) {
+    top: 100%;
+    bottom: auto;
+}
+
+.group-name {
+    padding: 8px 15px;
+    background: #f8f9fa;
+    font-size: 12px;
+    font-weight: 700;
+    color: #007bff;
+    text-transform: uppercase;
+}
+
+.item-option {
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.item-option:hover {
+    background: #f1f3f5;
+}
+
+.item-option.selected {
+    background: #e7f1ff;
+}
+
+.check-box {
+    width: 18px;
+    height: 18px;
+    border: 1px solid #adb5bd;
+    border-radius: 4px;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    color: white;
+    font-size: 12px;
+}
+
+.item-option.selected .check-box {
+    background: #007bff;
+    border-color: #007bff;
+}
+
+.item-label {
+    font-size: 14px;
+    color: #495057;
+}

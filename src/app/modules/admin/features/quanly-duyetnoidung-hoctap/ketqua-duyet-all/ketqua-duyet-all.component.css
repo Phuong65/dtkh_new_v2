@@ -1,0 +1,55 @@
+.status-is-active {
+    color: #28a745;
+}
+
+.status-is-deactive {
+    color: #BDBDBD;
+}
+
+.status-is-redo {
+    color: red;
+}
+
+.status-is-require {
+    color: #8f48d2;
+}
+
+.layout-ketqua-duyet {
+    padding: 15px;
+    height: 100%;
+    overflow: auto;
+}
+
+tr, td, th {
+    border: 1px solid #dee2e6;
+    border-width: 1px 1px 1px 1px !important;
+}
+
+/*======================new ===================*/
+.duyet-container{
+    display:flex;
+    justify-content: center;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 0 0;
+    flex-wrap: wrap;
+}
+.duyet-container button{
+    height:36px;
+}
+.listcheckAccept{
+    padding:10px;
+    display: flex;
+    flex-direction: column;
+    gap:10px;
+}
+.listcheckAccept .item{
+    display: flex;
+    gap: 10px;
+    font-size: 15px;
+    align-items: center;
+    font-weight: 400;
+}
+.listcheckAccept .item >span{
+    line-height: 1.2;
+}

@@ -1,0 +1,44 @@
+.ictu-course-reporter__scores,
+.ictu-course-reporter__teacher-classes {
+    padding: 10px;
+    display: block;
+}
+
+.ictu-course-reporter__scores__heading,
+.ictu-course-reporter__teacher-classes__heading {
+    display: block;
+    font-family: "Roboto", sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    line-height: 1.5;
+    margin: 0;
+    color: #333333;
+    padding: 5px 0;
+}
+
+.ictu-course-reporter__tbl-heading {
+    display: block;
+    font-family: "Roboto", sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    text-align: left;
+    text-transform: uppercase;
+    line-height: 1.5;
+    margin: 0 0 10px;
+}
+
+.ictu-course-reporter__tbl-results__col-point-percentage,
+.ictu-course-reporter__tbl-results__col-point-number {
+    width: 60px;
+}
+
+.ictu-course-reporter__tbl-results__col-total-reject {
+    width: 100px;
+}
+
+.ictu-course-reporter__scores-tbl {
+    margin-top: 15px;
+    line-height: 1;
+}

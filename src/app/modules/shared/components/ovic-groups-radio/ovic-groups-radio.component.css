@@ -1,0 +1,94 @@
+.ovic-radios {
+    display: flex;
+    margin: 5px 0 0;
+    list-style: none;
+    justify-content: flex-start;
+}
+
+.ovic-radios--horizontal {
+    flex-direction: row;
+    align-items: baseline;
+}
+
+.ovic-radios--vertical {
+    flex-direction: column;
+}
+
+.ovic-radios li {
+    display: inline-block;
+    margin: 0;
+    flex: 1;
+}
+
+.ovic-radios--vertical li + li {
+    margin-top: 10px;
+}
+
+.ovic-radios li.layout-3-columns {
+    max-width: 33.333333333%;
+}
+
+.ov-btn-radio {
+    background: transparent;
+    border: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    box-shadow: none !important;
+    outline: none !important;
+    font-size: 13px;
+    font-weight: 300;
+    color: #6f6d6d;
+    line-height: 20px;
+    /*height: 20px;*/
+    transition: all 0.5s ease 0s;
+    justify-content: flex-start;
+    /*align-items: center;*/
+
+}
+.ov-btn-radio .ovic-radios__text{
+    text-align: left!important;
+}
+.ov-btn-radio .ov-prefix {
+    border: 1px solid #a6a6a6;
+    background-color: #ffffff;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+    position: relative;
+    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+    border-radius: 50%;
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 7px;
+    min-width: 18px;
+}
+
+.ov-btn-radio.active .ov-prefix {
+    background-color: #007ad9;
+    border-color: #007ad9;
+}
+
+.ov-btn-radio .ov-prefix::before {
+    position: absolute;
+    content: "\f00c";
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #ffffff;
+    top: 4px;
+    left: 4px;
+    font-size: 9px;
+    transition: all 0.5s ease 0s;
+    visibility: hidden;
+    opacity: 0;
+    font-weight: 100;
+}
+
+.ov-btn-radio.active .ov-prefix::before {
+    visibility: visible;
+    opacity: 1;
+    color: #ffffff;
+}

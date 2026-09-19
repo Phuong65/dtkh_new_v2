@@ -1,0 +1,25 @@
+.ketqua-container{
+    height: 100%;
+    display: flex;
+    max-width: 1024px;
+    margin: 0 auto;
+    flex-direction: column;
+}
+.ketqua-head{
+    height: 50px;
+    border:1px solid #ededed;
+    background:  #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding:10px;
+}
+.ketqua-body{
+    height:  1%;
+    flex: 1 1 auto;
+    /*background: #fff;*/
+    border:1px solid #ededed;
+
+    padding:10px;
+    background: #fbfbfb;
+}

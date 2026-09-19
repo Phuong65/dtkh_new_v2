@@ -1,0 +1,1005 @@
+/* ===== CSS Variables ===== */
+:host {
+  --primary: #4f46e5;
+  --primary-light: #eef2ff;
+  --primary-dark: #3730a3;
+  --success: #10b981;
+  --success-light: #ecfdf5;
+  --warning: #f59e0b;
+  --warning-light: #fffbeb;
+  --danger: #ef4444;
+  --danger-light: #fef2f2;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 16px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Reset global body !important overrides */
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+}
+
+/* ===== Unified Button System ===== */
+/* --- Base button --- */
+.class-group-wrapper .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-weight: 500;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid transparent;
+  transition: var(--transition);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  box-shadow: none !important;
+}
+
+.class-group-wrapper .btn:active {
+  transform: scale(0.97);
+}
+
+.class-group-wrapper .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.class-group-wrapper .btn i,
+.class-group-wrapper .btn .material-icons {
+  font-size: 16px !important;
+  line-height: 1 !important;
+}
+
+/* --- Button size: sm (table action cells) --- */
+.class-group-wrapper .btn-sm,
+.action-cell .btn {
+  padding: 5px 10px;
+  font-size: 12px !important;
+}
+
+.class-group-wrapper .btn-sm i,
+.class-group-wrapper .btn-sm .material-icons,
+.action-cell .btn i,
+.action-cell .btn .material-icons {
+  font-size: 14px !important;
+}
+
+.action-cell {
+  white-space: nowrap;
+}
+
+.action-cell .btn + .btn {
+  margin-left: 4px;
+}
+
+/* --- Button size: lg (dialog actions) --- */
+.class-group-wrapper .btn-lg,
+.dialog-actions .btn {
+  padding: 9px 22px;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+}
+
+.class-group-wrapper .btn-lg i,
+.class-group-wrapper .btn-lg .material-icons,
+.dialog-actions .btn i,
+.dialog-actions .btn .material-icons {
+  font-size: 17px !important;
+}
+
+/* --- Button variants --- */
+
+/* Primary */
+.btn-primary {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: #fff !important;
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35) !important;
+}
+
+.btn-primary:active {
+  background: var(--primary-dark) !important;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3) !important;
+}
+
+/* Success */
+.btn-success {
+  background: var(--success) !important;
+  border-color: var(--success) !important;
+  color: #fff !important;
+}
+
+.btn-success:hover {
+  background: #059669 !important;
+  border-color: #059669 !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35) !important;
+}
+
+.btn-success:active {
+  background: #059669 !important;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3) !important;
+}
+
+.btn-success:disabled {
+  background: var(--gray-300) !important;
+  border-color: var(--gray-300) !important;
+  box-shadow: none !important;
+  opacity: 0.6;
+}
+
+/* Danger */
+.btn-danger {
+  background: var(--danger) !important;
+  border-color: var(--danger) !important;
+  color: #fff !important;
+}
+
+.btn-danger:hover {
+  background: #dc2626 !important;
+  border-color: #dc2626 !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35) !important;
+}
+
+/* Outline Primary */
+.btn-outline-primary {
+  background: transparent !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+}
+
+.btn-outline-primary:hover {
+  background: var(--primary-light) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary-dark) !important;
+}
+
+/* Outline Secondary */
+.btn-outline-secondary {
+  background: transparent !important;
+  border-color: var(--gray-300) !important;
+  color: var(--gray-600) !important;
+}
+
+.btn-outline-secondary:hover {
+  background: var(--gray-100) !important;
+  border-color: var(--gray-400) !important;
+  color: var(--gray-700) !important;
+}
+
+/* Outline Danger */
+.btn-outline-danger {
+  background: transparent !important;
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
+}
+
+.btn-outline-danger:hover {
+  background: var(--danger-light) !important;
+  border-color: var(--danger) !important;
+  color: #dc2626 !important;
+}
+
+/* ===== Dialog Button Overrides (::ng-deep) ===== */
+:host ::ng-deep .p-dialog .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-weight: 500;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+  padding: 9px 22px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid transparent;
+  transition: var(--transition);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  box-shadow: none !important;
+}
+
+:host ::ng-deep .p-dialog .btn:active {
+  transform: scale(0.97);
+}
+
+:host ::ng-deep .p-dialog .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+:host ::ng-deep .p-dialog .btn i,
+:host ::ng-deep .p-dialog .btn .material-icons {
+  font-size: 17px !important;
+  line-height: 1 !important;
+}
+
+:host ::ng-deep .p-dialog .btn + .btn {
+  margin-left: 8px;
+}
+
+/* ===== Wrapper ===== */
+.class-group-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 16px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* ===== Header ===== */
+.class-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.class-group-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--primary), #818cf8);
+  border-radius: 4px 0 0 4px;
+}
+
+.class-group-header h3 {
+  font-size: 20px !important;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: var(--gray-900);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.class-group-header h3::before {
+  content: '👥';
+  font-size: 22px !important;
+}
+
+.class-group-header p {
+  color: var(--gray-500);
+  margin: 0;
+  font-size: 14px !important;
+  font-weight: 400;
+}
+
+.class-group-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* ===== Summary Cards ===== */
+.class-group-summary {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(160px, 1fr));
+}
+
+.class-group-summary > div {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.class-group-summary > div:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--primary);
+}
+
+.class-group-summary > div::after {
+  content: '';
+  position: absolute;
+  right: -10px;
+  bottom: -10px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  opacity: 0.05;
+}
+
+.class-group-summary > div:first-child::after {
+  background: var(--primary);
+}
+
+.class-group-summary > div:last-child::after {
+  background: var(--success);
+}
+
+.summary-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px !important;
+  flex-shrink: 0;
+}
+
+.summary-icon.groups {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.summary-icon.students {
+  background: var(--success-light);
+  color: var(--success);
+}
+
+.summary-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-label {
+  color: var(--gray-500);
+  display: block;
+  font-size: 13px !important;
+  font-weight: 400;
+  margin-bottom: 2px;
+}
+
+.class-group-summary strong {
+  color: var(--gray-900);
+  font-size: 24px !important;
+  font-weight: 700;
+  line-height: 1.2 !important;
+}
+
+/* ===== Empty State ===== */
+.empty-state {
+  background: var(--gray-50);
+  border: 2px dashed var(--gray-300);
+  border-radius: var(--radius-lg);
+  color: var(--gray-500);
+  padding: 48px 24px;
+  text-align: center;
+  font-size: 15px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  transition: var(--transition);
+}
+
+.empty-state:hover {
+  border-color: var(--gray-400);
+  background: #ffffff;
+}
+
+.empty-state .empty-icon {
+  font-size: 48px !important;
+  opacity: 0.6;
+}
+
+.empty-state .empty-title {
+  font-weight: 600;
+  color: var(--gray-700);
+  font-size: 16px !important;
+}
+
+.empty-state .empty-hint {
+  color: var(--gray-400);
+  font-size: 13px !important;
+  max-width: 360px;
+}
+
+/* ===== Table Styling ===== */
+:host ::ng-deep .p-datatable {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-header {
+  background: linear-gradient(135deg, #f8faff, #ffffff);
+  border: none;
+  padding: 14px 16px;
+  font-weight: 600;
+  color: var(--gray-700);
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+  background: var(--gray-50);
+  border-color: var(--gray-200);
+  color: var(--gray-700);
+  font-weight: 600;
+  font-size: 13px !important;
+  padding: 12px 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  line-height: 1.5 !important;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr {
+  transition: var(--transition);
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr:nth-child(even) {
+  background: var(--gray-50);
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr:hover {
+  background: var(--primary-light);
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+  padding: 12px 16px;
+  border-color: var(--gray-200);
+  font-size: 14px !important;
+  color: var(--gray-700);
+  line-height: 1.5 !important;
+}
+
+:host ::ng-deep .p-datatable.p-datatable-sm .p-datatable-tbody > tr > td {
+  padding: 10px 16px;
+}
+
+/* ===== Student Chips ===== */
+.student-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--primary-light);
+  border-radius: 999px;
+  color: var(--primary-dark);
+  font-size: 12px !important;
+  font-weight: 500;
+  margin: 2px 4px 2px 0;
+  padding: 4px 10px;
+  white-space: nowrap;
+  transition: var(--transition);
+  border: 1px solid transparent;
+  cursor: default;
+}
+
+.student-chip:hover {
+  background: #ddd6fe;
+  border-color: #c7d2fe;
+  transform: translateY(-1px);
+}
+
+.student-chip::before {
+  content: '👤';
+  font-size: 11px !important;
+}
+
+/* ===== Group Form ===== */
+.group-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.group-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+
+.group-form label span {
+  color: var(--gray-700);
+  font-weight: 600;
+  font-size: 14px !important;
+}
+
+.group-form .form-control {
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--gray-300);
+  padding: 8px 12px;
+  font-size: 14px !important;
+  transition: var(--transition);
+  background: #ffffff;
+  height: auto !important;
+  line-height: 1.5 !important;
+}
+
+.group-form .form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  outline: none;
+}
+
+.group-form .form-control.ng-invalid.ng-touched {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-error {
+  color: var(--danger);
+  font-size: 12px !important;
+  margin-top: -8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.form-error::before {
+  content: '⚠';
+  font-size: 12px !important;
+}
+
+/* ===== Dialog Actions ===== */
+.dialog-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--gray-200);
+}
+
+/* ===== Selected Student Box ===== */
+.selected-student-box {
+  background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+  border: 1px solid #a7f3d0;
+  border-radius: var(--radius-md);
+  margin-bottom: 16px;
+  padding: 14px 16px;
+}
+
+.selected-student-box > span {
+  color: #065f46;
+  display: block;
+  font-weight: 600;
+  font-size: 13px !important;
+  margin-bottom: 8px;
+}
+
+.selected-student-box .student-chip {
+  background: #d1fae5;
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+
+.selected-student-box .student-chip:hover {
+  background: #a7f3d0;
+}
+
+/* ===== Student Search ===== */
+.student-search-box {
+  margin-bottom: 12px;
+}
+
+.student-search-box .form-control {
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--gray-300);
+  padding: 10px 12px 10px 36px;
+  font-size: 14px !important;
+  width: 100%;
+  transition: var(--transition);
+  background: #ffffff;
+  height: auto !important;
+  line-height: 1.5 !important;
+}
+
+.student-search-box .form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  outline: none;
+}
+
+.search-input-wrapper {
+  position: relative;
+}
+
+.search-input-wrapper::before {
+  content: '🔍';
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px !important;
+  z-index: 1;
+}
+
+/* ===== Student List ===== */
+.student-list {
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  max-height: 420px;
+  overflow-y: auto;
+  margin-bottom: 0;
+}
+
+.student-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.student-list::-webkit-scrollbar-track {
+  background: var(--gray-100);
+  border-radius: 3px;
+}
+
+.student-list::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: 3px;
+}
+
+.student-list::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-400);
+}
+
+.student-row {
+  display: grid;
+  align-items: center;
+  gap: 12px;
+  grid-template-columns: 24px 1fr auto;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: var(--transition);
+  user-select: none;
+}
+
+.student-row + .student-row {
+  border-top: 1px solid var(--gray-100);
+}
+
+.student-row:hover {
+  background: var(--primary-light);
+}
+
+.student-row.active {
+  background: #eef2ff;
+  border-left: 3px solid var(--primary);
+  padding-left: 11px;
+}
+
+/* Custom checkbox */
+.student-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: var(--transition);
+}
+
+.student-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.student-info strong {
+  color: var(--gray-800);
+  font-size: 14px !important;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4 !important;
+}
+
+.student-info span {
+  color: var(--gray-500);
+  font-size: 12px !important;
+}
+
+.student-group-state {
+  color: var(--gray-400);
+  font-size: 12px !important;
+  font-weight: 400;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--gray-100);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.student-group-state.has-group {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+}
+
+.student-group-state.no-group {
+  background: var(--gray-100);
+  color: var(--gray-500);
+}
+
+/* Student count badge */
+.student-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 13px !important;
+  font-weight: 600;
+}
+
+/* Student count button (clickable) */
+.student-count-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  transition: var(--transition);
+  line-height: 1 !important;
+  min-width: auto !important;
+  height: auto !important;
+}
+
+.student-count-btn:hover {
+  transform: scale(1.15);
+}
+
+.student-count-btn:hover .student-count-badge {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+}
+
+.student-count-btn:active {
+  transform: scale(0.95);
+}
+
+/* ===== Member List Dialog ===== */
+.member-summary {
+  margin-bottom: 16px;
+}
+
+.member-count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  font-size: 14px !important;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+
+.member-list {
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  max-height: 420px;
+  overflow-y: auto;
+  margin-bottom: 0;
+}
+
+.member-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.member-list::-webkit-scrollbar-track {
+  background: var(--gray-100);
+  border-radius: 3px;
+}
+
+.member-list::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: 3px;
+}
+
+.member-list::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-400);
+}
+
+.member-row {
+  display: grid;
+  align-items: center;
+  gap: 12px;
+  grid-template-columns: 36px 1fr;
+  padding: 10px 14px;
+  transition: var(--transition);
+}
+
+.member-row + .member-row {
+  border-top: 1px solid var(--gray-100);
+}
+
+.member-row:hover {
+  background: var(--primary-light);
+}
+
+.member-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), #818cf8);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px !important;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.member-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.member-info strong {
+  color: var(--gray-800);
+  font-size: 14px !important;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4 !important;
+}
+
+.member-info span {
+  color: var(--gray-500);
+  font-size: 12px !important;
+}
+
+/* ===== Progress Dialog ===== */
+.progress-text {
+  margin: 16px 0 4px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--gray-700);
+  font-size: 15px !important;
+}
+
+.progress-text::after {
+  content: ' hoàn thành';
+  font-weight: 400;
+  color: var(--gray-500);
+}
+
+/* ===== Dialog Overrides (::ng-deep for elements rendered outside component) ===== */
+:host ::ng-deep .p-dialog .p-dialog-header {
+  border-bottom: 1px solid var(--gray-200);
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #f8faff, #ffffff);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-title {
+  font-weight: 700;
+  font-size: 17px !important;
+  color: var(--gray-900);
+  line-height: 1.4 !important;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content {
+  padding: 24px;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content p {
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-footer {
+  border-top: 1px solid var(--gray-200);
+  padding: 12px 24px;
+}
+
+/* Ensure mat-progress-bar inside dialog has proper sizing */
+:host ::ng-deep .p-dialog mat-progress-bar {
+  border-radius: 4px;
+  height: 8px !important;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 992px) {
+  .class-group-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .class-group-actions {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .class-group-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+
+}
+
+@media (max-width: 576px) {
+  .class-group-header {
+    padding: 16px;
+  }
+
+  .class-group-header h3 {
+    font-size: 17px !important;
+  }
+
+  .class-group-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .class-group-summary > div {
+    padding: 14px 16px;
+  }
+
+  .student-row {
+    grid-template-columns: 24px 1fr;
+  }
+
+  .student-group-state {
+    grid-column: 2;
+  }
+
+  .action-cell .btn {
+    padding: 4px 8px;
+    font-size: 11px !important;
+  }
+
+  :host ::ng-deep .p-dialog .p-dialog-content {
+    padding: 16px;
+  }
+}

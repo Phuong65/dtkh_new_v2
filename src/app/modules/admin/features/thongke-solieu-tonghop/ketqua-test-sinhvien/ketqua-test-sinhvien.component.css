@@ -1,0 +1,87 @@
+.layout_component_container-top {
+    padding: 5px;
+    border-bottom: 1px solid #c8c8c8;
+    display: flex;
+}
+
+.container-top-left {
+    width: 300px;
+}
+
+.container-top-right {
+    display: flex;
+    justify-content: flex-end;
+    flex: 1;
+}
+
+.layout_component_container-bottom {
+    height: calc(100% - 41px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+}
+
+.container-bottom-left {
+    width: 310px;
+    border-right: 1px solid #c8c8c8;
+    height: 100%;
+}
+
+.container-bottom-right {
+    flex: 1;
+    height: calc(100% - 41px);
+    padding: 5px;
+    width: 100%;
+}
+
+.title-col-flex {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.title-col-flex-text {
+    flex: 1;
+}
+
+.lesson-view-content .title-lesson-parent span {
+    font-weight: 600;
+}
+
+.title-lesson-parent {
+    padding: 8px;
+    border-bottom: 1px solid #9ec5fe;
+    background-color: #cfe2ff;
+
+}
+
+.title-lesson-child {
+    padding: 8px;
+    border-bottom: 1px solid #9ec5fe;
+    /* background-color: #cfe2ff; */
+    display: flex;
+    align-items: center;
+}
+
+.lesson-view-content {
+    border: 1px solid #9ec5fe;
+    border-bottom: 0px;
+}
+
+.title-progress-student {
+    background-color: #007bff;
+    border: 1px solid #007bff;
+    border-bottom: 0px;
+    padding: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.card-progress-student {
+    /* margin-bottom: 20px; */
+}
+
+.p-tabview .p-tabview-panels {
+    padding: 0px !important;
+}

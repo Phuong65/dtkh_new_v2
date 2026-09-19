@@ -1,0 +1,11 @@
+.layout_component_container-top {
+    padding: 5px;
+    border-bottom: 1px solid #c8c8c8;
+    display: flex;
+    align-items: center;
+}
+
+.layout_component_container-bottom {
+    height: calc(100% - 81px);
+    padding: 5px;
+}

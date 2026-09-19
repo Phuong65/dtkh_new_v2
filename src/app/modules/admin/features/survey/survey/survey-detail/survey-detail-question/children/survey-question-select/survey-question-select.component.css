@@ -1,0 +1,47 @@
+.layout-component-container-survey-question-radio {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    gap: 10px;
+    padding: 0px 10px;
+}
+
+.survey-question-radio-title {
+    display: flex;
+    flex-direction: column;
+}
+
+.survey-question-radio-answer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.survey-question-radio-answer__list-option-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.survey-question-square-number {
+    width: 36px;
+    height: 36px;
+    background: #989fff;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.survey-question-radio-view{
+  width:18px;
+  height:18px;
+  border:2px solid #9ca3af;
+  border-radius:50%;
+  display:inline-block;
+}

@@ -1,0 +1,23 @@
+<div class="ovic-media-files" *ngIf="!oneResult">
+    <div class="files-list">
+        <div class="single-file" style="" *ngFor="let file of fileChooser, index as i">
+            <i class="icon-in-open-download-file" [ngClass]="file | ovicFileIcon" ></i>
+            <div class="info">
+                <h4 class="name">{{file.title}}</h4>
+                <p class="size">{{file['file_size']}}</p>
+            </div>
+            <button *ngIf='viewOnly && downloadShow' (click)="actionDownload(i)" type="button"
+                class="btn btn-success btn-download" container="body" placement="top">
+                <i aria-hidden=" true" class="fa fa-download"
+                    [ngClass]="file['download']? 'download-true':'download-false' "></i></button>
+            <button *ngIf='viewOnly' (click)="deleteFileChoosed(i)" type="button" class="btn-delete">
+                <i  class="fa fa-trash-o"></i></button>
+        </div>
+        <button *ngIf='viewOnly' (click)="openFileManager()" type="button"
+            class="btn btn-outline-success call-file-picker">{{this.buttonLabel}}
+        </button>
+    </div>
+</div>
+<button *ngIf="oneResult" (click)="openFileManager()" type="button"
+    class="btn btn-outline-success call-file-picker btn-choose-avata">{{this.buttonLabel}}
+</button>

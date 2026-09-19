@@ -1,0 +1,97 @@
+.files-list{
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.single-file{
+    display: flex;
+    align-items: center;
+
+    padding: 12px 20px;
+    background: rgba(248,249,250);
+    border:1px solid rgb(230.8451612903, 234.2, 237.5548387097);
+    border-radius: 12px;
+    gap:10px;
+}
+
+.single-file .site:hover{
+    cursor: pointer;
+}
+.files-list .single-file .name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #353f4a;
+    margin: 0;
+}
+
+
+.files-list .single-file>img {
+    width: 34px;
+}
+
+.files-list .single-file .size {
+    font-size: 12px;
+    font-weight: 500;
+    color: #a4a4a4;
+    margin: 0;
+}
+.files-list .single-file .info {
+    width: 100%;
+    padding-left: 7px;
+}
+.files-list .single-file .file button {
+
+    /*padding-left: 10px;*/
+    width: 30px;
+    height:30px;
+    border-radius:12px !important;
+}
+
+.icon-in-open-download-file {
+    font-size: 30px;
+}
+
+
+.fa-trash-o {
+    color: #e02b2b;
+}
+
+.fa-file-image-o {
+    color: #76ab39;
+}
+
+.fa-file-word-o {
+    color: #1565c0;
+}
+
+.fa-file-excel-o {
+    color: #03b108;
+}
+
+.fa-file-powerpoint-o {
+    color: #ff5722;
+}
+
+.fa-file-pdf-o {
+    color: #cc4b4c;
+}
+
+.fa-file-code-o {
+    color: #37474f;
+}
+
+.fa-folder {
+    color: #ffc876;
+}
+
+.fa-file-archive-o {
+    color: #2196f3;
+}
+
+.fa-file-audio-o {
+    color: #8d6e63;
+}
+
+.fa-file-video-o {
+    color: #795548;
+}

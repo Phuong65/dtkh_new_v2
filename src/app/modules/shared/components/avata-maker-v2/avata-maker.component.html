@@ -1,0 +1,39 @@
+<div class="modal-body">
+  <div class="panel panel-default">
+    <div class="panel-heading vt-relative">
+      <strong class="text-u-c"><i class="fa fa-th"></i> Edit</strong>
+    </div>
+    <div class="panel-body padding-xl ui-g">
+      <div class="text-center ui-lg-6 ui-g12">
+        <div class="work-zone" >
+          <image-cropper
+            
+            [imageChangedEvent]="imageChangedEvent"
+            [imageBase64]="imageBase64"
+            [maintainAspectRatio]="true"
+            [aspectRatio]="aspectRatio"
+            [resizeToWidth]="300"
+            [imageQuality]="100"
+            format="png"
+            (imageCropped)="imageCropped($event)"
+            (imageLoaded)="imageLoaded()"
+            (cropperReady)="cropperReady()"
+            (loadImageFailed)="loadImageFailed()"></image-cropper>
+          <small *ngIf="isError" class="text-danger errorMessage" (click)="hideError()">
+            Lỗi kiểu dữ liệu
+          </small>
+        </div>
+      </div>
+      <div class="text-center ui-lg-6 ui-g-12" *ngIf="croppedImage">
+        <div class="result-zone" >
+          <img class="img-preview" [src]="croppedImage"/>
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer vt-area-button">
+      <button type="submit" (click)="sendBackData()" class="btn btn-info btn ovic-over-right-section__foot-btn btn-primary ng-star-inserted">Lưu lại</button>
+      <button type="submit" (click)="sendBackCurrentData()" class="btn btn-success btn ovic-over-right-section__foot-btn btn-primary ng-star-inserted">Không lưu</button>
+      <button type="button" (click)="activeModal.close()" class="btn btn-danger btn ovic-over-right-section__foot-btn btn-primary ng-star-inserted">Hủy</button>
+    </div>
+  </div>
+</div>

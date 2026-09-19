@@ -1,0 +1,4 @@
+﻿D:\project\dtkh_v2.1\src\app\modules\shared\services\ovic-zoom.service.ts:90:getBody ( hostId : string , startTime : any , time : number , title : string ) {
+D:\project\dtkh_v2.1\src\app\modules\shared\services\ovic-zoom.service.ts:139:'start_time' : startTime ,
+D:\project\dtkh_v2.1\src\app\modules\shared\services\ovic-zoom.service.ts:157:createMeeting ( api : string , apisecret : string , hostId : string , startTime : any , time : number , title : string , userId : string ) : Observable<any> {
+D:\project\dtkh_v2.1\src\app\modules\shared\services\ovic-zoom.service.ts:159:const body = this.getBody ( hostId , startTime , time , title );

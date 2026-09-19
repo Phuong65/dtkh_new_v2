@@ -1,0 +1,52 @@
+.thong-bao-layout-header {
+    padding: 5px;
+    border-bottom: 1px solid #c8c8c8;
+    display: flex;
+}
+
+.thong-bao-layout-bottom {
+    height: calc(100% - 41px);
+}
+
+.thong-bao-layout-header-left {
+    flex: 1;
+}
+
+.thong-bao-layout-header-right {
+    text-align: right;
+}
+
+.action-thong-bao button {
+    border-radius: 50% !important;
+}
+
+.list-thong-bao-layout {
+    height: calc(100% - 40px);
+    overflow: auto;
+}
+
+.card-thongbao-layout {
+    padding: 15px;
+    border: 1px solid #c8c8c8;
+    border-radius: 6px;
+    background: #fff;
+}
+
+.info-thongbao-bottom-layout {
+    padding: 15px;
+    overflow: auto;
+}
+
+.card-thongbao-layout {
+    font-size: 14px;
+}
+
+.doituong-nhan-layout label {
+    margin: 0px;
+}
+
+.card-thongbao-layout {
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.5;
+}

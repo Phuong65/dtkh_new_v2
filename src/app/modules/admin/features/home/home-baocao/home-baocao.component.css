@@ -1,0 +1,291 @@
+.view-full-size{
+   max-width:100vw !important;
+}
+
+
+.admin-dashboard {
+    min-height: calc(var(--max-screen-height, 100vh) - 60px);
+    height: calc(var(--max-screen-height, 100vh) - 60px);
+    max-height: calc(var(--max-screen-height, 100vh) - 60px);
+    display: block;
+    width: 100%;
+    position: relative;
+    overflow-y: auto;
+}
+
+.admin-dashboard__container {
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 100%;
+    min-height: calc(var(--max-screen-height, 100vh) - 60px);
+    padding: 10px;
+    background-color: #e9ecef73;
+}
+
+.admin-dashboard__group-counter {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: stretch;
+    gap: 4px;
+}
+
+.admin-dashboard__group-counter li {
+    display: inline-flex;
+    flex-basis: calc((100% / 6) - 4px);
+}
+
+.admin-dashboard__row {
+    width: 100%;
+    --admin-dashboard-collumn-size: 40.3176542%;
+    --admin-dashboard-collumn-gap: 20px;
+}
+
+.admin-dashboard__row + .admin-dashboard__row {
+    margin-top: 15px;
+}
+
+.admin-dashboard__row.d-flex {
+    gap: var(--admin-dashboard-collumn-gap);
+    flex-flow: row wrap;
+}
+
+.admin-dashboard__col--size-40-percent {
+    width: var(--admin-dashboard-collumn-size);
+    min-width: var(--admin-dashboard-collumn-size);
+    max-width: var(--admin-dashboard-collumn-size);
+}
+
+.admin-dashboard__row-fix > .flex-fill,
+.admin-dashboard__col--size-40-percent + .flex-fill {
+    --admin-dashboard-collumn-flex-fill: calc(100% - var(--admin-dashboard-collumn-size) - var(--admin-dashboard-collumn-gap));
+    width: var(--admin-dashboard-collumn-flex-fill);
+    max-width: var(--admin-dashboard-collumn-flex-fill);
+}
+
+.admin-dashboard__row-fix {
+    --admin-dashboard-collumn-size: 34.5942648%;
+}
+
+.admin-dashboard__col--size-35-percent {
+    width: var(--admin-dashboard-collumn-size);
+    min-width: var(--admin-dashboard-collumn-size);
+    max-width: var(--admin-dashboard-collumn-size);
+}
+
+
+.admin-dashboard__grid-counter {
+    width: 100%;
+    height: 100%;
+}
+
+.admin-dashboard__grid-counter ul {
+    padding: 15px;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 100%;
+    margin: 0;
+    list-style: none;
+    gap: 15px;
+}
+
+.admin-dashboard__grid-counter ul li {
+    --grid-counter-size: 100%;
+    width: var(--grid-counter-size);
+}
+
+
+/*=================================
+* admin-dashboard-banner
+=================================*/
+.admin-dashboard-banner {
+    width: 100%;
+    aspect-ratio: 660/349;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    background-color: #ffffff;
+}
+
+.admin-dashboard-banner__heading {
+    margin: 0;
+    display: block;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1.5;
+    text-align: center;
+    max-width: 375px;
+}
+
+.admin-dashboard-banner__list-apps {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+}
+
+.admin-dashboard-banner__list-apps li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-dashboard-banner__list-apps li img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    margin: 0;
+}
+
+.admin-dashboard-banner__list-apps li b {
+    font-size: 18px;
+    font-weight: 500;
+    text-transform: lowercase;
+    line-height: 1;
+    margin: 15px 0 0;
+    letter-spacing: 1px;
+}
+
+.ictu-section-chart__chart-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 953/360;
+    padding: 10px;
+}
+
+.ictu-section-chart__chart-wrapper__chart-element {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.admin-dashboard__col {
+    background-color: #ffffff;
+}
+
+/*=================================
+* tbl-faculty
+=================================*/
+.tbl-faculty {
+    --tbl-faculty-size-col-index: 50px;
+    --tbl-faculty-size-col-number-of-subjects: 95px;
+    --tbl-faculty-size-col-number-of-classes: 95px;
+    --tbl-faculty-size-col-number-of-students: 95px;
+    --tbl-faculty-size-col-number-of-students-rate: 95px;
+}
+
+.tbl-faculty td,
+.tbl-faculty th {
+    line-height: 1.3;
+}
+
+.tbl-faculty__col-index {
+    width: var(--tbl-faculty-size-col-index);
+    min-width: var(--tbl-faculty-size-col-index);
+}
+
+.tbl-faculty__col-number-of-subjects {
+    width: var(--tbl-faculty-size-col-number-of-subjects);
+    min-width: var(--tbl-faculty-size-col-number-of-subjects);
+}
+
+.tbl-faculty__col-number-of-classes {
+    width: var(--tbl-faculty-size-col-number-of-classes);
+    min-width: var(--tbl-faculty-size-col-number-of-classes);
+}
+
+.tbl-faculty__col-number-of-students {
+    width: var(--tbl-faculty-size-col-number-of-students);
+    min-width: var(--tbl-faculty-size-col-number-of-students);
+}
+
+.tbl-faculty__col-number-of-students-drop-out--number,
+.tbl-faculty__col-number-of-students-drop-out--percent,
+.tbl-faculty__col-number-of-students-behind-progress--number,
+.tbl-faculty__col-number-of-students-behind-progress--percent {
+    width: var(--tbl-faculty-size-col-number-of-students-rate);
+    min-width: var(--tbl-faculty-size-col-number-of-students-rate);
+}
+
+/*=================================
+* tbl-results-frequently
+=================================*/
+.tbl-results-frequently {
+    --tbl-results-frequently-col-index: 40px;
+    --tbl-results-frequently-col-point-number: 67px;
+    --tbl-results-frequently-col-point-percentage: 53px;
+    --tbl-results-frequently-col-total-students: 65px;
+    --tbl-results-frequently-col-total-classes: 53px;
+    --tbl-results-frequently-col-total-subjects: 48px;
+}
+
+.tbl-results-frequently__col-index {
+    width: var(--tbl-results-frequently-col-index);
+    min-width: var(--tbl-results-frequently-col-index);
+}
+
+.tbl-results-frequently__col-point-number {
+    width: var(--tbl-results-frequently-col-point-number);
+    min-width: var(--tbl-results-frequently-col-point-number);
+}
+
+.tbl-results-frequently__col-point-percentage {
+    width: var(--tbl-results-frequently-col-point-percentage);
+    min-width: var(--tbl-results-frequently-col-point-percentage);
+}
+
+.tbl-results-frequently__col-total-students {
+    width: var(--tbl-results-frequently-col-total-students);
+    min-width: var(--tbl-results-frequently-col-total-students);
+}
+
+.tbl-results-frequently__col-total-classes {
+    width: var(--tbl-results-frequently-col-total-classes);
+    min-width: var(--tbl-results-frequently-col-total-classes);
+}
+
+.tbl-results-frequently__col-total-subjects {
+    width: var(--tbl-results-frequently-col-total-subjects);
+    min-width: var(--tbl-results-frequently-col-total-subjects);
+}
+
+/*=================================
+* tbl-courses
+=================================*/
+.tbl-courses {
+    --tbl-courses-col-index: 40px;
+    --tbl-courses-col-code: 85px;
+    --tbl-courses-col-total-classes: 60px;
+    --tbl-courses-col-total-students: 110px;
+}
+
+.tbl-courses__index {
+    width: var(--tbl-courses-col-index);
+    min-width: var(--tbl-courses-col-index);
+}
+
+.tbl-courses__code {
+    width: var(--tbl-courses-col-code);
+    min-width: var(--tbl-courses-col-code);
+}
+
+.tbl-courses__total-classes {
+    width: var(--tbl-courses-col-total-classes);
+    min-width: var(--tbl-courses-col-total-classes);
+}
+
+.tbl-courses__total-students {
+    width: var(--tbl-courses-col-total-students);
+    min-width: var(--tbl-courses-col-total-students);
+}

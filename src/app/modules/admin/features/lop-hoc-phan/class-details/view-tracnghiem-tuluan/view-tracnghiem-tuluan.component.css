@@ -1,0 +1,499 @@
+:host {
+    --review-primary: #2563eb;
+    --review-primary-hover: #1d4ed8;
+    --review-primary-soft: #eff6ff;
+    --review-ink: #0f172a;
+    --review-muted: #64748b;
+    --review-border: #e2e8f0;
+    --review-surface: #ffffff;
+    --review-canvas: #f8fafc;
+    --review-success: #059669;
+    --review-success-soft: #d1fae5;
+    --review-danger: #dc2626;
+    --review-danger-soft: #fef2f2;
+    display: block;
+    height: 100%;
+    color: var(--review-ink);
+    font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.view-test-body {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    padding: 16px;
+    overflow: auto;
+    scrollbar-gutter: stable;
+    background: var(--review-canvas);
+}
+
+.view-test-body-content {
+    box-sizing: border-box;
+    width: min(100%, 1100px);
+    margin: 0 auto;
+    overflow: hidden;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.5;
+    background: transparent;
+}
+
+.review-header {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(280px, 1fr) auto auto;
+    align-items: center;
+    gap: 20px;
+    padding: 16px clamp(18px, 3vw, 30px);
+    color: #fff;
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    border-top: 4px solid #60a5fa;
+    border-radius: 10px;
+}
+
+.review-heading {
+    min-width: 0;
+}
+
+.review-eyebrow {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.review-eyebrow {
+    color: #bfdbfe;
+}
+
+.review-title {
+    margin: 0;
+    color: #fff;
+    font-family: inherit;
+    font-size: clamp(21px, 3vw, 28px);
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.review-description {
+    margin: 4px 0 0;
+    color: #dbeafe;
+    font-size: 13px;
+}
+
+.review-score {
+    display: flex;
+    min-width: 118px;
+    padding: 9px 13px;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    color: var(--review-ink);
+    background: #fff;
+    border-radius: 6px;
+}
+
+.review-score-metric {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.review-score-value {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+.review-score-value strong {
+    color: var(--review-primary);
+    font-size: 25px;
+}
+
+.review-score-label {
+    color: var(--review-muted);
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.review-legend {
+    display: flex;
+    padding: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px 12px;
+}
+
+.review-legend-title {
+    display: none;
+}
+
+.review-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #dbeafe;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.review-legend-item i {
+    display: block;
+    width: 8px;
+    height: 8px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+}
+
+.review-legend-correct {
+    color: #6ee7b7;
+}
+
+.review-legend-wrong {
+    color: #fca5a5;
+}
+
+.assessment-content {
+    padding: 0;
+}
+
+.review-header + .assessment-content {
+    padding-top: 16px;
+}
+
+.assessment-content .flex {
+    display: flex;
+    align-items: flex-start;
+}
+
+.assessment-content .flex-1,
+.assessment-content .direction,
+.assessment-content .direction-part {
+    min-width: 0;
+    flex: 1;
+}
+
+.assessment-content .no-margin-child-p p {
+    margin: 0;
+}
+
+.assessment-content .question {
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0 0 16px;
+    padding: 16px;
+    background: var(--review-surface);
+    border: 1px solid var(--review-border);
+    border-radius: 10px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.assessment-content .question:last-child {
+    margin-bottom: 0;
+}
+
+.assessment-content .question-direction {
+    gap: 8px;
+    margin-bottom: 10px;
+    color: var(--review-ink);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.assessment-content .number-question,
+.assessment-content .part-number {
+    width: max-content;
+    margin-right: 2px;
+    flex: 0 0 auto;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.35;
+    white-space: nowrap;
+    background: var(--review-primary);
+    border-radius: 4px;
+}
+
+.assessment-content .question-direction > .number-question,
+.assessment-content .part-number {
+    padding: 2px 6px;
+}
+
+.assessment-content .answer {
+    box-sizing: border-box;
+    margin: 0 0 5px 20px;
+    padding: 6px 8px;
+    gap: 6px;
+    color: #334155;
+    background: #f8fafc;
+    border: 1px solid transparent;
+    border-radius: 6px;
+}
+
+.assessment-content .answer:last-child {
+    margin-bottom: 0;
+}
+
+.assessment-content .answer .number-question {
+    display: flex;
+    width: 26px;
+    height: 26px;
+    margin: 0;
+    padding: 0;
+    flex: 0 0 26px;
+    align-items: center;
+    justify-content: center;
+    color: #475569;
+    line-height: 1;
+    background: transparent;
+    border: 1px solid #cbd5e1;
+    border-radius: 50%;
+}
+
+.assessment-content .border-answer {
+    color: var(--review-danger) !important;
+    background: var(--review-danger-soft) !important;
+    border: 1px solid var(--review-danger) !important;
+    box-shadow: inset 3px 0 0 var(--review-danger);
+}
+
+.assessment-content .border-answer.border-correct {
+    color: var(--review-success) !important;
+    background: var(--review-success-soft) !important;
+    border-color: var(--review-success) !important;
+    box-shadow: inset 3px 0 0 var(--review-success);
+}
+
+.assessment-content .input-wrong,
+.assessment-content .input-correct {
+    padding: 5px 9px;
+    border-left: 3px solid currentColor;
+    border-radius: 0 4px 4px 0;
+}
+
+.assessment-content .input-wrong {
+    color: var(--review-danger);
+    background: var(--review-danger-soft);
+}
+
+.assessment-content .input-correct {
+    color: var(--review-success);
+    background: var(--review-success-soft);
+}
+
+.assessment-content .bold {
+    font-weight: 700;
+}
+
+.assessment-content .width-max-content {
+    display: block;
+    width: max-content !important;
+    max-width: 100%;
+    margin-right: 4px;
+}
+
+.assessment-content .child-question {
+    margin: 9px 0 11px 24px;
+    padding: 11px;
+    background: #fbfcfe;
+    border: 1px solid var(--review-border);
+    border-radius: 6px;
+}
+
+.assessment-content .child-question .answer {
+    margin-left: 16px;
+}
+
+.assessment-content .drag-drop-list-answer {
+    display: flex;
+    margin: 0 0 11px 24px;
+    padding: 8px;
+    flex-wrap: wrap;
+    gap: 6px;
+    background: var(--review-primary-soft);
+    border: 1px dashed #93c5fd;
+    border-radius: 6px;
+}
+
+.assessment-content .item-drag-drop-answer {
+    margin: 0;
+    padding: 4px 8px;
+    color: #1e3a5f;
+    overflow-wrap: anywhere;
+    background: #fff;
+    border: 1px solid #bfdbfe;
+    border-radius: 4px;
+}
+
+.assessment-content img {
+    width: auto;
+    max-width: 100%;
+    height: auto;
+}
+
+.assessment-content .direction,
+.assessment-content .direction-part {
+    overflow-wrap: anywhere;
+}
+
+.view-test-body .part-question {
+    margin-bottom: 26px;
+}
+
+.view-test-body .part-direction {
+    display: flex;
+    width: 100%;
+    margin: 0 0 12px;
+    align-items: center;
+    gap: 10px;
+}
+
+.view-test-body .part-direction::after {
+    height: 1px;
+    flex: 1;
+    content: "";
+    background: var(--review-border);
+}
+
+.view-test-body .part-name {
+    color: var(--review-ink);
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.view-test-body .part-childrent {
+    margin-bottom: 14px;
+}
+
+.view-test-body .part-childrent-direction {
+    margin-bottom: 9px;
+    padding: 8px 11px;
+    gap: 8px;
+    background: var(--review-primary-soft);
+    border-radius: 6px;
+}
+
+.assessment-content .question-av-part {
+    width: calc(100% - 24px);
+    margin-left: 24px;
+}
+
+@media (max-width: 768px) {
+    .view-test-body {
+        height: auto;
+        padding: 10px;
+        overflow: visible;
+    }
+
+    .review-header {
+        grid-template-columns: 1fr auto;
+        gap: 10px 14px;
+        padding: 14px 16px;
+    }
+
+    .review-heading {
+        grid-column: 1 / -1;
+    }
+
+    .review-legend {
+        justify-content: flex-start;
+    }
+
+    .assessment-content .question {
+        padding: 12px;
+    }
+
+    .assessment-content .question-direction,
+    .assessment-content .part-childrent-direction {
+        flex-direction: column;
+    }
+
+    .assessment-content .answer,
+    .assessment-content .child-question,
+    .assessment-content .drag-drop-list-answer {
+        margin-left: 0;
+    }
+
+    .assessment-content .child-question .answer {
+        margin-left: 0;
+    }
+
+    .assessment-content .question-av-part {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .view-test-body {
+        padding: 0;
+        background: #fff;
+    }
+
+    .view-test-body-content {
+        width: 100%;
+    }
+
+    .review-header {
+        grid-template-columns: 1fr;
+        border-radius: 0;
+    }
+
+    .review-heading,
+    .review-legend,
+    .review-score {
+        grid-column: 1;
+    }
+
+    .assessment-content .question {
+        margin-bottom: 10px;
+        padding: 12px 10px;
+        border-right: 0;
+        border-left: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .assessment-content .width-max-content {
+        width: auto !important;
+    }
+}
+
+@media print {
+    .view-test-body {
+        height: auto;
+        padding: 0;
+        overflow: visible;
+        background: #fff;
+    }
+
+    .view-test-body-content {
+        width: 100%;
+    }
+
+    .review-header {
+        color: #000;
+        background: #fff;
+        border: 2px solid #000;
+    }
+
+    .review-title,
+    .review-eyebrow,
+    .review-description {
+        color: #000;
+    }
+
+    .assessment-content .question {
+        break-inside: avoid;
+        box-shadow: none;
+    }
+}

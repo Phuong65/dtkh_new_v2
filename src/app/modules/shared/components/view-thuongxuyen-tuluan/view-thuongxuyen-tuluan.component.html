@@ -1,0 +1,128 @@
+<div class="view-tuluan-layout">
+    <div class="document-editor__editable" *ngIf="selectedTuluan">
+        <div class="document-editor__editable-header row" style="margin-bottom: 30px;">
+            <div class="col-5" style="text-align: center; padding: 15px;">
+                <div>
+                    {{app_config.donviquanly}}
+                </div>
+                <div style="font-weight: 600;">
+                    {{app_config.donvitructhuoc}}
+                </div>
+                <hr style="margin: 0px auto; border-color: #333; width: 50%;">
+            </div>
+            <div class="col-7" style="padding: 15px;">
+                <div style="text-align: center;font-weight: 600; margin-bottom: 30px;">
+                    {{selectedTuluan.course_plan_activity_id !== 0 ?
+                    'ĐỀ KIỂM TRA THƯỜNG XUYÊN' : 'ĐỀ THI KẾT THÚC HỌC PHẦN'}}
+                </div>
+                <div>
+                    <div>Học phần: {{courseSelected.title+' - '+courseSelected.maso}}</div>
+                    <div>Hình thức: {{hinhthuc}}
+                    </div>
+                    <div *ngIf="selectedTuluan.time_duration">Thời gian làm bài:
+                        {{selectedTuluan.time_duration}} phút</div>
+                    <!-- <div *ngIf="selectedTuluan.point && selectedTuluan.course_plan_activity_id">Điểm:
+                        {{selectedTuluan.point}}</div> -->
+                    <div *ngIf="selectedTuluan.cdr">Mức CDR: {{selectedTuluan.cdr | showlabel :chuandaura : 'id' :
+                        'label'}}</div>
+                </div>
+            </div>
+        </div>
+        <div class="document-editor__editable-body">
+            <div class="ck ck-editor__main" role="presentation">
+                <div *ngIf="selectedTuluan.private === 1"
+                    style="margin-left: 8.4px; font-weight: 600;padding: 10px 0px;">
+                    <div *ngIf="selectedTuluan.type === 'GROUP_QUESTION'">
+                        {{selectedTuluan.title}}:
+                    </div>
+                    <div *ngIf="selectedTuluan.type === 'QUESTION'">
+                        Câu {{selectedTuluan.ordering+" ("+selectedTuluan.point+" điểm)"}}:
+                    </div>
+                </div>
+
+                <div [appKatexImg]="countChanges" style="border:none" [appLoadMediaOnText]="countChanges"
+                    class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                    [innerHTML]="selectedTuluan.desc | safeHtml">
+                </div>
+
+                <!-- <div *ngIf="selectedTuluan.note && !noViewNote" style="margin-top: 40px;" class="question-content-note">
+                    <p-divider align="left" type="dashed">
+                        <b>Hướng dẫn chấm điểm</b>
+                    </p-divider>
+
+                    <div [appLoadMediaOnText]="countChanges" style="border:none"
+                        class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                        [innerHTML]="selectedTuluan.note | safeHtml">
+                    </div>
+                </div> -->
+
+                <div *ngIf="selectedTuluan['tuluan_in_name']" style="margin-top: 40px;" class="question-content-note">
+                    <p-divider align="left" type="dashed">
+                        <b>Đề tham chiếu</b>
+                    </p-divider>
+                    <ul style="font-size: 14px; list-style: decimal;">
+                        <li *ngFor="let item of selectedTuluan['tuluan_in_name']">{{item}}</li>
+                    </ul>
+                </div>
+
+                <div *ngIf="list_tieuchi_cham && list_tieuchi_cham.length && !hideNote" style="margin-top: 40px;"
+                    class="question-content-note">
+                    <p-divider align="left" type="dashed">
+                        <b>Hướng dẫn chấm theo tiêu chí</b>
+                    </p-divider>
+
+                    <div style="padding: 0 0.6em; font-size: 14px; padding-bottom: 15px;"
+                        *ngFor="let item of list_tieuchi_cham, index as i">
+                        <div *ngIf="item.title" class="header-tieuchicham">
+                            <strong>{{i + 1}}</strong>.
+                            <strong>{{item.title}} ({{item.point}} điểm)</strong>
+                        </div>
+
+                        <div *ngIf="item.desc" [appLoadMediaOnText]="countChanges" style="border:none"
+                            class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                            [innerHTML]="item.desc | safeHtml">
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="list_tieuchi_cham_cau1 && list_tieuchi_cham_cau1.length && !hideNote"
+                    style="margin-top: 40px;" class="question-content-note">
+                    <p-divider align="left" type="dashed">
+                        <b>Hướng dẫn chấm câu 1</b>
+                    </p-divider>
+
+                    <div style="padding: 0 0.6em; font-size: 14px; padding-bottom: 15px;"
+                        *ngFor="let item of list_tieuchi_cham_cau1, index as i">
+                        <div *ngIf="item.title" class="header-tieuchicham">
+                            <strong>{{i + 1}}</strong>.
+                            <strong>{{item.title}} ({{item.point}} điểm)</strong>
+                        </div>
+
+                        <div *ngIf="item.desc" [appLoadMediaOnText]="countChanges" style="border:none"
+                            class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                            [innerHTML]="item.desc | safeHtml">
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="list_tieuchi_cham_cau2 && list_tieuchi_cham_cau2.length && !hideNote"
+                    style="margin-top: 40px;" class="question-content-note">
+                    <p-divider align="left" type="dashed">
+                        <b>Hướng dẫn chấm câu 2</b>
+                    </p-divider>
+
+                    <div style="padding: 0 0.6em; font-size: 14px; padding-bottom: 15px;"
+                        *ngFor="let item of list_tieuchi_cham_cau2, index as i">
+                        <div *ngIf="item.title" class="header-tieuchicham">
+                            <strong>{{i + 1}}</strong>.
+                            <strong>{{item.title}} ({{item.point}} điểm)</strong>
+                        </div>
+
+                        <div *ngIf="item.desc" [appLoadMediaOnText]="countChanges" style="border:none"
+                            class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                            [innerHTML]="item.desc | safeHtml">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

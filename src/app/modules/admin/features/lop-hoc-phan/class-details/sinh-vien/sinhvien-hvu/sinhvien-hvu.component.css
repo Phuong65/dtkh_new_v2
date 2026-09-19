@@ -1,0 +1,261 @@
+.sinhvien-layout {
+    height: 100%;
+}
+
+.sinhvien-layout-top {
+    padding: 5px;
+    border-bottom: 1px solid #c8c8c8;
+    display: flex;
+    align-items: center;
+}
+
+.sinhvien-layout-top-title {
+    flex: 1;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.action-layout-top button {
+    margin-left: 5px;
+    line-height: 1;
+}
+
+.sinhvien-layout-bottom {
+    height: calc(100% - 41px);
+}
+
+.name-group-class {
+    display: flex;
+    align-items: center;
+}
+
+.name-group-class button {
+    line-height: 1;
+}
+
+.group-student-full-name {
+    display: flex;
+    align-items: center;
+}
+
+.group-student-full-name button {
+    padding: 2px 5.54px !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+    line-height: 1;
+}
+
+.group-student-full-name i {
+    margin: 0px !important;
+    color: #aaaaaa;
+}
+
+.group-student-full-name .hight-star-color {
+    color: #ffc107;
+}
+
+.checkbox-one {
+    position: absolute;
+    left: -30px;
+    top: 3px;
+}
+
+.checkbox-all {
+    margin-left: -30px;
+}
+
+.import-header {
+    padding: 5px;
+    border-bottom: 1px solid #c8c8c8;
+    justify-content: space-between;
+}
+
+.import-header button {
+    margin-right: 10px;
+    line-height: 1;
+}
+
+.import-body {
+    height: calc(100% - 41px);
+    padding: 5px;
+}
+
+.import-body.import-body-has-comparison {
+    height: calc(100% - 94px);
+}
+
+.import-comparison {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 5px;
+    padding: 5px 7px;
+    border: 1px solid #cfe2ff;
+    border-radius: 5px;
+    background: #f6f9fc;
+    color: #334155;
+    line-height: 1.2;
+}
+
+.import-comparison-warning {
+    border-color: #f5cf69;
+    background: #fffaf0;
+}
+
+.import-comparison-title {
+    display: flex;
+    flex: 1 1 220px;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 3px 5px;
+    min-width: 0;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.import-comparison-title i {
+    color: #d97706;
+}
+
+.import-comparison-title small {
+    width: 100%;
+    color: #64748b;
+    font-size: 10px;
+    font-style: italic;
+    font-weight: 400;
+}
+
+.import-comparison-stats {
+    display: flex;
+    flex: 0 1 auto;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 4px;
+}
+
+.import-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 26px;
+    padding: 3px 7px;
+    border-left: 3px solid currentColor;
+    border-radius: 4px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+    white-space: nowrap;
+}
+
+.import-stat strong {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.import-stat small {
+    color: #475569;
+    font-size: 10px;
+}
+
+.import-stat-current {
+    color: #2563eb;
+}
+
+.import-stat-valid {
+    color: #16a34a;
+}
+
+.import-stat-new {
+    color: #7c3aed;
+}
+
+.import-stat-existing {
+    color: #64748b;
+}
+
+.import-stat-missing {
+    color: #ea580c;
+}
+
+.import-stat-invalid {
+    color: #dc2626;
+}
+
+.import-stat-duplicate {
+    color: #ca8a04;
+}
+
+@media (max-width: 900px) {
+    .import-comparison {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .import-comparison-title {
+        flex-basis: auto;
+    }
+
+    .import-comparison-stats {
+        justify-content: flex-start;
+    }
+}
+
+.import-thanhcong {
+    background-color: #1da75045;
+}
+
+.import-header-center {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+}
+
+.status-key {
+    font-size: 14px;
+    display: flex;
+    /* align-items: center; */
+    visibility: hidden;
+    position: absolute;
+    flex-direction: column;
+    background: #fff;
+    /* border: 1px solid #eee; */
+    border: 0 none;
+    padding: 5px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    line-height: 1.25;
+    min-width: 300px;
+    width: auto;
+    right: 0;
+    top: 40px;
+    z-index: 105;
+    transition: all 0.5s;
+}
+
+.status-key span {
+    margin-top: 5px;
+    padding: 8px;
+    background: var(--panel-left-menu-bg-hover);
+    cursor: pointer;
+}
+
+.status-key span:hover {
+    background: var(--green-200);
+}
+
+.status-key span.active {
+    background: var(--green-200);
+}
+
+.total-data-confirm {
+    transition: all 0.5s;
+    position: relative;
+    font-size: 14px;
+    background: #eaeaea;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.total-data-confirm:hover .status-key {
+    visibility: visible;
+    top: 30px;
+}

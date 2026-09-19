@@ -1,0 +1,303 @@
+<div class="files-management-new-layout" [ngClass]="no_footer?'no-footer-files':''">
+    <div class="files-management-new-header">
+        <span class="files-management-new-header-title">Quản lý tệp tin</span>
+        <button class="btn ovic-over-right-section__close-button" (click)="onSelectedFile()"></button>
+        <!-- <button class="btn btn-success btn-icon btn-transparent"><i class="fa fa-times"></i></button> -->
+    </div>
+    <div class="files-management-new-body">
+        <div class="files-management-new-body-left">
+            <div class="files-management-new-date-folders">
+                <div class="files-management-new-date-folders-header">
+                    <input class="ovic-input-field" type="text" placeholder="Tìm kiếm">
+                </div>
+                <div class="files-management-new-date-folders-body">
+                    <tree-custom [data]="treeFolder" (selectNode)="nodeSelect($event)" [select]="selectedFolder"
+                        (closeAndOpenNode)="closeAndOpenNode($event)" [contextMenuItems]="contextMenuFolderItems"
+                        [contextMenu]="true"></tree-custom>
+                </div>
+            </div>
+            <!-- <div class="files-management-new-upload">
+                        <div class="file-upload-wrapper">
+                            <div class="card card-body view file-upload">
+                                <div class="card-text file-upload-message"><i class="fa fa-cloud-upload"></i>
+                                    <p>Drag and drop a file here or click</p>
+                                </div>
+                                <input type="file" id="input-file-now" class="file-upload" />
+                            </div>
+                        </div>
+                    </div> -->
+        </div>
+
+        <div class="files-management-new-body-right" ovicDropAndDrag (fileDropped)="onFileInput($event)">
+            <div *ngIf="selectedFolder" class="files-management-new-body-right-header"
+                style="padding: 5px;display: flex;">
+                <div class="files-management-new-body-right-header-left" style=" flex: 1;">
+                    <input style="width: 300px;" (keyup.enter)="filterBynameFile($event)" [(ngModel)]="filterName"
+                        class="ovic-input-field" type="text" placeholder="Nhập tên rồi ấn enter">
+                </div>
+                <div class="files-management-new-body-right-header-right">
+                    <input [accept]="ext_convert" style="visibility: hidden; height: 0!important; width: 0;" type="file"
+                        id="input-file-now" class="file-upload" #fileChooser multiple
+                        (change)="onFileInput($event.target['files'])" />
+                    <!-- <button (click)="sortAlpha()" style="margin-left: 10px; line-height: 1;"
+                        class="btn btn-icon btn-success"><i class="fa fa-sort-alpha-asc"></i></button> -->
+                    <button *ngIf="selectedFolder.id !== -100" (click)="openCreateFormFolder()"
+                        style="margin-left: 10px; line-height: 1;" class="btn btn-primary"><i class="fa fa-plus"></i>Tạo
+                        thư mục</button>
+                    <button *ngIf="selectedFolder.id !== -100" (click)="openUploadFile()"
+                        style="margin-left: 10px; line-height: 1;" class="btn btn-success"><i
+                            class="fa fa-upload"></i>Upload</button>
+                </div>
+            </div>
+            <div *ngIf="selectedFolder" class="files-management-new-body-right-body" #filesmanagementbody>
+                <p-contextMenu #cm [model]="selectedFolder.id !== -100  ? contextMenuItems : contextMenuRestoreItems"
+                    appendTo="body"></p-contextMenu>
+                <p-table [(contextMenuSelection)]="selectedFile" [contextMenu]="cm" [value]="file_list"
+                    styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-none-header files-management-table table-reBorder">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width: 50px; text-align: center;">
+                                <p-checkbox [disabled]="!isMultipleMode" name="group" [binary]="true"
+                                    (onChange)="onChangeCheckAllInPage($event)"></p-checkbox>
+                            </th>
+                            <th style="width: 50px; text-align: center;">#</th>
+                            <th>Tên <i (click)="sortFiles('title')" style="margin-left: 5px; cursor: pointer;"
+                                    class="fa fa-sort"></i></th>
+                            <th style="width: 150px; text-align: center;">Kích thước <i (click)="sortFiles('size')"
+                                    style="margin-left: 5px; cursor: pointer;" class="fa fa-sort"></i></th>
+                            <th style="width: 150px; text-align: center;">Ngày upload <i
+                                    (click)="sortFiles('created_at')" style="margin-left: 5px; cursor: pointer;"
+                                    class="fa fa-sort"></i></th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-file>
+                        <tr [pContextMenuRow]="file"
+                            [ngClass]="selectedFile && selectedFile.id === file.id?'files-management-file-select':''"
+                            class="files-management-file">
+                            <td style="width: 50px; text-align: center;">
+                                <p-checkbox name="groupname" [value]="file" (onChange)="onChangeCheck($event,file )"
+                                    [(ngModel)]="selectedFiles">
+                                </p-checkbox>
+                            </td>
+                            <td style="width: 50px; text-align: center;">
+                                {{file["index_"]}}
+                            </td>
+                            <td>
+                                <div style="display: flex;">
+                                    <i style="font-size: 18px; margin-right: 10px" class="icon-in-open-download-file"
+                                        [ngClass]="file | ovicFileIcon" ></i>
+                                    <span
+                                        style="line-height: 20px; overflow: hidden; text-overflow: ellipsis;flex: 1; display: block; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;">
+                                        {{file["title"]}}
+                                    </span>
+                                </div>
+                            </td>
+                            <td style="width: 150px; text-align: center;">{{file["file_size"]}}</td>
+                            <td style="width: 150px; text-align: center;">{{file["upload_at"]}}</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+            <div class="page-layout-set files-management-new-body-page" style="border: none;">
+                <ng-template #paginatorRight>
+                    <div>
+                        <button style="height: auto!important;margin-right: 10px;" (click)="onSelectedFile(true)"
+                            class="btn btn-primary btn-save-file"><i class="fa fa-floppy-o"></i>
+                            Chọn file</button>
+                    </div>
+                </ng-template>
+                <p-paginator [templateRight]="paginatorRight" #paginator (onPageChange)="changePage($event)" [rows]="20"
+                    [totalRecords]="total_file"></p-paginator>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="files-management-new-footer">
+                <button (click)="onSelectedFile()" class="btn btn-primary"><i class="fa fa-floppy-o"></i> Lưu lại</button>
+            </div> -->
+
+    <p-dialog styleClass="p-dialog-uploading-files" [showHeader]="false" [(visible)]="displayPosition"
+        position="bottom-left" [modal]="false" [style]="{width: '400px'}" [draggable]="true" [resizable]="false"
+        [closeOnEscape]="false">
+        <div class="dialog-upload-files" [ngClass]="minimize?'minimize-dialog-upload':''">
+            <div class="dialog-upload-files-header">
+                <span style="flex: 1; font-weight: 500;">Uploading files</span>
+                <div class="upload-header-button">
+                    <button (click)="minimize = !minimize" style="margin-right: 5px;"
+                        class="btn btn-primary btn-transparent btn-icon"><i
+                            [ngClass]="minimize?'fa fa-window-maximize':'fa fa-window-minimize' "></i></button>
+                    <button (click)="closeDialogUpload()" class="btn btn-primary btn-transparent btn-icon"><i
+                            class="fa fa-times"></i></button>
+                </div>
+            </div>
+            <div class="dialog-upload-files-body">
+                <div style="padding: 5px; border-bottom: 1px solid #c8c8c8;"
+                    *ngFor="let file of uploadingFiles, index as i">
+                    <div style="display: flex; flex-direction: row;">
+                        <i style="font-size: 20px;
+                                 padding: 5px;" class="icon-in-open-download-file" [ngClass]="file | ovicFileIcon"
+                            ></i>
+                        <div class="info" style="padding: 5px; flex: 1;">
+                            <h4 class="name">{{file.title}}</h4>
+                        </div>
+                        <i *ngIf="file['uploaded']" class="fa fa-check" style="font-size: 14px;
+                                 padding: 8px; color:#28a745"></i>
+                    </div>
+                    <div *ngIf="!file['uploaded'] && file['validate']">
+                        <mat-progress-bar mode="determinate" [value]="file['progressValue']">
+                        </mat-progress-bar>
+                    </div>
+                    <div *ngIf="!file['validate']">
+                        <span style="font-size: 14px; color: red;">{{file['message']}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </p-dialog>
+</div>
+
+<ng-template #viewDocumentTempalte let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section" style="height: 100vh;">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">View</h3>
+            <button [disabled]="startProgress" class="btn ovic-over-right-section__close-button"
+                (click)="d(true)"></button>
+        </div>
+        <div class="ovic-over-right-section__body footer-no-hint no-footer" style="padding: 0px;">
+            <div class="ovic-vertical__inputs" style="height: 100%;">
+                <view-document [file]="selectedFile?selectedFile:null">
+                </view-document>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #createFolderTemplate let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">Tạo thư mục</h3>
+            <button class="btn ovic-over-right-section__close-button" (click)="d(true)"></button>
+        </div>
+        <div class="ovic-over-right-section__body footer-no-hint" style="height: auto;">
+            <div class="ovic-vertical__inputs">
+                <form [formGroup]="formFolder" class="formFolder">
+                    <div class="row form-row form-row-flex-row">
+                        <div class="col-12 flex-div" [ngClass]="{ 'field-err' : !slugIsValid }">
+                            <span class="ov-check-slug-hint__wrap-mess alert-danger" *ngIf="!slugIsValid">
+                                <span class="ov-check-slug-hint__messages">tên thư mục đã tồn tại, Vui lòng thay
+                                    đổi
+                                </span>
+                            </span>
+                            <label for="title">Tên thư mục:<span class="ovic-mark">*</span></label>
+                            <input type="text" id="name" class="ovic-input-field" formControlName="name"
+                                autocomplete="off">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="ovic-over-right-section__foot-wrap-buttons flex-footer-right">
+            <button type="button" class="btn btn-primary" (click)="startSaveFolder(d)">
+                <i class="fa fa-floppy-o" ></i>Lưu lại
+            </button>
+        </div>
+    </div>
+</ng-template>
+
+<p-sidebar [(visible)]="display_move_template" position="right" [style]="{width:'500px'}" [showCloseIcon]="false"
+    appendTo="body" styleClass="template-move-folder">
+    <div class="ovic-over-right-section right-slide-class" style="margin-top:0px">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">Chọn folder</h3>
+            <button (click)="closeMoveFolder()"
+                class="btn ovic-over-right-section__close-button btn-recss-close-right-button"></button>
+        </div>
+        <div style="line-height: 1.25; padding: 5px;"
+            class="ovic-over-right-section__body right-section-body-menu no-warning">
+            <div class="content-folders-move" style="height: 100%;">
+                <div class="top-content-folder" style="display: flex; align-items: center;">
+                    <button style="margin-right: 5px;" (click)="backspaceFolder()" class="btn btn-transparent btn-icon"
+                        [disabled]="folder_show_move && (folder_show_move['parent_id'] || folder_show_move['parent_id'] === 0)?false: true">
+                        <i class="pi pi-arrow-left"></i>
+                    </button>
+                    <span style="font-size: 18px; font-weight: 500;" class="folder-name-position">{{folder_show_move ?
+                        folder_show_move['name']:''}}</span>
+                </div>
+                <div class="folders-list_folder-content phanquyen-dulieu-content-left"
+                    style="height: calc(100% - 40px);">
+                    <div class="row form-row form-row-flex-row">
+                        <div class="col-12" style="padding: 5px; line-height: 1;">
+                            <input style="width: 100%;" class="ovic-input-field" type="text" [(ngModel)]="searchFolder"
+                                placeholder="Tìm kiếm">
+                        </div>
+                    </div>
+                    <mat-selection-list (selectionChange)="changeFolder($event)" class="selection-list-mat" #folders
+                        [multiple]="false"
+                        *ngIf="(list_folder_show_move |filter: searchFolder : ['name']).length > 0; else noResults">
+                        <mat-list-option *ngFor="let folder of list_folder_show_move | filter: searchFolder : ['name']"
+                            [value]="folder">
+                            <div mat-line style="display: flex; align-items: center;">
+                                <div style="flex: 1; margin-right: 5px; font-size: 14px;">{{folder.name}}</div>
+                                <!-- <button (click)="showThisFolder(folder)"> -->
+                                <mat-icon class="icon_show_folder_move"
+                                    (click)="showThisFolder(folder)">keyboard_arrow_right</mat-icon>
+                                <!-- </button> -->
+                            </div>
+                        </mat-list-option>
+                    </mat-selection-list>
+                    <ng-template #noResults>
+                        <div class="result-search-none">Không có thư mục nào...</div>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+        <div class="ovic-dynamic-right-section__foot">
+            <p class="ovic-over-right-section__foot-wrap-buttons">
+                <button [disabled]="selected_folder?false: true" type="button"
+                    class="btn btn ovic-over-right-section__foot-btn btn-primary btn-primary"
+                    (click)="moveToFolder($event)"><i class="fa fa-floppy-o" ></i>Di chuyển đến thư
+                    mục này
+                </button>
+            </p>
+        </div>
+    </div>
+</p-sidebar>
+
+
+<ng-template #changeFileNameTemplate let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">Sửa tên file</h3>
+            <button class="btn ovic-over-right-section__close-button" (click)="d(true)"></button>
+        </div>
+        <div class="ovic-over-right-section__body footer-no-hint" style="height: auto;">
+            <div class="ovic-vertical__inputs">
+                <form [formGroup]="formFolder" class="formFolder">
+                    <div class="row form-row form-row-flex-row">
+                        <div class="col-12 flex-div">
+                            <label for="title">Tên file:<span class="ovic-mark">*</span></label>
+                            <input type="text" id="name" class="ovic-input-field" formControlName="name"
+                                autocomplete="off">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="ovic-over-right-section__foot-wrap-buttons flex-footer-right">
+            <button type="button" class="btn btn-primary" (click)="saveRenameFile(d)">
+                <i class="fa fa-floppy-o" ></i>Lưu lại
+            </button>
+        </div>
+    </div>
+</ng-template>
+
+<!-- <p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+    [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+    <div class="popup-waiting-loading">
+        <label style="width: 100%;">Đang đồng bộ giữ</label>
+        <div class="tn-import-student-progressbar">
+            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+        </div>
+    </div>
+</p-dialog> -->
+
+<p-confirmPopup></p-confirmPopup>

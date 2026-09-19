@@ -1,0 +1,16 @@
+.question-type-input-box {
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-items: stretch;
+}
+
+.question-type-group-input__element__input {
+	font-family: var(--primary-font);
+	font-size: 14px;
+	line-height: 1.5;
+	padding: 10px;
+	margin: 5px 0 0 0;
+	font-weight: 400;
+	border-radius: 4px;
+}

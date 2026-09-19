@@ -1,0 +1,47 @@
+.import-monhoc-layout {
+    height: 100%;
+}
+
+.import-monhoc-header {
+    padding: 5px;
+    border-bottom: 1px solid #c8c8c8;
+    line-height: 1;
+}
+
+.import-monhoc-header button {
+    margin-right: 5px;
+    line-height: 1;
+}
+
+.import-monhoc-bottom {
+    height: calc(100% - 41px);
+}
+
+.hover-underline:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.student-status-shift {
+    padding: 5px;
+    width: 134px;
+    display: inline-block;
+}
+
+.status-deactive {
+    background-color: #E0E0E0;
+}
+
+.status-activite {
+    color: #fff;
+    background-color: #1da750;
+}
+
+.import-fail {
+    color: #fff;
+    background-color: red;
+}
+
+.no-teacher {
+    background-color: orange;
+}

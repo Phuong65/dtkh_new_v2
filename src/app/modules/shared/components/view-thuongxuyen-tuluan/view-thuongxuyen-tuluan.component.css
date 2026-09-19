@@ -1,0 +1,19 @@
+.view-tuluan-layout {
+    width: 100%;
+    height: 100%;
+    background-color: #eaeaea;
+    padding: 15px 0px;
+    font-size: 14px;
+    overflow: auto;
+}
+
+.document-editor__editable {
+    width: 21cm;
+    margin: 0 auto;
+    background-color: #fff;
+    min-height: 29.7cm;
+    border: 1px hsl(0, 0%, 82.7%) solid;
+    box-shadow: 0 0 5px hsla(0, 0%, 0%, .1);
+    padding: 1cm;
+    line-height: 1.25;
+}

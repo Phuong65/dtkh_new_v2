@@ -1,0 +1,326 @@
+.layout_component_container-course {
+    width: 400px;
+    height: 100%;
+    /* overflow: hidden; */
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s;
+}
+
+.layout_component_container {
+    display: flex;
+    flex-direction: row;
+}
+
+.layout_component_container-course {
+    border-right: 1px solid #c8c8c8;
+}
+
+.layout_component_container-noidung {
+    width: calc(100% - 400px);
+    height: 100%;
+}
+
+.list-course-layout {
+    flex: 1;
+    overflow: auto;
+}
+
+.search-layout {
+    padding: 5px;
+    border-bottom: 1px solid #c8c8c8;
+    display: flex;
+    flex-direction: column;
+}
+
+.button-close-left-body {
+    margin-left: 5px;
+    min-width: 0px;
+    position: absolute;
+    right: -14px;
+    top: calc(50% - 40px);
+    padding: 0;
+    width: 14px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+.button-close-left-body.btn.btn-success:before {
+    position: absolute;
+    content: '';
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 50%;
+    border-left: 15px solid #28a745;
+    border-top: 15px solid transparent;
+    z-index: -1;
+}
+
+.button-close-left-body.btn.btn-success:after {
+    position: absolute;
+    content: '';
+    top: 50%;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-left: 15px solid #28a745 !important;
+    border-bottom: 15px solid transparent !important;
+    z-index: -1;
+}
+
+.close-left-body .layout_component_container-course {
+    margin-left: -400px;
+}
+
+.close-left-body .layout_component_container-noidung {
+    width: calc(100% - 100px);
+}
+
+.mat-tab-list-cauhoi {
+    height: 100%;
+    overflow: hidden;
+}
+
+.normal-color {
+    color: #333;
+}
+
+.mat-tab-list-cauhoi-list {
+    height: calc(100% - 40px);
+    overflow: auto;
+    background-color: #eaeaea;
+}
+
+.mat-tab-list-cauhoi-doc {
+    width: 21cm;
+    margin: 10px auto;
+    background-color: #fff;
+    border: 1px hsl(0, 0%, 82.7%) solid;
+    box-shadow: 0 0 5px hsla(0, 0%, 0%, .1);
+}
+
+.header-question-number {
+    background: #bfdbfeab;
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+.name-code-question {
+    font-weight: 600;
+    flex: 1;
+}
+
+.header-question-number-action button {
+    margin-left: 10px;
+}
+
+.question-content {
+    padding: 10px;
+}
+
+.question-title {
+    padding: 20px 18px;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.question-bottom {
+    transition: all 0.3s;
+}
+
+.extend-content-false {
+    overflow: hidden;
+    height: 0px;
+}
+
+.extend-content-true {
+    overflow: visible;
+}
+
+/* --------------- */
+.activity {
+    border-color: #004ef9;
+}
+
+.cdr-action-header {
+    line-height: 1;
+    /* padding: 5px; */
+    text-align: right;
+    position: absolute;
+    right: 0px;
+    top: 10px;
+    padding: 5px;
+    background: var(--ck-color-shadow-drop);
+    z-index: 1;
+    visibility: hidden;
+    transition: all 0.3s;
+}
+
+textarea {
+    outline: none !important;
+    border: 1px solid #c8c8c8;
+}
+
+textarea:focus {
+    border: 1px solid #007bff;
+}
+
+.comment-edit-layout textarea {
+    flex: 1;
+}
+
+.comment-edit-layout {
+    display: flex;
+}
+
+.action-edit-layout {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+}
+
+.back-ground-info {
+    background-color: #FBFBFB;
+    padding: 15px;
+}
+
+.files-list-view {
+    background-color: #fff;
+}
+
+.class-duyet-layout {
+    background-color: #f5f5f5;
+    border-top: 1px solid #c8c8c8;
+    /* padding: 15px; */
+    font-size: 14px;
+    width: 100%;
+    margin: 0 auto;
+    /* border: 1px hsl(0, 0%, 82.7%) solid;
+    box-shadow: 0 0 5px hsla(0, 0%, 0%, .1); */
+}
+
+.conten-comment-box {
+    white-space: break-spaces;
+    line-height: 1.25;
+    padding: 15px;
+    width: calc(100% - 50px);
+}
+
+.margin-bottom {
+    margin-bottom: 10px;
+}
+
+.reply-layout {
+    margin-top: 10px;
+}
+
+/* .action-edit-layout button{
+    margin-bottom: 10px;
+} */
+
+/* comment */
+
+.inner-comment {
+    border-bottom: 1px solid #c8c8c8;
+    /* background: #fff; */
+    /* padding: 25px 10px 10px 10px; */
+    /* position: relative; */
+    /* border-radius: 6px; */
+}
+
+.comment-box {
+    margin-bottom: 20px;
+}
+
+.inner-comment-header {
+    /* background: var(--surface-200);
+    border-bottom: 1px solid #c8c8c8; */
+    display: flex;
+    align-items: center;
+    padding-bottom: 5px;
+}
+
+.duyet-comment {
+    background-color: #CDECFF;
+    border-radius: 0px 10px 10px 10px;
+    padding: 15px;
+}
+
+.yeucausua-comment {
+    color: #FF0000;
+    background-color: #FFD8D8;
+    border-radius: 0px 10px 10px 10px;
+    padding: 15px;
+}
+
+.panel-plan-activity-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.panel-plan-activity-gioithieu:last-child hr {
+    display: none;
+}
+
+.comment-box {
+    margin-bottom: 10px;
+}
+
+.conten-comment-box-left {
+    border-radius: 10px 0px 10px 10px;
+    padding: 15px;
+    background-color: #fff;
+    width: calc(100% - 50px);
+    margin-left: 50px;
+}
+
+/* .my-reply-comment {
+    background-color: #004ef9;
+    color: #fff;
+} */
+
+.display-none {
+    display: none;
+}
+
+.comment-box:last-child {
+    margin-bottom: 0px;
+}
+
+.display-none {
+    display: none;
+}
+
+.status-is-active {
+    color: #28a745;
+}
+
+.status-is-deactive i, .status-is-deactive {
+    color: #BDBDBD;
+}
+
+.status-is-redo {
+    color: red;
+}
+
+.status-is-require {
+    color: #8f48d2;
+}
+
+.table-list-de-tuluan {
+    padding: 5px;
+}
+
+.right-top-content{
+    padding: 5px;
+    border-bottom: 1px solid #c8c8c8;
+}

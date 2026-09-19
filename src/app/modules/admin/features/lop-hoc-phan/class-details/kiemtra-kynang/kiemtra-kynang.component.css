@@ -1,0 +1,54 @@
+.kiemtra-kynang-layout-top {
+    padding: 5px;
+    border-bottom: 1px solid #c8c8c8;
+}
+
+.kiemtra-kynang-layout {
+    height: 100%;
+    width: 100%;
+}
+
+.kiemtra-kynang-layout-bottom {
+    height: calc(100% - 41px);
+    padding: 10px;
+    overflow: auto;
+}
+
+.mat-list-option-own-class-title {
+    min-width: 500px;
+    flex: auto;
+}
+
+.mat-list-option-own-class-info-item {
+    color: #9e9e9e;
+    margin-right: 20px;
+}
+
+.mat-list-option-own-class-info {
+    display: flex !important;
+}
+
+.content-right {
+    height: 100%;
+}
+
+.mat-list-option-item-card {
+    display: flex;
+    width: 100%;
+    align-items: center;
+}
+
+.mat-list-option-own-class-item {
+    flex: 1;
+    padding-left: 10px;
+    display: flex;
+    align-items: center;
+}
+
+._tuluan_plan_top {
+    padding: 5px;
+}
+
+/* ._tuluan_plan_bottom {
+    height: calc(100% - 41px);
+} */

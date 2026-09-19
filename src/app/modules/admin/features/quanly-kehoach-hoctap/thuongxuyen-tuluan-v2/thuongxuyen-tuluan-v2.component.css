@@ -1,0 +1,281 @@
+.tuluan-layout {
+    padding: 5px;
+}
+
+.activity-row {
+    background-color: #bfdbfe !important;
+}
+
+.status-is-active {
+    color: #28a745;
+}
+
+.status-is-deactive i,
+.status-is-deactive {
+    color: #BDBDBD;
+}
+
+.status-is-redo {
+    color: red;
+}
+
+.status-is-require {
+    color: #8f48d2;
+}
+
+/* ---------- */
+.activity {
+    border-color: #004ef9;
+}
+
+.cdr-action-header {
+    line-height: 1;
+    /* padding: 5px; */
+    text-align: right;
+    position: absolute;
+    right: 0px;
+    top: 10px;
+    padding: 5px;
+    background: var(--ck-color-shadow-drop);
+    z-index: 1;
+    visibility: hidden;
+    transition: all 0.3s;
+}
+
+textarea {
+    outline: none !important;
+    border: 1px solid #c8c8c8;
+}
+
+textarea:focus {
+    border: 1px solid #007bff;
+}
+
+.comment-edit-layout textarea {
+    flex: 1;
+}
+
+.comment-edit-layout {
+    display: flex;
+}
+
+.action-edit-layout {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+}
+
+.back-ground-info {
+    background-color: #FBFBFB;
+    padding: 15px;
+}
+
+.files-list-view {
+    background-color: #fff;
+}
+
+.class-duyet-layout {
+    background-color: #f5f5f5;
+    border-top: 1px solid #c8c8c8;
+    /* padding: 15px; */
+    font-size: 14px;
+    width: 21cm;
+    margin: 0 auto;
+    border: 1px hsl(0, 0%, 82.7%) solid;
+    box-shadow: 0 0 5px hsla(0, 0%, 0%, .1);
+}
+
+.conten-comment-box {
+    white-space: break-spaces;
+    line-height: 1.25;
+    padding: 15px;
+    width: calc(100% - 50px);
+}
+
+.margin-bottom {
+    margin-bottom: 10px;
+}
+
+.reply-layout {
+    margin-top: 10px;
+}
+
+/* .action-edit-layout button{
+    margin-bottom: 10px;
+} */
+
+/* comment */
+
+.inner-comment {
+    border-bottom: 1px solid #c8c8c8;
+    /* background: #fff; */
+    /* padding: 25px 10px 10px 10px; */
+    /* position: relative; */
+    /* border-radius: 6px; */
+}
+
+.comment-box {
+    margin-bottom: 20px;
+}
+
+.inner-comment-header {
+    /* background: var(--surface-200);
+    border-bottom: 1px solid #c8c8c8; */
+    display: flex;
+    align-items: center;
+    padding-bottom: 5px;
+}
+
+.duyet-comment {
+    background-color: #CDECFF;
+    border-radius: 0px 10px 10px 10px;
+    padding: 15px;
+}
+
+.yeucausua-comment {
+    color: #FF0000;
+    background-color: #FFD8D8;
+    border-radius: 0px 10px 10px 10px;
+    padding: 15px;
+}
+
+.panel-plan-activity-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.panel-plan-activity-gioithieu:last-child hr {
+    display: none;
+}
+
+.comment-box {
+    margin-bottom: 10px;
+}
+
+.conten-comment-box-left {
+    border-radius: 10px 0px 10px 10px;
+    padding: 15px;
+    background-color: #fff;
+    width: calc(100% - 50px);
+    margin-left: 50px;
+}
+
+/* .my-reply-comment {
+    background-color: #004ef9;
+    color: #fff;
+} */
+
+.display-none {
+    display: none;
+}
+
+.comment-box:last-child {
+    margin-bottom: 0px;
+}
+
+.display-none {
+    display: none;
+}
+
+.form-add-tuluan {
+    height: 100%;
+}
+
+.left-form-add-tuluan {
+    height: 100%;
+    border-right: 1px solid #c8c8c8;
+    overflow: auto;
+    padding: 0px !important;
+}
+
+.right-form-add-tuluan {
+    height: 100%;
+    padding: 0px !important;
+    background-color: #e9ecef;
+}
+
+.ovic-vertical__inputs {
+    padding: 15px;
+}
+
+.form-add-tuluan {
+    margin: 0px !important;
+}
+
+
+
+/* Nhãn */
+.form-row label {
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.right-form-add-tuluan {
+    overflow: auto;
+    background-color: #F5F5F5;
+}
+
+.header-item {
+    font-size: 14px;
+    padding: 10px;
+    background: aliceblue;
+    display: flex;
+    align-items: center;
+}
+
+.item-content {
+    padding: 5px;
+
+}
+
+.item-tieuchi-cham-thuchanh {
+    margin: 10px 0px;
+    border: 1px solid #dee2e6;
+    background-color: #fff;
+}
+
+
+.right-form-add-tuluan .form-row label {
+    font-weight: normal;
+}
+
+.action-button-tuluan button {
+    height: 24px;
+    width: 24px;
+}
+
+.content-form-tieuchicham-top {
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #c8c8c8;
+}
+
+.content-list-tieuchicham {
+    padding: 5px;
+    height: 100%;
+}
+
+.content-form-tieuchicham-bottom {
+    height: calc(100% - 41px);
+    overflow: auto;
+}
+
+.content-form-tieuchicham{
+    min-width: 500px;
+}
+
+.tieuchicham-card-panel{
+    margin-bottom: 10px;
+}
+
+.text-open-huong-dancham{
+    color: #007bff;
+    cursor: pointer;
+}
+
+.text-open-huong-dancham:hover{
+    text-decoration: underline;
+}

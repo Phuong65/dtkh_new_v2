@@ -1,0 +1,18 @@
+﻿D:\project\dtkh_v2.1\node_modules\ngx-pinch-zoom\bundles\ngx-pinch-zoom.umd.js:44:this.touchstartTime = 0;
+D:\project\dtkh_v2.1\node_modules\ngx-pinch-zoom\bundles\ngx-pinch-zoom.umd.js:67:_this.touchstartTime = new Date().getTime();
+D:\project\dtkh_v2.1\node_modules\ngx-pinch-zoom\bundles\ngx-pinch-zoom.umd.js:105:_this.touchstartTime = new Date().getTime();
+D:\project\dtkh_v2.1\node_modules\ngx-pinch-zoom\bundles\ngx-pinch-zoom.umd.js:281:var tapLength = currentTime - this.touchstartTime;
+D:\project\dtkh_v2.1\node_modules\ngx-pinch-zoom\bundles\ngx-pinch-zoom.umd.min.js:1:!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(exports,require("@angular/core"),require("@angular
+D:\project\dtkh_v2.1\node_modules\ngx-pinch-zoom\esm2015\lib\touches.js:10:this.touchstartTime = 0;
+D:\project\dtkh_v2.1\node_modules\ngx-pinch-zoom\esm2015\lib\touches.js:33:this.touchstartTime = new Date().getTime();
+D:\project\dtkh_v2.1\node_modules\ngx-pinch-zoom\esm2015\lib\touches.js:71:this.touchstartTime = new Date().getTime();
+D:\project\dtkh_v2.1\node_modules\ngx-pinch-zoom\esm2015\lib\touches.js:234:const tapLength = currentTime - this.touchstartTime;
+D:\project\dtkh_v2.1\node_modules\ngx-pinch-zoom\fesm2015\ngx-pinch-zoom.js:40:this.touchstartTime = 0;
+D:\project\dtkh_v2.1\node_modules\ngx-pinch-zoom\fesm2015\ngx-pinch-zoom.js:63:this.touchstartTime = new Date().getTime();
+D:\project\dtkh_v2.1\node_modules\ngx-pinch-zoom\fesm2015\ngx-pinch-zoom.js:101:this.touchstartTime = new Date().getTime();
+D:\project\dtkh_v2.1\node_modules\ngx-pinch-zoom\fesm2015\ngx-pinch-zoom.js:264:const tapLength = currentTime - this.touchstartTime;
+D:\project\dtkh_v2.1\node_modules\ngx-pinch-zoom\lib\touches.d.ts:24:touchstartTime: number;
+D:\project\dtkh_v2.1\node_modules\latex.js\dist\latex.js:2:/*! https://mths.be/he v1.2.0 by @mathias | MIT license */!function(e,r){!function(n){var i=r,o=e&&e.exports==i&&e,a="ob
+D:\project\dtkh_v2.1\node_modules\latex.js\dist\latex.mjs:2:/*! https://mths.be/he v1.2.0 by @mathias | MIT license */n=o,i=o.exports,function(t){var r=i,o=n&&n.exports==r&&n,a="ob
+D:\project\dtkh_v2.1\node_modules\latex.js\node_modules\fs-extra\lib\remove\rimraf.js:288:const startTime = Date.now()
+D:\project\dtkh_v2.1\node_modules\latex.js\node_modules\fs-extra\lib\remove\rimraf.js:294:} while (Date.now() - startTime < 500) // give up after 500ms

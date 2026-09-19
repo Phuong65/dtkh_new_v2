@@ -1,0 +1,360 @@
+.kt-daugio-layout-top {
+    padding: 5px;
+    border-bottom: 1px solid #c8c8c8;
+    text-align: right;
+}
+
+.kt-daugio-layout-bottom {
+    padding: 5px;
+}
+
+.student-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1
+}
+
+.student-name {
+    display: flex;
+    align-items: center;
+}
+
+
+.status-shift {
+    padding: 5px 8px;
+    width: 100%;
+    display: block;
+    text-align: center;
+}
+
+.status-danger {
+    color: #fff;
+    background-color: red;
+}
+
+
+.status-deactive {
+    background-color: #E0E0E0;
+}
+
+.status-activite {
+    color: #fff;
+    background-color: #1da750;
+}
+
+.status-doing {
+    color: #333;
+    background-color: orange;
+}
+
+.status-pause {
+    background: #A855F7;
+    color: #fff;
+}
+
+.fa-unlock {
+    color: #c8c8c8;
+}
+
+.fa-lock,
+.vang-mat {
+    color: red;
+}
+
+.kt-daugio-layout-bottom {
+    height: calc(100% - 41px);
+    display: flex;
+    transition: all 0.3s;
+}
+
+.kt-daugio-layout-bottom-content {
+    display: flex;
+    transition: all 0.3s;
+}
+
+.caption-table-title span:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.kt-daugio-layout-bottom-right {
+    width: 250px;
+    height: 100%;
+    border-left: 1px solid #c8c8c8;
+    background-color: #fff;
+    margin-right: -250px;
+    transition: all 0.3s;
+}
+
+.kt-daugio-layout-bottom-left {
+    width: 100%;
+    transition: all 0.3s;
+}
+
+.left-layout-open .kt-daugio-layout-bottom-left {
+    width: calc(100% - 250px);
+}
+
+.left-layout-open .kt-daugio-layout-bottom-right {
+    margin-right: 0px;
+}
+
+.warning-card {
+    background: #fff2e2;
+    border: solid #cc8925;
+    border-width: 0 0 0 6px;
+    color: #cc8925;
+    margin: 5px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.warning-card-content {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem 1.75rem;
+    color: #cc8925;
+}
+
+.margin-right-5px {
+    margin-right: 5px;
+}
+
+.point-editor {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    justify-content: center;
+}
+
+.point-input {
+    width: 70px;
+    text-align: center;
+    height: 30px;
+    padding: 2px 4px;
+}
+
+.point-save-btn {
+    line-height: 1;
+    padding: 2px 8px;
+    height: 30px;
+}
+
+/* ===== View Student Test — A4 Modern Clean ===== */
+
+.view-test-body {
+    padding: 0;
+    line-height: 1.6;
+    background: #f0f2f5;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.view-test-content {
+    width: 210mm;
+    margin: 24px auto;
+    padding: 28px 32px;
+    background: #fff;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    border-radius: 0;
+    position: relative;
+}
+
+/* ===== Questions ===== */
+
+.view-test-question {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e8ecf0;
+    page-break-inside: avoid;
+}
+
+.view-test-question:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.view-test-question-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.view-test-question-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    background: #1a73e8;
+    color: #fff;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 0 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.view-test-question-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.view-test-question-meta {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 6px;
+}
+
+.view-test-point-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #e8f0fe;
+    color: #1a73e8;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 12px;
+    border-radius: 20px;
+}
+
+.view-test-point-badge::before {
+    content: '📌';
+    font-size: 11px;
+}
+
+/* Question content — CKEditor */
+.view-test-question-body .ck-content,
+.view-test-question-body [innerHTML] {
+    font-size: 14px;
+    color: #1a1a1a;
+    line-height: 1.7;
+}
+
+/* ===== Answer Section ===== */
+
+.view-test-answer-section {
+    margin-top: 14px;
+    margin-left: 44px;
+    padding: 16px 18px 18px;
+    background: #f7f9fc;
+    border: 1px solid #e4e7ec;
+    border-radius: 10px;
+}
+
+.view-test-answer-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #37474f;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.view-test-answer-label::before {
+    content: '✍';
+    font-size: 14px;
+}
+
+.view-test-answer-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #dde1e6;
+}
+
+.view-test-answer-content {
+    border: none;
+    background: transparent;
+    padding: 0;
+    font-size: 14px;
+    color: #1a1a1a;
+    line-height: 1.7;
+}
+
+.view-test-answer-content.ck-editor__editable {
+    min-height: auto;
+}
+
+.view-test-answer-empty {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #9aa0a6;
+    font-style: italic;
+    font-size: 13px;
+    margin: 2px 0;
+    padding: 6px 10px;
+    background: #f0f2f5;
+    border-radius: 6px;
+}
+
+.view-test-answer-empty::before {
+    content: '—';
+    font-weight: 700;
+    color: #c4c7cc;
+}
+
+/* ===== Empty state ===== */
+
+.view-test-empty {
+    text-align: center;
+    padding: 100px 20px;
+    color: #9aa0a6;
+    background: #f7f9fc;
+    border-radius: 12px;
+    margin: 20px 0;
+}
+
+.view-test-empty-icon {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 16px;
+    opacity: 0.6;
+}
+
+.view-test-empty-text {
+    font-size: 15px;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* ===== Override parent layout — scoped ===== */
+
+/* ===== View Student Test — Header point editor ===== */
+
+.view-test-header-point-editor {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: 5px;
+}
+
+.view-test-point-input {
+    width: 130px;
+    height: 30px;
+    text-align: center;
+    padding: 2px 4px;
+    font-size: 13px;
+}
+
+/* ===== View Student Test — Header nav buttons ===== */
+
+.view-test-header-nav {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    margin-right: 5px;
+}
+
+.view-test-header-nav .btn-icon {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    font-size: 13px;
+    border-radius: 3px;
+}

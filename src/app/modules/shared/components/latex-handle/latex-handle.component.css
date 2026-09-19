@@ -1,0 +1,190 @@
+/* Container chính */
+.latex-dialog-container {
+    min-width: 450px;
+    background: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Textarea nhập liệu */
+.latex-textarea {
+    font-family: "Consolas", "Monaco", "Courier New", monospace !important;
+    font-size: 14px !important;
+    line-height: 1.5;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    resize: none;
+    background-color: #fafafa;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.latex-textarea:focus {
+    border-color: #007bff;
+    background-color: #fff;
+    outline: 0;
+}
+
+/* Khu vực Preview */
+.preview-box {
+    min-height: 140px;
+    max-height: 220px;
+    overflow-y: auto;
+    border: 1px dashed #dee2e6 !important;
+    /* Tạo nền lưới nhẹ cho cảm giác kỹ thuật */
+    background-color: #ffffff;
+    background-image: linear-gradient(#f8f9fa 1.1px, transparent 1.1px),
+        linear-gradient(90deg, #f8f9fa 1.1px, transparent 1.1px);
+    background-size: 22px 22px;
+}
+
+.katex-display-area {
+    font-size: 14px;
+    color: #212529;
+    min-height: 50px;
+}
+
+/* Text mờ khi trống */
+.text-muted-custom {
+    color: #adb5bd;
+    font-style: italic;
+    font-size: 0.85rem;
+}
+
+/* Ghi đè padding mặc định của Angular Material Dialog */
+::ng-deep .mat-dialog-container {
+    padding: 0 !important;
+    border-radius: 0px !important;
+    overflow: auto !important;
+    height: auto!important;
+}
+
+/* Nút bấm tinh chỉnh */
+.btn-sm {
+    font-size: 0.85rem;
+    border-radius: 4px;
+}
+
+.font-size-16 {
+    font-size: 16px;
+}
+
+.preset-btn {
+    min-width: fit-content;
+    height: 50px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    transition: all 0.2s;
+}
+
+.preset-btn:hover {
+    border-color: #007bff !important;
+    background-color: #e7f1ff !important;
+    transform: scale(1.05);
+    z-index: 10;
+}
+
+.latex-icon {
+    font-size: 0.9rem;
+    color: #333;
+}
+
+/* Tùy chỉnh thanh cuộn cho bảng icon */
+.tab-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tab-content::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}
+
+/* Nav-pills style nhỏ gọn */
+.nav-pills .nav-link {
+    border-radius: 0.25rem;
+    color: #495057;
+    background: #f8f9fa;
+    margin: 0 2px;
+}
+
+.nav-pills .nav-link.active {
+    background-color: #007bff;
+}
+
+/* Đảm bảo nút trong nav-pills không có outline xấu khi click */
+.nav-pills .nav-link {
+    cursor: pointer;
+    outline: none;
+}
+
+.nav-pills .nav-link:focus {
+    box-shadow: none;
+}
+
+/* Hiệu ứng mượt mà khi chuyển tab */
+.tab-pane.fade {
+    transition: opacity 0.1s linear;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.2s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.preset-btn {
+    background: white;
+    min-width: 55px;
+    height: 45px;
+}
+
+.presets-all-container {
+    background-color: #fdfdfd;
+}
+
+.group-title {
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.75rem;
+}
+
+.preset-btn {
+    width: fit-content;
+    height: 40px;
+    padding: 2px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.preset-btn:hover {
+    background-color: #eef6ff !important;
+    border-color: #007bff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.latex-icon {
+    font-size: 12px;
+}
+
+/* Tùy chỉnh thanh cuộn đẹp hơn */
+.presets-all-container::-webkit-scrollbar {
+    width: 5px;
+}
+.presets-all-container::-webkit-scrollbar-thumb {
+    background: #d1d1d1;
+    border-radius: 10px;
+}

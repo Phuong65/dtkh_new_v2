@@ -1,0 +1,90 @@
+<!-- <div class="youtube-manager ovic-media-files">
+    <div class="files-list">
+        <div (click)="openYoutubeManager_secondary()" class="single-file" [ngClass]="!isMultipleMode?'one-file':''"
+            style="" *ngFor="let file of fileChooser, index as i">
+            <i class="icon-in-open-download-file ovic-file-icon fa fa-file-video-o" ></i>
+            <div class="info">
+                <h4 class="name">{{file.title}}</h4>
+                <p class="size">{{file['file_size']}}</p>
+            </div>
+            <button *ngIf="isMultipleMode" (click)="deleteFileChoosed(i)" type="button" class="btn-delete">
+                <i  class="fa fa-trash-o"></i></button>
+        </div>
+        <button *ngIf="isMultipleMode || !fileChooser || !fileChooser.length" (click)="openYoutubeManager()"
+            type="button" class="btn btn-outline-success call-file-picker">Chọn video
+        </button>
+    </div>
+</div>
+<ng-template #templateMananger let-c="close" let-d="dismiss">
+    <div class="modal-header ">
+        <h4 class="modal-title">Danh sách video</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d(true)">
+            <span >&times;</span>
+        </button>
+    </div>
+    <div class="modal-body ovic-modal-body youtube-manager-container" *ngIf="id_playlist">
+        <div class="youtube-manager-container-left">
+            <div *ngIf="selectedVideo && selectedVideo.length && !startProgress" plyr style="width: 80%;"
+                plyrTitle="Video 1" [plyrPlaysInline]="true" [plyrSources]="selectedVideo" (plyrInit)="player = $event"
+                (plyrPlay)="played($event)"></div>
+            <span *ngIf="(!selectedVideo || !selectedVideo.length) && !startProgress" style="font-size: 18px;">Vui lòng
+                chọn
+                video...</span>
+            <div *ngIf="startProgress" class="popup-waiting-loading" style="width: 80%;">
+                <label>Vui lòng chờ...</label>
+                <div *ngIf="startProgress" class="tn-import-student-progressbar" style="width: 100%;">
+                    <p-progressBar [value]="progressValue" mode="dynamic"></p-progressBar>
+                </div>
+            </div>
+        </div>
+        <div class="youtube-manager-container-right">
+            <div class="top-container-right ovic-file-manager-upload-area">
+                <div class="ovic-file-manager-container" ovicDropAndDrag
+                    (fileDropped)="onFileInput($event,fileChooser)">
+                    <input type="file" #fileChooser multiple (change)="onFileInput($event.target['files],fileChooser)"
+                        accept="video/mp4" />
+                    <img src="assets/images/dnd/ic-upload-file.svg" alt="">
+                    <h3>Kéo thả files vào đây hoặc <span class="text-danger">click</span> để upload video <br><span
+                            style="color:#284CE0;">(Dung lượng tối đa là 2GB)</span></h3>
+                </div>
+            </div>
+            <div class="bottom-container-right">
+                <div class="ovic-input-line">
+                    <div style="padding: 5px;" class="ovic-input-item">
+                        <input class="ovic-input-field" type="text" [(ngModel)]="searchVideo" placeholder="Search">
+                    </div>
+                </div>
+                <mat-selection-list class="selection-list-mat" #videos [multiple]="false"
+                    *ngIf="(videoSources |filter: searchVideo : ['title']).length > 0; else noResults">
+                    <mat-list-option
+                        *ngFor="let video of videoSources | filter: searchVideo : ['title'], index as index"
+                        [value]="video">
+                        <div style="display: flex; align-items: center; justify-content: space-between;"
+                            class="card-name-listvanban">
+                            <mat-checkbox (change)="checkBoxVideo(index)" [(ngModel)]="video['check']"
+                                class="example-margin"></mat-checkbox>
+                            <div (click)="chooseVideo(video)"
+                                style="display: flex; align-items: center; flex:1; margin: 0 10px; height: 100%;"
+                                mat-line>
+                                <div style="white-space:initial;">
+                                    {{video.title}}
+                                </div>
+                            </div>
+                        </div>
+                    </mat-list-option>
+                </mat-selection-list>
+                <div style="padding: 5px; text-align: right; border-top: 1px solid #c8c8c8;">
+                    <button (click)="saveChooseVideos(d)" class="btn btn-primary"><i class="fa fa-floppy-o"></i>Lưu
+                        lại</button>
+                </div>
+                <ng-template #noResults>
+                    <div class="result-search-none">Không có video nào...</div>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+    <div style="display: flex; justify-content: center;align-items: center;"
+        class="modal-body ovic-modal-body youtube-manager-container" *ngIf="!id_playlist">
+        <button *ngIf="!startProgress" (click)="createPlaylist()" class="btn btn-success">{{create_Label}}</button>
+    </div>
+</ng-template> -->

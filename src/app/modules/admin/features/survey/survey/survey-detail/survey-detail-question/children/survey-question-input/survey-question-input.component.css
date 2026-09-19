@@ -1,0 +1,50 @@
+.layout_component_container_survey_question_radio {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    gap: 10px;
+    padding: 0px 10px;
+}
+
+.survey_question_radio_title {
+    display: flex;
+    flex-direction: column;
+}
+
+.survey_question_radio_answer {
+    display: flex;
+    flex-direction: column;
+}
+
+.survey_question_radio_answer__list-option{
+    display: flex;
+    flex-direction: column;
+}
+
+.survey_question_radio_answer__list-option_item{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.survey_question_square-number {
+  width: 36px;
+  height: 36px;
+  background: #989fff;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+.text-answer-input {
+  width: 100%;
+  padding: 6px 0;
+  border-bottom: 1px dotted #999;
+  color: #6b6b6b;
+  font-size: 14px;
+}
