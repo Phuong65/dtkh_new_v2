@@ -2,7 +2,7 @@ import { Component , Input , OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { BUTTON_NO , BUTTON_YES , OvicButton } from '@core/models/buttons';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-confirm-rounded' ,
 	templateUrl : './confirm-rounded.component.html' ,
 	styleUrls   : [ './confirm-rounded.component.css' ]

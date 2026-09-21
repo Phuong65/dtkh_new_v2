@@ -1,7 +1,7 @@
 import { Directive , Optional , Host , ElementRef , OnInit , Input } from '@angular/core';
 import { FlickityDirective } from '../flickity/flickity.directive';
 
-@Directive( { selector : '[flickityChild]' } )
+@Directive( {standalone: false,  selector : '[flickityChild]' } )
 export class FlickityChildDirective implements OnInit {
 
 	@Input() flickityChild : any;

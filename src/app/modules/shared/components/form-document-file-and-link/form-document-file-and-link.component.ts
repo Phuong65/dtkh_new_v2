@@ -17,7 +17,7 @@ export interface DocumentFileAndLink {
     file?: OvicFile;
 }
 
-@Component({
+@Component({standalone: false, 
     selector: 'form-document-file-and-link',
     templateUrl: './form-document-file-and-link.component.html',
     styleUrls: ['./form-document-file-and-link.component.css']

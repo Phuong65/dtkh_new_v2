@@ -1,6 +1,6 @@
 import { Component , OnInit } from '@angular/core';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-color-panel' ,
 	templateUrl : './color-panel.component.html' ,
 	styleUrls   : [ './color-panel.component.css' ]

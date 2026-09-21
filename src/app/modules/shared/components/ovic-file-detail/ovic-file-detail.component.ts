@@ -3,7 +3,7 @@ import { OvicDriveFile , OvicFile } from '@core/models/file';
 import { FileService } from '@core/services/file.service';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'ovic-file-detail' ,
 	templateUrl : './ovic-file-detail.component.html' ,
 	styleUrls   : [ './ovic-file-detail.component.css' ]

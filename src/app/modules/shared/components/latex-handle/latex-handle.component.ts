@@ -7,10 +7,10 @@ import { parse, HtmlGenerator } from 'latex.js';
 import * as EqEditor from 'src/assets/js/latex-toolbar.min.js';
 import katex from 'katex';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import renderMathInElement from 'katex/dist/contrib/auto-render';
+import renderMathInElement from 'katex/contrib/auto-render';
 // declare var EqEditor;
 
-@Component({
+@Component({standalone: false, 
     selector: 'latex-handle',
     templateUrl: './latex-handle.component.html',
     styleUrls: ['./latex-handle.component.css'],

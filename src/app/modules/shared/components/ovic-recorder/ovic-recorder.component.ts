@@ -1,8 +1,8 @@
 import { Component , EventEmitter , Input , OnChanges , OnInit , Output , SimpleChanges } from '@angular/core';
 import { NotificationService } from '@core/services/notification.service';
-import * as MicRecorder from 'mic-recorder-to-mp3';
+import MicRecorder from 'mic-recorder-to-mp3';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'ovic-recorder' ,
 	templateUrl : './ovic-recorder.component.html' ,
 	styleUrls   : [ './ovic-recorder.component.css' ]

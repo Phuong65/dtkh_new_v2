@@ -1,7 +1,7 @@
 import { Component, ElementRef, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { debounceTime, map, Observable, Subject, takeUntil } from 'rxjs';
 import { GoogleSignIn, UserSignIn } from '@core/models/auth';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -44,7 +44,7 @@ interface SignInThirdPartyResponse {
     message: string,
 }
 
-@Component({
+@Component({standalone: false, 
     selector: 'app-login-template-ictu',
     templateUrl: './login-template-ictu.component.html',
     styleUrls: ['./login-template-ictu.component.css']
@@ -140,10 +140,13 @@ export class LoginTemplateIctuComponent implements OnInit, OnDestroy {
             callback: (response: any) => this.handleGoogleSignIn(response)
         });
 
-        google.accounts.id.renderButton(
-            document.getElementById('sign-up-form__btn--google-sign-in'),
-            { text: 'Đăng nhập', locale: 'vi', size: 'large', type: 'standard', width: '300px', shape: 'rectangular', theme: 'filled_blue', scope: 'profile email', longtitle: true, height: 50 }  // customization attributes
-        );
+        const googleButton = document.getElementById('sign-up-form__btn--google-sign-in');
+        if (googleButton && typeof google !== 'undefined' && google.accounts?.id) {
+            google.accounts.id.renderButton(
+                googleButton,
+                { text: 'Đăng nhập', locale: 'vi', size: 'large', type: 'standard', width: '300px', shape: 'rectangular', theme: 'filled_blue', scope: 'profile email', longtitle: true, height: 50 }  // customization attributes
+            );
+        }
     }
 
     checkUserLoginStatus() {

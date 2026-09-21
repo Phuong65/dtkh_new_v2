@@ -2,7 +2,7 @@ import { Component, OnInit, Input, SimpleChanges, OnChanges, Output, EventEmitte
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
-@Component({
+@Component({standalone: false, 
     selector: 'ovic-groups-checkbox',
     templateUrl: './ovic-groups-checkbox.component.html',
     styleUrls: ['./ovic-groups-checkbox.component.css']

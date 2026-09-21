@@ -7,7 +7,7 @@ import { NotificationService } from '@core/services/notification.service';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { DownloadProcess } from '@shared/components/ovic-download-progress/ovic-download-progress.component';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-file-list-local-on-table' ,
 	templateUrl : './file-list-local-on-table.component.html' ,
 	styleUrls   : [ './file-list-local-on-table.component.css' ]

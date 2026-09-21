@@ -10,7 +10,7 @@ import { OvicFileExplorerService } from '../../../shared/services/ovic-file-expl
 import { OvicFileSever, OvicFileStore, OvicTree, OvicDriveFile, OvicFileUpload } from '@core/models/file';
 import { DomSanitizer } from '@angular/platform-browser';
 import { catchError, filter, map, mergeMap, tap } from 'rxjs/operators';
-import { async } from '@angular/core/testing';
+import { waitForAsync as async } from '@angular/core/testing';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MAXIMIZE_MODAL_OPTIONS, OvicVideoSourceObject } from '../../utils/syscat';
 import { request } from 'http';
@@ -19,7 +19,7 @@ import { NotificationService } from '@core/services/notification.service';
 import { LatexHandleComponent } from '../latex-handle/latex-handle.component';
 import { MatDialog } from '@angular/material/dialog';
 
-@Component({
+@Component({standalone: false, 
     selector: 'ovic-ckeditor-document',
     templateUrl: './ovic-ckeditor-document.component.html',
     styleUrls: ['./ovic-ckeditor-document.component.css']

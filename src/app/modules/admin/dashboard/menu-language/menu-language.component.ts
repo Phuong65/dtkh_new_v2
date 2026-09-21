@@ -4,14 +4,14 @@ import { UnsubscribeAndCompleteObserversOnDestroy } from '@core/utils/decorator'
 import { APP_CONFIGS } from '@env';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { OverlayPanel } from 'primeng/overlaypanel/overlaypanel';
+import { OverlayPanel } from 'primeng/overlaypanel';
 
 interface MenuLanguage {
 	name : string;
 	label : string;
 }
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'admin-menu-language' ,
 	templateUrl : './menu-language.component.html' ,
 	styleUrls   : [ './menu-language.component.css' ]

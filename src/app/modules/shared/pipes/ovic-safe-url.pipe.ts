@@ -1,7 +1,7 @@
 import { Pipe , PipeTransform } from '@angular/core';
 import { DomSanitizer , SafeUrl } from '@angular/platform-browser';
 
-@Pipe( {
+@Pipe( {standalone: false, 
 	name : 'ovicSafeUrl'
 } )
 export class OvicSafeUrlPipe implements PipeTransform {

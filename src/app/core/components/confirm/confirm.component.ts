@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, Input, OnInit } from '@angular/co
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { BUTTON_CLOSED, OvicButton } from '@core/models/buttons';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-confirm' ,
 	templateUrl : './confirm.component.html' ,
 	styleUrls   : [ './confirm.component.css' ]

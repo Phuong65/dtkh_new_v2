@@ -10,7 +10,7 @@ import { DownloadProcess } from '@shared/components/ovic-download-progress/ovic-
 import { Observable , of , Subject } from 'rxjs';
 import { CLOUD_STORAGE_KEY } from '../../../../../environments/environment.prod';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-file-list-local' ,
 	templateUrl : './file-list-local.component.html' ,
 	styleUrls   : [ './file-list-local.component.css' ]

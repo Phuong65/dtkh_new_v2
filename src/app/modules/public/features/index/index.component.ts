@@ -11,7 +11,7 @@ import { DanhMucService } from '@shared/services/danh-muc.service';
 import { QuyetDinhService } from '@shared/services/quyet-dinh.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { filter , map } from 'rxjs/operators';
-import { NgbModalOptions } from '@ng-bootstrap/ng-bootstrap/modal/modal-config';
+import { NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { DropdownFilterOptions } from 'primeng/dropdown';
 import { NgPaginateEvent } from '@shared/models/ovic-models';
 import { FormGroup } from '@angular/forms';
@@ -22,7 +22,7 @@ interface AgencyOption {
 	logo : string
 }
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-index' ,
 	templateUrl : './index.component.html' ,
 	styleUrls   : [ './index.component.css' ]

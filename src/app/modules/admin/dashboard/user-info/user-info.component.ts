@@ -5,10 +5,10 @@ import { RoleService } from '@core/services/role.service';
 import { Router } from '@angular/router';
 import { BUTTON_NO, BUTTON_YES } from '@core/models/buttons';
 import { NotificationService } from '@core/services/notification.service';
-import { OverlayPanel } from 'primeng/overlaypanel/overlaypanel';
+import { OverlayPanel } from 'primeng/overlaypanel';
 import { filter } from 'rxjs/operators';
 
-@Component({
+@Component({standalone: false, 
     selector: 'admin-user-info',
     templateUrl: './user-info.component.html',
     styleUrls: ['./user-info.component.css']

@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import {RouterModule} from '@angular/router';
 
-@Component({
+@Component({standalone: false, 
     selector: 'question-type-select-box',
     templateUrl: './question-type-select-box.component.html',
     styleUrls: [ './question-type-select-box.component.css' ],

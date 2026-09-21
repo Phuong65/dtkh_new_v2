@@ -4,7 +4,7 @@ import { ViewDocumentComponent } from '../components/view-document/view-document
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LARGE_MODAL_OPTIONS } from '../utils/syscat';
 
-@Directive({
+@Directive({standalone: false, 
     selector: '[clickableImagePreview]'
 })
 export class ClickableImagePreviewDirective {

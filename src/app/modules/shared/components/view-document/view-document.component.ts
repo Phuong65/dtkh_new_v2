@@ -13,7 +13,7 @@ import { getLinkMedia_aws } from 'src/environments/environment.prod';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { OFFICE_SUPORT_FILE, OvicVideoSourceObject, TYPE_FILE_LIST } from '@modules/shared/utils/syscat';
 
-@Component({
+@Component({standalone: false, 
     selector: 'view-document',
     templateUrl: './view-document.component.html',
     styleUrls: ['./view-document.component.css']

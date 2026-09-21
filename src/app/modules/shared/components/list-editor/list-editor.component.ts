@@ -2,7 +2,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 
-@Component({
+@Component({standalone: false, 
     selector: 'app-list-editor',
     templateUrl: './list-editor.component.html',
     styleUrls: ['./list-editor.component.css']

@@ -1,6 +1,6 @@
 import { AfterViewInit , Component , ElementRef , Input , OnInit , Output , ViewChild } from '@angular/core';
 import { ImageCroppedEvent } from 'ngx-image-cropper';
-import { OutputFormat } from 'ngx-image-cropper/lib/interfaces/cropper-options.interface';
+import { OutputFormat } from 'ngx-image-cropper';
 import { state , style , trigger } from '@angular/animations';
 import { NotificationService } from '@core/services/notification.service';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -12,7 +12,7 @@ import { filter , map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { UnsubscribeAndCompleteObserversOnDestroy } from '@core/utils/decorator';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'ovic-avatar-maker' ,
 	templateUrl : './ovic-avatar-maker.component.html' ,
 	styleUrls   : [ './ovic-avatar-maker.component.css' ] ,

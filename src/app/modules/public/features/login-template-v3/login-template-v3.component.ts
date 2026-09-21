@@ -1,7 +1,7 @@
 import { Component, NgZone, OnDestroy, OnInit, TemplateRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { GoogleSignIn, UserSignIn } from '@core/models/auth';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -30,7 +30,7 @@ interface LoginButton {
 
 declare var google: any;
 
-@Component({
+@Component({standalone: false, 
     selector: 'app-login-template-v3',
     templateUrl: './login-template-v3.component.html',
     styleUrls: ['./login-template-v3.component.css']

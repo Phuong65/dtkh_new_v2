@@ -2,7 +2,7 @@ import { Pipe , PipeTransform } from '@angular/core';
 import { OvicDriveFile , OvicFile , OvicFileStore  } from '@core/models/file';
 import { FileService } from '@core/services/file.service';
 
-@Pipe( {
+@Pipe( {standalone: false, 
 	name : 'ovicFileSize'
 } )
 export class OvicFileSizePipe implements PipeTransform {

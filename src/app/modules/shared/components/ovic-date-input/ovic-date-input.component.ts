@@ -3,7 +3,7 @@ import { AbstractControl } from '@angular/forms';
 import { debounceTime } from 'rxjs';
 import { HelperService } from '@core/services/helper.service';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'ovic-date-input' ,
 	templateUrl : './ovic-date-input.component.html' ,
 	styleUrls   : [ './ovic-date-input.component.css' ]

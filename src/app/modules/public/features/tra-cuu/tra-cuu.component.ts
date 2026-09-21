@@ -13,7 +13,7 @@ import { AGENCIES , ENABLE_SELECT_AGENCY } from '@env';
 import { DropdownFilterOptions } from 'primeng/dropdown';
 import { NgPaginateEvent } from '@shared/models/ovic-models';
 import { Paginator } from 'primeng/paginator';
-import { NgbModalOptions } from '@ng-bootstrap/ng-bootstrap/modal/modal-config';
+import { NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 interface AgencyOption {
 	id : number,
@@ -22,7 +22,7 @@ interface AgencyOption {
 }
 
 @UnsubscribeAndCompleteObserversOnDestroy()
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-tra-cuu' ,
 	templateUrl : './tra-cuu.component.html' ,
 	styleUrls   : [ './tra-cuu.component.css' ]

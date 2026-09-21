@@ -3,7 +3,7 @@ import { FileService } from '@core/services/file.service';
 import { OvicFileStore , OvicFile } from '@core/models/file';
 import { NotificationService } from '@core/services/notification.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { AbstractControl } from '@angular/forms';
 import { AuthService } from '@core/services/auth.service';
 import { BUTTON_NO , BUTTON_YES } from '@core/models/buttons';
@@ -15,7 +15,7 @@ interface OvicFolderTreeObject {
 	children? : OvicFolderTreeObject[];
 }
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'ovic-file-manager' ,
 	templateUrl : './ovic-file-manager.component.html' ,
 	styleUrls   : [ './ovic-file-manager.component.css' ]

@@ -14,14 +14,16 @@
     "declaration"                        : false,
     "downlevelIteration"                 : true,
     "experimentalDecorators"             : true,
-    "moduleResolution"                   : "node",
+    "moduleResolution"                   : "bundler",
+    "skipLibCheck"                       : true,
+    "isolatedModules"                    : true,
     "importHelpers"                      : true,
-    "target"                             : "es2020",
-    "module"                             : "es2020",
+    "useDefineForClassFields"            : false,
+    "target"                             : "es2022",
+    "module"                             : "es2022",
     "lib"                                : [
-      "es2020",
-      "dom",
-      "ScriptHost"
+      "es2022",
+      "dom"
     ],
     "paths"                              : {
       "@env"       : ["src/environments/environment"],

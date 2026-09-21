@@ -1,6 +1,6 @@
 import { Directive , HostListener , Input } from '@angular/core';
 
-@Directive( {
+@Directive( {standalone: false, 
 	selector : '[preventDoubleClick]'
 } )
 export class PreventDoubleClickDirective {

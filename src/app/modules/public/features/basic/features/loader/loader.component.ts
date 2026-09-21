@@ -27,7 +27,7 @@ class loader {
 	}
 }
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-loader' ,
 	templateUrl : './loader.component.html' ,
 	styleUrls   : [ './loader.component.css' ]

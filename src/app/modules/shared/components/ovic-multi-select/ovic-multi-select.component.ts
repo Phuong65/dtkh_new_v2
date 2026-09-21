@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, SimpleChanges, OnInit, Outpu
 import { OvicChooser } from '@shared/models/ovic-models';
 import { AbstractControl } from '@angular/forms';
 
-@Component({
+@Component({standalone: false, 
     selector: 'ovic-multi-select',
     templateUrl: './ovic-multi-select.component.html',
     styleUrls: ['./ovic-multi-select.component.css']

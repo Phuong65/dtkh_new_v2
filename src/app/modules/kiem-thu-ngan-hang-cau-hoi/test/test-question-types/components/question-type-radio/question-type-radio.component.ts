@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import {RouterModule} from '@angular/router';
 
-@Component({
+@Component({standalone: false, 
     selector: 'question-type-radio-show',
     templateUrl: './question-type-radio.component.html',
     styleUrls: [ './question-type-radio.component.css' ],

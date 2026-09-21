@@ -29,7 +29,7 @@ import { FormsModule } from '@angular/forms';
 // import { HomeGdqpAnComponent } from './features/home/home-gdqp-an/home-gdqp-an.component';
 // import { HomeLcmsComponent } from './features/home/home-lcms/home-lcms.component';
 import { ChartModule } from 'primeng/chart';
-import { GoogleChartsModule } from 'angular-google-charts';
+// import { GoogleChartsModule } from 'angular-google-charts';
 // import AdminDashboardComponent from './features/home/admin-dashboard-225/admin-dashboard/admin-dashboard.component';
 import { MenuV2Component } from './dashboard/menu-v2/menu-v2.component';
 
@@ -68,7 +68,7 @@ import { MenuV2Component } from './dashboard/menu-v2/menu-v2.component';
         DropdownModule,
         FormsModule,
         ChartModule,
-        GoogleChartsModule,
+        // GoogleChartsModule,
         // AdminDashboardComponent
     ],
 })

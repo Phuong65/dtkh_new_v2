@@ -10,7 +10,7 @@ interface SingleFileDriverPreview {
 	url : string;
 }
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'ovic-preview-single-google-drive-file' ,
 	templateUrl : './ovic-preview-single-google-drive-file.component.html' ,
 	styleUrls   : [ './ovic-preview-single-google-drive-file.component.css' ]

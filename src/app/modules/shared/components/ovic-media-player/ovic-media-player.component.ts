@@ -4,7 +4,7 @@ import * as Plyr from 'plyr';
 import { OvicMedia , OvicMediaSources } from '@core/models/file';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-ovic-media-player' ,
 	templateUrl : './ovic-media-player.component.html' ,
 	styleUrls   : [ './ovic-media-player.component.css' ]

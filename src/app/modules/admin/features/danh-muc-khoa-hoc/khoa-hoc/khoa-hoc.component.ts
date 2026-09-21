@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import {RouterModule} from '@angular/router';
 
-@Component({
+@Component({standalone: false, 
     selector: 'app-khoa-hoc',
     templateUrl: './khoa-hoc.component.html',
     styleUrls: ['./khoa-hoc.component.css'],

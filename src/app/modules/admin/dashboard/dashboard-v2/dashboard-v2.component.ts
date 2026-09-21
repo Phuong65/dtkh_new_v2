@@ -13,7 +13,7 @@ import { debounceTime, of, Subscription, BehaviorSubject, merge, Subject, firstV
 import { Ucase } from '@core/models/ucase';
 import { UnsubscribeAndCompleteObserversOnDestroy } from '@core/utils/decorator';
 import { ThemeSettingsService } from '@core/services/theme-settings.service';
-import { LangChangeEvent } from '@ngx-translate/core/lib/translate.service';
+import { LangChangeEvent } from '@ngx-translate/core';
 import {
     moveFromLeft,
     moveFromRight,
@@ -56,9 +56,9 @@ import {
     rotateSides,
     slide
 } from '@shared/animations/router-animations';
-import { OverlayPanel } from 'primeng/overlaypanel/overlaypanel';
+import { OverlayPanel } from 'primeng/overlaypanel';
 import { BUTTON_NO, BUTTON_YES } from '@core/models/buttons';
-import { ScrollPanel } from 'primeng/scrollpanel/scrollpanel';
+import { ScrollPanel } from 'primeng/scrollpanel';
 import { Title } from '@angular/platform-browser';
 import { ClassesService } from '@modules/shared/services/classes.service';
 import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';

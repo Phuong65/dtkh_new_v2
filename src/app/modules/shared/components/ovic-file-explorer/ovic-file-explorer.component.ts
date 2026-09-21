@@ -40,7 +40,7 @@ interface SearchInfo {
 	limit : number;
 }
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'ovic-file-explorer' ,
 	templateUrl : './ovic-file-explorer.component.html' ,
 	styleUrls   : [ './ovic-file-explorer.component.css' ] ,

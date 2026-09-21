@@ -8,7 +8,7 @@ import { HelperService } from '@core/services/helper.service';
 import { AuthService } from '@core/services/auth.service';
 import { OvicFileStore, OvicFileSever } from '../../models/file-store';
 
-@Component({
+@Component({standalone: false, 
     selector: 'avata-maker',
     templateUrl: './avata-maker.component.html',
     styleUrls: ['./avata-maker.component.css']

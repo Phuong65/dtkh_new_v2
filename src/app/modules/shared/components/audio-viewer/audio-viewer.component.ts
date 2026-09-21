@@ -2,7 +2,7 @@ import { Component, OnInit, Output, Input, ViewChild, ElementRef, EventEmitter, 
 import { FileService } from '@core/services/file.service';
 import { HelperService } from '@core/services/helper.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DomSanitizer } from '@angular/platform-browser';
 // import { TnBankQuestionService } from '../../../shared/services/tn-bank-question.service';
 import {
@@ -14,7 +14,7 @@ import {
 import { getLinkDownload_aws, getLinkMedia_aws } from '@env';
 import { AuthService } from '@core/services/auth.service';
 
-@Component({
+@Component({standalone: false, 
     selector: 'audio-viewer',
     templateUrl: './audio-viewer.component.html',
     styleUrls: ['./audio-viewer.component.css']

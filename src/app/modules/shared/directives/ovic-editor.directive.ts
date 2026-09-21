@@ -1,6 +1,6 @@
 import { Directive , Input , OnChanges , SimpleChange , ElementRef } from '@angular/core';
 
-@Directive( {
+@Directive( {standalone: false, 
 	selector : '[ovic-editor]'
 } )
 export class OvicEditorDirective implements OnChanges {

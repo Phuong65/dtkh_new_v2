@@ -25,7 +25,7 @@ import { MatSelectionListChange } from '@angular/material/list';
 import { BUTTON_CANCEL, BUTTON_CLOSED, BUTTON_NO, BUTTON_YES } from '@core/models/buttons';
 import { ConfirmationService } from 'primeng/api';
 import * as FileSaver from 'file-saver';
-@Component({
+@Component({standalone: false, 
     selector: 'files-management-new',
     templateUrl: './files-management-new.component.html',
     styleUrls: ['./files-management-new.component.css'],

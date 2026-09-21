@@ -29,7 +29,7 @@ export interface TREE {
     deleteNode?: boolean;
 }
 
-@Component({
+@Component({standalone: false, 
     selector: 'tree-custom',
     templateUrl: './tree-custom.component.html',
     styleUrls: ['./tree-custom.component.css'],

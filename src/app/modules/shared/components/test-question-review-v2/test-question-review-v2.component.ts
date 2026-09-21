@@ -3,7 +3,7 @@ import { AuthService } from '@core/services/auth.service';
 import { HelperService } from '@core/services/helper.service';
 import { getLinkDownload_aws } from '@env';
 
-@Component({
+@Component({standalone: false, 
   selector: 'test-question-review-v2',
   templateUrl: './test-question-review-v2.component.html',
   styleUrls: ['./test-question-review-v2.component.css']

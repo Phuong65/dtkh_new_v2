@@ -1,7 +1,7 @@
 import { AfterViewInit , Directive , ElementRef } from '@angular/core';
 import { FileService } from '@core/services/file.service';
 
-@Directive( {
+@Directive( {standalone: false, 
 	selector : '[ovicMediaLoader]'
 } )
 export class OvicMediaLoaderDirective implements AfterViewInit {

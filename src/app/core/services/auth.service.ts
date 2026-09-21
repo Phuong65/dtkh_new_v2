@@ -10,7 +10,7 @@ import { Ucase, UcaseAdvance } from '@core/models/ucase';
 import { UserService } from '@core/services/user.service';
 import * as CryptoJS from 'crypto-js';
 import { TranslateService } from '@ngx-translate/core';
-import { LangChangeEvent } from '@ngx-translate/core/lib/translate.service';
+import { LangChangeEvent } from '@ngx-translate/core';
 import { HttpBackend, HttpClient } from '@angular/common/http';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Dto } from '@core/models/dto';

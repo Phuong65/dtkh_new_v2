@@ -2,7 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { HelperService } from '@core/services/helper.service';
 
-@Pipe({
+@Pipe({standalone: false, 
     name: 'safeHtmlDecode'
 })
 export class SafeHtmlDecodePipe implements PipeTransform {

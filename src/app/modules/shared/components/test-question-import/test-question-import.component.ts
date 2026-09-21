@@ -4,7 +4,7 @@ import mammothPlus from 'mammoth-plus';
 import { MathMLToLaTeX } from 'mathml-to-latex';
 import * as latex_js from 'latex.js';
 
-@Component({
+@Component({standalone: false, 
     selector: 'test-question-import',
     templateUrl: './test-question-import.component.html',
     styleUrls: ['./test-question-import.component.css']

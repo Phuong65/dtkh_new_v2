@@ -3,14 +3,14 @@ import { FileService } from '@core/services/file.service';
 import { debounceTime , Subject , Subscription } from 'rxjs';
 import { DomSanitizer , SafeUrl } from '@angular/platform-browser';
 
-@Directive( {
+@Directive( {standalone: false, 
 	selector : '[ovicLazyLoad]'
 } )
 export class OvicLazyLoadDirective implements AfterViewInit , OnChanges , OnDestroy {
 
 	@Input( 'ovicLazyLoad' ) fileId : number;
 
-	@HostBinding( 'src' ) src : SafeUrl;
+	@HostBinding( 'attr.src' ) src : SafeUrl;
 
 	subscription = new Subscription();
 

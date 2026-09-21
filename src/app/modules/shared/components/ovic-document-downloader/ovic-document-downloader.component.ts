@@ -26,7 +26,7 @@ const STATE_CANCEL : OvicDocumentDownloadResult = {
 	download : null
 };
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-ovic-document-downloader' ,
 	templateUrl : './ovic-document-downloader.component.html' ,
 	styleUrls   : [ './ovic-document-downloader.component.css' ]

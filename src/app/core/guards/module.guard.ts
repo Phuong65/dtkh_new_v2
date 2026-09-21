@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot , CanActivate , CanActivateChild , Router , RouterStateSnapshot , UrlTree } from '@angular/router';
+import { Injectable, inject } from '@angular/core';
+import { ActivatedRouteSnapshot , CanActivate , CanActivateFn , Router , RouterStateSnapshot , UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthService } from '@core/services/auth.service';
 
@@ -25,3 +25,5 @@ export class ModuleGuard implements CanActivate {
 		return true;
 	}
 }
+
+export const moduleGuard: CanActivateFn = (route, state) => inject(ModuleGuard).canActivate(route, state);

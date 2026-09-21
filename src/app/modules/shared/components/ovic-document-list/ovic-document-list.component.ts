@@ -4,7 +4,7 @@ import { FileService } from '@core/services/file.service';
 import { NotificationService } from '@core/services/notification.service';
 import { MediaService } from '@shared/services/media.service';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'ovic-document-list' ,
 	templateUrl : './ovic-document-list.component.html' ,
 	styleUrls   : [ './ovic-document-list.component.css' ]

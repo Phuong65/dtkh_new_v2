@@ -2,7 +2,7 @@ import { Pipe , PipeTransform } from '@angular/core';
 import { OvicDriveFile , OvicFile , OvicFileStore , OvicFileUpload , OvicDocument } from '@core/models/file';
 import { FileType } from '@shared/utils/syscat';
 
-@Pipe( { name : 'ovicFileType' } )
+@Pipe( {standalone: false,  name : 'ovicFileType' } )
 export class FileTypePipe implements PipeTransform {
 
 	fileType = FileType;

@@ -3,7 +3,7 @@ import { AbstractControl, FormGroup } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { KEY_ANSWER } from '@modules/shared/utils/syscat';
 
-@Component({
+@Component({standalone: false, 
     selector: 'ovic-groups-radio-v2',
     templateUrl: './ovic-groups-radio-v2.component.html',
     styleUrls: ['./ovic-groups-radio-v2.component.css'],

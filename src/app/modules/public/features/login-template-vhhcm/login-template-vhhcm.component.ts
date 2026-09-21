@@ -1,7 +1,7 @@
 import { Component, ElementRef, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { GoogleSignIn, UserSignIn } from '@core/models/auth';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -46,7 +46,7 @@ interface LoginBanner {
 
 declare var google: any;
 
-@Component({
+@Component({standalone: false, 
     selector: 'app-login-template-vhhcm',
     templateUrl: './login-template-vhhcm.component.html',
     styleUrls: ['./login-template-vhhcm.component.css']

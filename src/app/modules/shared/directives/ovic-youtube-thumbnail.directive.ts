@@ -2,7 +2,7 @@ import { Directive , HostBinding , Input , OnInit } from '@angular/core';
 import { HelperService } from '@core/services/helper.service';
 import { DomSanitizer , SafeStyle } from '@angular/platform-browser';
 
-@Directive( {
+@Directive( {standalone: false, 
 	selector : '[ovicYoutubeThumbnail]'
 } )
 export class OvicYoutubeThumbnailDirective implements OnInit {

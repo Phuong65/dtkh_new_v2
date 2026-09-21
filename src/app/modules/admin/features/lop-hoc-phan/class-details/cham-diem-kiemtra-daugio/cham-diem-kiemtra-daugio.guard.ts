@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { CanDeactivate } from '@angular/router';
+import { Injectable, inject } from '@angular/core';
+import { CanDeactivate, CanDeactivateFn } from '@angular/router';
 import { Observable } from 'rxjs';
 import { ChamDiemKiemtraDaugioComponent } from './cham-diem-kiemtra-daugio.component';
 
@@ -9,3 +9,5 @@ export class ChamDiemKiemtraDaugioGuard implements CanDeactivate<ChamDiemKiemtra
         return component.requestDeactivate();
     }
 }
+
+export const chamDiemKiemtraDaugioGuard: CanDeactivateFn<ChamDiemKiemtraDaugioComponent> = (component) => inject(ChamDiemKiemtraDaugioGuard).canDeactivate(component);

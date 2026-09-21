@@ -30,7 +30,7 @@ export type ChartOptions = {
 	toolbar : any;
 };
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-area-chart-basic' ,
 	templateUrl : './area-chart-basic.component.html' ,
 	styleUrls   : [ './area-chart-basic.component.css' ]

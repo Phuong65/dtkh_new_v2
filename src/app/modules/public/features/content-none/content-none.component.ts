@@ -1,6 +1,6 @@
 import { Component , OnInit } from '@angular/core';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-content-none' ,
 	templateUrl : './content-none.component.html' ,
 	styleUrls   : [ './content-none.component.css' ]

@@ -1,7 +1,7 @@
 import { Directive , HostBinding , HostListener } from '@angular/core';
 import { WindowRef } from '@core/services/window-ref.service';
 
-@Directive( {
+@Directive( {standalone: false, 
     selector : '[ovicVideoAspectRatio16x9]'
 } )
 export class OvicVideoAspectRatio16x9Directive {

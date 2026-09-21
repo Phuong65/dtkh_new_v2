@@ -2,7 +2,7 @@ import { Component, OnInit, Input, SimpleChanges, OnChanges, Output, EventEmitte
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
-@Component({
+@Component({standalone: false, 
     selector: 'ovic-groups-radio',
     templateUrl: './ovic-groups-radio.component.html',
     styleUrls: ['./ovic-groups-radio.component.css']

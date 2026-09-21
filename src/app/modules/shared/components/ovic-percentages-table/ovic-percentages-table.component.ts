@@ -2,9 +2,9 @@ import { Component , EventEmitter , Input , OnChanges , OnInit , Output , Simple
 import { OvicPercentageElement , OvicPercentagesDataTable } from '@shared/models/ovic-models';
 import { NotificationService } from '@core/services/notification.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'ovic-percentages-table' ,
 	templateUrl : './ovic-percentages-table.component.html' ,
 	styleUrls   : [ './ovic-percentages-table.component.css' ]

@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import {RouterModule} from '@angular/router';
 
-@Component({
+@Component({standalone: false, 
     selector: 'question-type-group-input',
     templateUrl: './question-type-group-input.component.html',
     styleUrls: [ './question-type-group-input.component.css' ],

@@ -1,6 +1,6 @@
 import { Component , OnInit } from '@angular/core';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-buttons' ,
 	templateUrl : './buttons.component.html' ,
 	styleUrls   : [ './buttons.component.css' ]

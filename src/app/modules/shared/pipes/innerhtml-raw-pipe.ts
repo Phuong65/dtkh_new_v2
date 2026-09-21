@@ -1,7 +1,7 @@
 import { ElementRef, Pipe, PipeTransform } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 
-@Pipe({
+@Pipe({standalone: false, 
     name: 'rawHtmlPipe'
 })
 export class RawHtmlPipe implements PipeTransform {

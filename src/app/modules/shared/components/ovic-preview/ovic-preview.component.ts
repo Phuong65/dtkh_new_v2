@@ -9,7 +9,7 @@ import { FileType } from '../../utils/syscat';
 import { OvicFileDetailComponent } from '../ovic-file-detail/ovic-file-detail.component';
 import * as Plyr from 'plyr';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'ovic-preview' ,
 	templateUrl : './ovic-preview.component.html' ,
 	styleUrls   : [ './ovic-preview.component.css' ]

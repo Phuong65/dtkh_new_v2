@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import {RouterModule} from '@angular/router';
 
-@Component({
+@Component({standalone: false, 
     selector: 'app-class-noidung-giangday',
     templateUrl: './class-noidung-giangday.component.html',
     styleUrls: [ './class-noidung-giangday.component.css' ],

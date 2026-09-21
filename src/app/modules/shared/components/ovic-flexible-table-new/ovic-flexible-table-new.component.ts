@@ -7,7 +7,7 @@ interface RowMenuEvent {
     item: any
 }
 
-@Component({
+@Component({standalone: false, 
     selector: 'ovic-flexible-table-new',
     templateUrl: './ovic-flexible-table-new.component.html',
     styleUrls: ['./ovic-flexible-table-new.component.css']

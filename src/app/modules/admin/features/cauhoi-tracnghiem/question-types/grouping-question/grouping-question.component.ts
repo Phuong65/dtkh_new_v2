@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import {RouterModule} from '@angular/router';
 
-@Component({
+@Component({standalone: false, 
     selector: 'grouping-question',
     templateUrl: './grouping-question.component.html',
     styleUrls: [ './grouping-question.component.css' ],

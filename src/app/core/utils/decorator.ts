@@ -22,7 +22,7 @@ export function UnsubscribeAndCompleteObserversOnDestroy() {
 					property.closeSideNavigationMenu( 'force close' );
 				}
 
-				if ( prop === '__observableCloser$' && property instanceof Subject<string> ) {
+				if ( prop === '__observableCloser$' && property instanceof Subject ) {
 					property.next( 'close' );
 					property.complete();
 				}

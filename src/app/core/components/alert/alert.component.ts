@@ -4,7 +4,7 @@ import { DomSanitizer , SafeUrl } from '@angular/platform-browser';
 import { BUTTON_CANCEL , BUTTON_DISMISS , BUTTON_NO , BUTTON_YES , OvicButton } from '@core/models/buttons';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-alert' ,
 	templateUrl : './alert.component.html' ,
 	styleUrls   : [ './alert.component.css' ]

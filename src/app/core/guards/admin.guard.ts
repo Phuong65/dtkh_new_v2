@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, CanActivateChild, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { Injectable, inject } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanActivateChildFn, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthService } from '@core/services/auth.service';
 
@@ -35,3 +35,5 @@ export class AdminGuard implements CanActivateChild {
         return (currentRoute !== 'content-none' && !this.auth.userCanAccess(currentRoute)) ? this.router.navigate(['/admin/content-none']) : true;
     }
 }
+
+export const adminGuardChild: CanActivateChildFn = (route, state) => inject(AdminGuard).canActivateChild(route, state);

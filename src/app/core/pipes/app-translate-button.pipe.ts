@@ -1,10 +1,10 @@
 import { Pipe , PipeTransform } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AuthService } from '@core/services/auth.service';
-import { LangChangeEvent } from '@ngx-translate/core/lib/translate.service';
+import { LangChangeEvent } from '@ngx-translate/core';
 import { OvicButton } from '@core/models/buttons';
 
-@Pipe( {
+@Pipe( {standalone: false, 
 	name : 'appTranslateButton'
 } )
 export class AppTranslateButtonPipe implements PipeTransform {

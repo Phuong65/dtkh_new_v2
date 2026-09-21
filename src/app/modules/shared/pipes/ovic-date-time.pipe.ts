@@ -1,6 +1,6 @@
 import { Pipe , PipeTransform } from '@angular/core';
 
-@Pipe( {
+@Pipe( {standalone: false, 
     name : 'ovicDateTime'
 } )
 export class OvicDateTimePipe implements PipeTransform {

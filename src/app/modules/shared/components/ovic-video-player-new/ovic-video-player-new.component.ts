@@ -9,7 +9,7 @@ import { debounceTime, map, mergeMap } from 'rxjs/operators';
 import { LessonVideoLogEvent, VideoBaiHoc } from '../../../shared/models/elng-bai-hoc';
 import { PlaylistYoutubeService } from '../../services/playlist-youtube.service';
 import { FileService } from '@core/services/file.service';
-import { async } from '@angular/core/testing';
+import { waitForAsync as async } from '@angular/core/testing';
 
 // export interface OvicVideosEventLog {
 //     tracking? : ClassStudentsTracking;
@@ -24,7 +24,7 @@ export interface OvicVideosEventLog {
     log: LessonVideoLogEvent;
 }
 
-@Component({
+@Component({standalone: false, 
     selector: 'ovic-video-player-new',
     templateUrl: './ovic-video-player-new.component.html',
     styleUrls: ['./ovic-video-player-new.component.css']

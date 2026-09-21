@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { OvicDocument , OvicDocumentDownloadResult , OvicDriveFile , OvicFile , OvicFileStore, OvicPreviewFileContent } from '@core/models/file';
-import { NgbModalOptions } from '@ng-bootstrap/ng-bootstrap/modal/modal-config';
+import { NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { OvicPreviewComponent } from '@shared/components/ovic-preview/ovic-preview.component';
 import { DownloadProcess , OvicDownloadProgressComponent } from '@shared/components/ovic-download-progress/ovic-download-progress.component';
 import { OvicFileDetailComponent } from '@shared/components/ovic-file-detail/ovic-file-detail.component';
@@ -12,7 +12,7 @@ import { FULL_SIZE_MODAL_OPTIONS } from '@shared/utils/syscat';
 import { OvicPersonalFileExplorerComponent } from '@shared/components/ovic-personal-file-explorer/ovic-personal-file-explorer.component';
 import { APP_CONFIGS } from '@env';
 import { AvatarMaker } from '@shared/models/avatar-maker';
-import { OutputFormat } from 'ngx-image-cropper/lib/interfaces/cropper-options.interface';
+import { OutputFormat } from 'ngx-image-cropper';
 import { OvicAvatarMakerComponent } from '@shared/components/ovic-avatar-maker/ovic-avatar-maker.component';
 
 interface FileExploreSettings extends Object {

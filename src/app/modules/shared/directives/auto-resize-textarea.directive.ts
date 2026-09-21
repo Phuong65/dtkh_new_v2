@@ -1,6 +1,6 @@
 import { Directive , ElementRef , Input , OnDestroy } from '@angular/core';
 
-@Directive( {
+@Directive( {standalone: false, 
 	selector : '[autoResizeTextarea]'
 } )
 export class AutoResizeTextareaDirective implements OnDestroy {

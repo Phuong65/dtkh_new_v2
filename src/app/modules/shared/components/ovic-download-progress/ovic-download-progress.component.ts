@@ -13,7 +13,7 @@ export enum DownloadProcess {
     completed = 'completed'
 }
 
-@Component({
+@Component({standalone: false, 
     selector: 'ovic-download-progress',
     templateUrl: './ovic-download-progress.component.html',
     styleUrls: ['./ovic-download-progress.component.css']

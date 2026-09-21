@@ -1,6 +1,6 @@
 import { Directive , ElementRef , HostBinding , HostListener } from '@angular/core';
 
-@Directive( {
+@Directive( {standalone: false, 
 	selector : '[appCustomOvicTooltip]'
 } )
 export class CustomOvicTooltipDirective {

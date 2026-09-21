@@ -2,7 +2,7 @@ import { Directive , ElementRef , Input , OnChanges , OnDestroy } from '@angular
 import { Subject , Subscription } from 'rxjs';
 import { debounceTime , distinctUntilChanged , filter } from 'rxjs/operators';
 
-@Directive( {
+@Directive( {standalone: false, 
 	selector : '[bindCssVariables]'
 } )
 export class BindCssVariablesDirective implements OnChanges , OnDestroy {

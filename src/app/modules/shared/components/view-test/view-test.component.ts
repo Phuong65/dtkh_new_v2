@@ -10,7 +10,7 @@ import { CourseQuestions } from '@modules/shared/models/course-questions';
 import { ThiShiftStudents } from '@modules/shared/models/thi-shift-students';
 import { KEY_ANSWER_new } from '@modules/shared/utils/syscat';
 
-@Component({
+@Component({standalone: false, 
     selector: 'app-view-test',
     templateUrl: './view-test.component.html',
     styleUrls: ['./view-test.component.css']

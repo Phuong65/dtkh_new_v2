@@ -1,7 +1,7 @@
 import { Directive , ElementRef , Input , OnDestroy , OnInit } from '@angular/core';
 import { debounceTime , fromEvent , Subscription } from 'rxjs';
 
-@Directive( {
+@Directive( {standalone: false, 
 	selector : '[ovicLogger]'
 } )
 export class OvicLoggerDirective implements OnInit , OnDestroy {

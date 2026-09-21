@@ -8,7 +8,7 @@ import { of , Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { NotificationService } from '@core/services/notification.service';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-unauthorized' ,
 	templateUrl : './unauthorized.component.html' ,
 	styleUrls   : [ './unauthorized.component.css' ]

@@ -1,6 +1,6 @@
 import { Directive , Output , Input , EventEmitter , HostBinding , HostListener } from '@angular/core';
 
-@Directive( {
+@Directive( {standalone: false, 
     selector : '[ovicDropAndDrag]'
 } )
 export class OvicDropAndDragDirective {

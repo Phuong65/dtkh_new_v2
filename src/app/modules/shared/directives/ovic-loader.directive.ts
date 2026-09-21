@@ -8,7 +8,7 @@ interface LoaderSettings {
 	border_size? : string;
 }
 
-@Directive( {
+@Directive( {standalone: false, 
 	selector : '[ovicLoader]'
 } )
 export class OvicLoaderDirective implements AfterViewInit , OnChanges {

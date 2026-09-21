@@ -1,4 +1,4 @@
-import { NgbModalOptions } from '@ng-bootstrap/ng-bootstrap/modal/modal-config';
+import { NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 export const NORMAL_MODAL_OPTIONS : NgbModalOptions = {
 	size        : 'md' ,

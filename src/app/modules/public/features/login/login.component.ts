@@ -2,7 +2,7 @@ import { Component , NgZone , OnInit , TemplateRef } from '@angular/core';
 import { FormBuilder , FormGroup , Validators } from '@angular/forms';
 import { ActivatedRoute , Router , Params } from '@angular/router';
 import { APP_CONFIGS } from '@env';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { debounceTime , Observable , Subject , Subscription } from 'rxjs';
 import { NORMAL_MODAL_OPTIONS } from '@core/utils/syscat';
@@ -30,7 +30,7 @@ interface LoginButton {
 
 declare var google : any;
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-login' ,
 	templateUrl : './login.component.html' ,
 	styleUrls   : [ './login.component.css' ]

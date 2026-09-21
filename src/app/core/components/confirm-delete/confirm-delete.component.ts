@@ -1,7 +1,7 @@
 import { Component , Input , OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-confirm-delete' ,
 	templateUrl : './confirm-delete.component.html' ,
 	styleUrls   : [ './confirm-delete.component.css' ]

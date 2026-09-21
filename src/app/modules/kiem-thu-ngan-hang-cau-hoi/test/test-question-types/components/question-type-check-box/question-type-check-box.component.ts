@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import {RouterModule} from '@angular/router';
 
-@Component({
+@Component({standalone: false, 
     selector: 'question-type-check-box',
     templateUrl: './question-type-check-box.component.html',
     styleUrls: ['./question-type-check-box.component.css'],

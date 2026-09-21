@@ -4,7 +4,7 @@ import { AppConfigService } from '../../services/app-config.service';
 
 declare let require : any;
 
-@Directive( { selector : '[flickity]' } )
+@Directive( {standalone: false,  selector : '[flickity]' } )
 
 export class FlickityDirective implements AfterContentInit , OnDestroy {
 

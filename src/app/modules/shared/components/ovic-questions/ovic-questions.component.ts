@@ -1,7 +1,7 @@
 import { Component , OnInit , Input , Output , EventEmitter , OnChanges , SimpleChanges } from '@angular/core';
 import { OvicQuestion } from '@shared/models/ovic-models';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'ovic-questions' ,
 	templateUrl : './ovic-questions.component.html' ,
 	styleUrls   : [ './ovic-questions.component.css' ]

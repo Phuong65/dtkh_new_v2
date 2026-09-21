@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import {RouterModule} from '@angular/router';
 
-@Component({
+@Component({standalone: false, 
     selector: 'app-thong-tin-he-thong',
     templateUrl: './thong-tin-he-thong.component.html',
     styleUrls: [ './thong-tin-he-thong.component.css' ],

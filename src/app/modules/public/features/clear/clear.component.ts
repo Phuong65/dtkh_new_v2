@@ -2,7 +2,7 @@ import { Component , OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-clear' ,
 	templateUrl : './clear.component.html' ,
 	styleUrls   : [ './clear.component.css' ]

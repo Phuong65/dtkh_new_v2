@@ -4,7 +4,7 @@ import { ConfirmationService } from 'primeng/api';
 import { BUTTON_CANCEL , BUTTON_SAVE } from '@core/models/buttons';
 import { NgbActiveOffcanvas , NgbOffcanvas , NgbOffcanvasOptions } from '@ng-bootstrap/ng-bootstrap';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-show-case' ,
 	templateUrl : './show-case.component.html' ,
 	styleUrls   : [ './show-case.component.css' ]

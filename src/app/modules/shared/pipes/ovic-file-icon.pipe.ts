@@ -3,7 +3,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { OvicDriveFile, OvicFile, OvicFileStore, OvicFileUpload, OvicDocument } from '@core/models/file';
 import { FileType } from '@shared/utils/syscat';
 
-@Pipe({
+@Pipe({standalone: false, 
     name: 'ovicFileIcon'
 })
 export class OvicFileIconPipe implements PipeTransform {

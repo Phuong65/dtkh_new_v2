@@ -12,7 +12,7 @@ import { APP_CONFIGS } from '@env';
 import { CoursePlanActivityTuluanTieuchicham } from '@modules/shared/models/course-plan-activity-tuluan-tieuchicham';
 import { CHUAN_DAU_RA } from '@modules/shared/utils/syscat';
 
-@Component({
+@Component({standalone: false, 
     selector: 'app-view-thuongxuyen-tuluan',
     templateUrl: './view-thuongxuyen-tuluan.component.html',
     styleUrls: ['./view-thuongxuyen-tuluan.component.css']

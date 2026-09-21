@@ -16,7 +16,7 @@ export interface InputDiaDanh {
 	fullAddress : string;
 }
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'ovic-input-address-four-layouts' ,
 	templateUrl : './ovic-input-address-four-layouts.component.html' ,
 	styleUrls   : [ './ovic-input-address-four-layouts.component.css' ]

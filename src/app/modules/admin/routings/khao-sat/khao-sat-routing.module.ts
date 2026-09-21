@@ -18,7 +18,7 @@ const routes: Routes = [
         path: 'khaosat-thongke',
         loadChildren: () => import('@modules/admin/features/survey/survey-statistical/survey-statistical.module').then(c => c.SurveyStatisticalModule),
     },
-];
+]; 
 
 @NgModule({
     imports: [RouterModule.forChild(routes)],

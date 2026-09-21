@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import {RouterModule} from '@angular/router';
 
-@Component({
+@Component({standalone: false, 
     selector: 'question-type-reorder-words-2',
     templateUrl: './question-type-reorder-words-2.component.html',
     styleUrls: [ './question-type-reorder-words-2.component.css' ],

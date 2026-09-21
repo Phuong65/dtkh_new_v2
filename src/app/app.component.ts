@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
 import { AuthService } from '@core/services/auth.service';
 import { APP_CONFIGS } from '@env';
 import katex from 'katex';
-@Component({
+@Component({standalone: false, 
 	selector: 'app-root',
 	templateUrl: './app.component.html',
 	styleUrls: ['./app.component.css']

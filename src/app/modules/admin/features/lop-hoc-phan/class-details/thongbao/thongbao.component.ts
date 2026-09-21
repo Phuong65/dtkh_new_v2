@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import {RouterModule} from '@angular/router';
 
-@Component({
+@Component({standalone: false, 
     selector: 'app-thongbao',
     templateUrl: './thongbao.component.html',
     styleUrls: [ './thongbao.component.css' ],

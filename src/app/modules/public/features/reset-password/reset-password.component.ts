@@ -6,7 +6,7 @@ import { ActivatedRoute , ParamMap , Router } from '@angular/router';
 import { NotificationService } from '@core/services/notification.service';
 import { AuthService } from '@core/services/auth.service';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-reset-password' ,
 	templateUrl : './reset-password.component.html' ,
 	styleUrls   : [ './reset-password.component.css' ] ,

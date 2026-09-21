@@ -66,7 +66,7 @@ export interface INFORES {
     noAnswerCorrectArray: string[]
 }
 
-@Component({
+@Component({standalone: false, 
     selector: 'test-question-import-v2',
     templateUrl: './test-question-import-v2.component.html',
     styleUrls: ['./test-question-import-v2.component.css']

@@ -2,7 +2,7 @@ import { Component , OnInit , Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { OvicButton } from '@core/models/buttons';
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'app-popup' ,
 	templateUrl : './popup.component.html' ,
 	styleUrls   : [ './popup.component.css' ]

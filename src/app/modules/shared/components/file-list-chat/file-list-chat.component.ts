@@ -2,7 +2,7 @@ import { Component, OnInit, Output, Input, ViewChild, ElementRef, EventEmitter, 
 import { FileService } from '@core/services/file.service';
 import { HelperService } from '@core/services/helper.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DomSanitizer } from '@angular/platform-browser';
 // import { TnBankQuestionService } from '../../../shared/services/tn-bank-question.service';
 import {
@@ -16,7 +16,7 @@ import { getLinkDownload_aws, getLinkMedia_aws } from '@env';
 import { AuthService } from '@core/services/auth.service';
 import { OvicDocument } from '@core/models/file';
 
-@Component({
+@Component({standalone: false, 
     selector: 'file-list-chat',
     templateUrl: './file-list-chat.component.html',
     styleUrls: ['./file-list-chat.component.css']

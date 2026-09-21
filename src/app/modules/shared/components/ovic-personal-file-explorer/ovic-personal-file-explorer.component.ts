@@ -47,7 +47,7 @@ interface SearchInfo {
 	limit : number;
 }
 
-@Component( {
+@Component( {standalone: false, 
 	selector    : 'ovic-personal-file-explorer' ,
 	templateUrl : './ovic-personal-file-explorer.component.html' ,
 	styleUrls   : [ './ovic-personal-file-explorer.component.css' ] ,
