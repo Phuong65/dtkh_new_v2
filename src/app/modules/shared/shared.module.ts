@@ -74,10 +74,8 @@ import { TableModule } from 'primeng/table';
 import { InputTextModule } from 'primeng/inputtext';
 import { CalendarModule } from 'primeng/calendar';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { PlyrModule } from 'ngx-plyr';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
-import { NgxViewerModule } from 'ngx-viewer';
 import { ImageCropperModule } from 'ngx-image-cropper';
 import { RippleModule } from 'primeng/ripple';
 import { TooltipModule } from 'primeng/tooltip';
@@ -95,6 +93,8 @@ import { FileListLocalComponent } from './components/file-list-local/file-list-l
 import { FileListLocalOnTableComponent } from './components/file-list-local-on-table/file-list-local-on-table.component';
 import { GetUserinfoDirective } from './directives/get-userinfo.directive';
 import { CustomOvicTooltipDirective } from './directives/custom-ovic-tooltip.directive';
+import { OvicPlyrDirective } from './directives/ovic-plyr.directive';
+import { NgxViewerDirective } from './directives/ngx-viewer.directive';
 
 
 import { OpenFileManagerComponent } from './components/open-file-manager/open-file-manager.component';
@@ -291,10 +291,10 @@ import { KatexImgDirective } from './directives/katex-img.directive';
 		NgxDocViewerModule,
 		ReactiveFormsModule,
 		DragDropModule,
-		PlyrModule,
+		OvicPlyrDirective,
 		MultiSelectModule,
 		PdfViewerModule,
-		NgxViewerModule,
+		NgxViewerDirective,
 		ImageCropperModule,
 		RippleModule,
 		TooltipModule,
