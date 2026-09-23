@@ -4,7 +4,7 @@ import { AuthService } from '@core/services/auth.service';
 import { LangChangeEvent } from '@ngx-translate/core';
 import { OvicButton } from '@core/models/buttons';
 
-@Pipe( {standalone: false, 
+@Pipe( { standalone: true,
 	name : 'appTranslateButton'
 } )
 export class AppTranslateButtonPipe implements PipeTransform {

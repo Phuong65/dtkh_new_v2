@@ -30,6 +30,7 @@
       "@modules/*" : ["src/app/modules/*"],
       "@shared/*"  : ["src/app/modules/shared/*"],
       "@core/*"    : ["src/app/core/*"],
+      "@core-new/*" : ["src/app/core-new/*"],
       "@app/*"     : ["src/app/*"]
     }
   },

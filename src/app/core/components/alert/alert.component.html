@@ -7,11 +7,14 @@
         <div class="alert-body">
             <span class="alert-title">{{options.title}}</span>
             <span class="alert-message">{{options.message}}</span>
-            <button *ngIf="options.type !=='question'" class="alert-button {{options.type}}-bg {{options.type}}-btn" (click)="close(btnYes)">{{options.btnLabel[ 0 ]}}</button>
-            <div class="question-buttons" *ngIf="options.type ==='question'">
+            @if (options.type !== 'question') {
+            <button class="alert-button {{options.type}}-bg {{options.type}}-btn" (click)="close(btnYes)">{{options.btnLabel[ 0 ]}}</button>
+            } @else {
+            <div class="question-buttons">
                 <button class="confirm-button question-bg question-btn" (click)="close(btnYes)">{{options.btnLabel[ 0 ]}}</button>
                 <button class="cancel-button error-bg error-btn" (click)="close(btnNo)">{{options.btnLabel[ 1 ]}}</button>
             </div>
+            }
         </div>
     </div>
 </div>

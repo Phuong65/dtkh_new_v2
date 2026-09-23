@@ -1,1 +1,365 @@
-﻿<div class="p-3">thao-luan.component works!</div>
+@if (list_class_plan_activities && list_class_plan_activities.length) {
+  <div class="kiemtra-kynang-layout">
+    <div class="kiemtra-kynang-layout-top" style="text-align: right;">
+      <button (click)="syncTest()" style="line-height: 1;" class="btn btn-success">
+        <i class="fa fa-refresh"></i>
+        Đồng bộ bài thảo luận
+      </button>
+    </div>
+    <div class="kiemtra-kynang-layout-bottom">
+      <div #list_test class="action-own-class-data-layout-bottom-table action-own-class-data-layout-bottom-list">
+        <mat-selection-list #tests [multiple]="false">
+          @for (test of list_class_plan_activities; track test; let i = $index) {
+            <mat-list-option
+              [selected]="selected_class_plan_activity && selected_class_plan_activity.id === test.id ? true : false"
+              class="mat-list-option-own-class"
+              [value]="test" (click)="openPostThaoLuan(test)">
+              <div style="width: 100%;">
+                <div class="mat-list-option-item-card">
+                  <mat-icon class="avatar-mat-list-icon-own-class" mat-list-icon>
+                    {{'comment'}}
+                  </mat-icon>
+                  <div mat-line class="mat-list-option-own-class-item">
+                    <div mat-line class="mat-list-option-own-class-title">
+                      <div class="title-thaoluan-list-own-class" mat-line>{{test.title}}</div>
+                      <div mat-line class="mat-list-option-own-class-info">
+                        @if (test['start_date']) {
+                          <div mat-line
+                            class="mat-list-option-own-class-info-item" style="margin: 0px;">
+                          {{test['start_date'] | ovicDateTime}} </div>
+                        }
+                        @if (!test['start_date']) {
+                          <div mat-line
+                            class="mat-list-option-own-class-info-item">
+                            Chưa cài đặt thời gian thảo luận
+                          </div>
+                        }
+                        @if (test['exprided_date']) {
+                          <div mat-line
+                            class="mat-list-option-own-class-info-item">
+                          &nbsp;- {{test['exprided_date'] | ovicDateTime}} </div>
+                        }
+                      </div>
+                    </div>
+                    <div mat-line class="mat-list-option-own-class-action">
+                      <button (click)="editThaoLuan(test,$event)" mat-list-item>
+                        <i style="color: #004ef9;" class="fa fa-pencil"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </mat-list-option>
+          }
+        </mat-selection-list>
+      </div>
+    </div>
+  </div>
+}
+
+@if (!list_class_plan_activities || !list_class_plan_activities.length) {
+<div style="display: flex;
+    align-items: center;
+    justify-content: center;" class="kiemtra-kynang-layout"
+    >
+    <button (click)="syncTest()" style="line-height: 1;
+    height: 40px;
+    width: 300px;
+    border-radius: 6px !important;
+    font-weight: 500;
+    font-size: 16px;" class="btn btn-primary"><i class="fa fa-refresh"></i>{{titleLayout}}</button>
+    </div>
+  }
+
+  <ng-template #templateThaoluan>
+    <div class="ovic-over-right-section">
+      <div class="ovic-over-right-section__head">
+        <h3 class="ovic-over-right-section__header">
+          {{selected_class_plan_activity?selected_class_plan_activity.title:''}}
+        </h3>
+        <button class="btn ovic-over-right-section__close-button" (click)="closeSideMenu()"></button>
+      </div>
+      <div class="ovic-over-right-section__body"
+        style="height: calc(100vh - 58px - 51px); line-height: 1.25; font-size: 14px;">
+        <div class="ovic-vertical__inputs">
+          <form [formGroup]="formData">
+            <div class="row form-row form-row-flex-row">
+              <div class="col-6 flex-div">
+                <label for="name">Nhập ngày bắt đầu:<span class="ovic-mark">*</span></label>
+                <p-calendar [showTime]="true" formControlName="start_date"
+                dateFormat="dd/mm/yy"></p-calendar>
+              </div>
+              <div class="col-6 flex-div">
+                <label for="name">Nhập ngày kết thúc:<span class="ovic-mark">*</span></label>
+                <p-calendar [showTime]="true" formControlName="exprided_date"
+                dateFormat="dd/mm/yy"></p-calendar>
+              </div>
+            </div>
+            <div class="row form-row form-row-flex-row">
+              <div class="col-12 flex-div">
+                <label for="name">Nội dung:</label>
+                <div class="info-desc ql-editor"
+                [innerHtml]="selected_class_plan_activity['desc'] | safeHtmlDecode"></div>
+              </div>
+            </div>
+            <div class="row form-row form-row-flex-row">
+              <div class="col-12 flex-div">
+                <label for="name">Tài liệu:</label>
+                <div class="files-list-view">
+                  @for (file of selected_class_plan_activity['files']; track file; let i = $index) {
+                    <div class="single-file" (click)="onSelectFileReview(file)"
+                      >
+                      <i class="icon-in-open-download-file" [ngClass]="file | ovicFileIcon"></i>
+                      <div class="info">
+                        <h4 class="name">{{file.title}}</h4>
+                        <p class="size">{{file['file_size']}}</p>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="ovic-over-right-section__foot-wrap-buttons">
+        <button (click)="saveThaoluan()" type="button" class="btn ovic-over-right-section__foot-btn btn-primary"><i
+        class="fa fa-floppy-o"></i>Lưu lại
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #filesLessonReview let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section" style="height: 100vh;">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">View</h3>
+      <button class="btn ovic-over-right-section__close-button" (click)="d(true)"></button>
+    </div>
+    <div class="ovic-over-right-section__body footer-no-hint no-footer" style="padding: 0px;">
+      <div class="ovic-vertical__inputs back-ground-info" style="height: 100%;">
+        <view-document [file]="selectedFileReview?selectedFileReview:null">
+        </view-document>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #templateThaoLuanPost let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section" style="height: 100vh;">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">
+        {{selectedThaoluan?selectedThaoluan.title:''}}
+      </h3>
+      <button class="btn ovic-over-right-section__close-button" (click)="closeSideMenu()"></button>
+    </div>
+    <div class="ovic-over-right-section__body footer-no-hint no-footer"
+      style="padding: 0px; height: calc(100% - 58px);">
+      <div class="ovic-vertical__inputs back-ground-info" style="height: 100%;">
+        <div style="height: calc(100% - 40px); padding: 10px;">
+          <p-table [value]="list_student"
+            styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-has-caption table-reBorder">
+            <ng-template pTemplate="caption">
+              <div class="flex" style="text-align: right;">
+                <span class="p-input-icon-left ml-auto">
+                  <input (keyup.enter)="onSearchStudent($event['target']['value'])"
+                    style="width: 250px;" type="text"
+                    placeholder="Nhập tên hoặc mã sv rồi nhấn enter" />
+                  </span>
+                </div>
+              </ng-template>
+              <ng-template pTemplate="header">
+                <tr>
+                  @for (col of cols_student; track col) {
+                    <th [ngClass]="col['class']">{{col['label']}}
+                    </th>
+                  }
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-row>
+                <tr (click)="onSelectStudent(row)" style="cursor: pointer;">
+                  @for (col of cols_student; track col) {
+                    <td [ngClass]="col['class']">
+                      @if (col['key'] !== 'action') {
+                        <span>{{row[col['key']]}}</span>
+                      }
+                      @if (col['key'] === 'action') {
+                        <div>
+                        </div>
+                      }
+                    </td>
+                  }
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+          <div class="page-layout-set">
+            <p-paginator #paginator (onPageChange)="changePage_student($event)" [rows]="limit_student"
+            [totalRecords]="total_student"></p-paginator>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #templateStudentPost let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section" style="height: 100vh;">
+      <div class="ovic-over-right-section__head">
+        <h3 class="ovic-over-right-section__header">
+          {{selectedStudent?selectedStudent['full_name']:''}}
+        </h3>
+        <button class="btn ovic-over-right-section__close-button" (click)="d(true)"></button>
+      </div>
+      <div class="ovic-over-right-section__body footer-no-hint no-footer"
+        style="padding: 0px; height: calc(100% - 58px);">
+        <div class="ovic-vertical__inputs back-ground-info" style="height: 100%; line-height: 1.25;">
+          <div class="forum-wrapper">
+            <div class="container-1024">
+
+              <!-- Lặp qua danh sách post -->
+              @for (post of list_thaoluan_post; track post; let i = $index) {
+                <div class="post-card mb-4">
+                  <!-- Header: Info người đăng & Thời gian -->
+                  <div class="post-header d-flex align-items-center">
+                    <!-- <div class="avatar-placeholder mr-3"></div> -->
+                    <div>
+                      <div class="author-name font-weight-bold">{{post.title}}</div>
+                      <small class="text-muted text-uppercase" style="font-size: 11px;">
+                        {{ post.created_at | date:'dd MMM, yyyy · HH:mm' }}
+                      </small>
+                    </div>
+                  </div>
+                  <!-- Body: Nội dung -->
+                  <div class="post-body">
+                    <div [appLoadMediaOnText]="post.id" [appKatexImg]="post.id" class="post-text mb-3"
+                      [innerHtml]="post.noidung | safeHtmlDecode">
+                    </div>
+                    <!-- File đính kèm với style hiện đại hơn -->
+                    @if (post.files?.length) {
+                      <div class="attachment-grid">
+                        @for (file of post.files; track file) {
+                          <div (click)="openViewFile(file)"
+                            class="attachment-item">
+                            <i class="fas fa-file-alt mr-2 text-secondary"></i>
+                            <span class="file-name">
+                              {{ file['fileName'] }}
+                            </span>
+                            <span (click)="downloadFile($event, file)" class="ml-auto text-primary">
+                              <i class="fas fa-download"></i>
+                            </span>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                  <div class="post-actions border-top border-bottom">
+                    <button class="btn-action">
+                      <i class="far fa-comment-alt mr-2"></i>
+                      Nhận xét
+                      <!-- {{ post.showComments ? 'Ẩn nhận xét' : 'Hiện nhận xet' }} -->
+                    </button>
+                  </div>
+                  <div class="post-comments shadow-inner">
+                    @if (!post['edit'] && post.reply) {
+                      <div class="comment-item">
+                        <div class="d-flex mb-1">
+                          <span class="ml-2 text-muted" style="font-size: 12px; flex: 1">
+                            {{ post.reply.created_at | date:'dd MMM, yyyy · HH:mm'}}
+                          </span>
+                          <span (click)="onEditReply(post)" style="line-height: 1; cursor: pointer;"
+                            class="true-blue">
+                            <i class="fa fa-pencil"></i>
+                          </span>
+                        </div>
+                        <div style="margin-bottom: 10px;" [innerHTML]="post.reply.noidung"
+                          class="comment-text">
+                        </div>
+                        @if (post.reply.files?.length) {
+                          <div class="attachment-grid">
+                            @for (file of post.reply.files; track file) {
+                              <div (click)="openViewFile(file)"
+                                class="attachment-item">
+                                <i class="fas fa-file-alt mr-2 text-secondary"></i>
+                                <span class="file-name">
+                                  {{ file['fileName'] }}
+                                </span>
+                                <span style="cursor: pointer;" (click)="downloadFile($event, file)"
+                                  class="ml-auto text-primary">
+                                  <i class="fas fa-download"></i>
+                                </span>
+                              </div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    } @else {
+                      <div class="comment-input-group mt-3">
+                        <div>
+                          <label>Nội dung nhận xét:</label>
+                          <textarea class="text-area-reply"
+                            style="width: 100%; border: 1px solid #c8c8c8; padding: 5px;"
+                            [(ngModel)]="noidung_reply">
+                          </textarea>
+                        </div>
+                        <div style="margin-top: 10px;">
+                          <label>Tệp đính kèm:</label>
+                          <open-file-manager-v2 [filesDefault]="formFile['value']"
+                            [formField]="formFile">
+                          </open-file-manager-v2>
+                        </div>
+                        <div style="margin-top: 10px; text-align: right;">
+                          <button (click)="cancelReply(post)" style="line-height: 1; margin-right:5px"
+                            class="btn btn-secondary">
+                            <i class="fa fa-times"></i>Hủy
+                          </button>
+                          <button (click)="postReply(post)" style="line-height: 1;"
+                            class="btn btn-primary">
+                            <i class="fa fa-floppy-o"></i>Lưu nhận xét
+                          </button>
+                        </div>
+                      </div>
+                    }
+                    <ng-template #editReply>
+                      <div class="comment-input-group mt-3">
+                        <div>
+                          <label>Nội dung nhận xét:</label>
+                          <textarea class="text-area-reply"
+                            style="width: 100%; border: 1px solid #c8c8c8; padding: 5px;"
+                            [(ngModel)]="noidung_reply">
+                          </textarea>
+                        </div>
+                        <div style="margin-top: 10px;">
+                          <label>Tệp đính kèm:</label>
+                          <open-file-manager-v2 [filesDefault]="formFile['value']"
+                            [formField]="formFile">
+                          </open-file-manager-v2>
+                        </div>
+                        <div style="margin-top: 10px; text-align: right;">
+                          <button (click)="cancelReply(post)" style="line-height: 1; margin-right:5px"
+                            class="btn btn-secondary">
+                            <i class="fa fa-times"></i>Hủy
+                          </button>
+                          <button (click)="postReply(post)" style="line-height: 1;"
+                            class="btn btn-primary">
+                            <i class="fa fa-floppy-o"></i>Lưu nhận xét
+                          </button>
+                        </div>
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <p-dialog [modal]="true" [style]="{width: '1024px', height:'90%'}" [baseZIndex]="1092" appendTo="body"
+    header="{{selectedFile?selectedFile['fileName']:''}}" [(visible)]="display_view_file">
+    @if (selectedFile) {
+      <view-document [file]="selectedFile?selectedFile:null">
+      </view-document>
+    }
+  </p-dialog>

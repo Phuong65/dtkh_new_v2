@@ -1,1 +1,387 @@
-﻿<div class="p-3">quanly-lophocphan-v2.component works!</div>
+<div class="layout_component_container">
+  <div class="class-layout-top">
+    <div class="row form-row form-row-flex-row" style="margin: 0px;padding: 5px; width: 100%;">
+      <div class="p-col-12 p-md-4 ui-inputgroup-search" style="flex:1;">
+        <div class="ui-inputgroup ">
+          <input (keyup)="searchClass($event)" class="class-layout-top-option-search" type="text" pInputText
+            placeholder="Nhập tên lớp rồi nhấn enter">
+          </div>
+        </div>
+
+        <button class="btn btn-icon" (click)="chooseStyleClass(1)" container="body" placement="left"
+          ngbTooltip="Hiển thị dưới dạng thẻ"
+          [ngClass]="activeIndex_class === 1?'btn btn-primary':'btn btn-secondary'">
+          <i style="margin-right: 0px;" class="pi pi-th-large"></i>
+        </button>
+
+        <button class="btn btn-icon" (click)="chooseStyleClass(0)" container="body" placement="left"
+          ngbTooltip="Hiển thị dưới dạng danh sách"
+          [ngClass]="activeIndex_class === 0?'btn btn-primary':'btn btn-secondary'">
+          <i style="margin-right: 0px;" class="pi pi-list"></i>
+        </button>
+
+        <p-overlayPanel #op appendTo="body">
+          <ng-template pTemplate>
+            <ng-container [ngTemplateOutlet]="templateFilterShift">
+            </ng-container>
+          </ng-template>
+        </p-overlayPanel>
+        <button (click)="op.toggle($event)" class="btn btn-icon btn-primary" container="body" placement="left"
+          ngbTooltip="Lọc">
+          <i style="margin-right: 0px;" class="pi pi-filter"></i>
+        </button>
+
+        @if (routerDaotao) {
+          <button class="btn btn-icon" (click)="openFormAddClass(false)" container="body"
+            placement="left" ngbTooltip="Thêm lớp học phần" class="btn btn-success">
+            <i style="margin-right: 0px;" class="pi pi-plus"></i>
+          </button>
+        }
+      </div>
+    </div>
+    <div class="class-layout-bottom class-layout-bottom-headertabview">
+      <p-tabView [activeIndex]="activeIndex_class">
+        <p-tabPanel header="class-list" [disabled]="false">
+          <div class="content-class-layout-bottom content-list">
+            <p-table [value]="listClass"
+              styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-none-header table-reBorder">
+              <ng-template pTemplate="header">
+                <tr>
+                  @for (col of cols_class; track col) {
+                    <th [width]="col['width']" [ngClass]="col['class']">
+                      {{col['label']}}
+                    </th>
+                  }
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-row>
+                <tr [ngClass]="selectedClass && selectedClass.id === row.id?'focus-row-table':''">
+                  @for (col of cols_class; track col) {
+                    <td [width]="col['width']" [ngClass]="col['class']">
+                      @if (col['key'] !== 'name' && col['key'] !== 'editer_name') {
+                        <span
+                        >{{row[col['key']]}}</span>
+                      }
+                      @if (col['key'] === 'name') {
+                        <div class="title-col-flex">
+                          <span class="title-col-flex-text">
+                            <a style="color: #333;" [routerLink]="['class-details']"
+                              [queryParams]="{code:row.id}">
+                              {{row[col['key']]}}
+                            </a>
+                          </span>
+                          <div>
+                            <button (click)="actionsEvent({key:'google_meet'},row)"
+                              style="margin-left: 5px;"
+                              class="btn btn-icon btn-success btn-transparent"
+                              [ngClass]="!row['google_meet']?'no-google-meet':''">
+                              <i class="fa fa-video-camera" ></i>
+                            </button>
+                            @if ((routerDaotao || routerLanhdaokhoa || routerAdmin) && canUpdate) {
+                              <button
+                                (click)="actionsEvent({key:'editDataClasses'},row)"
+                                style="margin-left: 5px;"
+                                class="btn btn-icon btn-primary btn-transparent">
+                                <i class="fa fa-pencil-square-o" ></i>
+                              </button>
+                            }
+                            @if ((routerDaotao  || routerLanhdaokhoa || routerAdmin) && canDelete) {
+                              <button
+                                (click)="actionsEvent({key:'requireDelete'},row)"
+                                style="margin-left: 5px;"
+                                class="btn btn-icon btn-danger btn-transparent">
+                                <i class="fa fa-trash" ></i>
+                              </button>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </td>
+                  }
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </p-tabPanel>
+        <p-tabPanel header="class-grid" [disabled]="false">
+          <div class="content-class-layout-bottom content-list">
+            <div class="class-layout-bottom-grid">
+              <ol class="grid-class-card-layout">
+                @for (class of listClass; track class) {
+                  <li [ngClass]="selectedClass && selectedClass.id === class.id?'class-hight-choose':''"
+                    class="class-card intro-y">
+                    <div class="image-layout-card">
+                      <div class="image-layout-card-color">
+                      </div>
+                      <h4 class="option-class-card-name">
+                        <a style="color: #fff;" [routerLink]="['class-details']"
+                          [queryParams]="{code:class.id}">
+                          {{class.name}}
+                        </a>
+                      </h4>
+                      <div class="content-img-class-card">
+                        <img [src]="class['blob']" />
+                      </div>
+                      @if (routerDaotao || routerLanhdaokhoa || routerAdmin) {
+                        <button
+                          class="button-option-class" mat-icon-button [matMenuTriggerFor]="menu"
+                          aria-label="option-class-card-button icon-button with a menu">
+                          <mat-icon>more_horiz</mat-icon>
+                        </button>
+                      }
+                      <mat-menu #menu="matMenu">
+                        <button
+                          [disabled]="(routerDaotao || routerLanhdaokhoa || routerAdmin) && canUpdate? false: true"
+                          (click)="openFormAddClass(true, class)" mat-menu-item>
+                          <mat-icon>edit</mat-icon>
+                          <span>Sửa lớp học phần</span>
+                        </button>
+                        <button
+                          [disabled]="(routerDaotao || routerLanhdaokhoa || routerAdmin) && canDelete?false:true"
+                          (click)="deleteClass(class)" mat-menu-item>
+                          <mat-icon>delete</mat-icon>
+                          <span>Xóa lớp học phần</span>
+                        </button>
+                      </mat-menu>
+                    </div>
+                    <div class="info-class-card">
+                      <div class="info-class-card-item">
+                        <label>Mã lớp HP</label>
+                        <h4>{{": "+ class.id}}</h4>
+                      </div>
+                      <div class="info-class-card-item">
+                        <label>Số tín chỉ</label>
+                        <h4>{{": "+ class.sotinchi}}</h4>
+                      </div>
+                      <div class="info-class-card-item">
+                        <label>Năm học</label>
+                        <h4>{{": "+ class.namhoc+ " - Học kỳ "+ class.hocky}}</h4>
+                      </div>
+                      <div class="info-class-card-item">
+                        <label>Giảng viên</label>
+                        <h4 [ngClass]="class['mainTeacher']?'':'red-mark-important'">
+                          {{class['mainTeacher']?': '+class['mainTeacher']:': Chưa xác định'}}
+                        </h4>
+                      </div>
+                      <div class="info-class-card-item">
+                        <label>Điện thoại</label>
+                        <h4 [ngClass]="class['sdt_teacher']?'':'red-mark-important'">
+                          {{class['sdt_teacher']?': '+class['sdt_teacher']:': Chưa xác định'}}
+                        </h4>
+                      </div>
+                    </div>
+                  </li>
+                }
+              </ol>
+            </div>
+          </div>
+        </p-tabPanel>
+      </p-tabView>
+    </div>
+    <div class="page-layout-set">
+      <p-paginator #paginator (onPageChange)="changePage($event)" [rows]="limitList"
+      [totalRecords]="countClass"></p-paginator>
+    </div>
+  </div>
+
+  <ng-template #templateFilterShift>
+    <div class="layout-filter-shift" style="width: 500px;">
+      <div class="ovic-vertical__inputs" style="line-height: 1.5;">
+        <div class="row form-row form-row-flex-row">
+          <div class="col-6">
+            <label>Năm học:</label>
+            <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?objectFilter['namhoc']: null"
+              (onChange)="onChangeFilter($event, 'namhoc')" placeholder="- Năm học -" [options]="listNamhoc"
+              optionId="value" optionLabel="label" [filter]="true">
+            </ovic-dropdown>
+          </div>
+          <div class="col-6">
+            <label>Học kỳ:</label>
+            <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?objectFilter['hocky']: null"
+              (onChange)="onChangeFilter($event, 'hocky' )" [options]="listHocky" placeholder="- Học kỳ -"
+              optionId="value" optionLabel="label" [filter]="true">
+            </ovic-dropdown>
+          </div>
+        </div>
+        @if (routerDaotao || routerAdmin) {
+          <div class="row form-row form-row-flex-row">
+            <div class="col-12">
+              <label>Khoa:</label>
+              <ovic-dropdown [defaultValue]="objectFilter['category_id'] ? objectFilter['category_id'] : null"
+                (onChange)="onChangeFilter($event, 'category_id' )" placeholder="- - - - -" scrollHeight="400px"
+                styleClass="shift-dropdown-filter width-250px" [options]="list_donvi_chuyenmon"
+                optionLabel="title" optionId="id" [filter]="true" filterBy="title">
+              </ovic-dropdown>
+            </div>
+          </div>
+        }
+        @if (routerDaotao || routerAdmin) {
+          <div class="row form-row form-row-flex-row">
+            <div class="col-12">
+              <label>Giảng viên:</label>
+              <ovic-dropdown [defaultValue]="objectFilter['manager_ids'] ? objectFilter['manager_ids'] : null"
+                (onChange)="onChangeFilter($event, 'manager_ids' )" placeholder="- - - - -" scrollHeight="400px"
+                styleClass="shift-dropdown-filter width-250px" [options]="listTeacher" optionLabel="show_name"
+                optionId="id" [filter]="true" filterBy="title">
+              </ovic-dropdown>
+            </div>
+          </div>
+        }
+        <!-- <div class="row form-row form-row-flex-row">
+        <div class="col-12" style="text-align: right;">
+          <button style="line-height: 1;" (click)="cancelFilter()" class="btn btn-secondary">
+            <i class="fa fa-refresh"></i>Hủy tìm kiếm
+          </button>
+        </div>
+      </div> -->
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #createClass let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+      <button class="btn ovic-over-right-section__close-button" (click)="closeSideMenu()"></button>
+    </div>
+    <div class="ovic-over-right-section__body" style="height: calc(100vh - 51px - 57px - 18px);">
+      <div class="ovic-vertical__inputs" style="line-height: 1.5;">
+        <form [formGroup]="formClass">
+          <div class="row form-row form-row-flex-row">
+            <div class="col-12">
+              <label>Chọn khoa quản lý:<span class="ovic-mark">*</span></label>
+              <ovic-dropdown [disabled]="routerDaotao || routerAdmin ? false : true"
+                (onChange)="onChangeDonviCM($event)" [filter]="true"
+                [placeholder]="'---Chọn khoa quản lý---'" [options]="list_donvi_chuyenmon" optionId="id"
+                optionLabel="title" [formField]="fC['category_id']"
+                [defaultValue]="fC['category_id']['value']" filterBy="title">
+              </ovic-dropdown>
+              <!-- <p-dropdown [disabled]="isManager? false: true" formControlName="category_id"
+              (onChange)="onChangeCategory($event)" [filter]="true" filterBy="label"
+              styleClass="ovic-input-field category-dropdown-class" [options]="listCategory"
+              placeholder="---chọn ngành học---">
+              <ng-template let-category pTemplate="item">
+                <div class="ui-helper-clearfix">
+                  <div [ngClass]="category.parent_id === 0?'is-parent-category':''"
+                  style="font-size:14px;margin-top:4px">{{category.label}}</div>
+                </div>
+              </ng-template>
+            </p-dropdown> -->
+          </div>
+        </div>
+        <div class="row form-row form-row-flex-row">
+          <div class="col-12">
+            <label>Chọn Bộ môn:<span class="ovic-mark"></span></label>
+            <ovic-dropdown (onChange)="loadCourse($event,'nganh_bomon_id')" [filter]="true"
+              [placeholder]="'--- chọn bộ môn ---'" [options]="listCategory"
+              [defaultValue]="fC['nganh_bomon_id']['value']" [formField]="fC['nganh_bomon_id']"
+              optionId="id" optionLabel="title" filterBy="title">
+            </ovic-dropdown>
+          </div>
+        </div>
+        <div class="row form-row form-row-flex-row">
+          <div class="col-12">
+            <label>Chọn môn học:<span class="ovic-mark">*</span></label>
+            <ovic-dropdown (onChange)="onChangeCourse($event)" placeholder="---chọn môn học---"
+              [options]="listCourse" [defaultValue]="fC['course_id']['value']" optionId="id"
+              optionLabel="title" [formField]="fC['course_id']" [filter]="true"
+            filterBy="title"></ovic-dropdown>
+          </div>
+        </div>
+        <div class="row form-row form-row-flex-row">
+          <div class="col-12">
+            <label>Chọn ảnh:<span class="ovic-mark">*</span></label>
+            <resizing-image [aspectRatio]="2" id="image" [formField]="fC['image']"
+              [default]="fC['image']['value']">
+            </resizing-image>
+          </div>
+        </div>
+        <div class="row form-row form-row-flex-row">
+          <div class="col-12">
+            @if (!slugIsValid) {
+              <span style="top: 15px!important;" class="ov-check-slug-hint__wrap-mess alert-danger"
+                >
+                <span class="ov-check-slug-hint__messages">Tên đã tồn tại
+                </span>
+              </span>
+            }
+            <label>Tên lớp:<span class="ovic-mark">*</span></label>
+            <input (keyup)="onFocusoutTitle('name',slugIsValid)" type="text" class="ovic-input-field"
+              formControlName="name">
+            </div>
+          </div>
+          @if (routerDaotao || routerLanhdaokhoa || routerAdmin) {
+            <div class="row form-row form-row-flex-row"
+              >
+              <div class="col-12">
+                <label>Giảng viên:<span class="ovic-mark"></span></label>
+                <ovic-dropdown (onChange)="onChangeTeacher($event)" placeholder="---chọn giảng viên---"
+                  [options]="listTeacher" optionId="id" optionLabel="show_name"
+                  [defaultValue]="fC['manager_ids'].value" [filter]="true"
+                filterBy="show_name"></ovic-dropdown>
+              </div>
+            </div>
+          }
+          <div class="row form-row form-row-flex-row">
+            <div class="col-6">
+              <label>Khóa mở:</label>
+              <input type="number" class="ovic-input-field" formControlName="khoa">
+            </div>
+            <div class="col-6">
+              <label>Đợt học:</label>
+              <input type="number" class="ovic-input-field" formControlName="dothoc">
+            </div>
+            <!-- <div class="ovic-input-item w-1-3-elm">
+            <label>Số sinh viên đăng ký:</label>
+            <input type="number" class="ovic-input-field" formControlName="sosv_dangky">
+          </div> -->
+        </div>
+        <div class="row form-row form-row-flex-row">
+          <div class="col-6">
+            @if (!kyhieuIsValid) {
+              <span style="top: 15px!important;" class="ov-check-slug-hint__wrap-mess alert-danger"
+                >
+                <span class="ov-check-slug-hint__messages">Ký hiệu đã tồn tại
+                </span>
+              </span>
+            }
+            <label>Ký hiệu:<span class="ovic-mark">*</span></label>
+            <input (keyup)="onFocusoutTitle('kyhieu',kyhieuIsValid)" type="text"
+              class="ovic-input-field" formControlName="kyhieu">
+            </div>
+            <div class="col-6">
+              <label>Số tín chỉ:<span class="ovic-mark">*</span></label>
+              <input type="number" class="ovic-input-field" formControlName="sotinchi">
+            </div>
+          </div>
+          <div class="row form-row form-row-flex-row">
+            <div class="col-6">
+              <label>Năm học:<span class="ovic-mark">*</span></label>
+              <ovic-dropdown [placeholder]="'---Chọn năm học---'" [options]="arrayYear"
+                [defaultValue]="fC['namhoc']['value']" optionId="value" optionLabel="value"
+                [formField]="fC['namhoc']">
+              </ovic-dropdown>
+            </div>
+            <div class="col-6">
+              <label>Học kỳ:<span class="ovic-mark">*</span></label>
+              <input type="number" min="1" class="ovic-input-field" formControlName="hocky">
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="ovic-dynamic-right-section__foot">
+      <p class="ovic-form-notes ovic-over-right-section__foot-ovic-input-line">
+        <i class="pi pi-info-circle"></i>các trường có đánh dấu ( <span class="ovic-mark">*</span> ) là
+        bắt
+        buộc phải nhập
+      </p>
+      <p class="ovic-over-right-section__foot-wrap-buttons">
+        <button class="btn ovic-over-right-section__foot-btn btn-primary" (click)="addClass()">
+          <i class="fa fa-floppy-o" ></i>Lưu lại
+        </button>
+      </p>
+    </div>
+  </div>
+</ng-template>

@@ -1,18 +1,18 @@
-﻿import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import {RouterModule} from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+
 
 @Component({
-    selector: 'app-ctdt-doingu',
-    templateUrl: './ctdt-doingu.component.html',
-    styleUrls: ['./ctdt-doingu.component.css'],
-    standalone: true,
-    imports: [CommonModule,RouterModule]
+  selector: 'app-ctdt-doingu',
+  standalone: true,
+  imports: [],
+  templateUrl: './ctdt-doingu.component.html',
+  styleUrls: ['./ctdt-doingu.component.css']
 })
 export class CtdtDoinguComponent implements OnInit {
-    constructor() {}
-    ngOnInit(): void {}
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+
 }
-
-
-

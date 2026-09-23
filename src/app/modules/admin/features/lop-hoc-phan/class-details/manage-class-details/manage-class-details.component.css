@@ -96,3 +96,29 @@
     height: 100%;
     font-weight: 500;
 }
+
+:host ::ng-deep .class-details-left-menu .mat-mdc-list-option {
+    border-bottom: 1px dashed #c8c8c8;
+    height: auto !important;
+    min-height: 48px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+}
+
+:host ::ng-deep .class-details-left-menu .mat-mdc-list-option.mdc-list-item--selected,
+:host ::ng-deep .class-details-left-menu .mat-mdc-list-option[aria-selected="true"] {
+    background-color: #2196f32b !important;
+}
+
+:host ::ng-deep .class-details-left-menu .mat-mdc-list-option:hover,
+:host ::ng-deep .class-details-left-menu .mat-mdc-list-option:focus {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+:host ::ng-deep .class-details-left-menu .mdc-list-item__primary-text {
+    font-weight: 500;
+    font-size: 14px;
+    color: #333;
+}
+

@@ -26,18 +26,7 @@ import { KatexImgDirective } from "@modules/shared/directives/katex-img.directiv
 import { GroupRadioQuestionV2Component } from './group-radio-question-v2/group-radio-question-v2.component';
 
 @NgModule({
-	declarations: [
-		DragAndDropQuestionComponent,
-		GroupingQuestionComponent,
-		QuestionTypeRadioComponent,
-		GroupRadioQuestionComponent,
-		GroupInputQuestionComponent,
-		QuestionTypeInputBoxComponent,
-		QuestionTypeReorderWordsComponent,
-		QuestionTypeRadioEditorComponent,
-		QuestionTypeArrangeParagraphsComponent,
-		GroupRadioQuestionV2Component
-	],
+	declarations: [],
 	exports: [
 		DragAndDropQuestionComponent,
 		GroupingQuestionComponent,
@@ -65,7 +54,17 @@ import { GroupRadioQuestionV2Component } from './group-radio-question-v2/group-r
 		InputQuestionDirectionComponent,
 		SharedModule,
 		DragDropModule,
-		KatexImgDirective
+		KatexImgDirective,
+		DragAndDropQuestionComponent,
+		GroupingQuestionComponent,
+		QuestionTypeRadioComponent,
+		GroupRadioQuestionComponent,
+		GroupInputQuestionComponent,
+		QuestionTypeInputBoxComponent,
+		QuestionTypeReorderWordsComponent,
+		QuestionTypeRadioEditorComponent,
+		QuestionTypeArrangeParagraphsComponent,
+		GroupRadioQuestionV2Component
 	]
 })
 export class QuestionTypesModule { }

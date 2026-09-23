@@ -1,1 +1,388 @@
-﻿<div class="p-3">cham-diem-kiemtra-daugio.component works!</div>
+<main class="grading-app" aria-labelledby="grading-title">
+  <a class="skip-link" href="#grading-canvas">Bỏ qua danh sách, đến bài làm</a>
+  <div class="sr-only" aria-live="polite" aria-atomic="true">{{liveMessage}}</div>
+
+  <header class="app-header">
+    <div class="header-left">
+      <div class="course-info">
+        <div class="breadcrumbs">
+          <span class="badge-week">Bài {{currentWeek || '-'}}</span>
+          <span class="class-code">{{classSelected?.name || 'Đang tải thông tin lớp học phần'}}</span>
+        </div>
+        <h1 id="grading-title" class="page-title">Chấm kiểm tra 15 phút</h1>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <div class="progress-stat" aria-label="Tiến độ chấm điểm">
+        <span>Tiến độ:</span>
+        <span class="progress-bar-wrap" role="progressbar" aria-valuemin="0"
+          [attr.aria-valuemax]="totalStudents || 1" [attr.aria-valuenow]="gradedCount">
+          <span class="progress-bar"
+          [style.width.%]="totalStudents ? (gradedCount / totalStudents) * 100 : 0"></span>
+        </span>
+        <span class="stat-value"><strong>{{gradedCount}}</strong>/{{totalStudents}} SV</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button type="button" class="btn btn-primary btn-compact bulk-grade-button" (click)="gradeAllWithAi()"
+        [disabled]="!canStartBulkAi">
+        <i class="fa" [ngClass]="isBulkAiGrading ? 'fa-spinner fa-spin' : 'fa-magic'" aria-hidden="true"></i>
+        <span>{{isBulkAiGrading ? 'Đang chấm...' : 'Tự động chấm tất cả'}}</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="workspace-body">
+    <aside class="panel-roster" aria-label="Danh sách sinh viên">
+      <div class="roster-header">
+        <label class="search-box" for="student-search">
+          <span class="sr-only">Tìm sinh viên</span>
+          <i class="fa fa-search icon-search" aria-hidden="true"></i>
+          <input id="student-search" type="search" class="form-control" [(ngModel)]="searchValue"
+            (keyup.enter)="applySearch()" placeholder="Tìm sinh viên..." />
+            @if (searchValue) {
+              <button type="button" class="clear-search" (click)="clearSearch()"
+                aria-label="Xóa từ khóa tìm kiếm">
+                <i class="fa fa-times" aria-hidden="true"></i>
+              </button>
+            }
+          </label>
+
+          <div class="filter-bar">
+            <label class="sr-only" for="grade-filter">Lọc trạng thái chấm</label>
+            <p-dropdown inputId="grade-filter" styleClass="grade-filter-dropdown"
+              [options]="gradeFilterOptions" optionLabel="label" optionValue="value"
+              [ngModel]="gradeFilter" (ngModelChange)="setFilter($event)"
+              [disabled]="!canNavigate" appendTo="body">
+            </p-dropdown>
+          </div>
+        </div>
+
+        <div #studentList class="roster-list" role="listbox" aria-label="Sinh viên trong lớp"
+          [attr.aria-busy]="isLoadingList">
+          @if (isLoadingList) {
+            <div class="pane-state" role="status">
+              <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+              <span>Đang tải danh sách sinh viên</span>
+            </div>
+          }
+
+          @if (!isLoadingList && listError) {
+            <div class="pane-state pane-state-error" role="alert">
+              <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+              <strong>Không tải được danh sách</strong>
+              <span>{{listError}}</span>
+              <button type="button" class="btn btn-light btn-compact" (click)="retryList()">Thử lại</button>
+            </div>
+          }
+
+          @if (!isLoadingList && !listError && !filteredStudents.length) {
+            <div class="pane-state">
+              <i class="fa fa-users" aria-hidden="true"></i>
+              <strong>Không có sinh viên phù hợp</strong>
+              <span>Đổi bộ lọc hoặc từ khóa tìm kiếm.</span>
+            </div>
+          }
+
+          @for (student of filteredStudents; track trackStudent($index, student)) {
+            <div role="option"
+              class="student-item" [attr.data-student-id]="student.student_id"
+              [attr.tabindex]="getStudentTabIndex(student)"
+              [attr.aria-selected]="student.student_id === selectedStudent?.student_id"
+              [attr.aria-label]="getStudentAriaLabel(student)"
+              [class.is-selected]="student.student_id === selectedStudent?.student_id"
+              [class.disabled]="!canNavigate && student.student_id !== selectedStudent?.student_id"
+              (focus)="onStudentFocus(student)" (keydown)="onStudentKeydown($any($event), student)"
+              (click)="selectStudent(student)">
+              <span class="student-avatar" aria-hidden="true">{{(student.full_name || '?').charAt(0)}}</span>
+              <span class="student-info">
+                <strong class="student-name">{{student.full_name}}</strong>
+                <span class="student-code">{{student.student_code}}</span>
+              </span>
+              <span class="student-status">
+                <span class="student-status-top">
+                  <span class="badge" [ngClass]="getStatusClass(student)">{{getStatusLabel(student)}}</span>
+                  <button type="button" class="student-review-button"
+                    [disabled]="!canOpenStudentTest(student)"
+                    [attr.aria-label]="'Xem bài kiểm tra của ' + student.full_name"
+                    ngbTooltip="Xem bài kiểm tra" container="body" placement="left"
+                    (keydown)="$event.stopPropagation()" (click)="openViewTest($event, student)">
+                    <i class="fa fa-eye" aria-hidden="true"></i>
+                  </button>
+                </span>
+                @if (isStudentGraded(student)) {
+                  <span class="student-points">
+                    <span>TN <strong>{{formatComponentPoint(student)}}</strong></span>
+                    <span>TL <strong>{{formatEssayPoint(student)}}</strong></span>
+                    <span>Trừ điểm <strong>{{formatDeductionPercent(student)}}</strong></span>
+                    <span>Tổng <strong>{{formatTotalPoint(student)}}</strong></span>
+                  </span>
+                }
+              </span>
+            </div>
+          }
+        </div>
+
+        <div class="student-pagination" aria-label="Phân trang danh sách sinh viên">
+          <span class="sr-only" aria-live="polite">Trang {{pageIndex}}, tổng {{totalStudents}} sinh viên</span>
+          <p-paginator class="p-paginator--size-minimal" [first]="(pageIndex - 1) * pageSize" [rows]="pageSize"
+            [totalRecords]="totalStudents" [rowsPerPageOptions]="[20, 50, 100, 150, 200]"
+            (onPageChange)="changePage($event)">
+          </p-paginator>
+        </div>
+      </aside>
+
+      <section id="grading-canvas" class="panel-canvas" aria-label="Bài làm của sinh viên" tabindex="-1">
+        @if (selectedStudent; as student) {
+          <div class="canvas-header">
+            <div class="current-student-card">
+              <h2 #essayHeading tabindex="-1">
+                {{student.full_name}}
+                <span class="sub-text">(Mã SV: {{student.student_code}})</span>
+              </h2>
+              <div class="quick-metrics">
+                <span class="metric-chip">Tự luận: <strong>{{essayQuestions.length}} câu</strong></span>
+              </div>
+            </div>
+          </div>
+          <div class="canvas-scroll">
+            @if (isLoadingDetail) {
+              <div class="detail-state" role="status">
+                <span class="loading-ring" aria-hidden="true"></span>
+                <strong>Đang mở bài tự luận</strong>
+                <span>Tải câu hỏi và bài làm của {{student.full_name}}.</span>
+              </div>
+            }
+            @if (!isLoadingDetail && detailError) {
+              <div class="detail-state detail-state-error" role="alert">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <strong>Không tải được bài tự luận</strong>
+                <span>{{detailError}}</span>
+                <button type="button" class="btn btn-light btn-compact" (click)="retryDetail()">Thử lại</button>
+              </div>
+            }
+            @if (!isLoadingDetail && !detailError && !student.student_test) {
+              <div class="detail-state">
+                <i class="fa fa-file-o" aria-hidden="true"></i>
+                <strong>Sinh viên chưa có đề</strong>
+                <span>Chưa có bài kiểm tra để chấm.</span>
+              </div>
+            }
+            @if (!isLoadingDetail && !detailError && student.student_test && student.student_test.status !== 1) {
+              <div
+                class="detail-state">
+                <i class="fa fa-clock-o" aria-hidden="true"></i>
+                <strong>Sinh viên chưa nộp bài</strong>
+                <span>Phần tự luận hiển thị sau khi bài được nộp.</span>
+              </div>
+            }
+            @if (!isLoadingDetail && !detailError && student.student_test && student.student_test.status === 1 && !isGradeable(student)) {
+              <div
+                class="detail-state">
+                <i class="fa fa-check-circle-o" aria-hidden="true"></i>
+                <strong>Bài không có phần tự luận</strong>
+                <span>Điểm trắc nghiệm đã hiển thị trong danh sách bên trái.</span>
+              </div>
+            }
+            @if (!isLoadingDetail && !detailError && isGradeable(student)) {
+              <div class="canvas-content"
+                >
+                @for (question of essayQuestions; track trackEssayQuestion(questionIndex, question); let questionIndex = $index) {
+                  <article class="question-card"
+                    >
+                    <div class="question-header">
+                      <span class="question-number">Câu {{questionIndex + 1}}</span>
+                      <span class="question-points">(Tối đa {{question.point}} điểm)</span>
+                      @if (question.note) {
+                        <button type="button" class="btn btn-compact guidance-toggle-btn"
+                          (click)="toggleEssayQuestionGuidance(question.id || 0)"
+                          [attr.aria-expanded]="essayQuestionGuidanceVisible[question.id || 0] ? 'true' : 'false'"
+                          >
+                          <i  style="font-size: 13px; margin-right: 0px;" class="fa" aria-hidden="true"
+                          [ngClass]="essayQuestionGuidanceVisible[question.id || 0] ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                          <span>{{essayQuestionGuidanceVisible[question.id || 0] ? 'Ẩn hướng dẫn chấm' : 'Hiển thị hướng dẫn chấm'}}</span>
+                        </button>
+                      }
+                    </div>
+                    <div class="question-body">
+                      <div class="prompt" [appKatexImg]="question.id"
+                      [innerHTML]="question.desc | ovicSafeHtml"></div>
+                    </div>
+                    @if (question.note && essayQuestionGuidanceVisible[question.id || 0]) {
+                      <div class="question-guidance">
+                        <div class="guidance-label">Hướng dẫn chấm:</div>
+                        <div class="guidance-text" [appKatexImg]="question.id"
+                        [innerHTML]="question.note | ovicSafeHtml"></div>
+                      </div>
+                    }
+                    <div class="student-answer-box">
+                      <div class="answer-label">Bài làm của sinh viên:</div>
+                      @if (hasEssayAnswer(question.id || 0)) {
+                        <div class="answer-text"
+                          [appKatexImg]="question.id"
+                        [innerHTML]="studentAnswerMap[question.id || 0]?.student_answer | ovicSafeHtml"></div>
+                      } @else {
+                        <div class="answer-text answer-empty">Chưa có câu trả lời</div>
+                      }
+                    </div>
+                    @if (essayQuestionStateMap[question.id || 0]; as state) {
+                      <div class="question-grading">
+                        @if (state.aiUnavailableReason && hasEssayAnswer(question.id || 0)) {
+                          <p class="grading-message grading-warning"
+                            >
+                            {{state.aiUnavailableReason}}
+                          </p>
+                        }
+                        @if (state.error) {
+                          <p class="grading-message grading-error" role="alert">
+                            {{state.error}}
+                          </p>
+                        }
+                        <div class="question-grading-fields">
+                          <div class="form-group score-field">
+                            <label [for]="'score-input-' + question.id">Điểm câu {{questionIndex + 1}}:</label>
+                            <div class="input-score-wrapper">
+                              <input [id]="'score-input-' + question.id" type="number"
+                                class="form-control input-sm" step="0.1" min="0" [max]="state.maxPoint"
+                                [(ngModel)]="state.editablePoint"
+                                (ngModelChange)="onEssayPointChange(question.id || 0)"
+                                [disabled]="!hasEssayAnswer(question.id || 0) || isEssayBusy || isBulkAiGrading"
+                                [attr.aria-invalid]="state.pointValidationError ? 'true' : 'false'"
+                                [attr.aria-describedby]="state.pointValidationError ? 'score-error-' + question.id : null" />
+                                <span class="max-score">/ {{state.maxPoint !== null ? state.maxPoint : '-'}}</span>
+                              </div>
+                              @if (state.pointValidationError) {
+                                <span [id]="'score-error-' + question.id" class="field-error" role="alert"
+                                >{{state.pointValidationError}}</span>
+                              }
+                            </div>
+                            <div class="form-group feedback-field">
+                              <label [for]="'feedback-input-' + question.id">Nhận xét:</label>
+                              <textarea [id]="'feedback-input-' + question.id" class="form-control feedback-input"
+                                rows="3" placeholder="Nhập nhận xét..." [(ngModel)]="state.feedback"
+                                (ngModelChange)="onEssayFeedbackChange(question.id || 0)"
+                              [disabled]="!hasEssayAnswer(question.id || 0) || isEssayBusy || isBulkAiGrading"></textarea>
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    </article>
+                  }
+                </div>
+              }
+            </div>
+            @if (!isLoadingDetail && !detailError && student.student_test && student.student_test.status === 1) {
+              <footer class="canvas-footer"
+                >
+                <div class="canvas-footer-status" aria-live="polite">
+                  @if (essayAiMessage) {
+                    <p class="grading-message">{{essayAiMessage}}</p>
+                  }
+                  @if (essaySaveMessage) {
+                    <p class="grading-message">{{essaySaveMessage}}</p>
+                  }
+                  @if (hasUnsavedChanges) {
+                    <p class="grading-message grading-warning">
+                      {{needsAggregateRetry ? 'Cần tổng hợp điểm lại' : 'Có điểm chưa lưu'}}
+                    </p>
+                  }
+                </div>
+                <div class="canvas-footer-actions">
+                  <button type="button" class="btn btn-light btn-compact ai-test-button"
+                    (click)="gradeSelectedWithAi()" [disabled]="!canGradeEssayWithAi">
+                    <i class="fa" [ngClass]="isGradingSelectedEssayWithAi ? 'fa-spinner fa-spin' : 'fa-magic'"
+                    aria-hidden="true"></i>
+                    {{isGradingSelectedEssayWithAi ? 'Đang chấm...' : 'Chấm điểm'}}
+                  </button>
+                  <button type="button" class="btn btn-primary btn-compact"
+                    (click)="saveSelectedEssay()" [disabled]="!canSaveEssay">
+                    {{needsAggregateRetry ? 'Thử tổng hợp lại' : 'Lưu & Bài tiếp theo'}}
+                    <i class="fa" [ngClass]="isSavingEssay ? 'fa-spinner fa-spin' : 'fa-arrow-right'"
+                    aria-hidden="true"></i>
+                  </button>
+                </div>
+              </footer>
+            }
+          } @else {
+            <div class="detail-state empty-workspace">
+              <span class="empty-sheet" aria-hidden="true"></span>
+              <strong>Chọn sinh viên để bắt đầu chấm</strong>
+              <span>Danh sách bên trái hiển thị toàn bộ sinh viên trong lớp.</span>
+            </div>
+          }
+        </section>
+      </div>
+    </main>
+
+    <ng-template #viewStudentTest let-c="close" let-d="dismiss">
+      <div class="ovic-over-right-section student-test-review-modal" style="height: 100vh;">
+        <div class="ovic-over-right-section__head">
+          <h3 class="ovic-over-right-section__header">
+            {{studentTestReviewStudent?.full_name || ''}}
+          </h3>
+          <button class="btn ovic-over-right-section__close-button" (click)="d(true)"></button>
+        </div>
+        <div class="ovic-over-right-section__body footer-no-hint student-test-review-body"
+          style="padding: 0px; line-height: 1.25;">
+          <div class="ovic-vertical__inputs" style="height: 100%;">
+            @if (studentTestReviewStudent?.student_test) {
+              <app-view-tracnghiem-tuluan
+                [_av]="courseSelected?.av"
+                [_id]="studentTestReviewStudent?.student_test?.id"
+                [_question]="studentTestReviewQuestions"
+                [_test_aws]="studentTestReviewAnswers">
+              </app-view-tracnghiem-tuluan>
+            }
+          </div>
+        </div>
+        <div class="ovic-dynamic-right-section__foot">
+          <nav class="student-test-navigation" aria-label="Điều hướng bài kiểm tra sinh viên">
+            <button type="button"
+              class="btn ovic-over-right-section__foot-btn btn-light student-test-navigation__button"
+              (click)="navigateStudentTest(-1)" [disabled]="!canViewPreviousStudentTest">
+              <i class="fa fa-chevron-left" aria-hidden="true"></i>
+              Sinh viên trước
+            </button>
+            <button type="button"
+              class="btn ovic-over-right-section__foot-btn btn-light student-test-navigation__button"
+              (click)="navigateStudentTest(1)" [disabled]="!canViewNextStudentTest">
+              Sinh viên sau
+              <i class="fa fa-chevron-right student-test-navigation__next-icon" aria-hidden="true"></i>
+            </button>
+          </nav>
+        </div>
+      </div>
+    </ng-template>
+
+    <p-dialog maskStyleClass="zindex-1000" appendTo="body" position="center" [draggable]="false"
+      [resizable]="false" [modal]="true" [closable]="false" [closeOnEscape]="false"
+      [(visible)]="isBulkAiGrading" [style]="{width: '520px', maxWidth: 'calc(100vw - 24px)'}"
+      header="Tiến trình chấm điểm AI">
+      <div class="bulk-progress" role="status" aria-live="polite">
+        <div class="bulk-progress-heading">
+          <span>{{bulkProgress.message}}</span>
+          <strong>{{bulkProgress.percent}}%</strong>
+        </div>
+        <div class="bulk-progress-track" role="progressbar" [attr.aria-valuenow]="bulkProgress.percent"
+          aria-valuemin="0" aria-valuemax="100">
+          <span [style.width.%]="bulkProgress.percent"></span>
+        </div>
+        @if (bulkProgress.summary) {
+          <p>{{bulkProgress.summary}}</p>
+        }
+      </div>
+    </p-dialog>
+
+    @if (!isBulkAiGrading && bulkFailedTestIds.length) {
+      <div class="bulk-retry">
+        <span>{{bulkFailedTestIds.length}} bài chấm AI lỗi</span>
+        @if (bulkFailedReasonSummary()) {
+          <span class="bulk-retry-detail" title="Lý do lỗi theo bài">
+            {{ bulkFailedReasonSummary() }}
+          </span>
+        }
+        <button type="button" class="btn btn-light btn-compact" (click)="retryFailedBulk()">Thử lại các bài lỗi</button>
+      </div>
+    }

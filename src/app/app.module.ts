@@ -5,7 +5,7 @@ import { HTTP_INTERCEPTORS , HttpClient , HttpClientModule } from '@angular/comm
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { MessageService, PrimeNGConfig } from 'primeng/api';
 import { ConfirmComponent } from '@core/components/confirm/confirm.component';
 import { PopupComponent } from '@core/components/popup/popup.component';
 import { AppSafeHtmlPipe } from '@core/pipes/app-safe-html.pipe';
@@ -34,13 +34,6 @@ export function HttpLoaderFactory( httpClient : HttpClient ) {
 @NgModule( {
 	declarations : [
 		AppComponent ,
-		ConfirmComponent ,
-		PopupComponent ,
-		AppSafeHtmlPipe ,
-		ConfirmRoundedComponent ,
-		ConfirmDeleteComponent ,
-		AlertComponent ,
-		AppTranslateButtonPipe,
 	] ,
 	imports      : [
 		BrowserModule ,
@@ -53,6 +46,13 @@ export function HttpLoaderFactory( httpClient : HttpClient ) {
 		NgbModule ,
 		ButtonModule ,
 		RippleModule ,
+		ConfirmComponent ,
+		PopupComponent ,
+		AppSafeHtmlPipe ,
+		ConfirmRoundedComponent ,
+		ConfirmDeleteComponent ,
+		AlertComponent ,
+		AppTranslateButtonPipe ,
 		TranslateModule.forRoot( {
 			loader : {
 				provide    : TranslateLoader ,
@@ -71,4 +71,11 @@ export function HttpLoaderFactory( httpClient : HttpClient ) {
 	exports      : [] ,
 	bootstrap    : [ AppComponent ]
 } )
-export class AppModule {}
+export class AppModule {
+	constructor(private primeConfig: PrimeNGConfig) {
+		this.primeConfig.overlayOptions = {
+			styleClass: '',
+			contentStyleClass: ''
+		};
+	}
+}

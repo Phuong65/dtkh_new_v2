@@ -1,1 +1,301 @@
-﻿<div class="p-3">cauhoi-tracnghiem-create-form.component works!</div>
+<div class="create-edit-question-section ovic-is-loading--size-normal d-flex flex-column h-100"
+    [class.ovic-is-loading]="loading">
+    <div class="question-content">
+        <div class="row config-row">
+            <div class="col-md-4" *ngIf="formMode !== 'update'">
+                <div>
+                    <label class="font-weight-bold">Loại câu hỏi <span class="text-danger">*</span></label>
+                    <p-dropdown [baseZIndex]="1099" appendTo="body" scrollHeight="400px"
+                        styleClass="w-100 custom-dropdown" [filter]="false" [options]="questionTypeSection.options"
+                        [(ngModel)]="questionTypeSection.active" (ngModelChange)="changesQuestionType()"
+                        optionLabel="label" optionValue="value" optionDisabled="disable"
+                        [placeholder]="questionTypeSection.placeholder">
+                    </p-dropdown>
+                </div>
+            </div>
+
+            <div [ngClass]="formMode === 'update' ? 'col-md-12' : 'col-md-8'">
+                <form [formGroup]="form">
+                    <div class="row">
+                        <div class="col-sm-6" *ngIf="testFormat === 'tienganh'">
+                            <div>
+                                <label class="font-weight-bold">Part <span class="text-danger">*</span></label>
+                                <p-dropdown [baseZIndex]="1099" scrollHeight="400px" appendTo="body"
+                                    styleClass="w-100 custom-dropdown" [filter]="false" [options]="list_part_code"
+                                    formControlName="code" optionLabel="label" optionValue="value"
+                                    placeholder="Chọn part">
+                                </p-dropdown>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6" *ngIf="selectedCdr && selectedCdr.week === 100">
+                            <div>
+                                <label class="font-weight-bold">Chọn CDR
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <p-dropdown [baseZIndex]="1099" scrollHeight="400px" appendTo="body"
+                                    styleClass="w-100 custom-dropdown" [filter]="true" [options]="listCdr"
+                                    formControlName="cdr_id" optionLabel="label" optionValue="id"
+                                    placeholder="Chọn chuẩn đầu ra">
+                                </p-dropdown>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6" *ngIf="selectedCdr && selectedCdr.week !== 100">
+                            <div>
+                                <label class="font-weight-bold">Quyền truy cập
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <p-selectButton [options]="select_private" formControlName="private" optionLabel="label"
+                                    optionValue="id" styleClass="custom-selectbutton">
+                                </p-selectButton>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="question-preview flex-fill" *ngIf="f['question_type'].value; else emptyMessage">
+            <div class="question-preview__container">
+                <div class="question-preview__question"
+                    [ngClass]="testFormat === 'tienganh' ? 'question-preview__question--layout-separator' : 'question-preview__question--layout-linear'">
+                    <div class="question-preview__question__direction">
+                        <div class="question-preview__question__size">
+                            <b class="question-preview__question__direction__prefix">
+                                {{testFormat === 'tienganh'?'PART':'CÂU HỎI'}}:
+                            </b>
+                            <div class="question-preview__question__direction__content">
+                                <app-input-question-direction #editorItem [abstractControl]="f['question_direction']"
+                                    (ckEditor)="ckEditorSetup($event)">
+                                </app-input-question-direction>
+                                <ng-container
+                                    *ngIf="testFormat === 'tienganh' || ((f['question_type'].value === 'group-input' || f['question_type'].value === 'group-radio' || f['question_type'].value === 'grouping' || f['question_type'].value === 'drag-drop'))">
+                                    <div class="question-media-wrapper" *ngIf="question.media; else showBtnImportMedia">
+                                        <div class="media-actions">
+                                            <button type="button" (click)="btnImportQuestionMedia()"
+                                                class="btn-import-media p-button-outlined" pRipple pButton
+                                                icon="fa fa-refresh" label="Chọn lại">
+                                            </button>
+                                        </div>
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col-md-7 pr-md-3 border-right-dashed">
+                                                <div class="media-item">
+                                                    <span class="media-label"><i class="fa fa-volume-up mr-1"></i>
+                                                        File nghe:
+                                                    </span>
+                                                    <div class="media-audio-row">
+                                                        <audio controls class="media-audio-player"
+                                                            [src]="question.media.path | ictuMediaLink : question.media.source : token | ovicSafeUrl">
+                                                        </audio>
+                                                        <button type="button" (click)="removeQuestionMedia()"
+                                                            class="media-remove-button p-button-text p-button-danger p-button-rounded"
+                                                            pRipple pButton icon="pi pi-times" pTooltip="Xóa file nghe"
+                                                            tooltipPosition="top">
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-5 pl-md-3">
+                                                <div class="media-item">
+                                                    <span class="media-label">Số lượt nghe:</span>
+                                                    <div class="input-group-sm mt-1">
+                                                        <input placeholder="Nhập số..." type="text"
+                                                            class="form-control flat-input"
+                                                            [(ngModel)]="question.media.replay"
+                                                            (keyup)="validateInputMediaReplay()">
+                                                    </div>
+                                                    <small class="text-muted mt-1 d-block" style="font-size: 11px;">
+                                                        (Vui lòng nhập số)
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <ng-template #showBtnImportMedia>
+                                        <button type="button" (click)="btnImportQuestionMedia()"
+                                            class="btn-import-media" pRipple pButton icon="fa fa-headphones"
+                                            label="Chọn file nghe">
+                                        </button>
+                                    </ng-template>
+                                </ng-container>
+                            </div>
+                            <div class="question-preview__question__list-answer-options"
+                                *ngIf="question && ['drag_drop','grouping'].includes(question.question_type) && question.answer_option &&  question.answer_option.length">
+                                <span class="question-preview__question__list-answer-options__text"
+                                    *ngFor="let option of question.answer_option">{{ option.value }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="question-preview__question__answer">
+                        <ng-container *ngIf="testFormat !== 'tienganh'; else inputTypeEnglish">
+                            <div [ngClass]="f['question_type'].value !=='group-radio'
+                                ?'question-preview__question__size':''">
+                                <ng-container [ngSwitch]="f['question_type'].value">
+                                    <group-input-question *ngSwitchCase="'group-input'" [question]="question"
+                                        [confirmOnDelete]="formMode==='update'"></group-input-question>
+                                    <!-- <group-radio-question-v2 *ngSwitchCase="'group-radio'"
+                                        [question]="question"></group-radio-question-v2> -->
+                                    <ng-container *ngSwitchCase="'group-radio'">
+                                        <div class="question-preview__question__size position-relative"
+                                            *ngFor="let child of question.children; index as i">
+                                            <button (click)="removeChildQuestion(i)" pButton pRipple icon="pi pi-trash"
+                                                class="question-preview__question__size__btn-remove-child-question p-button-danger"></button>
+                                            <group-radio-question-v2 [question]="child"></group-radio-question-v2>
+                                        </div>
+                                    </ng-container>
+                                    <drag-and-drop-question *ngSwitchCase="'drag_drop'" [question]="question"
+                                        [confirmOnDelete]="formMode==='update'"></drag-and-drop-question>
+                                    <question-type-radio-editor *ngSwitchCase="'checkbox'" [multiple]="true"
+                                        [question]="question"></question-type-radio-editor>
+                                    <question-type-radio-editor *ngSwitchCase="'radio'" [multiple]="false"
+                                        [question]="question"></question-type-radio-editor>
+                                    <grouping-question *ngSwitchCase="'grouping'"
+                                        [question]="question"></grouping-question>
+                                    <question-type-input-box [testFormat]="testFormat" *ngSwitchCase="'inputbox'"
+                                        [question]="question">
+                                    </question-type-input-box>
+                                    <ng-container *ngSwitchCase="'reorder_words'"></ng-container>
+                                    <ng-container *ngSwitchCase="'matching'"></ng-container>
+                                    <div *ngSwitchDefault
+                                        class="d-flex flex-fill w-100 h-100 justify-content-center align-items-center">
+                                        <p class="alert alert-secondary m-0 primary-font --fs-14">Vui lòng chọn loại câu
+                                            hỏi
+                                        </p>
+                                    </div>
+                                </ng-container>
+                            </div>
+                            <div class="question-preview__question__size">
+                                <div class="question-type-radio__footer d-flex justify-content-between align-items-center"
+                                    *ngIf="question.question_type === 'group-radio' ">
+                                    <p-checkbox [(ngModel)]="question.config.invertedAnswer" [binary]="true"
+                                        label="Đảo vị trí của các câu hỏi"></p-checkbox>
+                                    <button (click)="addMoreChildQuestion()" class="typical-question__btn-add">
+                                        <i class="pi pi-plus-circle"></i>Thêm câu hỏi
+                                    </button>
+                                </div>
+                                <div class="question-preview__question__size__foot"
+                                    [class.p-0]="question.question_type === 'drag_drop'">
+                                    <button [disabled]="!availableToSave" (click)="saveQuestion()" pButton pRipple
+                                        icon="pi pi-save"
+                                        class="question-preview__question__size__foot__button p-button--center p-button-success"
+                                        label="Lưu lại">
+                                    </button>
+                                    <button *ngIf="question && question['status'] === -1" [disabled]="!availableToSave"
+                                        (click)="saveQuestion(true)" pButton pRipple icon="pi pi-save"
+                                        class="question-preview__question__size__foot__button p-button--center p-button-help"
+                                        label="Lưu lại và yêu cầu duyệt">
+                                    </button>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <ng-template #inputTypeEnglish>
+                            <ng-container *ngIf="question.question_type !== 'drag_drop' ; else dragAndDropInEnglish">
+                                <div class="question-preview__question__size position-relative"
+                                    *ngFor="let child of question.children; index as i">
+                                    <button (click)="removeChildQuestion(i)" pButton pRipple icon="pi pi-trash"
+                                        class="question-preview__question__size__btn-remove-child-question p-button-danger"></button>
+                                    <div class="row"
+                                        *ngIf="!['inputbox','reorder_words'].includes(child.question_type)">
+                                        <div class="col-12">
+                                            <div class="ovic-vertical__inputs ovic-vertical__inputs--layout-2">
+                                                <p class="form-row mt-0">
+                                                    <label for="question_number">Câu hỏi số</label>
+                                                    <input id="question_number" class="ovic-input-field"
+                                                        [(ngModel)]="child.question_number">
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="ovic-vertical__inputs ovic-vertical__inputs--layout-2">
+                                                <p class="form-row mb-5">
+                                                    <label for="question_number">Nội dung câu hỏi
+                                                        <span class="ovic-mark">*</span></label>
+                                                    <textarea rows="2" [autoResize]="true" pInputTextarea
+                                                        class="ovic-input-field" [(ngModel)]="child.question_direction">
+                                                    </textarea>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <ng-container [ngSwitch]="child.question_type">
+                                        <group-input-question *ngSwitchCase="'group-input'"
+                                            [question]="child"></group-input-question>
+                                        <group-radio-question *ngSwitchCase="'group-radio'"
+                                            [question]="child"></group-radio-question>
+                                        <question-type-radio-editor *ngSwitchCase="'checkbox'" [multiple]="true"
+                                            [question]="child"></question-type-radio-editor>
+                                        <question-type-radio-editor *ngSwitchCase="'radio'" [multiple]="false"
+                                            [question]="child"></question-type-radio-editor>
+                                        <drag-and-drop-question *ngSwitchCase="'drag_drop'"
+                                            [question]="child"></drag-and-drop-question>
+                                        <grouping-question *ngSwitchCase="'grouping'"
+                                            [question]="child"></grouping-question>
+                                        <question-type-input-box *ngSwitchCase="'inputbox'"
+                                            [question]="child"></question-type-input-box>
+                                        <question-type-reorder-words *ngSwitchCase="'reorder_words'"
+                                            [question]="child"></question-type-reorder-words>
+                                        <question-type-arrange-paragraphs *ngSwitchCase="'arrange_paragraphs'"
+                                            [question]="child"></question-type-arrange-paragraphs>
+                                        <ng-container *ngSwitchCase="'matching'"></ng-container>
+                                        <div *ngSwitchDefault
+                                            class="d-flex flex-fill w-100 h-100 justify-content-center align-items-center">
+                                            <p class="alert alert-secondary m-0 primary-font --fs-14">Vui lòng chọn loại
+                                                câu
+                                                hỏi</p>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </ng-container>
+
+                            <ng-template #dragAndDropInEnglish>
+                                <div class="question-preview__question__size">
+                                    <drag-and-drop-question [question]="question"
+                                        [enableQuestionNumber]="true"></drag-and-drop-question>
+                                </div>
+                            </ng-template>
+
+                            <div class="question-preview__question__size">
+                                <div class="question-type-radio__footer d-flex justify-content-between align-items-center"
+                                    *ngIf="question.question_type !== 'drag_drop' ">
+                                    <p-checkbox [(ngModel)]="question.config.invertedAnswer" [binary]="true"
+                                        label="Đảo vị trí của các câu hỏi"></p-checkbox>
+                                    <button (click)="addMoreChildQuestion()" class="typical-question__btn-add">
+                                        <i class="pi pi-plus-circle"></i>Thêm câu hỏi
+                                    </button>
+                                </div>
+                                <div class="question-preview__question__size__foot"
+                                    [class.p-0]="question.question_type === 'drag_drop'">
+                                    <button [disabled]="!availableToSave" (click)="saveQuestion()" pButton pRipple
+                                        icon="pi pi-save"
+                                        class="question-preview__question__size__foot__button p-button--center p-button-success"
+                                        label="Lưu lại">
+                                    </button>
+                                    <button *ngIf="question && question['status'] === -1" [disabled]="!availableToSave"
+                                        (click)="saveQuestion(true)" pButton pRipple icon="pi pi-save"
+                                        class="question-preview__question__size__foot__button p-button--center p-button-help"
+                                        label="Lưu lại và yêu cầu duyệt">
+                                    </button>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<ng-template #emptyMessage>
+    <div class="create-edit-question-section__panel d-flex flex-fill flex-column">
+        <p class="alert alert-secondary m-0 primary-font --fs-14">{{ guideMessages }}</p>
+    </div>
+</ng-template>
+<!-- <div class="col-1">
+    <div class="ovic-vertical__inputs ovic-vertical__inputs--layout-2">
+        <p class="form-row mt-2">
+            <label for="cdr">Cdr <span class="ovic-mark">*</span></label>
+            <input id="cdr" class="ovic-input-field" [value]="level" disabled="disabled">
+        </p>
+    </div>
+</div> -->

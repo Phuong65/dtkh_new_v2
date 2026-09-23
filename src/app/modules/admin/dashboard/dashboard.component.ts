@@ -1,7 +1,7 @@
 import { SysConfigsService } from '@modules/shared/services/sys-configs.service';
 import { ConfigsService } from '@modules/shared/services/configs.service';
 import { state, style, transition, trigger, useAnimation } from '@angular/animations';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef, NgZone } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
@@ -205,7 +205,9 @@ export class DashboardComponent implements OnInit {
         private activatedRoute: ActivatedRoute,
         private classesService: ClassesService,
         private elnKhoaHocService: ElnKhoaHocService,
-        private SysConfigsService: SysConfigsService
+        private SysConfigsService: SysConfigsService,
+        private cdr: ChangeDetectorRef,
+        private ngZone: NgZone
     ) {
         this.title.setTitle(APP_CONFIGS.pageTitle);
 
@@ -335,7 +337,6 @@ export class DashboardComponent implements OnInit {
         this.subscriptions.add(observerChangeLanguage);
 
         const observerOpenSideNavigation = this.notificationService.onSideNavigationMenuOpen().pipe(
-            debounceTime(100),
             switchMap(settings => {
                 this.sideNavigationMenuSettings = settings;
                 this.menuSize = settings.size ? `${settings.size}px` : '100%';
@@ -344,14 +345,21 @@ export class DashboardComponent implements OnInit {
                 this.sideNavigationOffCanvasSize = settings['offCanvas'] ? Math.max(0, (settings.size + 10)) + 'px' : '0';
                 return of('');
             }
-            ), delay(50)).subscribe(() => this.navigationMenuState = 'open');
+            ), delay(50)).subscribe(() => {
+                this.ngZone.run(() => {
+                    this.navigationMenuState = 'open';
+                    this.cdr.detectChanges();
+                });
+            });
 
         this.subscriptions.add(observerOpenSideNavigation);
 
-        const observerCloseSideNavigation = this.notificationService.onSideNavigationMenuClosed().pipe(debounceTime(100)).subscribe(() => {
-            console.log('ddd');
-            this.navigationMenuState = 'close';
-            this.sideNavigationOffCanvasSize = '0';
+        const observerCloseSideNavigation = this.notificationService.onSideNavigationMenuClosed().subscribe(() => {
+            this.ngZone.run(() => {
+                this.navigationMenuState = 'close';
+                this.sideNavigationOffCanvasSize = '0';
+                this.cdr.detectChanges();
+            });
         });
 
         this.subscriptions.add(observerCloseSideNavigation);

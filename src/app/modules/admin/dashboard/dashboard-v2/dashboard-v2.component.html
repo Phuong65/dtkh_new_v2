@@ -270,8 +270,10 @@
         *ngTemplateOutlet="sideNavigationMenuSettings ? sideNavigationMenuSettings.template : null"></ng-container>
 </div>
 
+@if (navigationMenuState === 'open') {
 <button [@overlayAnimations]="navigationMenuState" class="btn ovic-side-navigation__overlay"
-    (click)="closePanel(sideNavigationMenuSettings.name)"></button>
+    (click)="closePanel(sideNavigationMenuSettings?.name)"></button>
+}
 
 <!--<ng-container *ngIf="navigationMenuState === 'open'">
     <button class="btn ovic-side-navigation__overlay" (click)="closePanel()"></button>

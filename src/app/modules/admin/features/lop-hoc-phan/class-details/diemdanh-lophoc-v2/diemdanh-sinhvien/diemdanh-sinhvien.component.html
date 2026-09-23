@@ -1,1 +1,105 @@
-﻿<div class="p-3">diemdanh-sinhvien.component works!</div>
+<div class="diemdanh-container">
+  <div class="diemdanh-l">
+    @if (mocdiemdanhSelect) {
+      <!--            <div style="height: calc(100% ); padding: 10px; min-width:100%;overflow-x: auto">-->
+      <div style="height: calc(100% ); padding: 10px">
+        <p-table [value]="listStudent"
+          styleClass="tbl-danhSachUser tbl-hvu-diemdanh table-hover table-scroll-able table-able-dropdown-p-table table-has-caption table-border min-width-maxcontent-table diemdanh-layout-table">
+          <ng-template pTemplate="caption">
+            <div class="d-flex justify-content-between align-items-center">
+              @if (listStudent && listStudent.length>0) {
+                <div>
+                  <strong>TUẦN {{mocdiemdanhSelect['tuan'] + ' (' + mocdiemdanhSelect['__ngay'] + '): '  }}</strong>
+                  <strong>Có: </strong> <strong
+                [ngClass]="coventDiemdanh('DD') !== 0 ? ('keydiemdanh-' + 'DD'):''">{{ coventDiemdanh('DD') }}</strong>
+                |
+                <strong>P: </strong> <strong
+              [ngClass]="coventDiemdanh('P') !== 0 ? ('keydiemdanh-' + 'P'):''">{{ coventDiemdanh('P') }}</strong>
+              |
+              <strong>K: </strong> <strong
+            [ngClass]="coventDiemdanh('K') !== 0 ? ('keydiemdanh-' + 'K'):''">{{ coventDiemdanh('K') }}</strong>
+            |
+            <strong>Muộn: </strong> <strong
+          [ngClass]="coventDiemdanh('M') !== 0 ? ('keydiemdanh-' + 'M'):''">{{ coventDiemdanh('M') }}</strong>
+        </div>
+      }
+      <button pRipple pButton icon="pi pi-sync" (click)="loadInit(mocdiemdanhSelect)"
+      class="btn btn-success" label="Reload"></button>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="header">
+    <tr>
+      <th class="text-center ovic-w-50px">#</th>
+      <th class="text-center ovic-w-200px">Họ và tên</th>
+      <th class="text-center ovic-w-100px"> Điểm danh</th>
+      <th class="text-center ">Thao tác</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-row>
+    <tr>
+      <td style="text-align: center">{{ row['_index'] }}</td>
+      <td>
+        <div style="display: flex; flex-direction: column;">
+          <strong>{{ row['full_name'] }}</strong>
+          <span>{{ row['student_code'] }}</span>
+        </div>
+      </td>
+      <td class="text-center">
+        <div
+          [ngClass]="row['_isdiemdanh'] ? ('keydiemdanh-' + row['_keydiemdanh'] ) :'-no-attended'">
+          <!--                                    <pre>{{ row['_isdiemdanh'] | json}}</pre>-->
+          {{ row['__titleDiemdanh'] }}
+        </div>
+      </td>
+      <td class="text-center">
+        <div class="d-flex justify-content-center align-items-center ">
+          <button [matMenuTriggerFor]="menu" class="btn btn-icon is-smaller ">
+            <i class="fa fa-ellipsis-h"></i>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button (click)="btnCheckItemNghi(row, 'K')" mat-menu-item>
+              <i class="pi pi-times"></i>
+              <span style="margin-left:10px;">Vắng K</span>
+            </button>
+            <button (click)="btnCheckItemNghi(row, 'P')" mat-menu-item>
+              <i class="pi pi-check"></i>
+              <span style="margin-left:10px;">Vắng P</span>
+            </button>
+            <button (click)="btnCheckItemNghi(row, 'M')" mat-menu-item>
+              <i class="pi pi-clock"></i>
+              <span style="margin-left:10px;">Muộn</span>
+            </button>
+            <button (click)="btnDelete(row)" mat-menu-item>
+              <i class="pi pi-trash"></i>
+              <span style="margin-left:10px;">Xóa</span>
+            </button>
+          </mat-menu>
+        </div>
+        <div class="is-big flex-row justify-content-center flex-wrap" style="gap:10px;">
+          <button pButton pRipple label="P"
+            class="p-button-success" icon="pi pi-check"
+          (click)="btnCheckItemNghi(row, 'P')"></button>
+          <button pButton pRipple label="K"
+            class="p-button-danger" icon="pi pi-times"
+          (click)="btnCheckItemNghi(row, 'K')"></button>
+          <button pButton pRipple label="M"
+            class="p-button-warning" icon="pi pi-clock"
+          (click)="btnCheckItemNghi(row, 'M')"></button>
+          <button [disabled]="!row['_isdiemdanh']" pButton pRipple icon="pi pi-trash"
+            class="p-button-secondary" label="Xóa"
+          (click)="btnDelete(row)"></button>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+</div>
+} @else {
+  <div class="d-flex justify-content-center align-items-center w-100 h-100">
+    Vui lòng chọn lịch điểm danh.
+  </div>
+}
+</div>
+</div>
+
+

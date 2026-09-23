@@ -1,1 +1,450 @@
-﻿<div class="p-3">theodoi-kiemtra-daugio.component works!</div>
+<div class="layout_component_container kt-daugio">
+  <div class="kt-daugio-layout-top">
+    <button (click)="triggerSubmit()" style="line-height: 1; margin-left: 5px;" class="btn btn-success">
+      Phân bổ đề
+    </button>
+    @if (status_object.unlock > 0 && tongtest !== 0) {
+      <button (click)="lockLoginAllStudent()"
+        style="line-height: 1; margin-left: 5px;" class="btn btn-danger">
+        <i style="color: fff;" class="pi pi-lock"></i>
+        Khóa đăng nhập tất cả SV
+      </button>
+    }
+    @if (status_object.unlock === 0 && tongtest !== 0) {
+      <button (click)="unlockLoginAllstudent()"
+        style="line-height: 1; margin-left: 5px;" class="btn btn-primary">
+        <i style="color: fff;" class="pi pi-unlock"></i>
+        Mở đăng nhập tất cả SV
+      </button>
+    }
+
+    @if (status_object.opened === 0 && tongtest !== 0) {
+      <button (click)="openAllTest()"
+        style="line-height: 1; margin-left: 5px;" class="btn btn-success">
+        Kích hoạt tất cả bài KT
+      </button>
+    }
+    @if (status_object.opened > 0 && tongtest !== 0) {
+      <button (click)="closedAllTest()"
+        style="line-height: 1; margin-left: 5px;" class="btn btn-danger">
+        Đóng tất cả bài KT
+      </button>
+    }
+    @if (tongtest !== 0) {
+      <button class="btn btn-success" [disabled]="status_object.danglam > 0?false : true "
+        (click)="nopBaiAll()" style="line-height: 1; margin-left: 5px;">
+        Yêu cầu tất cả nộp bài
+      </button>
+    }
+    @if (displayDelete && tongtest !== 0) {
+      <button ngbTooltip="Xóa" container="body" placement="left"
+        (click)="deleteTest()" style="line-height: 1; margin-left: 5px;" class="btn btn-danger btn-icon"
+        [disabled]="isBulkAiGrading">
+        <i class="fa fa-trash"></i>
+      </button>
+    }
+  </div>
+  <div class="kt-daugio-layout-bottom" [ngClass]="show_warning ? 'left-layout-open':''">
+    @if (tongtest === 0) {
+      <div style="text-align: center; padding: 15px; height: 100%; width: 100%; display: flex; align-items: center; justify-content: center;"
+        >
+        <p style="font-size: 18px; color: #c79807; font-weight: 500;">Chưa có đề kiểm tra, vui lòng phân bổ đề cho
+        sinh viên</p>
+      </div>
+    }
+    @if (tongtest !== 0) {
+      <div class="kt-daugio-layout-bottom-content">
+        <div class="kt-daugio-layout-bottom-left" style="height: 100%;">
+          <div style="height:calc(100% - 40px); padding: 5px;">
+            <p-table [(selection)]="selectedStudents"
+              [value]="list_student | filter : filterStatusHtml.closed : ['closed'] | filter : filterStatusHtml.locked: ['locked'] | filter: filterStatusHtml.status:['status_info_test'] | filter: search_student_html:['full_name','student_code'] "
+              styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-has-caption table-reBorder">
+              <ng-template pTemplate="caption">
+                <div class="flex caption-table" style="display: flex; align-items: center;">
+                  <div class="caption-table-title">
+                    <span (click)="onChangeFilterStatus({value:'all'})"
+                      class="padding-5px hover-underline">Tổng đề/sv:
+                    {{tongtest}}/{{tongsv}}</span> |
+                    <span (click)="onChangeFilterStatus({value:'vang'})"
+                      class="padding-5px hover-underline red">Vắng:
+                    {{status_object.vang}} </span> |
+                    <span (click)="onChangeFilterStatus({value:'opened'})"
+                      class="padding-5px hover-underline blue">Đã mở:
+                    {{status_object.opened}} </span> |
+                    <span (click)="onChangeFilterStatus({value:'chualam'})"
+                      class="padding-5px hover-underline gray">Chưa làm:
+                    {{status_object.chualam}} </span> |
+                    <span (click)="onChangeFilterStatus({value:'danglam'})"
+                      class="padding-5px hover-underline orange">Đang làm:
+                    {{status_object.danglam}} </span> |
+                    <span (click)="onChangeFilterStatus({value:'danop'})"
+                      class="padding-5px hover-underline blue">Đã nộp:
+                    {{status_object.danop}} </span>
+                  </div>
+                  <div style="display: flex;"
+                    class="p-input-icon-left ml-auto filter-student-test-status">
+                    <button pBadge value="{{list_warning.length}}" severity="danger"
+                      (click)="openWarning()"
+                      ngbTooltip="Danh sách cảnh báo thoát khỏi màn hình bài KT (sử dụng phần mềm khác hoặc tab khác,...)"
+                      placement="left" container="body" style="margin-left: 5px; line-height: 1;"
+                      class="btn btn-warning btn-icon">
+                      <i class="fa fa-exclamation-circle"></i>
+                    </button>
+                    <input (keyup)="onSearchStudent($event)" style="width: 200px; margin-left: 5px;"
+                      type="text" placeholder="Nhập tên hoặc mã sv rồi nhấn enter" />
+                    </div>
+                  </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                  <tr>
+                    @if (displayDelete) {
+                      <th style="width: 3rem; text-align: center;">
+                        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                      </th>
+                    }
+                    @for (col of cols_student; track col) {
+                      <th [ngClass]="col['class']">{{col['label']}}
+                      </th>
+                    }
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-row>
+                  <tr>
+                    @if (displayDelete) {
+                      <td style="width: 3rem; text-align: center;">
+                        <p-tableCheckbox [value]="row"></p-tableCheckbox>
+                      </td>
+                    }
+                    @for (col of cols_student; track col) {
+                      <td [ngClass]="col['class']">
+                        @if (!col['html'] && !col['private']) {
+                          <span>{{row[col['key']]}}</span>
+                        }
+                        @if (col['html']  && !col['private']) {
+                          <span [innerHtml]="row[col['key']]"></span>
+                        }
+                        @if (col['key'] === 'locked'  && col['private']) {
+                          <div>
+                            @if (row['student_test']) {
+                              <span style="cursor: pointer; font-size: 16px;"
+                                (click)="onChangeLock(row)"
+                                [ngClass]="row[col['key']] === 1?'vang-mat':'co-mat'">{{row[col['key']] ===
+                              1?'Vắng':'Có'}}</span>
+                            }
+                            @if (!row['student_test']) {
+                              <span>-</span>
+                            }
+                          </div>
+                        }
+                        @if (col['key'] === 'closed'  && col['private']) {
+                          <div>
+                            @if (row['student_test']) {
+                              <i (click)="onChangeClosed(row)" style="font-size: 16px; cursor: pointer;"
+                              [ngClass]="row[col['key']] === 1? 'fa fa-square-o gray':'fa fa-check-square-o blue'"></i>
+                            }
+                            @if (!row['student_test']) {
+                              <span>-</span>
+                            }
+                          </div>
+                        }
+                        @if (col['key'] === 'status_test'  && col['private']) {
+                          <div>
+                            @if (row['student_test']) {
+                              <div>
+                                @if (isTestGraded(row['student_test'])) {
+                                  <span class="status-shift status-activite">Đã chấm xong</span>
+                                } @else {
+                                  @switch (row['status_test']) {
+                                    @case (-1) {
+                                      <span class="status-shift status-deactive">Chưa
+                                      làm</span>
+                                    }
+                                    @case (0) {
+                                      <span class="status-shift status-doing">Đang làm
+                                      bài</span>
+                                    }
+                                    @case (1) {
+                                      <span class="status-shift status-activite">Đã
+                                      nộp</span>
+                                    }
+                                    @case (-2) {
+                                      <span class="status-shift status-danger">Không
+                                        nộp
+                                      bài</span>
+                                    }
+                                    @case (2) {
+                                      <span class="status-shift status-activite">Hệ
+                                        thống thu
+                                      bài</span>
+                                    }
+                                    @case (3) {
+                                      <span class="status-shift status-activite">Giảng
+                                        viên thu
+                                      bài</span>
+                                    }
+                                  }
+                                }
+                              </div>
+                            }
+                            @if (!row['student_test']) {
+                              <div>
+                                <span class="status-shift status-deactive">Chưa có đề</span>
+                              </div>
+                            }
+                          </div>
+                        }
+                        @if (col['key'] === 'violation' && col['private']) {
+                          <div>
+                            {{row.violation_of_exam ? row.violation_of_exam.title +' (đã trừ '+
+                            (row.violation_of_exam.key | showlabel: dbConfig : 'key' : 'POINT' )+'%)' :
+                            '-'}}
+                          </div>
+                        }
+                        @if (col['key'] === 'tong_diem' && col['private']) {
+                          <div>
+                            @if (row['student_test'] && row['student_test']['status'] === 1 && canShowStudentTestPoint(row['student_test'])) {
+                              <span
+                              >{{formatTongDiem(row[col['key']])}}</span>
+                            }
+                            @if (!row['student_test'] || row['student_test']['status'] !== 1 || !canShowStudentTestPoint(row['student_test'])) {
+                              <span
+                              >-</span>
+                            }
+                          </div>
+                        }
+                        @if (col['key'] === 'full_name' && col['private']) {
+                          <div class="student-name">
+                            <div class="student-info">
+                              <span class="font-weight-600" style="margin-bottom: 5px;">
+                                {{row[col['key']]}}
+                              </span>
+                              <span>{{row['student_code']}}</span>
+                            </div>
+                            <div class="student-action-phongthi">
+                              @if (row.user && row.user['is_locked'] === 1) {
+                                <button (click)="unLockLoginStudent(row)"
+                                  ngbTooltip="Đã khóa đăng nhập" container="body" placement="left"
+                                  style="margin-right: 5px;" pButton pRipple type="button"
+                                  icon="pi pi-lock" class="p-button-danger p-button-text">
+                                </button>
+                              }
+                              @if (row.user && row.user['is_locked'] === 0) {
+                                <button (click)="lockLoginStudent(row)"
+                                  ngbTooltip="Đã mở khóa đăng nhập" container="body" placement="left"
+                                  style="margin-right: 5px;" pButton pRipple type="button"
+                                  icon="pi pi-lock-open" class="p-button-secondary p-button-text">
+                                </button>
+                              }
+                              <button
+                                [disabled]="row['student_test'] &&  row['student_test'].status === 0 ? false : true"
+                                (click)="nopBaiOne(row)" ngbTooltip="Yêu cầu nộp bài" container="body"
+                                placement="left" style="margin-right: 5px;" pButton pRipple
+                                type="button" icon="pi pi-inbox" class="p-button-success p-button-text">
+                              </button>
+                              <button (click)="openViewTest(row)"
+                                [disabled]="!canOpenStudentTest(row)"
+                                pButton pRipple ngbTooltip="Xem bài kiểm tra" container="body"
+                                placement="left" style="margin-right: 5px;"
+                                class="p-button-help p-button-text" type="button" icon="pi pi pi-eye">
+                              </button>
+                              @if (row['student_test'] && row['student_test']['tracking'] && row['student_test']['tracking']['warnings'] && row['student_test']['tracking']['warnings'].length > 0) {
+                                <button
+                                  (click)="openWarningStudent(row)" pBadge
+                                  value="{{ row['student_test'] && row['student_test']['tracking'] && row['student_test']['tracking']['warnings']?row['student_test']['tracking']['warnings'].length: 0}}"
+                                  severity="danger"
+                                  ngbTooltip="Số lần cảnh báo sử dụng phần mềm khác hoặc thoát khỏi bài KT"
+                                  container="body" placement="left" style="margin-right: 5px;" pButton
+                                  pRipple type="button" icon="pi pi-info-circle"
+                                  class="p-button-warning p-button-text btn-warning-test-15">
+                                </button>
+                              }
+                              <button [matMenuTriggerFor]="menuActionTest" ngbTooltip="Thao tác khác"
+                                container="body" placement="left" style="margin-right: 5px;" pButton
+                                pRipple type="button" icon="pi pi-ellipsis-h"
+                                class="p-button-info p-button-text">
+                              </button>
+                              <mat-menu #menuActionTest="matMenu">
+                                <button (click)="openViolationSet(row)" mat-menu-item>
+                                  <i class="pi pi-file-edit margin-right-5px"></i>
+                                  <span>Xử lý vi phạm quy chế</span>
+                                </button>
+                                <button [disabled]="!row.violation_of_exam ? true : false"
+                                  (click)="deleteViolation(row)" mat-menu-item>
+                                  <i class="pi pi-file-excel margin-right-5px"></i>
+                                  <span>Hủy xử lý vi phạm quy chế</span>
+                                </button>
+                                                <button (click)="resetTestStudent(row)" [disabled]="!row['student_test'] ?
+                                                true : false" mat-menu-item>
+                                  <i class="pi pi-refresh margin-right-5px"></i>
+                                  <span>Nhận đề mới</span>
+                                </button>
+                              </mat-menu>
+                            </div>
+                          </div>
+                        }
+                      </td>
+                    }
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+            <div class="page-layout-set">
+              <p-paginator dropdownAppendTo="body" [rowsPerPageOptions]="[20,50,100,150,200]" #paginator
+                (onPageChange)="changePage_student($event)" [rows]="limit_student"
+              [totalRecords]="total_student"></p-paginator>
+            </div>
+          </div>
+          <div class="kt-daugio-layout-bottom-right">
+            <div
+              style="height: 60px; border-bottom: 1px solid #c8c8c8; display: flex; align-items: center; font-size: 14px; padding: 5px; background-color: #faedc4;">
+              Danh sách cảnh báo sinh viên thoát khỏi màn hình bài KT (sử dụng phần mềm khác hoặc tab khác,...)
+            </div>
+            <div #scrollMe style="height: calc(100% - 60px); overflow: auto;">
+              @for (item of list_warning; track item) {
+                <div class="warning-card">
+                  <div class="warning-card-content">
+                    <strong>{{item["full_name"]}}</strong>
+                    <span>{{item["student_code"]}}</span>
+                    <span style="font-style: italic;">{{item["time"]}}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <p-dialog maskStyleClass="zindex-1000" styleClass="bulk-ai-progress-dialog" appendTo="body" position="center"
+    [draggable]="false" [resizable]="false" [modal]="true" [closable]="false" [closeOnEscape]="false"
+    [visible]="isBulkAiGrading" [style]="{width: '520px', maxWidth: 'calc(100vw - 24px)'}"
+    header="Tiến trình chấm điểm AI">
+    <div class="bulk-ai-progress">
+      <div class="bulk-ai-progress__status">
+        <span>{{bulkAiProgress.message}}</span>
+        <strong>{{bulkAiProgress.percent}}%</strong>
+      </div>
+      <div class="bulk-ai-progress__track" role="progressbar" [attr.aria-valuenow]="bulkAiProgress.percent"
+        aria-valuemin="0" aria-valuemax="100" [attr.aria-label]="bulkAiProgress.message">
+        <span class="bulk-ai-progress__bar" [style.width.%]="bulkAiProgress.percent"></span>
+      </div>
+      @if (bulkAiProgress.summary) {
+        <div class="bulk-ai-progress__summary">
+          {{bulkAiProgress.summary}}
+        </div>
+      }
+    </div>
+  </p-dialog>
+
+  <p-dialog maskStyleClass="zindex-1000" styleClass="report-create-plan-dialog" [showHeader]="false" appendTo="body"
+    position="center" [draggable]="false" [resizable]="false" [modal]="true" header="Title"
+    [(visible)]="displayViolation" [style]="{width: '700px'}" [closable]="false">
+    @if (selectedStudent) {
+      <div class="step-sync-plans" style="background-color: #fff;">
+        <div class="step-sync-plans-header" style="display: flex; align-items: center;">
+          <span style="flex: 1;">Xử lý vi phạm sinh viên: {{selectedStudent.user_info.full_name + ' - ' +
+          selectedStudent.user_info.student_code }}</span>
+          <span (click)="closeAddTime()" class="action-span"
+            style="margin-right: 0px; height: 20px; width: 20px; padding: 0px; line-height: 20px;text-align: center; cursor: pointer;">
+            <i style="color: red; margin: 0px;" class="fa fa-times"></i>
+          </span>
+        </div>
+        <div class="step-sync-plans-body ovic-vertical__inputs">
+          <div class="row form-row form-row-flex-row">
+            <div class="col-12 flex-div">
+              <label style="font-weight: bold;" for="title">Chọn mức độ vi phạm:<span class="ovic-mark"
+              style="color: red;"></span></label>
+              <p-dropdown appendTo="body" placeholder="-----" scrollHeight="300px" [options]="dbConfig"
+                optionLabel="TITLE" optionValue="key" [(ngModel)]="violationData['key']">
+              </p-dropdown>
+            </div>
+          </div>
+          <div class="row form-row form-row-flex-row" style="text-align: justify;">
+            @if (violationData['key']) {
+              <div class="col-12 flex-div">
+                <label style="font-weight: bold;" for="title">Mô tả:</label>
+                <div style="color: red;" [innerHTML]="violationData['key'] | showlabel : dbConfig : 'key' : 'DESC'">
+                </div>
+                <div style="color: red;">
+                  <em>
+                    - Mức điểm bị trừ: {{violationData['key'] | showlabel : dbConfig : 'key' : 'POINT'}}%
+                  </em>
+                </div>
+              </div>
+            }
+          </div>
+          <div class="row form-row form-row-flex-row" style="margin-top: 10px;">
+            <div class="col-12" style="text-align: right;">
+              <button style="line-height: 1;" (click)="saveViolation()" class="btn btn-primary">Lưu lại</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </p-dialog>
+
+  <ng-template #templateWarningStudent>
+    <div class="ovic-over-right-section">
+      <div class="ovic-over-right-section__head">
+        <h3 class="ovic-over-right-section__header">
+          {{selectedStudent && selectedStudent['user_info']?selectedStudent['user_info']['full_name']:''}}
+        </h3>
+        <button class="btn ovic-over-right-section__close-button" (click)="closeSideMenu()"></button>
+      </div>
+      <div class="ovic-over-right-section__body"
+        style="height: calc(100vh - 58px); padding: 0px; line-height: 1.25; font-size: 14px;">
+        @if (selectedStudent && selectedStudent['student_test'] && selectedStudent['student_test']['tracking'] && selectedStudent['student_test']['tracking']['warnings']) {
+          <div
+            >
+            @for (item of selectedStudent['student_test']['tracking']['warnings']; track item) {
+              <div class="warning-card">
+                <div style="display: flex; align-items: center; flex-direction: row;" class="warning-card-content">
+                  <span style="flex: 1; margin-right: 10px;">{{item}}</span>
+                  <span>
+                    <i style="font-size: 16px;" class="fa fa-exclamation-triangle"></i>
+                  </span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #viewStudentTest let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section student-test-review-modal" style="height: 100vh;">
+      <div class="ovic-over-right-section__head">
+        <h3 class="ovic-over-right-section__header">
+          {{selectedStudent && selectedStudent['user_info']?selectedStudent['user_info']['full_name']:''}}
+        </h3>
+        <button class="btn ovic-over-right-section__close-button" (click)="d(true)"></button>
+      </div>
+      <div class="ovic-over-right-section__body footer-no-hint student-test-review-body"
+        style="padding: 0px; line-height: 1.25;">
+        <div class="ovic-vertical__inputs" style="height: 100%;">
+          <app-view-tracnghiem-tuluan [_av]="courseSelected.av"
+            [_id]="selectedStudent['student_test']['id']" [_question]="list_question"
+            [_test_aws]="list_aws">
+          </app-view-tracnghiem-tuluan>
+        </div>
+      </div>
+      <div class="ovic-dynamic-right-section__foot">
+        <nav class="student-test-navigation" aria-label="Điều hướng bài kiểm tra sinh viên">
+          <button type="button"
+            class="btn ovic-over-right-section__foot-btn btn-light student-test-navigation__button"
+            (click)="navigateStudentTest(-1)" [disabled]="!canViewPreviousStudentTest">
+            <i class="fa fa-chevron-left" aria-hidden="true"></i>
+            Sinh viên trước
+          </button>
+          <button type="button"
+            class="btn ovic-over-right-section__foot-btn btn-light student-test-navigation__button"
+            (click)="navigateStudentTest(1)" [disabled]="!canViewNextStudentTest">
+            Sinh viên sau
+            <i class="fa fa-chevron-right student-test-navigation__next-icon" aria-hidden="true"></i>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </ng-template>

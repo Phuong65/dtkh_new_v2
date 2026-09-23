@@ -1,1 +1,32 @@
-﻿<div class="p-3">question-type-arrange-paragraphs.component works!</div>
+@if (answerOptions.length) {
+  <div class="question-type-arrange-paragraphs__answers ictu-drag-drop d-flex flex-column">
+    <ul class="question-type-arrange-paragraphs__answers__list ictu-drag-drop__list" cdkDropList (cdkDropListDropped)="drop($event)">
+      @for (_option of answerOptions; track _option; let i = $index) {
+        <li cdkDrag class="question-type-arrange-paragraphs__answers__element ictu-drag-drop__list__element">
+          <div class="question-type-arrange-paragraphs__answers__option d-flex justify-content-start align-items-start position-relative">
+            @if (devMode) {
+              <code class="question-type-arrange-paragraphs__answers__option_code">{{ _option.id }}</code>
+            }
+            <label cdkDragHandle for="{{uniqueCode}}-paragraph-element-{{_option.id}}" class="question-type-arrange-paragraphs__answers__option__label d-inline-flex justify-content-center align-items-center">
+              <!-- <i class="pi pi-arrows-alt"></i> -->					P{{ 1 + i }} </label>
+              <textarea autoResizeTextarea [id]="uniqueCode+'paragraph-element-'+_option.id" class="question-type-arrange-paragraphs__answers__option__text" placeholder="..." pInputTextarea [(ngModel)]="_option.value" cols="15" rows="1"></textarea>
+              <button (click)="btnDeleteAnswer(_option)" preventDoubleClick pButton pRipple icon="pi pi-trash" class="question-type-arrange-paragraphs__answers__option__btn-remove p-button-danger p-button-rounded p-button-text p-button-outlined"></button>
+            </div>
+          </li>
+        }
+      </ul>
+      <div class="question-type-arrange-paragraphs__answers__footer d-flex justify-content-between align-items-center">
+        <!-- <div class="question-type-arrange-paragraphs__answers__list-correct-answers ictu-drag-drop d-flex align-items-center">
+        <span class="question-type-arrange-paragraphs__answers__list-correct-answers__label">Thứ tự đúng</span>
+        <ul *ngIf="correctAnswers && correctAnswers.length" cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="dropCorrectAnswer($event)" class="ictu-drag-drop__list d-flex flex-row flex-fill">
+          <li cdkDrag class="ictu-drag-drop__list__element" *ngFor="let _id of correctAnswers">
+            <span class="d-flex justify-content-center align-items-center">P{{ _id }}</span>
+          </li>
+        </ul>
+      </div> -->
+      <button (click)="btnAddNewOption()" preventDoubleClick class="typical-question__btn-add mx-auto">
+        <i class="pi pi-plus-circle"></i> Thêm phương án trả lời
+      </button>
+    </div>
+  </div>
+}

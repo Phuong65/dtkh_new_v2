@@ -3,9 +3,11 @@
         <h4 class="confirm-rounded-block__head">{{head}}</h4>
         <div class="confirm-rounded-block__mess" [innerHTML]="body | appSafeHtml"></div>
         <div class="confirm-rounded-block__wrap-buttons">
-            <ng-container *ngIf="buttons && buttons.length">
-                <button pButton pRipple type="button" [label]="btn | appTranslateButton " [class]="btn.class" [icon]="btn.icon" *ngFor="let btn of buttons" (click)="confirmAction(btn)"></button>
-            </ng-container>
+            @if (buttons && buttons.length) {
+                @for (btn of buttons; track $index) {
+                <button pButton pRipple type="button" [label]="btn | appTranslateButton " [class]="btn.class" [icon]="btn.icon" (click)="confirmAction(btn)"></button>
+                }
+            }
         </div>
     </div>
 </div>

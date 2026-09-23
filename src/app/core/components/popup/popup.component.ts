@@ -1,11 +1,15 @@
 import { Component , OnInit , Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { OvicButton } from '@core/models/buttons';
+import { AppSafeHtmlPipe } from '@core/pipes/app-safe-html.pipe';
+import { TranslateModule } from '@ngx-translate/core';
 
-@Component( {standalone: false, 
+@Component( {
+	standalone  : true ,
 	selector    : 'app-popup' ,
 	templateUrl : './popup.component.html' ,
-	styleUrls   : [ './popup.component.css' ]
+	styleUrls   : [ './popup.component.css' ] ,
+	imports     : [ AppSafeHtmlPipe , TranslateModule ]
 } )
 export class PopupComponent implements OnInit {
 

@@ -1,1 +1,38 @@
-﻿<div class="p-3">question-type-input-box.component works!</div>
+@if (question) {
+  <div class="question-type-input-box">
+    @if (testFormat === 'tienganh') {
+      <div class="row">
+        <div class="col-2">
+          <div class="ovic-vertical__inputs ovic-vertical__inputs--layout-2">
+            <p class="form-row mt-0">
+              <label for="question_number">Câu hỏi số</label>
+              <input id="question_number" class="ovic-input-field" [(ngModel)]="question.question_number">
+            </p>
+          </div>
+        </div>
+        <div class="col-10">
+          <div class="ovic-vertical__inputs ovic-vertical__inputs--layout-2">
+            <p class="form-row mt-0">
+              <label for="question_number">Câu hỏi</label>
+              <input class="ovic-input-field" [(ngModel)]="question.question_direction">
+            </p>
+          </div>
+        </div>
+      </div>
+    }
+    <div class="row">
+      <div class="col-12">
+        <div class="ovic-vertical__inputs ovic-vertical__inputs--layout-2">
+          <p class="form-row">
+            <label for="answer">Đáp án</label>
+            <input id="answer" class="ovic-input-field" [(ngModel)]="raw_answer"
+              (ngModelChange)="updateAnswer()">
+              <small class="question-type-input-box__guide text-secondary">Trường hợp câu hỏi có nhiều đáp án
+                đúng, thì các đáp án được phân cách nhau bởi dấu chấm phẩy( ";") và không phân biệt chữ hoa, chữ
+              thường. Ví dụ : 1; one; first</small>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  }

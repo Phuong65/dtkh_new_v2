@@ -1,1 +1,637 @@
-﻿<div class="p-3">cauhoi-thuchanh.component works!</div>
+<div class="layout_component_container">
+  <div class="lesson-baihocv2" [ngClass]="closeLeft?'close-left-body':''" style="transition: all 0.3s;">
+    <div class="menu-lesson-baihocv2">
+      <button style="margin-left: 5px; padding: 0px; min-width: 0px; z-index: 50;" (click)="closeLeftBody()"
+        class="btn btn-success button-close-left-body">
+        <i style="margin: 0px;vertical-align: middle; font-size: 13px;"
+        [ngClass]="closeLeft?'pi pi-angle-double-right':'pi pi-angle-double-left'"></i>
+      </button>
+      <div class="menu-list-lessonv2">
+        @for (parent of list_form; track parent; let keyParent = $index) {
+          <div style="margin: 5px;" class="parent-lesson-layout"
+            >
+            <div style="border-bottom: 0px;" class="parent-name"
+              [ngClass]="selectedForm && parent.id === selectedForm.id ?'activity':''">
+              <div (click)="onChangeFormKthp(parent)" class="parent-name-layout"
+                style="display:flex; align-items: center;">
+                <span style="margin-right: 5px; align-self: baseline; flex: 1" class="parent-title">
+                  Nhóm {{parent.ordering}}
+                </span>
+                <div style="font-weight: normal;text-transform: none;">
+                  <span style="margin-right: 5px;" class="blue">Duyệt: {{parent['duyet']}}</span>|
+                  <span style="color: #333;margin-left: 5px;">Tổng: {{parent['tong']}}</span>
+                </div>
+                <!-- <div style="text-transform: none; font-weight: normal;" *ngIf="parent['noidung']"
+                [innerHtml]="parent['noidung'] | safeHtmlDecode">
+              </div> -->
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+  <div class="lesson-content-right-monhoc-v2 content-form-lesson-right-top">
+    @if (selectedForm && selectedCourse) {
+      <div>
+        <ng-container [ngTemplateOutlet]="templateListCauhoi"></ng-container>
+      </div>
+    }
+  </div>
+</div>
+</div>
+
+<ng-template #templateListCauhoi>
+  <div class="layout-tuluan-right">
+    <div class="layout-tuluan-right-top">
+      @if (selectedForm) {
+        <span style="flex:1; font-size: 14px;">
+          <strong>Nhóm {{selectedForm.ordering}}</strong>&nbsp;
+        </span>
+      }
+      <input [(ngModel)]="search_id_question" type="text" class="ovic-input-field"
+        placeholder="Tìm kiếm theo mã" type="text" style="width: 300px; margin-right:10px">
+        <button (click)="openAddCauhoi()" class="btn btn-success">
+          <i class="fa fa-plus"></i>
+          Thêm câu hỏi
+        </button>
+      </div>
+      <div class="layout-tuluan-right-bottom">
+        <p-table [value]="list_cauhoi | filter: search_id_question : ['id']"
+          styleClass="table-reBorder table-scroll-able table-able-dropdown-p-table">
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="text-align: center; width: 80px;">TT</th>
+              <th style="text-align: center; width: 150px;">Mã câu hỏi</th>
+              <th style="text-align: center;">Chuẩn đầu ra học phần</th>
+              <th style="text-align: center; width: 180px;">Mức độ/trình độ năng lực</th>
+              <th style="text-align: center; width: 100px;">SL tiêu chí</th>
+              <th style="text-align: center; width:100px">Điểm</th>
+              <th style="text-align: center; width:150px">Mức độ truy cập</th>
+              <th style="text-align: center; width: 150px;">Trạng thái</th>
+              <th style="text-align: center; width: 220px;">Thao tác</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-cauhoi>
+            <tr>
+              <td style="text-align: center;">
+                {{cauhoi['index_']}}
+              </td>
+              <td style="text-align: center;">
+                #{{cauhoi['id']}}
+              </td>
+              <td style="text-align: center;">
+                {{cauhoi.course_clo_id | showlabel : list_clo : 'id' : 'kyhieu'}}
+              </td>
+              <td style="text-align: center;">
+                <span class="box-span dat-box">
+                  {{cauhoi['cdr'] |showlabel : chuandaura: 'id' : 'label' }}
+                </span>
+              </td>
+              <!-- <td>
+              <div style="display: flex; align-items: center;">
+                <span style="flex: 1">
+                  <strong>
+                    Câu {{cauhoi['ordering']}} ({{cauhoi['point']}} điểm)
+                  </strong>
+                </span>
+                <span class="box-span dat-box">
+                  {{cauhoi['cdr'] |showlabel : chuandaura: 'id' : 'label' }}
+                </span>
+                <span class="box-span da-sua-box">
+                  {{cauhoi['private'] ? 'Private':'Public'}}
+                </span>
+              </div>
+            </td> -->
+            <td style="text-align: center;">
+              {{cauhoi['tieuchi']?cauhoi['tieuchi'].length:0}}
+            </td>
+            <td style="text-align: center;">
+              {{cauhoi.point}}
+            </td>
+            <td style="text-align: center;">
+              <span class="box-span da-sua-box">
+                {{cauhoi['private'] ? 'Private':'Public'}}
+              </span>
+            </td>
+            <td style="text-align: center;">
+              <div>
+                @switch (cauhoi['status']) {
+                  @case (0) {
+                    <span class="action-icon status-is-deactive">
+                      Chờ duyệt
+                    </span>
+                  }
+                  @case (1) {
+                    <span class="action-icon status-is-active">
+                      Đạt
+                    </span>
+                  }
+                  @case (-1) {
+                    <span class="action-icon status-is-redo">
+                      Chưa đạt
+                    </span>
+                  }
+                  @case (-2) {
+                    <span class="action-icon status-is-require">
+                      Yêu cầu duyệt
+                    </span>
+                  }
+                }
+              </div>
+            </td>
+            <td style="text-align: right;">
+              <div class="action-table-list-cauhoi">
+                @if (cauhoi['status'] !== 1 && cauhoi['tieuchi'] && cauhoi['tieuchi'].length === 0) {
+                  <button
+                    (click)="openListDuanTuCopyTieuchi(cauhoi)"
+                    ngbTooltip="Sao chép tiêu chí từ câu hỏi khác" container="body" placement="left"
+                    style="margin-right: 5px;" pButton pRipple type="button" icon="pi pi-copy"
+                    class="p-button-rounded p-button-text p-button-success">
+                  </button>
+                }
+                <button (click)="viewTuluan(cauhoi)" ngbTooltip="Xem câu hỏi" container="body"
+                  placement="left" style="margin-right: 5px;" pButton pRipple type="button"
+                  icon="pi pi-eye" class="p-button-rounded p-button-text p-button-plain">
+                </button>
+                @if (cauhoi['status'] !== 1) {
+                  <button (click)="editTieuchi(cauhoi)"
+                    ngbTooltip="Nhập tiêu chí chấm" container="body" placement="left"
+                    style="margin-right: 5px;" pButton pRipple type="button" icon="pi pi-list"
+                    class="p-button-rounded p-button-text p-button-help">
+                  </button>
+                }
+                @if (cauhoi['status'] !== 1) {
+                  <button ngbTooltip="Sửa câu hỏi" container="body" placement="left"
+                    style="margin-right: 5px;"
+                    (click)="editCauhoi(cauhoi)" pButton pRipple type="button" icon="pi pi-file-edit"
+                    class="p-button-rounded p-button-text">
+                  </button>
+                }
+                @if (cauhoi['status'] !== 1) {
+                  <button ngbTooltip="Xóa câu hỏi" container="body" placement="left"
+                    (click)="deleteCauhoi(cauhoi)" pButton pRipple
+                    type="button" icon="pi pi-trash"
+                    class="p-button-rounded p-button-danger p-button-text">
+                  </button>
+                }
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #templateQuestion let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+      <button class="btn ovic-over-right-section__close-button" (click)="closeSideMenu()"></button>
+    </div>
+    <div style="line-height: 1.25; padding: 15px; height: calc(100vh - 51px - 57px);"
+      class="ovic-over-right-section__body footer-no-hint">
+      <div class="ovic-vertical__inputs form-setting-lesson " style="line-height: 1.5;">
+        <form [formGroup]="formData">
+          @if (selectedForm) {
+            <div class="row form-row form-row-flex-row">
+              <div class="col-12" class="table-reBorder table-info-question" style="width:100%">
+                <table>
+                  <tr>
+                    <th style="text-align: center;" colspan="2">{{"Nhóm "+selectedForm.ordering}}</th>
+                  </tr>
+                  <tr>
+                    <th>Chuẩn đầu ra học phần</th>
+                    <td> {{selectedForm.course_clo_id | showlabel : list_clo : 'id' : 'kyhieu'}}</td>
+                  </tr>
+                  <tr>
+                    <th>Mức độ/trình độ năng lực</th>
+                    <td>{{selectedForm.cdr | showlabel : chuandaura : 'id' : 'label'}}</td>
+                  </tr>
+                  <tr>
+                    <th>Điểm</th>
+                    <td>{{selectedForm.point}}</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          }
+          <div class="row form-row form-row-flex-row">
+            <div class="col-12">
+              <label>Nội dung:<span class="ovic-mark">*</span></label>
+              <ovic-ckeditor-document [changeId]="selectedCauhoi?selectedCauhoi.id:0" [autoSave]="true"
+                [formField]="f['desc']" [default]="f['desc'].value"
+                styleClass="vietbaocao-doctument-content">
+              </ovic-ckeditor-document>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="ovic-dynamic-right-section__foot">
+      <p class="ovic-over-right-section__foot-wrap-buttons">
+        @if (selectedCauhoi && selectedCauhoi.status === -1) {
+          <button (click)="saveCauhoi(true)" type="button"
+            class="btn ovic-over-right-section__foot-btn btn-primary"><i class="fa fa-floppy-o"></i>Lưu lại và
+            yêu cầu duyệt
+          </button>
+        }
+        <button (click)="saveCauhoi()" type="button"
+          class="btn ovic-over-right-section__foot-btn btn-primary"><i class="fa fa-floppy-o"></i>Lưu lại
+        </button>
+      </p>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #templateFormAddTieuchicham let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section right-slide-class">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+      <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+      (click)="closeSideMenu(true)"></button>
+    </div>
+    <div style="line-height: 1.25; padding: 0px; height: calc(100vh - 57px);"
+      class="ovic-over-right-section__body footer-no-hint">
+      @if (selectedCauhoi) {
+        <p-splitter panelStyleClass="class-tieuchi-spliter-panel" [panelSizes]="[50,50]"
+          [style]="{'height': '100%'}">
+          <ng-template pTemplate>
+            <div style="width: 100%; height: 100%; background-color: #eaeaea; overflow: auto;">
+              <div class="document-type-a4 document-cauhoi-layout">
+                <div
+                  style="display: flex; align-items: center; padding: 10px; background: var(--orange-100);">
+                  <span style="flex: 1">
+                    <strong>
+                      Câu {{selectedCauhoi['ordering']}} ({{selectedCauhoi['point']}} điểm)
+                    </strong>
+                  </span>
+                  <span class="box-span dat-box">
+                    {{selectedCauhoi['cdr'] | showlabel : chuandaura: 'id' : 'label' }}
+                  </span>
+                  <span class="box-span da-sua-box">
+                    {{selectedCauhoi['private'] ? 'Private':'Public'}}
+                  </span>
+                </div>
+                <div class="cauhoi-content" style="padding: 1cm;">
+                  <div style="border:none; padding: 0px;" [appKatexImg]="selectedCauhoi.id" [appLoadMediaOnText]="selectedCauhoi.id"
+                    class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                    [innerHTML]="selectedCauhoi.desc | safeHtml">
+                  </div>
+                </div>
+                <div style="padding: 1cm;" class="question-content-note">
+                  <p-divider align="left" type="dashed">
+                    <b>Hướng dẫn chấm theo tiêu chí</b>
+                  </p-divider>
+                  @for (item of list_tieuchi_chamdiem; track item; let i = $index) {
+                    <div style="font-size: 14px; padding-bottom: 15px;"
+                      >
+                      @if (item.title) {
+                        <div class="header-tieuchicham">
+                          <strong>{{i + 1}}</strong>.
+                          <strong>{{item.title}} ({{item.point}} điểm)</strong>
+                        </div>
+                      }
+                      @if (item.desc) {
+                        <div [appLoadMediaOnText]="item.id" style="border:none"
+                          class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                          [innerHTML]="item.desc | safeHtml">
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template pTemplate>
+            <div class="content-mat-tab-tieuchicham" style="width: 100%; height: 100%;">
+              <div style="padding: 5px; display: flex; align-items: center; background-color: #ead6fd;"
+                class="content-mat-tab-tieuchicham-top">
+                <span style="flex:1; margin-right: 5px;">
+                  <strong>Tổng tiêu chí:</strong> {{list_tieuchi_chamdiem.length}}
+                  - <strong>Tổng điểm tiêu chí:</strong> {{returnTotalPointTieuChi()}}
+                </span>
+                @if (list_tieuchi_chamdiem.length && selectedCauhoi && selectedCauhoi.status !== 1) {
+                  <button (click)="saveTieuchiChams()"
+                    style="line-height: 1; margin-right: 5px;" class="btn btn-primary">
+                    <i class="fa fa-floppy-o"></i>
+                    Lưu lại
+                  </button>
+                }
+                @if (selectedCauhoi && selectedCauhoi.status !== 1) {
+                  <button (click)="addOneTieuchiChams()"
+                    style="line-height: 1;" class="btn btn-success">
+                    <i class="fa fa-plus"></i>
+                    Thêm tiêu chí
+                  </button>
+                }
+              </div>
+              @if (list_tieuchi_chamdiem && list_tieuchi_chamdiem.length) {
+                <div style="height: calc(100% - 41px); padding: 5px; overflow: auto;"
+                  >
+                  @for (item of list_tieuchi_chamdiem; track item; let i = $index) {
+                    <div class="tieuchicham-card-panel">
+                      <p-panel #panel_tieuchi [collapsed]="item['collapsed']" [toggleable]="true">
+                        <ng-template pTemplate="header">
+                          <div style="width: 100%;">
+                            <div style="display: flex;">
+                              <div class="row form-row" style="flex: 1;margin-right: 5px;">
+                                <div class="col-9">
+                                  <textarea
+                                    [disabled]="selectedCauhoi && selectedCauhoi.status === 1? true: false"
+                                    style="width: 100%; resize: none; height: -webkit-fill-available;"
+                                    cols="2" placeholder="Nhập tiêu đề cho tiêu chí {{i + 1}}"
+                                    class="ovic-input-field" [(ngModel)]="item.title">
+                                  </textarea>
+                                </div>
+                                <div class="col-3">
+                                  <div style="margin-bottom: 5px;" class="p-inputgroup">
+                                    <span style="border-radius: 0px; padding: 0px;"
+                                    class="p-inputgroup-addon">Điểm:</span>
+                                    <input style="width: inherit;"
+                                      [disabled]="selectedCauhoi && selectedCauhoi.status === 1? true: false"
+                                      #input_point_tieuchi
+                                      (keydown)="pointQuestionKeyDown($event,input_point_tieuchi)"
+                                      type="text" class="ovic-input-field"
+                                      [(ngModel)]="item.point">
+                                    </div>
+                                    <div>
+                                      <p-dropdown
+                                        [disabled]="selectedCauhoi && selectedCauhoi.status === 1? true: false"
+                                        [style]="{'width': '100%'}" optionDisabled="disabled"
+                                        optionValue="id" [options]="chuandaura"
+                                        [(ngModel)]="item.cdr" optionLabel="label">
+                                      </p-dropdown>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div>
+                                  <button (click)="deleteTieuchi(item.id)"
+                                    class="btn btn-danger btn-icon btn-transparent">
+                                    <i class="fa fa-trash"></i>
+                                  </button>
+                                </div>
+                              </div>
+                              <div style="padding-top: 0.75rem;">
+                                <span (click)="openHuongdancham(panel_tieuchi,item)"
+                                  class="text-open-huong-dancham">
+                                  <i class="fa fa-angle-double-down"></i>
+                                  Nhập hướng dẫn chấm
+                                </span>
+                              </div>
+                            </div>
+                          </ng-template>
+                          <div class="ovic-vertical__inputs form-setting-lesson edit-hight-200"
+                            style="padding: 0px;">
+                            @if (!item['collapsed']) {
+                              <div class="row form-row form-row-flex-row">
+                                <div class="col-12">
+                                  <label>Hướng dẫn chấm:</label>
+                                  <ovic-ckeditor-document
+                                    (onSaveData)="onChangeEditorTieuchi($event,item)"
+                                    [changeId]="item.id" [autoSave]="true" [default]="item.desc"
+                                    styleClass="vietbaocao-doctument-content">
+                                  </ovic-ckeditor-document>
+                                </div>
+                              </div>
+                            }
+                          </div>
+                        </p-panel>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </ng-template>
+          </p-splitter>
+        }
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #templatePmsDuan let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section right-slide-class">
+      <div class="ovic-over-right-section__head">
+        <h3 class="ovic-over-right-section__header">Danh sách câu hỏi</h3>
+        <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+        (click)="closeSideMenu()"></button>
+      </div>
+      <div style="line-height: 1.25; padding: 5px; height: calc(100vh - 51px - 57px);"
+        class="ovic-over-right-section__body footer-no-hint">
+        <div style="height: 100%;" class="phanquyen-dulieu-content-left ovic-vertical__inputs">
+          <div class="form-row row">
+            <div class="col-12">
+              <input class="ovic-input-field" type="text" [(ngModel)]="searchCauhoi" placeholder="Search">
+            </div>
+          </div>
+          @if ((list_cauhoi | filter: searchCauhoi : ['ordering','id']).length > 0) {
+            <mat-selection-list [multiple]="false" [hideSingleSelectionIndicator]="true" class="selection-list-mat" #duans
+              (selectionChange)="changeSelecDuan($event)"
+              >
+              @for (duan of list_cauhoi | filter: searchCauhoi : ['ordering','id']; track duan) {
+                <mat-list-option
+                  [value]="duan" [disabled]="selectedCauhoi && duan.id === selectedCauhoi.id ? true : false">
+                  <div mat-line style="display: flex; align-items: center;">
+                    <div mat-line style="flex: 1;">
+                      <div mat-line>#{{duan.id}}</div>
+                      <div mat-line style="font-size: 12px;"> </div>
+                    </div>
+                  </div>
+                </mat-list-option>
+              }
+            </mat-selection-list>
+          } @else {
+            <div class="result-search-none">Không tìm thấy câu hỏi nào...</div>
+          }
+        </div>
+      </div>
+      <div class="ovic-dynamic-right-section__foot">
+        <p class="ovic-over-right-section__foot-wrap-buttons">
+          <button (click)="saveTieuchiChamCopy()" type="button"
+            class="btn btn ovic-over-right-section__foot-btn btn-primary btn-primary">
+            <i class="fa fa-floppy-o"></i>Lưu lại
+          </button>
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #templateViewTuluan let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section right-slide-class">
+      <div class="ovic-over-right-section__head">
+        <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+        <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+        (click)="closeSideMenu()"></button>
+      </div>
+      <div style="line-height: 1.25; height: calc(100vh - 57px); font-size: 14px; padding: 0px;"
+        class="ovic-over-right-section__body footer-no-hint">
+        <div style="width: 100%; height: 100%; background-color: #eaeaea; padding: 15px;overflow: auto;">
+          <div class="document-type-a4 document-cauhoi-layout" style="margin: 0px auto; min-height: 100%;">
+            <div style="display: flex; align-items: center; padding: 10px; background: var(--orange-100);">
+              <span style="flex: 1">
+                <strong>
+                  Câu {{selectedCauhoi['ordering']}} ({{selectedCauhoi['point']}} điểm)
+                </strong>
+              </span>
+              <span class="box-span dat-box">
+                {{selectedCauhoi['cdr'] |showlabel : chuandaura: 'id' : 'label' }}
+              </span>
+              <span class="box-span da-sua-box">
+                {{selectedCauhoi['private'] ? 'Private':'Public'}}
+              </span>
+            </div>
+            <div class="cauhoi-content" style="padding: 1cm;">
+              <div style="border:none; padding: 0px;" [appKatexImg]="selectedCauhoi.id" [appLoadMediaOnText]="selectedCauhoi.id"
+                class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                [innerHTML]="selectedCauhoi.desc | safeHtml">
+              </div>
+            </div>
+            @if (selectedCauhoi.tieuchi && selectedCauhoi.tieuchi.length) {
+              <div style="padding: 1cm;"
+                class="question-content-note">
+                <p-divider align="left" type="dashed">
+                  <b>Hướng dẫn chấm theo tiêu chí</b>
+                </p-divider>
+                @for (item of selectedCauhoi.tieuchi; track item; let i = $index) {
+                  <div style="font-size: 14px; padding-bottom: 15px;"
+                    >
+                    @if (item.title) {
+                      <div class="header-tieuchicham">
+                        <strong>{{i + 1}}</strong>.
+                        <strong>{{item.title}} ({{item.point}} điểm)</strong>
+                      </div>
+                    }
+                    @if (item.desc) {
+                      <div [appLoadMediaOnText]="item.id" style="border:none"
+                        class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                        [innerHTML]="item.desc | safeHtml">
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+            <div style="padding: 15px 0px;">
+              @if (selectedCauhoi && selectedCauhoi['comments'] && selectedCauhoi['comments'].length) {
+                <div class="class-duyet-layout"
+                  >
+                  <div style="width: 100%; padding: 15px;" class="list-comment-layout">
+                    <label style="font-weight: 600; margin-bottom: 10px;">Ý KIẾN NHẬN XÉT CỦA THÀNH VIÊN HỘI
+                      ĐỒNG:
+                    </label>
+                    @if (selectedCauhoi['status'] === 1 || selectedCauhoi['status'] === -1) {
+                      <div style="padding-bottom: 10px; border-bottom: 1px solid #c8c8c8; margin-bottom: 10px;"
+                        >
+                        <div>
+                          <label style="width: 150px;">- Duyệt lúc:</label>
+                          {{selectedCauhoi['approved_at'] |
+                          ovicDateTime}}
+                        </div>
+                        <div>
+                          <label style="width: 150px;">- Trạng thái duyệt:</label>
+                          {{selectedCauhoi['status'] === 1?'Đạt':'Yêu cầu sửa'}}
+                        </div>
+                      </div>
+                    }
+                    @for (comment of selectedCauhoi['comments']; track comment; let index = $index) {
+                      <div
+                        class="comment-box">
+                        <div class="inner-comment">
+                          <div class="inner-comment-header">
+                            <div style="flex: 1;">
+                              <span
+                                style="font-weight: 600; margin-right: 10px; text-decoration: underline;">
+                              {{'Ủy viên'+(index + 1)+':'}}</span>
+                            </div>
+                          </div>
+                          @if (comment['children'] && comment['children'].length) {
+                            <div>
+                              @for (children of comment['children']; track children) {
+                                <div
+                                  style="margin-bottom: 15px; ">
+                                  <div [ngClass]="children['status'] === 1?'duyet-comment':'yeucausua-comment'"
+                                    class="conten-comment-box">
+                                    <div class="conten-comment-inner-box"
+                                      [innerHTML]="children.comment">
+                                    </div>
+                                  </div>
+                                  <div style="margin-left: 20px; margin-top: 5px;">
+                                    <span
+                                      style="font-size: 12px; color: #898989; margin-right: 20px; font-style: italic;">{{children.created_at
+                                    | ovicDateTime}}</span>
+                                    <span style="color: #898989; cursor: pointer;"
+                                      (click)="openReply(children,index)">Phản hồi
+                                    ({{children['count_reply']}})</span>
+                                  </div>
+                                  @if (children['reply_open'] === true) {
+                                    <div class="reply-layout">
+                                      <div class="list_reply_comments">
+                                        @for (reply_comment of children['reply_comments']; track reply_comment) {
+                                          <div style="margin-bottom: 15px;"
+                                            >
+                                            <div style="text-align: right; margin-bottom: 5px;">
+                                              <span>{{reply_comment['display_name']}}</span>
+                                            </div>
+                                            <div class="conten-comment-box-left"
+                                              [ngClass]="reply_comment['my_reply_comment']?'my-reply-comment':''">
+                                              <div class="conten-comment-inner-box-left"
+                                                [innerHTML]="reply_comment.comment">
+                                              </div>
+                                            </div>
+                                            <div
+                                              style="margin-right: 20px; margin-top: 5px; text-align: right;">
+                                              <span
+                                                style="font-size: 12px; color: #898989; font-style: italic;">{{reply_comment.created_at
+                                              | ovicDateTime}}</span>
+                                            </div>
+                                          </div>
+                                        }
+                                      </div>
+                                      @if (selectedCourse && userId === selectedCourse.creator_plan_id) {
+                                        <div style="display: flex; position: relative;"
+                                          >
+                                          <div
+                                            style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
+                                            <img style="width: 100%;"
+                                              src="../../../assets/images/a_none.jpg">
+                                            </div>
+                                            <textarea
+                                              style="height: 40px; margin-left: 10px; flex: 1; padding-right: 130px;"
+                                              placeholder="Nhập phản hồi... "
+                                            [(ngModel)]="children['textarea_comment']"></textarea>
+                                            <button
+                                              (click)="saveCommentReply(children , selectedCauhoi, index)"
+                                              style="position: absolute; bottom: 5px; right:5px"
+                                              class="btn btn-primary"><i class="fa fa-paper-plane"></i>Gửi
+                                            phản hồi</button>
+                                          </div>
+                                        }
+                                      </div>
+                                    }
+                                  </div>
+                                }
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+      [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+      <div class="popup-waiting-loading">
+        <label style="width: 100%;">{{waitting_title}}</label>
+        <div class="tn-import-student-progressbar">
+          <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+        </div>
+      </div>
+    </p-dialog>

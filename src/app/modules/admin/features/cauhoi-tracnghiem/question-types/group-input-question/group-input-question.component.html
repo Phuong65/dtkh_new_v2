@@ -1,1 +1,60 @@
-﻿<div class="p-3">group-input-question.component works!</div>
+@if (question) {
+  <div class="group-input-question">
+    @if (childQuestion && childQuestion.length) {
+      <ul class="group-input-question__list">
+        @for (q of childQuestion; track q; let i = $index) {
+          <li class="group-input-question__list__element"
+            [ngClass]="'group-input-question__list__element--size-'+question.config.cols"
+            >
+            @if (!isPresent) {
+              <div class="group-radio-question__block">
+                <div class="group-radio-question__block__head">
+                  <input type="text" pInputText placeholder="Nội dung câu hỏi"
+                    class="group-input-question__option__input group-input-question__option__input--bold"
+                    [(ngModel)]="q.question.question_direction">
+                    <input type="text" pInputText placeholder="Đáp án" class="group-input-question__option__input"
+                      [(ngModel)]="q.answer" (ngModelChange)="updateAnswer(q)">
+                    </div>
+                    <button (click)="deleteAnswer(i)" pButton pRipple icon="pi pi-trash"
+                    class="group-input-question__option__btn-remove p-button-danger p-button-rounded p-button-text p-button-outlined"></button>
+                  </div>
+                } @else {
+                  <div class="group-radio-question__block group-radio-question__block--only-present">
+                    <div class="group-radio-question__block__head">
+                      <b class="group-input-question__option__input group-input-question__option__input--bold">
+                      {{ 1 + i }}) {{ q.question.question_direction }}</b>
+                      <input [disabled]="true" type="text" pInputText placeholder="Đáp án"
+                        class="group-input-question__option__input" [(ngModel)]="q.answer">
+                      </div>
+                    </div>
+                  }
+                </li>
+              }
+            </ul>
+          }
+          @if (!isPresent) {
+            <div class="group-input-question__footer d-flex  flex-column">
+              <div style="margin-bottom: 10px;">
+                <p-checkbox [(ngModel)]="question.config.invertedAnswer" [binary]="true"
+                label="Đảo vị trí của phương án trả lời"></p-checkbox>
+              </div>
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="group-input-question__note text-left text-secondary">Trường hợp câu hỏi có nhiều đáp án đúng,
+                  thì
+                  các đáp án được phân cách nhau
+                  <br>bởi dấu chấm phẩy( ";") và không phân biệt chữ hoa, chữ thường. Ví dụ : 1; one; first</small>
+                  <div class="ovic-vertical__inputs ovic-vertical__inputs--layout-2">
+                    <p class="form-row mt-0">
+                      <p-dropdown class="input-element ovic-dropdown-style" [filter]="false" [options]="colOptions"
+                        [(ngModel)]="question.config.cols" optionLabel="label" optionValue="value"
+                      optionDisabled="disable" placeholder="--Lựa chọn--"></p-dropdown>
+                    </p>
+                  </div>
+                  <button (click)="addMoreAnswerOption()" class="typical-question__btn-add">
+                    <i class="pi pi-plus-circle"></i>Thêm câu hỏi
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }

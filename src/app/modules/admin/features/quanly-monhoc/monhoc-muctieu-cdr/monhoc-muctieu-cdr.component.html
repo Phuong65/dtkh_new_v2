@@ -1,1 +1,361 @@
-﻿<div class="p-3">monhoc-muctieu-cdr.component works!</div>
+<div class="layout_component_container">
+  <div class="document-type-a4-vertical" style="position: relative;">
+    <div class="muctieu-chung" style="padding-bottom: 20px;">
+      <b style="font-size: 14px; margin-bottom: 10px;">1. Mục tiêu chung</b>
+      @if (selectedCourse) {
+        <ovic-editor [showSaveButton]="true" height="auto"
+        (saveText)="saveMucTieuChung($event)" [default]="selectedCourse.muctieu"></ovic-editor>
+      }
+    </div>
+    <div style="padding-bottom: 20px;">
+      <b style="font-size: 14px; margin-bottom: 10px;">2. Mục tiêu chi tiết</b>
+      <p-table [reorderableColumns]="true" [value]="list_course_muctieu"
+        styleClass="table-reBorder table-course-muctieu">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width:3rem"></th>
+            <th style="width: 120px; text-align: center; ">Thứ tự mục tiêu</th>
+            <th>Nội dung mục tiêu</th>
+            <th style="width:80px; text-align: center;">Thao tác</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-muctieu let-rowIndex="rowIndex">
+          <tr [pReorderableRow]="rowIndex">
+            <td style="text-align: center;">
+              <span class="pi pi-bars" [pReorderableRowHandle]="rowIndex"></span>
+            </td>
+            <td style="text-align: center;">{{muctieu.kyhieu}}</td>
+            <td class="td-text-area" pEditableColumn>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <textarea (focus)="autoResize($event)" (input)="autoResize($event)"
+                    style="overflow:hidden;resize:none;" (keydown)="blockArrowKeys($event)"
+                    [attr.spellcheck]="false" class="editor-in-table" [(ngModel)]="muctieu.noidung">
+                  </textarea>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  @if (muctieu.noidung) {
+                    <div class="text-innerhtml-raw"
+                      [innerHTML]="muctieu.noidung">
+                    </div>
+                  }
+                  @if (!muctieu.noidung) {
+                    <div style="color:#9fa9b7">
+                      Click vào đây để nhập nội dung...
+                    </div>
+                  }
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td style="text-align: center;">
+              <!-- <button (click)="addCdrOfCourseMuctieu(muctieu)"
+              style="line-height: 1; margin-right: 2.5px;" class="btn btn-success">
+              <i class="fa fa-plus"></i>
+              Thêm CĐR
+            </button> -->
+            <button style="line-height: 1; margin-left: 2.5px;"
+              (click)="deleteCourseMuctieuchitiet(muctieu)" class="btn btn-danger btn-icon">
+              <i class="fa fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="summary">
+        <div class="flex align-items-center " style="text-align: right;">
+          <button (click)="addMuctieu()" style="line-height: 1; margin-right: 5px;"
+            class="btn btn-success">
+            <i class="fa fa-plus"></i>
+            Thêm mục tiêu
+          </button>
+          <button (click)="saveMuctieuChitiet()" style="line-height: 1;" class="btn btn-primary">
+            <i class="fa fa-floppy-o"></i>
+            Lưu lại
+          </button>
+        </div>
+      </ng-template>
+    </p-table>
+  </div>
+  <div style="padding-bottom: 20px;">
+    <b style="font-size: 14px; margin-bottom: 10px;">3. Chuẩn đầu ra</b>
+    <p-table [reorderableColumns]="true" [value]="list_course_clo"
+      styleClass="table-reBorder table-course-muctieu">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width:3rem"></th>
+          <th style="width: 100px; text-align: center; ">Thứ tự CĐR</th>
+          <th>Nội dung CĐR</th>
+          @for (muctieu of list_course_muctieu; track muctieu) {
+            <th style="text-align: center; width: 80px">
+              {{muctieu.kyhieu}}
+            </th>
+          }
+          <th style="width:80px; text-align: center;">Thao tác</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-clo let-rowIndex="rowIndex">
+        <tr [pReorderableRow]="rowIndex">
+          <td style="text-align: center;">
+            <span class="pi pi-bars" [pReorderableRowHandle]="rowIndex"></span>
+          </td>
+          <td style="text-align: center;">{{clo.kyhieu}}</td>
+          <td class="td-text-area" pEditableColumn>
+            <p-cellEditor>
+              <ng-template pTemplate="input">
+                <textarea placeholder="Nhập nội dung tại đây..." (focus)="autoResize($event)"
+                  (input)="autoResize($event)" style="overflow:hidden;resize:none;"
+                  (keydown)="blockArrowKeys($event)" [attr.spellcheck]="false"
+                  class="editor-in-table" [(ngModel)]="clo.noidung">
+                </textarea>
+              </ng-template>
+              <ng-template pTemplate="output">
+                @if (clo.noidung) {
+                  <div class="text-innerhtml-raw" [innerHTML]="clo.noidung">
+                  </div>
+                }
+                @if (!clo.noidung) {
+                  <div style="color:#9fa9b7">
+                    Click vào đây để nhập nội dung...
+                  </div>
+                }
+              </ng-template>
+            </p-cellEditor>
+          </td>
+          @for (muctieu of list_course_muctieu; track muctieu) {
+            <td (click)="chooseMuctieuForClo(clo,muctieu)"
+              style="text-align: center; width: 80px; cursor: pointer;"
+              >
+              <span class="check-course-muctieu">
+                @if (muctieu.id === clo.course_muctieu_chitiet_id) {
+                  <i
+                  class="fa fa-check-square-o blue"></i>
+                }
+                @if (muctieu.id !== clo.course_muctieu_chitiet_id) {
+                  <i class="fa fa-square-o"></i>
+                }
+              </span>
+            </td>
+          }
+          <td style="text-align: center;">
+            <button (click)="deleteClo(clo)" style="line-height: 1;" class="btn btn-danger btn-icon">
+              <i class="fa fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="summary">
+        <div class="flex align-items-center " style="text-align: right;">
+          <button (click)="addClo()" style="line-height: 1; margin-right: 5px;" class="btn btn-success">
+            <i class="fa fa-plus"></i>
+            Thêm CĐR
+          </button>
+          <button (click)="saveClo()" style="line-height: 1;" class="btn btn-primary">
+            <i class="fa fa-floppy-o"></i>
+            Lưu lại
+          </button>
+        </div>
+      </ng-template>
+    </p-table>
+  </div>
+  <div style="padding-bottom: 20px;">
+    <b style="font-size: 14px; margin-bottom: 10px;">4. Mối liên hệ giữa các chuẩn đầu ra học phần(CLO) và chuẩn
+    đầu ra của CTDT(PLO) và các chỉ số PI</b>
+    <p-table [reorderableColumns]="true" [value]="list_ctdt" styleClass="table-reBorder table-course-muctieu">
+      <ng-template pTemplate="header">
+        <tr>
+          <th rowspan="2" style="width:3rem; text-align: center;">TT</th>
+          <th rowspan="2" style="width: 200px;">Tên CTDT</th>
+          <th style="text-align: center;"
+            [attr.colspan]="list_course_clo.length?list_course_clo.length:1">
+            Chuẩn đầu ra học phần
+          </th>
+        </tr>
+        <tr>
+          @for (clo of list_course_clo; track clo) {
+            <th style="text-align: center;">
+              {{clo.kyhieu}}
+            </th>
+          }
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-ctdt let-rowIndex="rowIndex">
+        <tr>
+          <td style="width:3rem; text-align: center;">{{rowIndex + 1}}</td>
+          <td>{{ctdt.ten}}</td>
+          @for (clo of list_course_clo; track clo) {
+            <td [ngClass]="selectedClo && selectedCtdt && clo.id === selectedClo.id && ctdt.id === selectedCtdt.id?'activity-cell-clo':''"
+              style="cursor: pointer;" (click)="openLayoutCtdtCdr(clo, ctdt )"
+              >
+              @if (clo['ctdt_cdr_'.concat(ctdt.id.toString())]) {
+                <div>
+                  <ul style="margin-bottom: 0px; list-style: none; padding: 0px;">
+                    @for (pi of clo['ctdt_cdr_'.concat(ctdt.id.toString())]; track pi) {
+                      <li>
+                        <span>- {{pi.parent_id | showlabel: ctdt['ctdt_cdr'] :
+                          'id':'kyhieu'}}</span>/<span>{{pi.kyhieu}}</span>
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                } @else {
+                  <div style="width:100%;height:100%;color:#9E9E9E">Click vào đây để chọn PIs</div>
+                }
+                <ng-template #emptyClo>
+                  <div style="width:100%;height:100%;color:#9E9E9E">Click vào đây để chọn PIs</div>
+                </ng-template>
+              </td>
+            }
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="summary">
+          <div class="flex align-items-center " style="text-align: right;">
+            <button (click)="savePiOnClo()" style="line-height: 1;" class="btn btn-primary">
+              <i class="fa fa-floppy-o"></i>
+              Lưu lại
+            </button>
+          </div>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<ng-template #templateCourseCdr>
+  <div class="ovic-over-right-section">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+      <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
+    </div>
+    <div class="ovic-over-right-section__body" style="height: calc(100vh - 51px - 57px - 18px);">
+      <div class="ovic-vertical__inputs" style="line-height: 1.5;">
+        <p-table [reorderableColumns]="true" [value]="list_course_clo_add"
+          styleClass="table-reBorder table-course-muctieu">
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width:3rem"></th>
+              <th style="width: 100px; text-align: center; ">Thứ tự</th>
+              <th>Nội dung</th>
+              <th style="width:120px; text-align: center;">Thao tác</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-clo let-rowIndex="rowIndex">
+            <tr [pReorderableRow]="rowIndex">
+              <td style="text-align: center;">
+                <span class="pi pi-bars" [pReorderableRowHandle]="rowIndex"></span>
+              </td>
+              <td style="text-align: center;">{{clo.kyhieu}}</td>
+              <td class="td-text-area" pEditableColumn>
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <textarea placeholder="Nhập nội dung tại đây..." (focus)="autoResize($event)"
+                      (input)="autoResize($event)" style="overflow:hidden;resize:none;"
+                      (keydown)="blockArrowKeys($event)" [attr.spellcheck]="false"
+                      class="editor-in-table" [(ngModel)]="clo.noidung">
+                    </textarea>
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    @if (clo.noidung) {
+                      <div class="text-innerhtml-raw" [innerHTML]="clo.noidung">
+                      </div>
+                    }
+                    @if (!clo.noidung) {
+                      <div style="color:#9fa9b7">
+                        Click vào đây để nhập nội dung...
+                      </div>
+                    }
+                  </ng-template>
+                </p-cellEditor>
+              </td>
+              <td style="text-align: center;">
+                <button (click)="deleteClo(clo)" style="line-height: 1;"
+                  class="btn btn-danger btn-icon">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <div class="ovic-dynamic-right-section__foot">
+      <p class="ovic-form-notes ovic-over-right-section__foot-ovic-input-line">
+        <i class="pi pi-info-circle"></i>các trường có đánh dấu ( <span class="ovic-mark">*</span> ) là bắt
+        buộc phải nhập
+      </p>
+      <p class="ovic-over-right-section__foot-wrap-buttons">
+        <button (click)="addClo()" style="line-height: 1; margin-right: 5px;" class="btn btn-success">
+          <i class="fa fa-plus"></i>
+          Thêm CĐR
+        </button>
+        <button class="btn ovic-over-right-section__foot-btn btn-primary">
+          <i class="fa fa-floppy-o"></i>Lưu lại
+        </button>
+      </p>
+    </div>
+  </div>
+</ng-template>
+
+
+<ng-template #templateCtdtCdr>
+  <div class="ovic-over-right-section">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">Chọn PI</h3>
+      <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
+    </div>
+    <div class="ovic-over-right-section__body" style="height: calc(100vh  - 57px);line-height: 1.5; padding: 0px;">
+      @if (selectedCtdt && selectedCtdt['ctdt_cdr'] && selectedCtdt['ctdt_cdr'].length) {
+        <div
+          class="container plo-container">
+          @for (plo of selectedCtdt['ctdt_cdr']; track plo) {
+            <div class="card mb-3 shadow-sm">
+              <div class="card-header bg-light d-flex align-items-start py-2">
+                <div class="custom-control custom-checkbox mt-1">
+                  <input type="checkbox" class="custom-control-input" [id]="'plo-' + plo.id"
+                    [checked]="isAllSelected(plo)" [indeterminate]="isIndeterminate(plo)"
+                    (change)="toggleAllChildren(plo, $event)">
+                    <label class="custom-control-label" [for]="'plo-' + plo.id"></label>
+                  </div>
+                  <div class="plo-content">
+                    <span class="badge badge-primary mr-2">{{ plo.kyhieu }}</span>
+                    <span class="font-weight-bold" [innerHTML]="plo.noidung | safeHtmlDecode"></span>
+                  </div>
+                </div>
+                @if (plo.items?.length > 0) {
+                  <ul class="list-group list-group-flush">
+                    @for (pi of plo.items; track pi) {
+                      <li class="list-group-item d-flex align-items-start pl-5 py-2">
+                        <div class="custom-control custom-checkbox mt-1">
+                          <input type="checkbox" class="custom-control-input" [id]="'pi-' + pi.id"
+                            [(ngModel)]="selectedStates[pi.id]" (change)="onItemSelect()">
+                            <label class="custom-control-label" [for]="'pi-' + pi.id"></label>
+                          </div>
+                          <div class="pi-content">
+                            <span class="text-muted font-weight-bold mr-2">{{ pi.kyhieu }}:</span>
+                            <span class="text-secondary" [innerHTML]="pi.noidung | safeHtmlDecode"></span>
+                          </div>
+                        </li>
+                      }
+                    </ul>
+                  }
+                  @if (plo.items?.length === 0) {
+                    <div class="card-body py-2 pl-5">
+                      <small class="text-muted font-italic">Không có chỉ số PI đi kèm.</small>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </ng-template>
+
+    <p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+      [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+      <div class="popup-waiting-loading">
+        <label style="width: 100%;">Đang lưu dữ liệu, vui lòng chờ...</label>
+        <div class="tn-import-student-progressbar">
+          <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+        </div>
+      </div>
+    </p-dialog>

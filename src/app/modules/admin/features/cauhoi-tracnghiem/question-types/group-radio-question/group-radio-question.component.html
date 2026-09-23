@@ -1,1 +1,84 @@
-﻿<div class="p-3">group-radio-question.component works!</div>
+@if (question) {
+  <div class="group-radio-question question-type-radio">
+    @if (question.children.length) {
+      <ul class="question-type-radio__list">
+        @for (childQuestion of question.children; track childQuestion; let i = $index) {
+          <li class="question-type-radio__list__element"
+            [ngClass]="isPresent?'question-type-radio__list__element--size-'+question.config.cols:'question-type-radio__list__element--size-1'"
+            >
+            @if (!isPresent) {
+              <div class="group-radio-question__block">
+                <div class="group-radio-question__block__head flex">
+                  <!-- <input type="text" pInputText placeholder="Nội dung câu hỏi"
+                  class="group-radio-question__block__input" [(ngModel)]="childQuestion.question_direction"> -->
+                  <!-- <app-input-question-direction [abstractControl]="childQuestion.question_direction"></app-input-question-direction> -->
+                  <div class="edit-hight-100 editor-question-direction">
+                    <ovic-ckeditor-document (onChange)="onChangeQuestionDirection($event,childQuestion)"
+                      [default]="childQuestion.question_direction">
+                    </ovic-ckeditor-document>
+                  </div>
+                  <button (click)="deleteAnswer(i)" pButton pRipple icon="pi pi-trash"
+                  class="question-type-radio__option__btn-remove p-button-danger p-button-rounded p-button-text p-button-outlined"></button>
+                </div>
+                <div class="group-radio-question__block__buttons">
+                  @for (answer of childQuestion.answer_option; track answer) {
+                    <button
+                      (click)="markCorrectAnswer(childQuestion,answer.id)"
+                      class="group-radio-question__block__buttons__btn"
+                      [class.question-type-radio__option--correct]="isCorrectAnswer(childQuestion,answer.id)">
+                    {{ answer.value }}</button>
+                  }
+                </div>
+              </div>
+            }
+            @if (isPresent) {
+              <div class="group-radio-question__block">
+                <div class="group-radio-question__block__head">
+                  @if (!childQuestion.config.contentHtml) {
+                    <div class="lqc-present-single-question__direction">
+                    {{childQuestion.question_direction}}</div>
+                  }
+                  @if (childQuestion.config.contentHtml) {
+                    <div style="border:none"
+                      class="lqc-present-single-question__direction ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                      [appLoadMediaOnText]="childQuestion['id']" [appKatexImg]="childQuestion['id']"
+                      [innerHTML]="childQuestion.question_direction | safeHtmlSingle">
+                    </div>
+                  }
+                  <!--                    <input type="text" pInputText placeholder="Nội dung câu hỏi" class="group-radio-question__block__input" [value]="childQuestion.question_direction" disabled="disabled">-->
+                  <!-- <button (click)="deleteAnswer(i)" pButton pRipple icon="pi pi-trash" class="question-type-radio__option__btn-remove p-button-danger p-button-rounded p-button-text p-button-outlined"></button>-->
+                </div>
+                <div class="group-radio-question__block__buttons">
+                  @for (answer of childQuestion.answer_option; track answer) {
+                    <button
+                      class="group-radio-question__block__buttons__btn"
+                      [class.question-type-radio__option--correct]="isCorrectAnswer(childQuestion,answer.id)">{{
+                    answer.value }}</button>
+                  }
+                </div>
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    }
+    @if (!isPresent) {
+      <div class="question-type-radio__footer d-flex justify-content-between align-items-center">
+        @if (question.question_type !== 'group-radio') {
+          <p-checkbox [(ngModel)]="question.config.invertedAnswer"
+          [binary]="true" label="Đảo vị trí của phương án trả lời"></p-checkbox>
+        }
+        <div class="ovic-vertical__inputs ovic-vertical__inputs--layout-2">
+          <p class="form-row mt-0">
+            <p-dropdown class="input-element ovic-dropdown-style" [filter]="false" [options]="colOptions"
+              [(ngModel)]="question.config.cols" optionLabel="label" optionValue="value" optionDisabled="disable"
+            placeholder="--Lựa chọn--"></p-dropdown>
+          </p>
+        </div>
+        <button (click)="addMoreAnswerOption()" class="typical-question__btn-add">
+          <i class="pi pi-plus-circle"></i>Thêm câu hỏi
+        </button>
+      </div>
+    }
+  </div>
+}

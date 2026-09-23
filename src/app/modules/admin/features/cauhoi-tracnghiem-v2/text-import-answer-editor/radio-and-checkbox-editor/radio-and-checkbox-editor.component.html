@@ -1,1 +1,100 @@
-﻿<div class="p-3">radio-and-checkbox-editor.component works!</div>
+<div class="quiz-viewport">
+  <div>
+    @if (av === 1) {
+      <div class="part-container">
+        <div class="part-header p-3 mb-5">
+          <div class="d-flex align-items-center mb-1">
+            <span class="part-title-text">{{ course_question['title_part'] }}</span>
+          </div>
+          <div [appKatexImg]="course_question.id" [appLoadMediaOnText]="course_question.id"
+            class="part-desc-text mb-2 ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+            [innerHTML]="course_question.question_direction | safeHtml">
+          </div>
+          @if (course_question.media) {
+            <audio controls class="w-100 audio-custom">
+              <source  [src]="course_question.media.path | ictuMediaLink : course_question.media.source : token | ovicSafeUrl">
+            </audio>
+          }
+        </div>
+        <div class="questions-list">
+          @for (child_q of course_question.children; track child_q; let i = $index) {
+            <ng-container *ngTemplateOutlet="questionTmpl; context: { $implicit: child_q, idx: i + 1 }">
+            </ng-container>
+          }
+        </div>
+      </div>
+    }
+
+    @if (av !== 1) {
+      <div>
+        <ng-container *ngTemplateOutlet="questionTmpl; context: { $implicit: course_question, idx: 1 }">
+        </ng-container>
+      </div>
+    }
+  </div>
+
+  <ng-template #questionTmpl let-q>
+    <div class="question-block">
+      <div class="question-header-section mb-3" [ngClass]="av === 1? 'font-weigth-700 p-2':''">
+        <div class="d-flex align-items-start">
+          @if (q.question_number && q.question_number !== 0) {
+            <span class="q-index-tag">
+              {{av === 1?q.question_number:'Câu ' +q.question_number}}:
+            </span>
+          }
+          <div [innerHTML]="q.question_direction | safeHtml" [appKatexImg]="q.id" [appLoadMediaOnText]="q.id"
+            class="q-content-text flex-grow-1 ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred">
+          </div>
+        </div>
+      </div>
+
+      <!-- Toolbar: chọn số đáp án / 1 hàng cho câu này (đặt NGOÀI question-header-section) -->
+      <div class="question-toolbar d-flex justify-content-end align-items-center mb-2"
+        (click)="$event.stopPropagation()">
+        <span class="toolbar-label">Hiển thị / hàng</span>
+        <div class="btn-group btn-toggle" role="group" aria-label="Cols per row">
+          @for (n of [1,2,3,4]; track n) {
+            <button type="button" class="btn btn-toggle-item"
+                        [ngClass]="{
+                          'active': (q.config && q.config.cols === n) || (!q.config && n === 2)
+                        }"
+              [title]="'Số cột: ' + n"
+            (click)="setCols(q, n)">{{n}}</button>
+          }
+        </div>
+      </div>
+
+      <div class="row no-gutters">
+        @for (ans of q.answer_option; track ans; let i = $index) {
+          <div [ngClass]="getColClass(q)" class="p-1">
+                    <div class="ans-card" [ngClass]="{
+                         'type-circle': q.question_type === 'radio',
+                         'type-square': q.question_type === 'checkbox',
+                         'state-active': ans.isSelected
+                       }" (click)="onSelect(q, ans)">
+              <div class="d-flex align-items-center h-100">
+                <div class="ans-label mr-2">{{getKey(i) }}</div>
+                <div class="ans-body flex-grow-1">
+                  <div [innerHTML]="ans.value | safeHtml" [appKatexImg]="ans.id"
+                    [appLoadMediaOnText]="ans.id"
+                    class="ans-txt ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Đệ quy: render children đến tận leaf -->
+      @if (q.children && q.children.length) {
+        <div class="questions-list pl-3 border-left mt-3">
+          @for (child_q of q.children; track child_q) {
+            <ng-container *ngTemplateOutlet="questionTmpl; context: { $implicit: child_q }">
+            </ng-container>
+          }
+        </div>
+      }
+    </div>
+  </ng-template>
+</div>

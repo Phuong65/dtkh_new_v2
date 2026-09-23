@@ -1,1 +1,551 @@
-﻿<div class="p-3">thuongxuyen-duan.component works!</div>
+<div class="duan-layout" style="padding: 5px;">
+  <p-table [value]="list_tuluan"
+    styleClass="tbl-danhSachUser table-reBorder table-scroll-able table-able-dropdown-p-table">
+    <ng-template pTemplate="caption">
+      <div style="display: flex; align-items: center;">
+        <span style="font-size: 14px; flex: 1;">{{activity.title}}</span>
+        @if (activity && activity.ordering === 0) {
+          <button (click)="createCodeTuluan()" style="line-height: 1;"
+            class="btn btn-success">
+            <i class="fa fa-plus"></i>Tạo dự án mới
+          </button>
+        }
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 80px;text-align: center;">Mã dự án</th>
+        <th style="width: 500px;">Tên dự án</th>
+        <th style="width: 150px; text-align: center;">SL tiêu chí</th>
+        <th style="width: 150px; text-align: center;">Mức độ truy cập</th>
+        <th style="width: 100px;text-align: center;">Trạng thái</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-test let-rowIndex="rowIndex">
+      <tr [ngClass]="selectedTuluan && selectedTuluan.id === test.id?'activity-row':''">
+        <td style="width: 80px;text-align: center;">
+          {{test['id']}}
+        </td>
+        <td style="cursor: pointer;">
+          <div style="display: flex; align-items: center; justify-content: center;">
+            <span style="flex:1">{{test['title']}}</span>
+            <div class="action-button-tuluan">
+              @if (test['status'] !== 1 && selectedActivity['ordering'] !== 0 && test['list_tieuchi'] && test['list_tieuchi'].length === 0) {
+                <button
+                  (click)="openListDuanTuCopyTieuchi(test)" ngbTooltip="Sao chép tiêu chí từ dự án khác"
+                  container="body" placement="left" style="margin-right: 5px;" pButton pRipple
+                  type="button" icon="pi pi-copy" class="p-button-rounded p-button-text p-button-success">
+                </button>
+              }
+              <button ngbTooltip="Xem dự án" container="body" placement="left" style="margin-right: 5px;"
+                (click)="onViewTuluan(test)" pButton pRipple type="button" icon="pi pi-eye"
+                class="p-button-rounded p-button-text p-button-plain">
+              </button>
+              @if (test['status'] !== 1 && selectedActivity['ordering'] !== 0) {
+                <button
+                  (click)="openAddTieuchicham(test)" ngbTooltip="Nhập tiêu chí chấm" container="body"
+                  placement="left" style="margin-right: 5px;" pButton pRipple type="button"
+                  icon="pi pi-list" class="p-button-rounded p-button-text p-button-help">
+                </button>
+              }
+              @if (test['status'] !== 1 && selectedActivity['ordering'] === 0 ) {
+                <button ngbTooltip="Sửa dự án" container="body" placement="left" style="margin-right: 5px;"
+                  (click)="editCodeTuluan(test)" pButton pRipple type="button" icon="pi pi-file-edit"
+                  class="p-button-rounded p-button-text">
+                </button>
+              }
+              @if (test['status'] !== 1) {
+                <button ngbTooltip="Xóa dự án" container="body" placement="left"
+                  (click)="deleteTuluan(test)" pButton pRipple type="button"
+                  icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-text">
+                </button>
+              }
+            </div>
+          </div>
+        </td>
+        <td style="width: 150px; text-align: center;">
+          {{test['list_tieuchi'].length}}
+        </td>
+        <td style="width: 150px; text-align: center;">
+          {{test['private']?'Private':'Public'}}
+        </td>
+        <td style="width: 100px; text-align: center;">
+          <div>
+            @switch (test['status']) {
+              @case (0) {
+                <span class="action-icon status-is-deactive">
+                  Chờ duyệt
+                </span>
+              }
+              @case (1) {
+                <span class="action-icon status-is-active">
+                  Đạt
+                </span>
+              }
+              @case (-1) {
+                <span class="action-icon status-is-redo">
+                  Chưa đạt
+                </span>
+              }
+              @case (-2) {
+                <span class="action-icon status-is-require">
+                  Yêu cầu duyệt
+                </span>
+              }
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage" let-car let-columns="columns">
+      <tr>
+        <td colspan="5">
+          Không có dữ liệu
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<ng-template #templateFormAddTuluanV2 let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section right-slide-class">
+    <div class="ovic-over-right-section__head" style="display: flex; align-items: center;">
+      <h3 style="flex: 1;" class="ovic-over-right-section__header">
+        {{selectedActivity?selectedActivity.title:""}} - {{formTitle}}
+      </h3>
+      <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+        (click)="closeForm()">
+      </button>
+    </div>
+    <div style="line-height: 1.25; padding: 0px; height: calc(100vh - 57px - 50px);"
+      class="ovic-over-right-section__body footer-no-hint">
+      <div class="ovic-vertical__inputs form-setting-lesson edit-hight-500">
+        <form [formGroup]="formData">
+          <div class="row form-row form-row-flex-row">
+            <div class="col-12">
+              <label>Tên dự án:<span class="ovic-mark">*</span></label>
+              <input type="text" class="ovic-input-field" formControlName="title">
+            </div>
+            <!-- <div class="col-3">
+            <label>Điểm:<span class="ovic-mark">*</span></label>
+            <input formControlName="point" #input_point type="text" class="ovic-input-field"
+              (keydown)="pointQuestionKeyDown($event,input_point)"
+              (keyup)="pointQuestionKeyup($event,input_point)">
+            </div> -->
+            <!-- <div class="col-3">
+            <label>Thời gian làm bài (phút):<span class="ovic-mark">*</span></label>
+            <input (keydown)="pointQuestionKeyDown($event,input_point)" type="number"
+              class="ovic-input-field" formControlName="time_duration">
+            </div> -->
+          </div>
+          <div class="row form-row form-row-flex-row">
+            <div class="col-9">
+              <label>CĐR liên quan:<span class="ovic-mark">*</span></label>
+              <p-multiSelect [baseZIndex]="1099" appendTo="body" (onChange)="onSelectCDR()"
+                selectedItemsLabel="{0} items selected" formControlName="activity_cdr_ids"
+                [showClear]="true" [options]="list_activity_cdr" optionValue="id">
+              </p-multiSelect>
+            </div>
+            <div class="col-3">
+              <label>Mức độ truy cập:<span class="ovic-mark"></span></label>
+              <ovic-groups-radio-v2 group_name="select_private" [columns]="2" [formField]="f['private']"
+                [options]="select_private" optionId="id" optionLabel="label"
+                [defaultValue]="f['private'].value">
+              </ovic-groups-radio-v2>
+            </div>
+          </div>
+          <div class="row form-row form-row-flex-row">
+            <div class="col-12">
+              <label>CĐR của câu hỏi:<span class="ovic-mark">*</span></label>
+              <ovic-groups-radio-v2 [disabled_item]="true" group_name="CHUAN_DAU_RA" optionLabel="label"
+                [columns]="6" [options]="chuandaura" [defaultValue]="f['cdr']['value']"
+                [formField]="f['cdr']" optionId="id">
+              </ovic-groups-radio-v2>
+            </div>
+          </div>
+          <div class="row form-row form-row-flex-row">
+            <div class="col-12">
+              <label>Nội dung:<span class="ovic-mark">*</span></label>
+              <ovic-ckeditor-document [changeId]="selectedTuluan?selectedTuluan.id:0" [autoSave]="true"
+                [formField]="f['desc']" [default]="f['desc'].value"
+                styleClass="vietbaocao-doctument-content">
+              </ovic-ckeditor-document>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="ovic-dynamic-right-section__foot">
+      <p class="ovic-over-right-section__foot-wrap-buttons">
+        @if (selectedTuluan && selectedTuluan.status === -1) {
+          <button (click)="saveCourseTuluan(true)"
+            type="button" class="btn ovic-over-right-section__foot-btn btn-primary"><i
+          class="fa fa-floppy-o"></i>Lưu lại và yêu cầu duyệt
+        </button>
+      }
+      <button (click)="saveCourseTuluan()" type="button"
+        class="btn ovic-over-right-section__foot-btn btn-primary"><i class="fa fa-floppy-o"></i>Lưu lại
+      </button>
+    </p>
+  </div>
+</div>
+</ng-template>
+
+<ng-template #templateFormViewTuluan let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section right-slide-class">
+    <div class="ovic-over-right-section__head" style="display: flex; align-items: center;">
+      <h3 class="ovic-over-right-section__header" style="flex:1">{{selectedTuluan.title}}</h3>
+      <div class="action-button-next-back">
+        <button style="line-height: 1; margin-right: 5px" (click)="openNewQuestion('back')"
+          class="btn btn-success btn-angle"><i class="pi pi-angle-double-left"></i>Đề trước</button>
+          <button style="line-height: 1;margin-right: 5px" (click)="openNewQuestion('next')"
+            class="btn btn-success btn-angle">Đề sau<i class="pi pi-angle-double-right"
+          style="margin-left: 5px; margin-right: 0px;"></i></button>
+        </div>
+        <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+        (click)="closeForm()"></button>
+      </div>
+      <div style="line-height: 1.25; padding: 0px; height: calc(100vh - 57px); background-color: #eaeaea;"
+        class="ovic-over-right-section__body footer-no-hint tuluan-comment-slide">
+        <app-view-thuongxuyen-tuluan [hideNote]="selectedActivity.ordering === 0 ? true: false"
+          [course_plan_activity_id]="selectedActivity.ordering === 0? null : selectedActivity.id"
+          [courseSelected]="courseSelected" [tuluan]="selectedTuluan">
+        </app-view-thuongxuyen-tuluan>
+        @if (selectedActivity.ordering === 0) {
+          <div class="duyet_tieu_chi_cham">
+            @for (_plan of list_plan_tieu_chi_cham; track _plan) {
+              <div style="margin-top: 40px;"
+                class="question-content-note">
+                <p-divider align="left" type="dashed">
+                  <b>{{_plan.title}}</b>
+                </p-divider>
+                @if (_plan['_tieuchicham'] ) {
+                  <div>
+                    @for (item of _plan['_tieuchicham']; track item; let i = $index) {
+                      <div style="padding: 0 0.6em; font-size: 14px; padding-bottom: 15px;"
+                        >
+                        @if (item.title) {
+                          <div class="header-tieuchicham">
+                            <strong>{{i + 1}}</strong>.
+                            <strong>{{item.title}} ({{item.point}} điểm)</strong>
+                          </div>
+                        }
+                        @if (!item.title) {
+                          <div class="header-tieuchicham">
+                            <strong>{{item.ordering}}</strong>. Chưa có tiêu đề cho tiêu chí
+                          </div>
+                        }
+                        @if (item.desc) {
+                          <div [appLoadMediaOnText]="item.id" style="border:none"
+                            class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                            [innerHTML]="item.desc | safeHtml">
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+        <div style="padding: 15px 0px;">
+          @if (selectedTuluan && selectedTuluan['comments'] && selectedTuluan['comments'].length) {
+            <div class="class-duyet-layout"
+              >
+              <div style="width: 100%; padding: 15px;" class="list-comment-layout">
+                <label style="font-weight: 600; margin-bottom: 10px;">Ý KIẾN NHẬN XÉT CỦA THÀNH VIÊN HỘI ĐỒNG:
+                </label>
+                @if (selectedTuluan['status'] === 1 || selectedTuluan['status'] === -1) {
+                  <div style="padding-bottom: 10px; border-bottom: 1px solid #c8c8c8; margin-bottom: 10px;"
+                    >
+                    <div>
+                      <label style="width: 150px;">- Duyệt lúc:</label> {{selectedTuluan['approved_at'] |
+                      ovicDateTime}}
+                    </div>
+                    <div>
+                      <label style="width: 150px;">- Trạng thái duyệt:</label>
+                      {{selectedTuluan['status'] === 1?'Đạt':'Yêu cầu sửa'}}
+                    </div>
+                  </div>
+                }
+                @for (comment of selectedTuluan['comments']; track comment; let index = $index) {
+                  <div class="comment-box">
+                    <div class="inner-comment">
+                      <div class="inner-comment-header">
+                        <div style="flex: 1;">
+                          <span style="font-weight: 600; margin-right: 10px; text-decoration: underline;">
+                          {{'Ủy viên'+(index + 1)+':'}}</span>
+                        </div>
+                      </div>
+                      @if (comment['children'] && comment['children'].length) {
+                        <div>
+                          @for (children of comment['children']; track children) {
+                            <div style="margin-bottom: 15px; ">
+                              <div [ngClass]="children['status'] === 1?'duyet-comment':'yeucausua-comment'"
+                                class="conten-comment-box">
+                                <div class="conten-comment-inner-box" [innerHTML]="children.comment">
+                                </div>
+                              </div>
+                              <div style="margin-left: 20px; margin-top: 5px;">
+                                <span
+                                  style="font-size: 12px; color: #898989; margin-right: 20px; font-style: italic;">{{children.created_at
+                                | ovicDateTime}}</span>
+                                <span style="color: #898989; cursor: pointer;"
+                                  (click)="openReply(children,index)">Phản hồi
+                                ({{children['count_reply']}})</span>
+                              </div>
+                              @if (children['reply_open'] === true) {
+                                <div class="reply-layout">
+                                  <div class="list_reply_comments">
+                                    @for (reply_comment of children['reply_comments']; track reply_comment) {
+                                      <div style="margin-bottom: 15px;"
+                                        >
+                                        <div style="text-align: right; margin-bottom: 5px;">
+                                          <span>{{reply_comment['display_name']}}</span>
+                                        </div>
+                                        <div class="conten-comment-box-left"
+                                          [ngClass]="reply_comment['my_reply_comment']?'my-reply-comment':''">
+                                          <div class="conten-comment-inner-box-left"
+                                            [innerHTML]="reply_comment.comment">
+                                          </div>
+                                        </div>
+                                        <div
+                                          style="margin-right: 20px; margin-top: 5px; text-align: right;">
+                                          <span
+                                            style="font-size: 12px; color: #898989; font-style: italic;">{{reply_comment.created_at
+                                          | ovicDateTime}}</span>
+                                        </div>
+                                      </div>
+                                    }
+                                  </div>
+                                  @if (courseSelected && userId === courseSelected.creator_plan_id) {
+                                    <div style="display: flex; position: relative;"
+                                      >
+                                      <div
+                                        style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
+                                        <img style="width: 100%;" src="../../../assets/images/a_none.jpg">
+                                      </div>
+                                      <textarea
+                                        style="height: 40px; margin-left: 10px; flex: 1; padding-right: 130px;"
+                                        placeholder="Nhập phản hồi... "
+                                      [(ngModel)]="children['textarea_comment']"></textarea>
+                                      <button (click)="saveCommentReply(children , selectedTuluan, index)"
+                                        style="position: absolute; bottom: 5px; right:5px"
+                                        class="btn btn-primary"><i class="fa fa-paper-plane"></i>Gửi
+                                      phản hồi</button>
+                                    </div>
+                                  }
+                                </div>
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #templateFormAddTieuchicham let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section right-slide-class">
+      <div class="ovic-over-right-section__head">
+        <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+        <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+        (click)="closeForm()"></button>
+      </div>
+      <div style="line-height: 1.25; padding: 0px; height: calc(100vh - 57px);"
+        class="ovic-over-right-section__body footer-no-hint">
+        <p-splitter panelStyleClass="class-tieuchi-spliter-panel" [panelSizes]="[50,50]"
+          [style]="{'height': '100%'}">
+          <ng-template pTemplate>
+            <div style="height: 100%; width: 100%;">
+              <app-view-thuongxuyen-tuluan [course_plan_activity_id]="selectedActivity.id"
+                [courseSelected]="courseSelected" [tuluan]="selectedTuluan">
+              </app-view-thuongxuyen-tuluan>
+            </div>
+          </ng-template>
+          <ng-template pTemplate>
+            <div class="content-mat-tab-tieuchicham" style="height: 100%; width: 100%;">
+              <div style="padding: 5px; display: flex; align-items: center; border-bottom: 1px solid #c8c8c8; background-color: rgba(0, 0, 0, .1);"
+                class="content-mat-tab-tieuchicham-top">
+                <span style="flex:1; margin-right: 5px;">
+                  <strong>Tổng tiêu chí:</strong> {{list_tieuchi_chamdiem.length}}
+                  - <strong>Tổng điểm tiêu chí:</strong> {{returnTotalPointTieuChi()}}
+                </span>
+                @if (list_tieuchi_chamdiem.length && selectedTuluan && selectedTuluan.status !== 1) {
+                  <button
+                    (click)="addOneTieuchiChams()" style="line-height: 1; margin-right: 5px;"
+                    class="btn btn-success">
+                    <i class="fa fa-plus"></i>
+                    Thêm 1 tiêu chí
+                  </button>
+                }
+                @if (list_tieuchi_chamdiem.length && selectedTuluan && selectedTuluan.status !== 1) {
+                  <button
+                    (click)="addTieuchiChams(true)" style="line-height: 1;" class="btn btn-primary">
+                    <i class="fa fa-floppy-o"></i>
+                    Lưu lại
+                  </button>
+                }
+              </div>
+              @if (list_tieuchi_chamdiem && list_tieuchi_chamdiem.length) {
+                <div style="height: calc(100% - 41px); padding: 5px; overflow: auto;"
+                  >
+                  @for (item of list_tieuchi_chamdiem; track item; let i = $index) {
+                    <div class="tieuchicham-card-panel">
+                      <p-panel #panel_tieuchi [collapsed]="item['collapsed']" [toggleable]="true">
+                        <ng-template pTemplate="header">
+                          <div style="width: 100%;">
+                            <div style="display: flex;">
+                              <div class="row form-row" style="flex: 1;margin-right: 5px;">
+                                <div class="col-9">
+                                  <textarea
+                                    [disabled]="selectedTuluan && selectedTuluan.status === 1? true: false"
+                                    style="width: 100%; resize: none; height: -webkit-fill-available;"
+                                    cols="2" placeholder="Nhập tiêu đề cho tiêu chí {{i + 1}}"
+                                    class="ovic-input-field" [(ngModel)]="item.title">
+                                  </textarea>
+                                </div>
+                                <div class="col-3">
+                                  <div style="margin-bottom: 5px;" class="p-inputgroup">
+                                    <span style="border-radius: 0px; padding: 0px;"
+                                    class="p-inputgroup-addon">Điểm:</span>
+                                    <input style="width: inherit;"
+                                      [disabled]="selectedTuluan && selectedTuluan.status === 1? true: false"
+                                      #input_point_tieuchi
+                                      (keydown)="pointQuestionKeyDown($event,input_point_tieuchi)"
+                                      (keyup)="pointTieuchiKeyup($event,input_point_tieuchi,item)"
+                                      type="text" class="ovic-input-field"
+                                      [(ngModel)]="item.point">
+                                    </div>
+                                    <div>
+                                      <p-dropdown
+                                        [disabled]="selectedTuluan && selectedTuluan.status === 1? true: false"
+                                        [style]="{'width': '100%'}" optionDisabled="disabled"
+                                        optionValue="id" [options]="chuandaura"
+                                        [(ngModel)]="item.cdr" optionLabel="label">
+                                      </p-dropdown>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div>
+                                  @if (list_tieuchi_chamdiem.length > selectedTuluan.point) {
+                                    <button
+                                      (click)="deleteTieuchi(item.id)"
+                                      class="btn btn-danger btn-icon btn-transparent">
+                                      <i class="fa fa-trash"></i>
+                                    </button>
+                                  }
+                                </div>
+                              </div>
+                              <div style="padding-top: 0.75rem;">
+                                <span (click)="openHuongdancham(panel_tieuchi,item)"
+                                  class="text-open-huong-dancham">
+                                  <i class="fa fa-angle-double-down"></i>
+                                  Nhập hướng dẫn chấm
+                                </span>
+                              </div>
+                            </div>
+                          </ng-template>
+                          <div class="ovic-vertical__inputs form-setting-lesson edit-hight-200"
+                            style="padding: 0px;">
+                            <div class="row form-row form-row-flex-row">
+                              <div class="col-12">
+                                <label>Hướng dẫn chấm:</label>
+                                <ovic-ckeditor-document
+                                  (onSaveData)="onChangeEditorTieuchi($event,item)"
+                                  [changeId]="item.id" [autoSave]="true" [default]="item.desc"
+                                  styleClass="vietbaocao-doctument-content">
+                                </ovic-ckeditor-document>
+                              </div>
+                            </div>
+                          </div>
+                        </p-panel>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div
+                    style="display: flex; align-items: center; justify-content: center; height: 100%; width: 100%;">
+                    <div style="text-align: center; width: 400px; margin: 0 auto;">
+                      <div
+                        style="font-size: 16px; font-weight: 500;color: var(--orange-400); margin-bottom: 5px;">
+                        Chưa có tiêu chí chấm, vui lòng tạo tiêu chí chấm
+                      </div>
+                      <button (click)="addTieuchiChams()" style="line-height: 1; width: 50%;"
+                        class="btn btn-success">
+                        Tạo tiêu chí chấm
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            </ng-template>
+          </p-splitter>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template #templatePmsDuan let-c="close" let-d="dismiss">
+      <div class="ovic-over-right-section right-slide-class">
+        <div class="ovic-over-right-section__head">
+          <h3 class="ovic-over-right-section__header">Danh sách giảng viên</h3>
+          <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+          (click)="closeForm()"></button>
+        </div>
+        <div style="line-height: 1.25; padding: 5px; height: calc(100vh - 51px - 57px);"
+          class="ovic-over-right-section__body footer-no-hint">
+          <div style="height: 100%;" class="phanquyen-dulieu-content-left ovic-vertical__inputs">
+            <div class="form-row row">
+              <div class="col-12">
+                <input class="ovic-input-field" type="text" [(ngModel)]="searchDuan" placeholder="Search">
+              </div>
+            </div>
+            @if ((list_tuluan | filter: true : ['hasTieuchi'] | filter: searchDuan : ['title']).length > 0) {
+              <mat-selection-list [multiple]="false" class="selection-list-mat" #duans
+                (selectionChange)="changeSelecDuan($event)"
+                >
+                @for (duan of list_tuluan | filter: true : ['hasTieuchi'] | filter: searchDuan : ['title']; track duan) {
+                  <mat-list-option
+                    [value]="duan">
+                    <div mat-line style="display: flex; align-items: center;">
+                      <div mat-line style="flex: 1;">
+                        <div mat-line>{{duan.title}}</div>
+                        <div mat-line style="font-size: 12px;"> </div>
+                      </div>
+                    </div>
+                  </mat-list-option>
+                }
+              </mat-selection-list>
+            } @else {
+              <div class="result-search-none">Không tìm thấy dự án nào...</div>
+            }
+          </div>
+        </div>
+        <div class="ovic-dynamic-right-section__foot">
+          <p class="ovic-over-right-section__foot-wrap-buttons">
+            <button (click)="saveTieuchiChamCopy()" type="button"
+              class="btn btn ovic-over-right-section__foot-btn btn-primary btn-primary">
+              <i class="fa fa-floppy-o"></i>Lưu lại
+            </button>
+          </p>
+        </div>
+      </div>
+    </ng-template>
+
+    <p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+      [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+      <div class="popup-waiting-loading">
+        <label style="width: 100%;">{{waitting_title}}</label>
+        <div class="tn-import-student-progressbar">
+          <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+        </div>
+      </div>
+    </p-dialog>

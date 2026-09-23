@@ -2401,9 +2401,9 @@ p-calendar {
     color: red;
 }
 
-.list-course-layout .mat-list-option,
-.class-details-left-menu .mat-list-option,
-.list-shift-layout .mat-list-option {
+/* .class-details-left-menu .mat-list-option, */
+.class-details-left-menu .mat-mdc-list-option,
+.class-details-left-menu .mdc-list-item {
     border-bottom: 1px dashed #c8c8c8;
 }
 

@@ -1,1 +1,488 @@
-﻿<div class="p-3">list-questions.component works!</div>
+<div class="list-questions ovic-is-loading--size-normal d-flex flex-column h-100">
+  @if (!courseQuestions || !courseQuestions.length) {
+    <div
+    class="list-questions__alert alert alert-secondary m-auto" role="alert">Không có câu hỏi</div>
+  } @else {
+    <div class="list-questions__contents d-flex flex-fill">
+      @if ((courseQuestions | filter: search_question : ['status','id_code']).length > 0) {
+        <ul class="list-questions__contents__list"
+          >
+          @if (testFormat === 'tienganh') {
+            @for (q of courseQuestions | filter: search_question : ['status','id_code']; track q) {
+              <li class="list-questions__contents__list__elements">
+                <div
+                  class="list-questions__contents__block list-questions__contents__block--head d-flex align-items-center flex-wrap">
+                  <small class="list-questions__contents__block__code">#{{ q.id }}</small>
+                  <span class="question-status">
+                    @switch (q['status']) {
+                      @case (0) {
+                        <span class="action-icon status-is-deactive">Chờ duyệt</span>
+                      }
+                      @case (1) {
+                        <span class="action-icon status-is-active">Đạt</span>
+                      }
+                      @case (-1) {
+                        <span class="action-icon status-is-redo">Chưa đạt</span>
+                      }
+                      @case (-2) {
+                        <span class="action-icon status-is-require">Yêu cầu duyệt</span>
+                      }
+                    }
+                  </span>
+                  @if (q['status'] !== 1 && canUpdate) {
+                    <button (click)="btnEdit(q)" pButton pRipple
+                      class="p-button-rounded" icon="pi pi-file-edit" tooltipStyleClass="ictu-p-tooltip"
+                    pTooltip="Cập nhật câu hỏi" tooltipPosition="top"></button>
+                  }
+                  @if (q['status'] !== 1 && canDelete) {
+                    <button (click)="btnDelete(q)" pButton pRipple
+                      class="p-button-danger p-button-rounded" icon="pi pi-trash"
+                      tooltipStyleClass="ictu-p-tooltip" pTooltip="Xóa câu hỏi"
+                    tooltipPosition="top"></button>
+                  }
+                  <span class="list-questions__contents__block__q-info__separator">|</span>
+                  <small class="list-questions__contents__block__code">#{{ q.code }}</small>
+                  <div
+                    class="list-questions__contents__block__q-info ml-auto d-inline-flex align-items-center">
+                    @if (['group-input','group-radio','checkbox','radio'].includes(q.question_type)) {
+                      <p class="list-questions__contents__block__q-info__inverted-answer">
+                        <i class="pi"
+                        [ngClass]="q.config['invertedAnswer'] ? 'pi-check':'pi-times'"></i> Đảo vị
+                        trí của phương án trả lời
+                      </p>
+                      <span class="list-questions__contents__block__q-info__separator">|</span>
+                    }
+                    <span class="list-questions__contents__block__q-info__cdr"
+                      [ngClass]="'list-questions__contents__block__q-info__cdr--'+q.cdr">{{
+                    showCdrLabel(q) }}</span>
+                    <span class="list-questions__contents__block__q-info__separator">|</span>
+                    <span style="background-color: #bfdbfe; color: #1d4ed8;"
+                      class="list-questions__contents__block__q-info__cdr">{{ q.private ? "Private" :
+                    "Public" }}</span>
+                  </div>
+                </div>
+                <div class="list-questions__contents__block">
+                  <div class="lqc-present-single-question__direction" [appKatexImg]="q.id"
+                  [appLoadMediaOnText]="q.id" [innerHTML]="q.question_direction | safeHtmlSingle"></div>
+                  @if (q.media) {
+                    <div class="lqc-present-single-question__direction__media mt-3">
+                      <audio controls>
+                        <source [src]="q.media.path | ictuMediaLink : q.media.source : token | ovicSafeUrl">
+                      </audio>
+                    </div>
+                  }
+                </div>
+              </li>
+              @if (q.question_type ==='drag_drop') {
+                <li class="list-questions__contents__list__elements">
+                  <div class="list-questions__contents__block">
+                    @for (child of (q | orderChildQuestion); track child) {
+                      <div class="list-questions__contents__list__elements__av_drag_and_drop"
+                        >
+                        <div class="list-questions__contents__list__elements__av_drag_and_drop__index">{{
+                        child.question_number }}</div>
+                        <div class="list-questions__contents__list__elements__av_drag_and_drop__direction lqc-present-single-question__direction"
+                          [appLoadMediaOnText]="child.id" [appKatexImg]="child.id"
+                        [innerHTML]="child.question_direction | safeHtmlSingle"></div>
+                        <div class="list-questions__contents__list__elements__av_drag_and_drop__answer">{{
+                        child.answer_correct | answerLabel : q.answer_option }}</div>
+                      </div>
+                    }
+                  </div>
+                </li>
+              }
+              @if (q.question_type !=='drag_drop') {
+                @for (child of (q | orderChildQuestion); track child) {
+                  <li class="list-questions__contents__list__elements"
+                    >
+                    <div
+                      class="list-questions__contents__block list-questions__contents__block--head d-flex align-items-center flex-wrap">
+                      <small class="list-questions__contents__block__code">#{{ child.id }}</small>
+                      @if (canUpdate) {
+                        <button (click)="btnEdit(child)" pButton pRipple
+                          class="p-button-rounded" icon="pi pi-file-edit" tooltipStyleClass="ictu-p-tooltip"
+                        pTooltip="Cập nhật câu hỏi" tooltipPosition="top"></button>
+                      }
+                      @if (canDelete) {
+                        <button (click)="btnDelete(child)" pButton pRipple
+                          class="p-button-danger p-button-rounded" icon="pi pi-trash"
+                          tooltipStyleClass="ictu-p-tooltip" pTooltip="Xóa câu hỏi"
+                        tooltipPosition="top"></button>
+                      }
+                      <div
+                        class="list-questions__contents__block__q-info ml-auto d-inline-flex align-items-center">
+                        @if (['group-input','group-radio','checkbox','radio'].includes(child.question_type)) {
+                          <p class="list-questions__contents__block__q-info__inverted-answer">
+                            <i class="pi"
+                            [ngClass]="child.config['invertedAnswer'] ? 'pi-check':'pi-times'"></i>
+                            Đảo vị trí của phương án trả lời
+                          </p>
+                          <span class="list-questions__contents__block__q-info__separator">|</span>
+                        }
+                        <span class="list-questions__contents__block__q-info__cdr"
+                          [ngClass]="'list-questions__contents__block__q-info__cdr--'+child.cdr">{{
+                        showCdrLabel(child) }}</span>
+                      </div>
+                    </div>
+                    <div class="list-questions__contents__block">
+                      <div class="lqc-present-single-question__direction" [appKatexImg]="child.id"
+                        [appLoadMediaOnText]="child.id"
+                      [innerHTML]="child.question_direction | safeHtmlSingle"></div>
+                    </div>
+                    <div class="list-questions__contents__block list-questions__contents__block--body"
+                      >
+                      @switch (child.question_type) {
+                        @case ('group-input') {
+                          <group-input-question
+                          [present]="child"></group-input-question>
+                        }
+                        @case ('group-radio') {
+                          <group-radio-question
+                          [present]="child"></group-radio-question>
+                        }
+                        @case ('checkbox') {
+                          <question-type-radio-editor [multiple]="true"
+                          [present]="child"></question-type-radio-editor>
+                        }
+                        @case ('drag_drop') {
+                        }
+                        @case ('radio') {
+                          <div class="question-type-radio">
+                            <ul class="question-type-radio__list">
+                              @for (o of child.answer_option; track o; let i = $index) {
+                                <li class="question-type-radio__list__element"
+                                  [ngClass]="'question-type-radio__list__element--size-'+child.config?.cols"
+                                  >
+                                  <!-- <span class="question-type-radio__radio-button" [class.question-type-radio__radio-button&#45;&#45;highlight]="o.id | isAnswerCorrect : child.answer_correct"></span>-->
+                                  <span class="question-type-radio__radio-button__index"
+                                    [class.question-type-radio__radio-button__index--highlight]="o.id | isAnswerCorrect : child.answer_correct">{{
+                                  i | questionPrefix }}</span>
+                                  <div class="question-type-radio__option" [appKatexImg]="o.id"
+                                    [appLoadMediaOnText]="o.id" [innerHTML]="o.value | safeHtmlSingle">
+                                  </div>
+                                </li>
+                              }
+                            </ul>
+                          </div>
+                        }
+                        @case ('grouping') {
+                          <div
+                            class="list-questions__contents__block__grouping d-flex justify-content-center align-items-center flex-wrap">
+                            @for (o of child.answer_option; track o) {
+                              <span class="list-questions__contents__block__grouping__choice"
+                              >{{ o.value }}</span>
+                            }
+                          </div>
+                          <div
+                            class="list-questions__contents__block__grouping__pairs d-flex align-items-start flex-wrap">
+                            @for (c of child['children']; track c) {
+                              <div class="list-questions__contents__block__grouping__pairs__elm"
+                                >
+                                <b class="list-questions__contents__block__grouping__pairs__elm__heading">{{
+                                c.question_direction }}</b>
+                                <textarea [rows]="5" [cols]="30" [disabled]="true"
+                                  placeholder="Các đáp án..."
+                                  class="list-questions__contents__block__grouping__pairs__elm__body"
+                                  pInputTextarea
+                                [autoResize]="true">{{ c.answer_correct | answerLabel : child.answer_option }}</textarea>
+                              </div>
+                            }
+                          </div>
+                        }
+                        @case ('inputbox') {
+                          @if (!child['children'] || child['children'].length === 0) {
+                            <div>
+                              <div class="p-chip-list">
+                                @for (ansc of child.answer_correct | stringToArrayPipe : '|'; track ansc) {
+                                  <p-chip class="example-box">
+                                    {{ ansc }}
+                                  </p-chip>
+                                }
+                              </div>
+                            </div>
+                          }
+                          @if (child['children'] && child['children'].length) {
+                            <div>
+                              @for (c of child['children']; track c) {
+                                <span class="list-questions__contents__block__separator"></span>
+                                <div
+                                  class="list-questions__contents__block list-questions__contents__input-box">
+                                  @if (c.question_number ) {
+                                    <span class="list-questions__contents__input-box__number"
+                                    >{{ c.question_number }}</span>
+                                  }
+                                  @if (c.question_direction) {
+                                    <div class="list-questions__contents__input-box__direction lqc-present-single-question__direction"
+                                      [appKatexImg]="c.id"
+                                      [appLoadMediaOnText]="c.id"
+                                    [innerHTML]="c.question_direction | safeHtmlSingle"></div>
+                                  }
+                                  <div class="list-questions__contents__input-box__correct-answer">{{
+                                  c.answer_correct | json }}</div>
+                                </div>
+                              }
+                            </div>
+                          }
+                        }
+                        @case ('reorder_words') {
+                          <div
+                            class="list-questions__contents__block__drag_drop__pairs d-flex align-items-start flex-wrap">
+                            <div class="list-questions__contents__block__drag_drop__pairs__elm m-0 w-100">
+                              <input [disabled]="true"
+                                class="list-questions__contents__block__drag_drop__pairs__elm__answer-correct w-100"
+                                type="text" pInputText
+                                [value]="child.answer_correct | extractCorrectAnswer"
+                                placeholder="Đáp án...">
+                              </div>
+                            </div>
+                          }
+                          @case ('matching') {
+                          }
+                          @case ('arrange_paragraphs') {
+                            <div class="list-questions__contents__block__arrange_paragraphs d-flex flex-column">
+                              @for (_ans of (child | orderAnswerOptionsByCorrectAnswer); track _ans; let i = $index) {
+                                <div class="list-questions__contents__block__arrange_paragraphs__item d-flex align-items-start justify-content-start"
+                                  >
+                                  <span
+                                    class="list-questions__contents__block__arrange_paragraphs__item__label d-inline-flex justify-content-center align-items-center">P{{
+                                  1 + i }}</span>
+                                  <p
+                                    class="list-questions__contents__block__arrange_paragraphs__item__text font-weight-normal">
+                                  {{ _ans.value }}</p>
+                                </div>
+                              }
+                            </div>
+                          }
+                          @default {
+                            <div
+                              class="d-flex flex-fill w-100 h-100 justify-content-center align-items-center">
+                              <p class="alert alert-secondary m-0 primary-font --fs-14">Loại câu hỏi({{
+                              child.question_type }}) chưa đươc support!</p>
+                            </div>
+                          }
+                        }
+                      </div>
+                    </li>
+                  }
+                  <app-nhanxet-question [question_input]="q"
+                  [course_input]="courseSelected"></app-nhanxet-question>
+                }
+              }
+            } @else {
+              @for (q of courseQuestions | filter: search_question : ['status','id_code']; track q) {
+                <li class="list-questions__contents__list__elements"
+                  >
+                  <div
+                    class="list-questions__contents__block list-questions__contents__block--head d-flex align-items-center flex-wrap">
+                    <small class="list-questions__contents__block__code">#{{ q.id }}</small>
+                    <span class="question-status">
+                      @switch (q['status']) {
+                        @case (0) {
+                          <span class="action-icon status-is-deactive">(Chờ duyệt)</span>
+                        }
+                        @case (1) {
+                          <span class="action-icon status-is-active">(Đạt)</span>
+                        }
+                        @case (-1) {
+                          <span class="action-icon status-is-redo">(Chưa đạt)</span>
+                        }
+                        @case (-2) {
+                          <span class="action-icon status-is-require">(Yêu cầu duyệt)</span>
+                        }
+                      }
+                    </span>
+                    @if (q['status'] !== 1 && canUpdate) {
+                      <button (click)="btnEdit(q)" pButton pRipple
+                        class="p-button-rounded" icon="pi pi-file-edit" tooltipStyleClass="ictu-p-tooltip"
+                      pTooltip="Cập nhật câu hỏi" tooltipPosition="top"></button>
+                    }
+                    @if (q['status'] !== 1 && canDelete) {
+                      <button (click)="btnDelete(q)" pButton pRipple
+                        class="p-button-danger p-button-rounded" icon="pi pi-trash"
+                      tooltipStyleClass="ictu-p-tooltip" pTooltip="Xóa câu hỏi" tooltipPosition="top"></button>
+                    }
+                    <div class="list-questions__contents__block__q-info ml-auto d-inline-flex align-items-center">
+                      @if (['group-input','group-radio','checkbox','radio'].includes(q.question_type)) {
+                        <!--<p-checkbox [disabled]="true" [(ngModel)]="q.config['invertedAnswer']" [binary]="true" label="Đảo vị trí của phương án trả lời"></p-checkbox>-->
+                        <p class="list-questions__contents__block__q-info__inverted-answer">
+                          <i class="pi" [ngClass]="q.config['invertedAnswer'] ? 'pi-check':'pi-times'"></i>
+                          Đảo vị trí của phương án trả lời
+                        </p>
+                        <span class="list-questions__contents__block__q-info__separator">|</span>
+                      }
+                      <span class="list-questions__contents__block__q-info__cdr"
+                        [ngClass]="'list-questions__contents__block__q-info__cdr--'+q.cdr">{{ showCdrLabel(q)
+                      }}</span>
+                      <span class="list-questions__contents__block__q-info__separator">|</span>
+                      <span style="background-color: #bfdbfe; color: #1d4ed8;"
+                        class="list-questions__contents__block__q-info__cdr">{{ q.private ? "Private" : "Public"
+                      }}</span>
+                    </div>
+                  </div>
+                  <div class="list-questions__contents__block list-questions__contents__block--body">
+                    <div class="lqc-present-single-question__direction" [appKatexImg]="q.id"
+                    [appLoadMediaOnText]="q.id" [innerHTML]="q.question_direction | safeHtmlSingle"></div>
+                  </div>
+                  <div class="list-questions__contents__block">
+                    @switch (q.question_type) {
+                      @case ('group-input') {
+                        <group-input-question [present]="q"></group-input-question>
+                      }
+                      @case ('group-radio') {
+                        <group-radio-question [present]="q"></group-radio-question>
+                      }
+                      @case ('checkbox') {
+                        <question-type-radio-editor [multiple]="true"
+                        [present]="q"></question-type-radio-editor>
+                      }
+                      @case ('drag_drop') {
+                        <div
+                          class="list-questions__contents__block__grouping d-flex justify-content-center align-items-center flex-wrap">
+                          @for (o of q.answer_option; track o) {
+                            <span class="list-questions__contents__block__grouping__choice"
+                            >{{ o.value }}</span>
+                          }
+                        </div>
+                        <div
+                          class="list-questions__contents__block__drag_drop__pairs d-flex align-items-start flex-wrap">
+                          @for (c of q.children; track c) {
+                            <div class="list-questions__contents__block__drag_drop__pairs__elm"
+                              >
+                              <b class="list-questions__contents__block__drag_drop__pairs__elm__heading">{{
+                              c.question_direction }}</b>
+                              <input [disabled]="true"
+                                class="list-questions__contents__block__drag_drop__pairs__elm__answer-correct"
+                                type="text" pInputText
+                                [value]="c.answer_correct | answerLabel : q.answer_option"
+                                placeholder="Đáp án...">
+                              </div>
+                            }
+                          </div>
+                        }
+                        @case ('radio') {
+                          <div class="question-type-radio">
+                            <ul class="question-type-radio__list">
+                              @for (o of q.answer_option; track o; let i = $index) {
+                                <li class="question-type-radio__list__element"
+                                  [ngClass]="'question-type-radio__list__element--size-'+q.config?.cols"
+                                  >
+                                  <!--                                            <span class="question-type-radio__radio-button" [class.question-type-radio__radio-button&#45;&#45;highlight]="o.id | isAnswerCorrect : q.answer_correct"></span>-->
+                                  <span class="question-type-radio__radio-button__index"
+                                    [class.question-type-radio__radio-button__index--highlight]="o.id | isAnswerCorrect : q.answer_correct">{{
+                                  i | questionPrefix }}</span>
+                                  <div class="question-type-radio__option" [appKatexImg]="o.id"
+                                    [appLoadMediaOnText]="o.id" [innerHTML]="o.value | safeHtmlSingle">
+                                  </div>
+                                </li>
+                              }
+                            </ul>
+                          </div>
+                        }
+                        @case ('grouping') {
+                          <div
+                            class="list-questions__contents__block__grouping d-flex justify-content-center align-items-center flex-wrap">
+                            @for (o of q.answer_option; track o) {
+                              <span class="list-questions__contents__block__grouping__choice"
+                              >{{ o.value }}</span>
+                            }
+                          </div>
+                          <div
+                            class="list-questions__contents__block__grouping__pairs d-flex align-items-start flex-wrap">
+                            @for (c of q.children; track c) {
+                              <div class="list-questions__contents__block__grouping__pairs__elm"
+                                >
+                                <b class="list-questions__contents__block__grouping__pairs__elm__heading">{{
+                                c.question_direction }}</b>
+                                <textarea [rows]="5" [cols]="30" [disabled]="true" placeholder="Các đáp án..."
+                                  class="list-questions__contents__block__grouping__pairs__elm__body"
+                                  pInputTextarea
+                                [autoResize]="true">{{ c.answer_correct | answerLabel : q.answer_option }}</textarea>
+                              </div>
+                            }
+                          </div>
+                        }
+                        @case ('inputbox') {
+                          @for (child of q.children; track child) {
+                            <span class="list-questions__contents__block__separator"></span>
+                            <div class="list-questions__contents__block list-questions__contents__input-box">
+                              @if (child.question_number ) {
+                                <span class="list-questions__contents__input-box__number"
+                                >{{ child.question_number }}</span>
+                              }
+                              @if (child.question_direction) {
+                                <div class="list-questions__contents__input-box__direction lqc-present-single-question__direction"
+                                  [appKatexImg]="child.id"
+                                  [appLoadMediaOnText]="child.id"
+                                [innerHTML]="child.question_direction | safeHtmlSingle"></div>
+                              }
+                              <div class="list-questions__contents__input-box__correct-answer">{{
+                              child.answer_correct | json }}</div>
+                            </div>
+                          }
+                        }
+                        @case ('reorder_words') {
+                        }
+                        @case ('matching') {
+                        }
+                        @default {
+                          <div
+                            class="d-flex flex-fill w-100 h-100 justify-content-center align-items-center">
+                            <p class="alert alert-secondary m-0 primary-font --fs-14">Vui lòng chọn loại câu hỏi</p>
+                          </div>
+                        }
+                      }
+                    </div>
+                    <ng-template #showMultipleRadio>
+                      @for (child of q.children; track child) {
+                        <span class="list-questions__contents__block__separator"></span>
+                        <div class="list-questions__contents__block">
+                          <div class="lqc-present-single-question__direction" [appKatexImg]="child.id"
+                            [appLoadMediaOnText]="child.id"
+                          [innerHTML]="child.question_direction | safeHtmlSingle"></div>
+                        </div>
+                        <div class="list-questions__contents__block">
+                          @switch (child.question_type) {
+                            @case ('group-input') {
+                            }
+                            @case ('group-radio') {
+                              <group-radio-question
+                              [present]="child"></group-radio-question>
+                            }
+                            @case ('checkbox') {
+                              <question-type-radio-editor [multiple]="true"
+                              [present]="child"></question-type-radio-editor>
+                            }
+                            @case ('drag_drop') {
+                            }
+                            @case ('radio') {
+                            }
+                            @case ('grouping') {
+                            }
+                            @case ('inputbox') {
+                            }
+                            @case ('reorder_words') {
+                            }
+                            @case ('matching') {
+                            }
+                            @default {
+                              <div
+                                class="d-flex flex-fill w-100 h-100 justify-content-center align-items-center">
+                                <p class="alert alert-secondary m-0 primary-font --fs-14">Vui lòng chọn loại câu
+                                hỏi</p>
+                              </div>
+                            }
+                          }
+                        </div>
+                      }
+                    </ng-template>
+                    <app-nhanxet-question [question_input]="q" [course_input]="courseSelected"></app-nhanxet-question>
+                  </li>
+                }
+              }
+            </ul>
+          } @else {
+            <div style="height: calc(100% - 42px);" class="result-search-none">Không tìm thấy...</div>
+          }
+        </div>
+      }
+    </div>

@@ -1,4 +1,4 @@
-import { Inject, Injectable, TemplateRef } from '@angular/core';
+import { Inject, Injectable, NgZone, TemplateRef } from '@angular/core';
 import { debounceTime, distinctUntilChanged, Observable, Subject, Subscription, fromEvent, BehaviorSubject } from 'rxjs';
 import { ToastMessage } from '@core/models/message';
 import { OvicButton } from '@core/models/buttons';
@@ -96,6 +96,7 @@ export class NotificationService {
 		private translate: TranslateService,
 		private titleService: Title,
 		private overlay: Overlay,
+		private ngZone: NgZone,
 		@Inject(DOCUMENT) private document: Document
 	) {
 		this.translate.onLangChange.asObservable().pipe(debounceTime(100), distinctUntilChanged()).subscribe({
@@ -127,7 +128,9 @@ export class NotificationService {
 	}
 
 	isProcessing(isLoading = true) {
-		this.OBSERVE_LOADING_ANIMATION.next(isLoading);
+		this.ngZone.run(() => {
+			this.OBSERVE_LOADING_ANIMATION.next(isLoading);
+		});
 	}
 
 	startLoading() {
@@ -143,7 +146,9 @@ export class NotificationService {
 	}
 
 	loadingAnimationV2(state: StateLoadingV2Input): void {
-		this.OBSERVE_LOADING_ANIMATION_V2.next({ loading: true, ...state });
+		this.ngZone.run(() => {
+			this.OBSERVE_LOADING_ANIMATION_V2.next({ loading: true, ...state });
+		});
 	}
 
 	disableLoadingAnimationV2(): void {
@@ -153,11 +158,17 @@ export class NotificationService {
 			text: '',
 			process: null
 		};
-		setTimeout(() => this.OBSERVE_LOADING_ANIMATION_V2.next(reset), 500);
+		setTimeout(() => {
+			this.ngZone.run(() => {
+				this.OBSERVE_LOADING_ANIMATION_V2.next(reset);
+			});
+		}, 500);
 	}
 
 	private toastMessage(message: ToastMessage) {
-		this.OBSERVE_TOAST_MESSAGE.next(message);
+		this.ngZone.run(() => {
+			this.OBSERVE_TOAST_MESSAGE.next(message);
+		});
 	}
 
 	toastError(body: string, heading = '', sound = APP_CONFIGS.soundAlert) {

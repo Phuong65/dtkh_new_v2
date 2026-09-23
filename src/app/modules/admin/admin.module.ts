@@ -14,7 +14,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { NgApexchartsModule } from 'ng-apexcharts';
 
 import { SharedModule } from '@shared/shared.module';
-import { ContentNoneComponent } from '@modules/admin/features/content-none/content-none.component';
 import { DashboardComponent } from '@modules/admin/dashboard/dashboard.component';
 import { UserInfoComponent } from '@modules/admin/dashboard/user-info/user-info.component';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
@@ -32,11 +31,11 @@ import { ChartModule } from 'primeng/chart';
 // import { GoogleChartsModule } from 'angular-google-charts';
 // import AdminDashboardComponent from './features/home/admin-dashboard-225/admin-dashboard/admin-dashboard.component';
 import { MenuV2Component } from './dashboard/menu-v2/menu-v2.component';
+import { ContentNoneComponent } from './features/content-none/content-none.component';
 
 @NgModule({
     declarations: [
         DashboardComponent,
-        ContentNoneComponent,
         // SidenavComponent,
         UserInfoComponent,
         MenuLanguageComponent,
@@ -49,6 +48,7 @@ import { MenuV2Component } from './dashboard/menu-v2/menu-v2.component';
 
     ],
     imports: [
+        ContentNoneComponent,
         // AdminDashboardComponent,
         CommonModule,
         AdminRoutingModule,

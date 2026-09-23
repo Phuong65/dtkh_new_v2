@@ -1,1 +1,89 @@
-﻿<div class="p-3">nganh-bomon.component works!</div>
+<div class="layout_component_container" style="padding: 5px;">
+    <ovic-table [data]="dmChuyenmuc" styleClass="tbl-danhSachkhoa table-able-dropdown" dataKey="id" rowHover="false"
+        tableName="Danh sách" [tblStructure]="tblCols" [enableSearch]="true" [globalFilterFields]="['title','desc']"
+        (editData)="editChuyenmuc($event)" (deleteData)="deleteChuyenmuc($event)" [options_dropdown]="dmDonvi_chuyenmon"
+        label_dropdown="title" [addDropdown]="true" (addNewRow)="createChuyenmuc()" [addRow]="canAdded"
+        (onChangeDropdownEvent)="onChangeDropdownEvent($event)" placeholder_dropdown="--Tất cả đơn vị chuyên môn--"
+        addRowLabel="Thêm mới">
+    </ovic-table>
+</div>
+
+<ng-template #formInfo let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+            <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
+        </div>
+        <div class="ovic-over-right-section__body users-layout-form" style="height: calc(100vh - 57px - 51px - 18px);">
+            <div class="ovic-vertical__inputs">
+                <form [formGroup]="formData">
+                    <div class="form-row">
+                        <label for="name">Chọn đơn vị chuyên môn<span class="ovic-mark">*</span></label>
+                        <ovic-dropdown [options]="dmDonvi_chuyenmon" [defaultValue]="f['donvi_chuyenmon_id'].value"
+                            optionId="id" optionLabel="title" [formField]="f['donvi_chuyenmon_id']"
+                            placeholder="---------" [showClear]="false"></ovic-dropdown>
+                    </div>
+                    <div class="form-row">
+                        <label for="name">Tên<span class="ovic-mark">*</span></label>
+                        <input type="text" id="name" (focusout)="onChangeTitle()" formControlName="title"
+                            class="form-control">
+                    </div>
+                    @if (app_config.codeByLvl) {
+                    <div class="form-row">
+                        <label for="name">Mã bộ môn<span class="ovic-mark">*</span></label>
+                        <div class="p-inputgroup">
+                            @if (f['donvi_chuyenmon_id'].value) {
+                            <span class="p-inputgroup-addon">
+                                {{f['donvi_chuyenmon_id'].value | showlabel : dmDonvi_chuyenmon : 'id' : 'code'}}.
+                            </span>
+                            }
+                            <input type="text" id="sup_code" formControlName="sup_code" class="form-control">
+                        </div>
+                    </div>
+                    }
+                    <!-- <div class="form-row">
+                        <span class="ov-check-slug-hint__wrap-mess alert-danger" *ngIf="!slugIsValid">
+                            <span class="ov-check-slug-hint__messages">Slug đã tồn tại, vui lòng thay đổi
+                                slug</span>
+                        </span>
+                        <label for="slug">Slug<span class="ovic-mark">*</span></label>
+                        <input type="text" id="slug" (focusout)="onChangeSlug()" formControlName="slug"
+                            class="form-control">
+                    </div> -->
+                    <div class="form-row">
+                        <label for="ordering">Vị trí<span class="ovic-mark">*</span></label>
+                        <input type="number" id="ordering" formControlName="ordering" class="form-control">
+                    </div>
+                    <!-- <div class="form-row">
+                        <label>Phân loại Ngành - Bộ môn <span class="ovic-mark">*</span></label>
+                        <span class="form-row__switch-buttons" style="justify-content: left;">
+                            <button class="btn form-row__btn-switch"
+                                [class.--btn-switch-active]="f['type'].value === 'nganh'"
+                                (click)="creatNgChangeActive('nganh')">Ngành</button>
+                            <button class="btn form-row__btn-switch"
+                                [class.--btn-switch-active]="f['type'].value === 'bomon'"
+                                (click)="creatNgChangeActive('bomon')">Bộ môn</button>
+                        </span>
+                    </div> -->
+
+                    <div class="form-row">
+                        <label for="desc-2">Mô tả</label>
+                        <textarea id="desc-2" formControlName="desc" rows="3" class="form-control"></textarea>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <p class="ovic-form-notes ovic-over-right-section__foot-ovic-input-line">
+            <i class="pi pi-info-circle"></i>các trường có đánh dấu ( <span class="ovic-mark">*</span> ) là bắt
+            buộc phải nhập
+        </p>
+        <div class="ovic-over-right-section__foot-wrap-buttons flex-footer-right">
+            <button type="button" class="btn btn-primary" (click)="saveFormData( isUpdated )">
+                <i class="fa fa-floppy-o" ></i>Lưu lại
+            </button>
+            <button type="button" class="btn btn-cancel" (click)="closeForm()">
+                <i class="fa fa-ban" ></i>Hủy thao tác
+            </button>
+        </div>
+    </div>
+</ng-template>

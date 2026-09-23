@@ -1,11 +1,17 @@
 import { Component , Input , OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { BUTTON_NO , BUTTON_YES , OvicButton } from '@core/models/buttons';
+import { AppSafeHtmlPipe } from '@core/pipes/app-safe-html.pipe';
+import { AppTranslateButtonPipe } from '@core/pipes/app-translate-button.pipe';
+import { ButtonModule } from 'primeng/button';
+import { RippleModule } from 'primeng/ripple';
 
-@Component( {standalone: false, 
+@Component( {
+	standalone  : true ,
 	selector    : 'app-confirm-rounded' ,
 	templateUrl : './confirm-rounded.component.html' ,
-	styleUrls   : [ './confirm-rounded.component.css' ]
+	styleUrls   : [ './confirm-rounded.component.css' ] ,
+	imports     : [ AppSafeHtmlPipe , AppTranslateButtonPipe , ButtonModule , RippleModule ]
 } )
 export class ConfirmRoundedComponent implements OnInit {
 

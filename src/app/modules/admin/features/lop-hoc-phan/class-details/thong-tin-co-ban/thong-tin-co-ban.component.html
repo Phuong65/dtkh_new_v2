@@ -1,1 +1,133 @@
-﻿<div class="p-3">thong-tin-co-ban.component works!</div>
+<div class="action-own-class-info">
+  @if (classSelected) {
+    <div class="ovic-student-class__body-section p-0" style="overflow-x:hidden">
+      <div class="class-section-grid-background"></div>
+      <div class="class-section-grid">
+        <div class="class-section-grid__left-section">
+          @if (noiti) {
+            <div class="thong-bao-sai-lech-thong-tin">
+              <div>
+                - Thông tin học kỳ và năm học của sinh viên trong lớp học có sự sai lệch với thông tin lớp học
+              </div>
+              <div>
+                - Giảng viên vui lòng import lại danh sách sinh viên và chọn tính năng ghi đè
+              </div>
+              <div>
+                - Thao tác này sẽ không làm mất dữ liệu học tập của sinh viên
+              </div>
+            </div>
+          }
+          <div class="class-section-grid__left-section__inner">
+            <table style="margin: 10px 0;">
+              <tr>
+                <td class="text-right --fix-width-100">Lớp học phần:</td>
+                <td colspan="3" class="text-left font-weight-bold">{{classSelected['name']}}</td>
+              </tr>
+              <tr>
+                <td class="text-right --fix-width-100">Môn học:</td>
+                <td colspan="3" class="text-left font-weight-bold">{{classSelected['show_mon']}}</td>
+              </tr>
+              <tr>
+                <td class="text-right --fix-width-100">Giảng viên:</td>
+                <td class="text-left font-weight-bold">{{classSelected['giangvien']?
+                classSelected['giangvien']:'--'}}</td>
+                <td class="text-right --fix-width-100">Năm học:</td>
+                <td class="text-left font-weight-bold">{{classSelected['namhoc']}}</td>
+              </tr>
+              <tr>
+                <td class="text-right --fix-width-100">Giảng viên khác:</td>
+                <td class="text-left font-weight-bold">
+                {{classSelected['trogiang']?classSelected['trogiang']: '--'}}</td>
+                <td class="text-right --fix-width-100">Học kỳ:</td>
+                <td class="text-left font-weight-bold">{{'HK: '+classSelected['hocky']}}</td>
+              </tr>
+              <!-- <tr>
+              <td class="text-right --fix-width-100">Bài giảng:</td>
+              <td colspan="3" class="text-left font-weight-bold">
+                <button class="btn-link-to-book"
+                  [disabled]="classSelected && classSelected['course_id']? false: true "
+                  (click)="moveToLesson()" container="body" placement="top" type="button" pButton
+                  pRipple
+                  [icon]="classSelected && classSelected['course_id']? 'pi pi-external-link': 'pi pi-ban' "
+                  [ngClass]="classSelected && classSelected['course_id']? 'ui-button-success': 'ui-button-danger' "
+                [label]="classSelected && classSelected['course_id']? 'Xem bài giảng': 'Chưa có bài giảng' "></button>
+              </td>
+            </tr> -->
+            <!-- <tr>
+            <td class="text-right --fix-width-100">Google meet:</td>
+            <td colspan="3" class="text-left ">
+              <div style="text-align: left; margin-top: 21px;" *ngIf="isEditLink" class="p-inputgroup"
+                class="input-link-google-meet">
+                <input [ngClass]="!isFalseLink?'is-false-link-google-meet':''"
+                  (keyup)="onChangeGoogleMeet()" [(ngModel)]="linkGoogleMeet['link']"
+                  (ngModelChange)="onChangeGoogleMeet()" type="text" pInputText
+                  placeholder="Link google meet">
+                  <span style="font-size: 11px;" class="red-mark-important text-impotant-red">{{
+                    "Ví
+                    dụ:
+                  https://meet.google.com/..."}}</span>
+                </div>
+                <span class="link-googlemeet" *ngIf="!isEditLink"
+                  (click)="moveToGoogleMeet(linkGoogleMeet['link'])">{{linkGoogleMeet['link']?
+                linkGoogleMeet['link'] : "Chưa có link" }}</span>
+              </td>
+            </tr> -->
+          </table>
+        </div>
+        <!-- <div class="class-section-grid__left-section__inner">
+        <img src="../../../../assets/images//banner-new-group.png" alt="">
+      </div> -->
+      <!-- <div class="class-section-grid__block-section">
+      <div class="class-section-grid__block-section__inner" *ngIf="classSelected">
+        <div class="class-section-grid__chart-circle">
+          <div class="class-section-grid__chart-circle__row">
+            <div class="class-section-grid__chart-circle__row-inner">
+              <span
+              class="class-section-grid__chart-circle__number">{{classSelected['count_student']}}</span>
+              <span class="class-section-grid__chart-circle__text">Sinh viên</span>
+            </div>
+          </div>
+          <div class="class-section-grid__chart-circle__row">
+            <div class="class-section-grid__chart-circle__row-inner">
+              <span
+              class="class-section-grid__chart-circle__number">{{classSelected['count_lesson']}}</span>
+              <span class="class-section-grid__chart-circle__text">bài học</span>
+            </div>
+          </div>
+          <div class="class-section-grid__chart-circle__row">
+            <div class="class-section-grid__chart-circle__row-inner">
+              <span
+              class="class-section-grid__chart-circle__number">{{classSelected['count_test']}}</span>
+              <span class="class-section-grid__chart-circle__text">bài tập bổ trợ</span>
+            </div>
+          </div>
+          <div class="class-section-grid__chart-circle__row">
+            <div class="class-section-grid__chart-circle__row-inner">
+              <span
+              class="class-section-grid__chart-circle__number">{{classSelected['count_class_test']}}</span>
+              <span class="class-section-grid__chart-circle__text">bài kiểm tra trắc
+              nghiệm</span>
+            </div>
+          </div>
+          <div class="class-section-grid__chart-circle__row">
+            <div class="class-section-grid__chart-circle__row-inner">
+              <span
+              class="class-section-grid__chart-circle__number">{{classSelected['count_homework']}}</span>
+              <span class="class-section-grid__chart-circle__text">bài tập tự luận</span>
+            </div>
+          </div>
+          <div class="class-section-grid__chart-circle__row">
+            <div class="class-section-grid__chart-circle__row-inner">
+              <span
+              class="class-section-grid__chart-circle__number">{{classSelected['count_document']}}</span>
+              <span class="class-section-grid__chart-circle__text">tài liệu</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> -->
+  </div>
+</div>
+</div>
+}
+</div>
