@@ -614,6 +614,7 @@
                                             <div class="ovic-vertical__inputs ovic-vertical__inputs--layout-2" style="width: 150px;">
                                               <p class="form-row mt-0">
                                                 <p-dropdown
+                                                  appendTo="body"
                                                   class="input-element ovic-dropdown-style p-dropdown-trigger--size-150 p-dropdown-trigger--label-minimal"
                                                   [filter]="false" [options]="question_status" [(ngModel)]="selected_status"
                                                   optionLabel="label" optionValue="value" optionDisabled="disable"
@@ -626,6 +627,7 @@
                                             <div class="ovic-vertical__inputs ovic-vertical__inputs--layout-2">
                                               <p class="form-row mt-0">
                                                 <p-dropdown
+                                                  appendTo="body"
                                                   class="input-element ovic-dropdown-style p-dropdown-trigger--size-20 p-dropdown-trigger--label-minimal"
                                                   [filter]="false" [options]="cdrOptions" [(ngModel)]="inputQuestion.cdrName"
                                                   (ngModelChange)="changeCdrSelect()" optionLabel="label" optionValue="value"

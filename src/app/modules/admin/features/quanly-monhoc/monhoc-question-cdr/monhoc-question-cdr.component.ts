@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ChangeDetectorRef, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CHUAN_DAU_RA, NORMAL_MODAL_OPTIONS, ROLES, ROUTERS } from '@modules/shared/utils/syscat';
 import { AuthService } from '@core/services/auth.service';
@@ -110,9 +110,9 @@ export class MonhocQuestionCdrComponent implements OnInit {
 
     chuandaura = CHUAN_DAU_RA;
 
-    list_cdr_cauhoi: PlanActivityCdr[];
+    list_cdr_cauhoi: PlanActivityCdr[] = [];
 
-    list_cdr_cauhoi_clone: PlanActivityCdr[];
+    list_cdr_cauhoi_clone: PlanActivityCdr[] = [];
 
     displayModal: boolean = false;
 
@@ -142,7 +142,8 @@ export class MonhocQuestionCdrComponent implements OnInit {
         private router: Router,
         private courseQuestionsService: CourseQuestionsService,
         private helperService: HelperService,
-        private modalService: NgbModal
+        private modalService: NgbModal,
+        private cdr: ChangeDetectorRef
     ) {
         this.isManager = this.auth.userHasRole(ROLES.manager) || this.auth.userHasRole(ROLES.admin) || this.auth.userHasRole(ROLES.troly_pdt) || this.auth.userHasRole(ROLES.chuyenvien_pdt) ? true : false;
 
@@ -363,9 +364,9 @@ export class MonhocQuestionCdrComponent implements OnInit {
                             }
                         })
 
-                        c['kyhieu_stt'] = c.kyhieu.replace(/\D/gi, '');
+                        c['kyhieu_stt'] = (c.kyhieu || '').replace(/\D/gi, '');
 
-                        if (c.params && c.params.cdr && c.params.cdr.cdr_info) {
+                        if (c.params && c.params.cdr && Array.isArray(c.params.cdr.cdr_info)) {
                             const index = c.params.cdr.cdr_info.findIndex(m => m.id === 'level_require');
                             if (index !== -1) {
                                 c['cdr_name'] = c.params.cdr.cdr_info[index].value;
@@ -393,11 +394,12 @@ export class MonhocQuestionCdrComponent implements OnInit {
                     f['children'] = this.helperService.sort(children, 'kyhieu_stt');
                 })
 
-                this.list_cdr_cauhoi = parent;
+                this.list_cdr_cauhoi = [...parent];
 
                 this.list_cdr_cauhoi_clone = [...parent];
 
                 this.checkCdrCourse();
+                this.cdr.detectChanges();
             },
 
             error: () => {
@@ -629,7 +631,7 @@ export class MonhocQuestionCdrComponent implements OnInit {
                 if (f.children) {
                     f.children.forEach(c => {
                         this.chuandaura.forEach(cdr => {
-                            if (c.cdr_cauhoi[cdr.id]) {
+                            if (c.cdr_cauhoi && c.cdr_cauhoi[cdr.id]) {
                                 cdr_total[cdr.id] = cdr_total[cdr.id] + c.cdr_cauhoi[cdr.id];
                                 s = c.cdr_cauhoi[cdr.id] + s;
                             }

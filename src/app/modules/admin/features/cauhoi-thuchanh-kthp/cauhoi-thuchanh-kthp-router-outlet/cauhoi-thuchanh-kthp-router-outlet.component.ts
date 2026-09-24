@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-
+import { CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { OvicQueryCondition } from '@core/models/dto';
@@ -10,8 +10,9 @@ import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.s
     selector: 'app-cauhoi-thuchanh-kthp-router-outlet',
     standalone: true,
     imports: [
-    RouterModule
-],
+        CommonModule,
+        RouterModule
+    ],
     templateUrl: './cauhoi-thuchanh-kthp-router-outlet.component.html',
     styleUrls: ['./cauhoi-thuchanh-kthp-router-outlet.component.css']
 })

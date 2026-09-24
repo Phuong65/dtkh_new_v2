@@ -272,11 +272,32 @@ body .ui-widget {
 * ovic-modal-class                 *
 ***********************************/
 .modal-backdrop.show {
-    z-index: 1090 !important;
+    z-index: 10000 !important;
 }
 
 .ovic-modal-class {
-    z-index: 1091;
+    z-index: 10001 !important;
+}
+
+ngb-modal-window.ovic-modal-class {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* Keep Angular Material 21 menus at the Angular Material 14 scale. */
+.mat-mdc-menu-item,
+.mat-mdc-menu-item-text {
+    font-size: 14px !important;
+}
+
+.mat-mdc-menu-item .mat-icon,
+.mat-mdc-menu-item .mat-icon-no-color {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 20px !important;
+    margin-right: 8px;
 }
 
 @media (min-width: 576px) {

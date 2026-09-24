@@ -3,7 +3,6 @@ import { CoursePlanActivitiesService } from '@modules/shared/services/course-pla
 import { CoursePlanActivityTuluanService } from './../../../../shared/services/course-plan-activity-tuluan.service';
 import { CommonModule } from '@angular/common';
 import { Component, NgModule, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
-import { MatListModule, MatSelectionListChange } from '@angular/material/list';
 import { MatTabsModule } from '@angular/material/tabs';
 import { OvicQueryCondition } from '@core/models/dto';
 import { AuthService } from '@core/services/auth.service';
@@ -65,7 +64,6 @@ export interface SINHDEOBJECT {
         MultiSelectModule,
         CommonModule,
         SharedModule,
-        MatListModule,
         PaginatorModule,
         NgbTooltipModule,
         MatTabsModule,
@@ -579,13 +577,28 @@ export class CauhoiKetthucHocphanComponent implements OnInit {
 
     }
 
-    closeLeftBody() {
-        this.closeLeft = !this.closeLeft;
+    onSelectCourseItem(course: ElnKhoaHoc) {
+        this.courseSelected = course;
+        this.codeTuluan = '';
+        this.onSelectTap(this.list_typeQuestion_practice[this.indexTap] || this.list_typeQuestion_practice[0], this.indexTap);
     }
 
-    onSelectCourse(event: MatSelectionListChange) {
-        this.courseSelected = event.options[0].value;
-        this.onSelectTap(this.list_typeQuestion_practice[0], 0);
+    onSelectTapIndex(index: number) {
+        if (this.list_typeQuestion_practice[index]) {
+            this.onSelectTap(this.list_typeQuestion_practice[index], index);
+        }
+    }
+
+    canEdit(): boolean {
+        return this.canUpdate || this.routerAdmin || this.routerDaotao || this.routerLanhdaokhoa || (this.courseSelected && this.userId === this.courseSelected.creator_plan_id);
+    }
+
+    canDel(): boolean {
+        return this.canDelete || this.routerAdmin || this.routerDaotao || this.routerLanhdaokhoa || (this.courseSelected && this.userId === this.courseSelected.creator_plan_id);
+    }
+
+    closeLeftBody() {
+        this.closeLeft = !this.closeLeft;
     }
 
     changePage(event) {

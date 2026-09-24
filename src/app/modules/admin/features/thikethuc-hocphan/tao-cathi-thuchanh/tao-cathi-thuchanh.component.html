@@ -1,1 +1,309 @@
-﻿<div class="p-3">tao-cathi-thuchanh.component works!</div>
+<div class="layout_component_container">
+    <div class="layout_component_container-header">
+        <div class="layout_component_container-header-filter" style="flex: 1;">
+            <input (keyup)="keyupForFilterByName($event['target']['value'])"
+                (keyup.enter)="startFilter($event['target']['value'],'name')"
+                placeholder="Nhập rồi nhấn enter để tìm kiếm" style="width: 250px;" type="text">
+        </div>
+        <div class="layout_component_container-header-action">
+            <p-overlayPanel #op appendTo="body">
+                <ng-template pTemplate>
+                    <ng-container [ngTemplateOutlet]="templateFilterShift">
+                    </ng-container>
+                </ng-template>
+            </p-overlayPanel>
+            <button (click)="op.toggle($event)" style="line-height: 1; margin-left: 5px;" class="btn btn-primary">
+                <i class="fa fa-filter"></i>Tìm kiếm
+            </button>
+            <button *ngIf="canAdded" (click)="openAddShifts()" style="line-height: 1; margin-left: 5px;"
+                class="btn btn-success"><i class="fa fa-plus"></i>Tạo ca
+                thi</button>
+        </div>
+    </div>
+    <div class="layout_component_container-bottom">
+        <div class="layout_component_container-bottom-table">
+            <p-table dataKey="id" [(selection)]="selectedShift" selectionMode="single" [value]="list_shifts"
+                styleClass="table-scroll-able table-able-dropdown-p-table table-none-header table-reBorder">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 3rem; text-align: center;">TT</th>
+                        <th style="width: 300px; min-width: 300px;">Tên ca thi</th>
+                        <th style="width: 130px; text-align: center;">Thời gian bắt đầu</th>
+                        <th style="width: 120px; text-align: center;">Số lượng đề</th>
+                        <th style="width: 300px;">Môn học</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-shift>
+                    <tr [pSelectableRow]="shift">
+                        <td style="text-align: center;">{{shift['index_']}}</td>
+                        <td>
+                            <div class="shift-name">
+                                <span style="flex: 1">{{shift.name}}</span>
+                                <button *ngIf="canUpdate && shift.status !== 2" [matMenuTriggerFor]="menuActionShift"
+                                    style="margin-left: 10px;" class="btn btn-primary btn-icon btn-transparent">
+                                    <i class="fa fa-ellipsis-v"></i>
+                                </button>
+                                <mat-menu #menuActionShift="matMenu">
+                                    <button
+                                        [disabled]="shift['tuluan_ids'] && shift['tuluan_ids'].length ? true : false"
+                                        (click)="startGetTestTuluanV2(shift)" mat-menu-item>
+                                        <i class="fa fa-file-archive-o margin-right-10px width-16px"></i>
+                                        <span>Sinh đề ngẫu nhiên</span>
+                                    </button>
+                                    <button
+                                        [disabled]="shift['tuluan_ids'] && shift['tuluan_ids'].length ? true : false"
+                                        (click)="startGetTestTuluan(shift)" mat-menu-item>
+                                        <i class="fa fa-file-archive-o margin-right-10px width-16px"></i>
+                                        <span>Sinh đề ngẫu nhiên cũ</span>
+                                    </button>
+                                    <button (click)="downloadTestV2(shift)" mat-menu-item>
+                                        <i class="fa fa-download margin-right-10px width-16px"></i>
+                                        <span>Tải đề về</span>
+                                    </button>
+                                    <button
+                                        [disabled]="shift['tuluan_ids'] && shift['tuluan_ids'].length ? false : true"
+                                        (click)="getTuluanTest(shift)" mat-menu-item>
+                                        <i class="fa fa-download margin-right-10px width-16px"></i>
+                                        <span>Tải đề về cũ</span>
+                                    </button>
+                                    <button (click)="downloadTestV2(shift,true)" mat-menu-item>
+                                        <i class="fa fa-download margin-right-10px width-16px"></i>
+                                        <span>Phương án chấm</span>
+                                    </button>
+                                    <button
+                                        [disabled]="shift['tuluan_ids'] && shift['tuluan_ids'].length ? false : true"
+                                        (click)="getTuluanTest(shift,true)" mat-menu-item>
+                                        <i class="fa fa-download margin-right-10px width-16px"></i>
+                                        <span>Phương án chấm cũ</span>
+                                    </button>
+                                    <button (click)="openEditShifts(shift)" mat-menu-item>
+                                        <i class="fa fa-pencil margin-right-10px width-16px"></i>
+                                        <span>Sửa</span>
+                                    </button>
+                                    <button *ngIf="canDelete" (click)="deleteShift(shift)" mat-menu-item>
+                                        <i class="fa fa-trash margin-right-10px width-16px"></i>
+                                        <span>Xóa</span>
+                                    </button>
+                                </mat-menu>
+                            </div>
+                        </td>
+                        <td style="text-align: center;">{{shift['time_start'] | date : 'dd/MM/yyyy HH:mm ' :'UTC+7'}}
+                        </td>
+                        <td style="text-align: center;">{{shift['num_of_test']}}</td>
+                        <td>{{shift['course_id'] | showlabel: list_course : 'id' : 'label_name'}}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+        <div class="page-layout-set">
+            <p-paginator #paginator_shift (onPageChange)="changePage_shift($event)" [rows]="limit_shifts"
+                [totalRecords]="total_shifts"></p-paginator>
+        </div>
+    </div>
+</div>
+
+<ng-template #templateFilterShift>
+    <div class="layout-filter-shift" style="width: 500px;">
+        <div class="ovic-vertical__inputs" style="line-height: 1.5;">
+            <div class="row form-row form-row-flex-row">
+                <div class="col-12">
+                    <label>Môn học:</label>
+                    <ovic-dropdown [defaultValue]="objectFillter['course_id']"
+                        (onChangeGetValue)="startFilter($event,'course_id')" placeholder="- - - - -"
+                        scrollHeight="400px" styleClass="shift-dropdown-filter width-250px" [options]="list_course"
+                        optionLabel="label_name" optionId="id" [filter]="true" filterBy="label_name">
+                    </ovic-dropdown>
+                </div>
+
+            </div>
+            <div class="row form-row form-row-flex-row">
+                <div class="col-4">
+                    <label>Năm học:</label>
+                    <ovic-dropdown [defaultValue]="objectFillter['namhoc']"
+                        (onChangeGetValue)="startFilter($event,'namhoc')" placeholder="- - - - -"
+                        [options]="list_namhoc" optionLabel="label" optionId="value">
+                    </ovic-dropdown>
+                </div>
+                <div class="col-4">
+                    <label>Học kỳ:</label>
+                    <ovic-dropdown [defaultValue]="objectFillter['hocky']"
+                        (onChangeGetValue)="startFilter($event,'hocky')" placeholder="- - - - -" [options]="list_hocky"
+                        optionLabel="label" optionId="value">
+                    </ovic-dropdown>
+                </div>
+                <div class="col-4">
+                    <label>Đợt thi:</label>
+                    <ovic-dropdown [defaultValue]="objectFillter['dotthi']"
+                        (onChangeGetValue)="startFilter($event,'dotthi')" placeholder="- - - - -"
+                        [options]="list_dotthi" optionLabel="label" optionId="value">
+                    </ovic-dropdown>
+                </div>
+            </div>
+            <div class="row form-row form-row-flex-row">
+                <div class="col-12" style="text-align: right;">
+                    <button style="line-height: 1;" (click)="cancelFilter()" class="btn btn-secondary"><i
+                            class="fa fa-refresh"></i>Hủy tìm kiếm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #createShift>
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+            <button class="btn ovic-over-right-section__close-button" (click)="closeSideMenu()"></button>
+        </div>
+        <div class="ovic-over-right-section__body" style="height:calc(100vh - 51px - 57px - 18px)">
+            <div class="ovic-vertical__inputs" style="line-height: 1.5;">
+                <form [formGroup]="formShift">
+                    <div class="row form-row form-row-flex-row">
+                        <div class="col-12">
+                            <label>Tên ca thi:<span class="ovic-mark">*</span></label>
+                            <input type="text" class="ovic-input-field" formControlName="name">
+                        </div>
+                    </div>
+                    <div class="row form-row form-row-flex-row">
+                        <div class="col-6">
+                            <label>Môn học:<span class="ovic-mark">*</span></label>
+                            <ovic-dropdown (onChange)="onChangeCourse($event)" placeholder="------" scrollHeight="400px"
+                                [options]="list_course" optionLabel="label_name" optionId="id" [filter]="true"
+                                filterBy="label_name" [defaultValue]="f['course_id'].value"
+                                [formField]="f['course_id']">
+                            </ovic-dropdown>
+                        </div>
+                        <div class="col-3">
+                            <label>Thời gian bắt đầu:<span class="ovic-mark">*</span></label>
+                            <p-calendar dateFormat="dd/mm/yy" formControlName="time_start" [showTime]="true"
+                                hourFormat="24"></p-calendar>
+                        </div>
+                        <div class="col-3">
+                            <label>Số lượng đề:<span class="ovic-mark">*</span></label>
+                            <input (keydown)="numberKeyDown($event)" type="number" class="ovic-input-field"
+                                formControlName="num_of_test">
+                        </div>
+                    </div>
+                    <div class="row form-row form-row-flex-row">
+                        <div class="col-6">
+                            <label>Năm học:<span class="ovic-mark">*</span></label>
+                            <ovic-dropdown placeholder="------" [options]="list_namhoc" optionLabel="label"
+                                optionId="value" [defaultValue]="f['namhoc'].value" [formField]="f['namhoc']">
+                            </ovic-dropdown>
+                        </div>
+                        <div class="col-3">
+                            <label>Học kỳ:<span class="ovic-mark">*</span></label>
+                            <ovic-dropdown placeholder="------" [options]="list_hocky" optionLabel="label"
+                                optionId="value" [defaultValue]="f['hocky'].value" [formField]="f['hocky']">
+                            </ovic-dropdown>
+                        </div>
+                        <div class="col-3">
+                            <label>Đợt thi:<span class="ovic-mark">*</span></label>
+                            <input (keydown)="numberKeyDown($event)" type="number" class="ovic-input-field"
+                                formControlName="dotthi">
+                        </div>
+                    </div>
+                    <!-- <div class="row form-row form-row-flex-row">
+                        <div class="col-12">
+                            <label>Loại kiểm tra:<span class="ovic-mark">*</span></label>
+                            <div class="radio-question-number-select" style="padding: 6px 0px;">
+                                <ovic-groups-radio-v2 [columns]="2" [group_name]="'type_of_test'"
+                                    [formField]="f['type_of_test']" [options]="list_type_test" optionId="id"
+                                    optionLabel="label" [defaultValue]="f['type_of_test'].value">
+                                </ovic-groups-radio-v2>
+                            </div>
+                        </div>
+                    </div> -->
+                    <div class="row form-row form-row-flex-row">
+                        <div class="col-12">
+                            <label>Mô tả:<span class="ovic-mark"></span></label>
+                            <ovic-editor height="auto" [default]="f['desc'].value"
+                                [formField]="f['desc']"></ovic-editor>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="ovic-dynamic-right-section__foot">
+            <p class="ovic-form-notes ovic-over-right-section__foot-ovic-input-line">
+                <i class="pi pi-info-circle"></i>các trường có đánh dấu ( <span class="ovic-mark">*</span> ) là
+                bắt
+                buộc phải nhập
+            </p>
+            <p class="ovic-over-right-section__foot-wrap-buttons">
+                <button (click)="saveShift()" class="btn ovic-over-right-section__foot-btn btn-primary">
+                    <i class="fa fa-floppy-o"></i>Lưu lại
+                </button>
+            </p>
+        </div>
+    </div>
+</ng-template>
+
+
+<p-dialog maskStyleClass="zindex-1000" styleClass="report-create-plan-dialog" [showHeader]="false" appendTo="body"
+    position="center" [draggable]="false" [resizable]="false" [modal]="true" header="Title" [(visible)]="display_layde"
+    [style]="{width: '700px'}" [closable]="false">
+    <div *ngIf="selectedShift" class="step-sync-plans" style="background-color: #fff;">
+        <div class="step-sync-plans-header" style="display: flex; align-items: center;">
+            <span style="flex: 1;">{{selectedShift.name}} - Sinh đề ngẫu nhiên</span>
+            <span (click)="display_layde = false" class="action-span"
+                style="margin-right: 0px; height: 20px; width: 20px; padding: 0px; line-height: 20px;text-align: center; cursor: pointer;">
+                <i style="color: red; margin: 0px;" class="fa fa-times"></i>
+            </span>
+        </div>
+        <div class="step-sync-plans-body ovic-vertical__inputs">
+            <div class="row form-row form-row-flex-row">
+                <div class="col-12 flex-div table-reBorder">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="text-align: center;">Số đề cần lấy</th>
+                                <th style="text-align: center;">Tổng số đề đang có trong ngân hàng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="text-align: center;">{{selectedShift.num_of_test}}</td>
+                                <td style="text-align: center;">{{list_tuluan?list_tuluan.length:0}}</td>
+                                <!-- <td style="text-align: center;">{{totalSinhdeObject.cau_1_total}}</td>
+                                <td style="text-align: center;">{{totalSinhdeObject.cau_2_total}}</td>
+                                <td style="text-align: center;">{{totalSinhdeObject.cau_1_total *
+                                    totalSinhdeObject.cau_2_total}}</td>
+                                <td style="text-align: center;">{{totalSinhdeObject.chuaduyet}}</td> -->
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row form-row form-row-flex-row">
+                <!-- <div class="col-12 flex-div ghi-de-dulieu">
+                    <p-checkbox [(ngModel)]="totalSinhdeObject.ghi_de" [binary]="true"
+                        label="Ghi đè dữ liệu nếu trùng mã câu hỏi"></p-checkbox>
+                </div> -->
+            </div>
+            <div class="row form-row form-row-flex-row" style="margin-top: 10px;">
+                <div class="col-12" style="text-align: right;">
+                    <button (click)="saveTestTuluan(true)" style="line-height: 1; margin-right: 10px;"
+                        class="btn btn-success">Lưu lại và tải đề</button>
+                    <button (click)="saveTestTuluan()" style="line-height: 1;" class="btn btn-primary">Lưu lại</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+    [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+    <div class="popup-waiting-loading">
+        <label style="width: 100%;">{{waitting_title}}</label>
+        <div class="tn-import-student-progressbar">
+            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+        </div>
+    </div>
+</p-dialog>
+<!-- <p-sidebar [showCloseIcon]="false" appendTo="body" [(visible)]="displaySidebarTeacher" position="right" [style]="{width:'200px'}">
+    <div class="layout-list-teacher">
+
+    </div>
+</p-sidebar> -->

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { MatListModule, MatSelectionListChange } from '@angular/material/list';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OvicQueryCondition } from '@core/models/dto';
@@ -106,7 +106,8 @@ export class ManageClassDetailsComponent implements OnInit {
         private auth: AuthService,
         private router: Router,
         private elnKhoaHocService: ElnKhoaHocService,
-        private elngUserProfileService: ElngUserProfileService
+        private elngUserProfileService: ElngUserProfileService,
+        private changeDetectorRef: ChangeDetectorRef
     ) {
         this.isManager = this.auth.userHasRole(ROLES.manager) || this.auth.userHasRole(ROLES.admin) || this.auth.userHasRole(ROLES.troly_pdt) || this.auth.userHasRole(ROLES.chuyenvien_pdt) || this.auth.userHasRole(ROLES.daotao_cv_1) ? true : false;
         this.isLanhDaoKhoa = this.auth.userHasRole(ROLES.lanhdaokhoa);
@@ -175,6 +176,7 @@ export class ManageClassDetailsComponent implements OnInit {
                                     this.selectedClass['supporter_ids'] = manager;
                                 }
                             }
+                            this.changeDetectorRef.detectChanges();
                             if (this.selectedClass.course_id) {
                                 forkJoin([
                                     this.elnKhoaHocService.getElnKhoaHocByItem(this.selectedClass.course_id.toString(), 'id'),

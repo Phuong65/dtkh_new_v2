@@ -13,7 +13,7 @@
         <div class="ovic-vertical__inputs ovic-vertical__inputs--layout-2">
           <p class="form-row mt-2">
             <label>Loại câu hỏi <span class="ovic-mark">*</span></label>
-            <p-dropdown scrollHeight="400px" class="input-element ovic-dropdown-style" [filter]="false" [options]="questionTypeSection.options" [(ngModel)]="questionTypeSection.active" (ngModelChange)="changesQuestionType()" optionLabel="label" optionValue="value" optionDisabled="disable" [placeholder]="questionTypeSection.placeholder"></p-dropdown>
+            <p-dropdown appendTo="body" scrollHeight="400px" class="input-element ovic-dropdown-style" [filter]="false" [options]="questionTypeSection.options" [(ngModel)]="questionTypeSection.active" (ngModelChange)="changesQuestionType()" optionLabel="label" optionValue="value" optionDisabled="disable" [placeholder]="questionTypeSection.placeholder"></p-dropdown>
           </p>
         </div>
       </div>

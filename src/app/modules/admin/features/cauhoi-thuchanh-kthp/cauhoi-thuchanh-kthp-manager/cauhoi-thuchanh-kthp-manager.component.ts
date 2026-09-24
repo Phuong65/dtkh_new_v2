@@ -3,7 +3,7 @@ import { ElngUserProfileService } from '@shared/services/elearning-user-profile.
 import { HelperService } from '@core/services/helper.service';
 import { NotificationService } from '@core/services/notification.service';
 import { Component, OnInit } from '@angular/core';
-
+import { CommonModule } from '@angular/common';
 import { SharedModule } from 'primeng/api';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { OvicQueryCondition } from '@core/models/dto';
@@ -26,13 +26,14 @@ import { PaginatorModule } from 'primeng/paginator';
     selector: 'app-cauhoi-thuchanh-kthp-manager',
     standalone: true,
     imports: [
-    SharedModule,
-    FormsModule,
-    ReactiveFormsModule,
-    TableModule,
-    RouterModule,
-    PaginatorModule
-],
+        CommonModule,
+        SharedModule,
+        FormsModule,
+        ReactiveFormsModule,
+        TableModule,
+        RouterModule,
+        PaginatorModule
+    ],
     templateUrl: './cauhoi-thuchanh-kthp-manager.component.html',
     styleUrls: ['./cauhoi-thuchanh-kthp-manager.component.css']
 })

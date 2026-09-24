@@ -1,1 +1,150 @@
-﻿<div class="p-3">danh-muc-survey.component works!</div>
+<div class="danh-muc-survey">
+    <div class="danh-muc-survey_head">
+        <!-- <ovic-dropdown styleClass="dropdown-200" (onChange)="onChangeParticipantRoles($event)" placeholder="---chọn nhóm khảo sát---"
+        [options]="participantRolesTypeOption" optionId="id"
+        optionLabel="label" [filter]="true"
+        filterBy="label" [showClear]="true"></ovic-dropdown> -->
+        <!-- <div class="ui-inputgroup ">
+            <input class="class-layout-top-option-search" type="text" pInputText placeholder="Nhập tiêu đề rồi nhấn enter">
+        </div> -->
+        <button class="btn btn-icon" container="body" placement="left" ngbTooltip="Thêm phiếu khảo sát" class="btn btn-success" (click)="openFormAddSurvey()">
+            <i style="margin-right: 0px;" class="pi pi-plus"></i>
+        </button>
+    </div>
+    <div class="danh-muc-survey_body">
+        <table class="table tbl survey-table table-border">
+            <tr>
+                <th class="text-center ovic-w-50px">STT</th>
+                <th class="text-center">Tiêu đề</th>
+                <th class="text-center">Mô tả ngắn</th>
+                <!-- <th class="text-center ovic-w-150px">Ngày bắt đầu</th>
+                <th class="text-center ovic-w-150px">Ngày kết thúc</th> -->
+                <th class="text-center ovic-w-100px">Số câu hỏi</th>
+                <th class="text-center ovic-w-150px">Nhóm khảo sát</th>
+                <th class="text-center ovic-w-150px">Lượt sử dụng</th>
+                <th class="text-center ovic-w-150px">Trạng thái</th>
+                <th class="text-center ovic-w-100px">Hành động</th>
+            </tr>
+            <ng-container>
+                <ng-container>
+                     <!-- *ngIf="listSurvey.length > 0 else notData" -->
+                    <tr *ngFor="let item of listSurvey let i = index">
+                        <td class="text-center" >{{ (temp.paged - 1) * temp.limit + i + 1 }}</td>
+                        <td class="text-left btn-title-survey" [routerLink]="['survey-info']"  [queryParams]="{code: item.id}">{{item['title']}}</td>
+                        <!-- <td class="text-center">{{item['start_date'] | date:'dd/MM/yyyy HH:mm'}}</td>
+                        <td class="text-center">{{item['end_date']  | date:'dd/MM/yyyy HH:mm'}}</td> -->
+                        <td class="text-center">{{item['description']}}</td>
+                        <td class="text-center">{{item['total_questions']}}</td>
+                        <td class="text-center">
+                            <ng-container>
+                                <span *ngIf="item['participant_roles'] == 'LECTURER'" class="badge-light-base badge-primary-light w-100">Giảng viên</span>
+                                <span *ngIf="item['participant_roles'] == 'STUDENT'" class="badge-light-base badge-teal-light w-100">Sinh viên</span>
+                                <span *ngIf="item['participant_roles'] == 'FORMER_STUDENTS'" class="badge-light-base badge-purple-light w-100">Cựu sinh viên</span>
+                                <span *ngIf="item['participant_roles'] == 'HEAD_OF_DEPARTMENT'" class="badge-light-base badge-success-light w-100">Trưởng Bộ môn</span>
+                                <span *ngIf="item['participant_roles'] == 'DEAN'" class="badge-light-base badge-warning-light w-100">Trưởng khoa</span>
+                                <span *ngIf="item['participant_roles'] == 'ALL_USERS'" class="badge-light-base badge-info-light w-100">Tất cả người dùng</span>
+                            </ng-container>
+                        </td>
+                        
+                        <td class="text-center">{{item['assigned_count']}}</td>
+                        <td class="text-center">
+                            <ng-container>
+                                <span *ngIf="item['status'] == 'DRAFT'" class="badge-light-base badge-secondary-light w-100">Đang soạn thảo</span>
+                                <span *ngIf="item['status'] == 'PUBLISHED'" class="badge-light-base badge-success-light w-100">Đã xuất bản</span>
+                                <span *ngIf="item['status'] == 'CLOSED'" class="badge-light-base badge-danger-light w-100">Đã đóng</span>
+                            </ng-container>
+                        </td>
+
+                        <td class="text-center">
+                            <button class="btn btn-danger btn-icon" container="body" placement="left"
+                                pTooltip="Xóa" tooltipPosition="left"
+                                [disabled]="(answerCountMap.get(item.id) || 0) > 0"
+                                (click)="deleteSurvey(item)">
+                                <i class="pi pi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                </ng-container>
+                <ng-template #notData>
+                    <tr>
+                        <td colspan="12"> Chưa có dữ liệu</td>
+                    </tr>
+                </ng-template>
+            </ng-container>
+            
+        </table>
+    </div>
+    <div class="danh-muc-survey_foot">
+
+        <p-paginator #paginator (onPageChange)="changePage($event)" [rows]="temp.limit" [totalRecords]="totalSurvey"></p-paginator>
+    </div>
+</div>
+
+
+<ng-template #createSurvey let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">Tạo phiếu khảo sát</h3>
+            <button class="btn ovic-over-right-section__close-button" (click)="closeSideMenu()"></button>
+        </div>
+        <div class="ovic-over-right-section__body" style="height: calc(100vh - 51px - 57px - 18px);">
+            <div class="ovic-vertical__inputs" style="line-height: 1.5;">
+                <form [formGroup]="formSurvey">
+                    <div class="row form-row form-row-flex-row form-row-flex-row--margin">
+                        <div class="col-12">
+                            <label class="label-margin">Tiêu đề phiếu<span class="ovic-mark">*</span></label>
+                            <input type="text" class="ovic-input-field" formControlName="title">
+                        </div>
+                    </div>
+                    <div class="row form-row form-row-flex-row form-row-flex-row--margin">
+                        <div class="col-12">
+                            <label>Mô tả ngắn</label>
+                            <textarea placeholder="Nhập mô tả... " formControlName="description"></textarea>
+                        </div>
+                    </div>
+                    <div class="row form-row form-row-flex-row form-row-flex-row--margin">
+                        <div class="col-12">
+                            <label class="label-margin">Nhóm khảo sát<span class="ovic-mark">*</span></label>
+                            <ovic-dropdown placeholder="---chọn nhóm khảo sát---"
+                                [options]="participantRolesTypeOption" [defaultValue]="formControl['participant_roles']['value']" optionId="id"
+                                optionLabel="label" [formField]="formControl['participant_roles']" [filter]="true"
+                                filterBy="label" [showClear]="false" [disabled]="true"></ovic-dropdown>
+                        </div>
+                    </div>
+                    <!-- <div class="row form-row form-row-flex-row">
+                        <div class="col-6">
+                            <div class="form-row">
+                                <label>Thời gian bắt đầu <span class="ovic-mark">*</span> </label>
+                                <p-calendar appendTo="body" formControlName="start_date"
+                                            dateFormat="dd/mm/yy" [showIcon]="true" [showTime]="false"
+                                            placeholder="Chọn ngày ...."></p-calendar>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-row">
+                                <label>Thời gian kết thúc</label>
+                                <p-calendar appendTo="body" formControlName="end_date"
+                                            dateFormat="dd/mm/yy" [showIcon]="true" [showTime]="false"
+                                            placeholder="Chọn ngày ...."></p-calendar>
+                            </div>
+                        </div>
+                    </div> -->
+                </form>
+            </div>
+        </div>
+
+        <div class="ovic-dynamic-right-section__foot">
+            <p class="ovic-form-notes ovic-over-right-section__foot-ovic-input-line">
+                <i class="pi pi-info-circle"></i>các trường có đánh dấu ( <span class="ovic-mark">*</span> ) là
+                bắt
+                buộc phải nhập
+            </p>
+            <p class="ovic-over-right-section__foot-wrap-buttons">
+                <button class="btn ovic-over-right-section__foot-btn btn-primary" (click)="saveSurvey()">
+                    <i class="fa fa-floppy-o" ></i>Lưu lại
+                </button>
+            </p>
+        </div>
+    </div>
+</ng-template>

@@ -851,7 +851,7 @@ export class TheodoiKiemtraDaugioComponent implements OnInit, OnDestroy {
                 ]).subscribe({
                     next: () => {
                         this.notificationService.isProcessing(false);
-                        this.notificationService.toastSuccess('Mở khóa bài kiểm tra thành công');
+                        this.notificationService.toastSuccess('Kích hoạt tất cả bài kiểm tra thành công');
                         this.loadStudentAndTest();
                     },
                     error: () => {
@@ -873,7 +873,7 @@ export class TheodoiKiemtraDaugioComponent implements OnInit, OnDestroy {
                 ]).subscribe({
                     next: () => {
                         this.notificationService.isProcessing(false);
-                        this.notificationService.toastSuccess('Mở khóa bài kiểm tra thành công');
+                        this.notificationService.toastSuccess('Đóng tất cả bài kiểm tra thành công');
                         this.loadStudentAndTest();
                     },
                     error: () => {

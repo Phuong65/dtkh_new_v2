@@ -1,1 +1,450 @@
-﻿<div class="p-3">import-sinhvien-lophoc.component works!</div>
+<div class="import-class-students-layout">
+    <header class="workspace-header">
+        <div class="workspace-heading">
+            <button (click)="backToDongbo()" [disabled]="busy" class="btn btn-icon btn-secondary"
+                ngbTooltip="Quay lại trang đồng bộ" container="body" placement="top"
+                aria-label="Quay lại trang đồng bộ">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <div class="toolbar-actions">
+            <button (click)="openDownloadSelection()" [disabled]="busy || !yearOptions.length || facultyScopeBlocked"
+                class="btn btn-success action-button">
+                <i class="fa fa-cloud-download" aria-hidden="true"></i>
+                Tải dữ liệu từ EDU
+            </button>
+            <button (click)="openImportConfirmation(null)" [disabled]="busy || !eligibleClasses.length"
+                class="btn btn-primary action-button">
+                <i class="fa fa-play" aria-hidden="true"></i>
+                Bắt đầu import
+            </button>
+        </div>
+    </header>
+
+    <div class="sync-journey" aria-label="Quy trình đồng bộ dữ liệu">
+        <div class="journey-step" [class.is-complete]="selectedYear && selectedSemester && selectedKhoa">
+            <span class="journey-marker">1</span>
+            <span class="journey-copy">
+                <strong>Chọn phạm vi</strong>
+                <small *ngIf="!selectedYear">Năm học · Học kỳ · Khóa</small>
+                <small *ngIf="selectedYear">{{selectedYear}} · Học kỳ {{selectedSemester}} · Khóa
+                    {{selectedKhoa}}</small>
+            </span>
+        </div>
+        <div class="journey-connector" [class.is-complete]="classes.length"></div>
+        <div class="journey-step" [class.is-complete]="classes.length">
+            <span class="journey-marker">2</span>
+            <span class="journey-copy">
+                <strong>Tải và đối chiếu</strong>
+                <small>{{classes.length ? classes.length + ' lớp đã tải' : 'Chưa có dữ liệu'}}</small>
+            </span>
+        </div>
+        <div class="journey-connector"
+            [class.is-complete]="importSummary.successClasses || importSummary.partialClasses || importSummary.failedClasses || importSummary.skippedUnchangedClasses || importSummary.staleBlockedClasses">
+        </div>
+        <div class="journey-step"
+            [class.is-complete]="importSummary.successClasses || importSummary.partialClasses || importSummary.failedClasses || importSummary.skippedUnchangedClasses || importSummary.staleBlockedClasses">
+            <span class="journey-marker">3</span>
+            <span class="journey-copy">
+                <strong>Xác nhận import</strong>
+                <small>{{eligibleClasses.length}} lớp sẵn sàng</small>
+            </span>
+        </div>
+
+        <div *ngIf="facultyScoped" class="scope-note">
+            <i class="fa fa-shield" aria-hidden="true"></i>
+            <span>Phạm vi giới hạn theo khoa của người dùng</span>
+        </div>
+    </div>
+
+    <section class="import-summary"
+        *ngIf="importSummary.successClasses || importSummary.partialClasses || importSummary.failedClasses || importSummary.skippedUnchangedClasses || importSummary.staleBlockedClasses"
+        aria-label="Kết quả import">
+        <div class="summary-heading">
+            <span class="section-kicker">Kết quả gần nhất</span>
+            <strong>Tổng kết import</strong>
+        </div>
+        <div class="summary-metric summary-success">
+            <span>{{importSummary.successClasses}}</span>
+            <small>Lớp thành công</small>
+        </div>
+        <div class="summary-metric summary-warning">
+            <span>{{importSummary.partialClasses}}</span>
+            <small>Lớp một phần</small>
+        </div>
+        <div class="summary-metric summary-error">
+            <span>{{importSummary.failedClasses}}</span>
+            <small>Lớp thất bại</small>
+        </div>
+        <div class="summary-metric">
+            <span>{{importSummary.successStudents}}</span>
+            <small>Sinh viên thành công</small>
+        </div>
+        <div class="summary-metric">
+            <span>{{importSummary.failedStudents}}</span>
+            <small>Sinh viên thất bại</small>
+        </div>
+        <div class="summary-metric summary-success">
+            <span>{{importSummary.skippedUnchangedClasses}}</span>
+            <small>Lớp không đổi đã bỏ qua</small>
+        </div>
+        <div class="summary-metric summary-warning">
+            <span>{{importSummary.staleBlockedClasses}}</span>
+            <small>Lớp dữ liệu đã đổi</small>
+        </div>
+        <button *ngIf="importSummary.partialClasses || importSummary.failedClasses" type="button"
+            class="btn btn-sm btn-warning summary-retry" [disabled]="busy" (click)="retryFailedClasses()">
+            <i class="fa fa-refresh" aria-hidden="true"></i>
+            Thử lại lớp lỗi
+        </button>
+    </section>
+
+    <main class="import-content">
+        <section class="class-panel" aria-label="Danh sách lớp học phần">
+            <div class="panel-header">
+                <div>
+                    <span class="section-kicker">Phạm vi tải</span>
+                    <strong>Danh sách lớp</strong>
+                    <span class="count-badge">{{displayedClasses.length}}/{{classes.length}}</span>
+                </div>
+                <button type="button" class="filter-button" [class.active]="!selectedSyncClassId"
+                    (click)="selectClass(null)" [attr.aria-pressed]="!selectedSyncClassId">
+                    Tất cả
+                </button>
+            </div>
+
+            <label class="class-search" *ngIf="classes.length">
+                <span class="sr-only">Tìm theo tên hoặc ký hiệu lớp</span>
+                <i class="fa fa-search" aria-hidden="true"></i>
+                <input type="text" [(ngModel)]="searchClass" (ngModelChange)="onClassSearchChange()"
+                    placeholder="Tìm tên hoặc ký hiệu lớp" />
+                <button *ngIf="searchClass" type="button" class="clear-search"
+                    (click)="searchClass = null; onClassSearchChange()" aria-label="Xóa nội dung tìm kiếm">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                </button>
+            </label>
+
+            <ul class="class-list" *ngIf="classes.length; else emptyClasses" role="listbox"
+                aria-label="Danh sách lớp học phần">
+                <li class="class-item" *ngFor="let item of displayedClasses" role="option" tabindex="0"
+                    [class.active]="selectedSyncClassId === item.syncClassId"
+                    [attr.aria-selected]="selectedSyncClassId === item.syncClassId"
+                    (click)="selectClass(item.syncClassId)" (keydown.enter)="selectClass(item.syncClassId)"
+                    (keydown.space)="$event.preventDefault(); selectClass(item.syncClassId)">
+                    <span class="class-item-heading">
+                        <span class="class-name">{{item.name}}</span>
+                    </span>
+                    <span class="class-title">{{item.name}}</span>
+                    <span class="class-counts">
+                        <span><strong>{{item.remoteStudentCount}}</strong><small>EDU</small></span>
+                        <span><strong>{{item.validStudentCount}}</strong><small>Hợp lệ</small></span>
+                        <span [class.has-error]="item.invalidStudentCount">
+                            <strong>{{item.invalidStudentCount}}</strong><small>Lỗi</small>
+                        </span>
+                    </span>
+                    <span class="class-statuses">
+                        <span class="status-chip" [ngClass]="statusClasses[item.downloadStatus]">
+                            {{downloadStatusLabels[item.downloadStatus]}}
+                        </span>
+                        <span class="status-chip" [ngClass]="statusClasses[item.comparisonStatus]">
+                            {{comparisonStatusLabels[item.comparisonStatus]}}
+                        </span>
+                        <span class="status-chip" [ngClass]="statusClasses[item.importStatus]">
+                            {{importStatusLabels[item.importStatus]}}
+                        </span>
+                    </span>
+                    <span *ngIf="item.comparisonStatus === 'changed'" class="class-difference-counts">
+                        <span><b>+{{item.addedStudentCount}}</b> thêm</span>
+                        <span><b>−{{item.removedStudentCount}}</b> xóa</span>
+                        <span><b>↕{{item.reorderedStudentCount}}</b> đổi thứ tự</span>
+                        <span *ngIf="item.invalidCurrentStudentCount" class="has-error">
+                            <b>{{item.invalidCurrentStudentCount}}</b> bất thường
+                        </span>
+                    </span>
+                    <span *ngIf="item.errorMessage" class="class-error">
+                        <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                        {{item.errorMessage}}
+                    </span>
+                </li>
+                <li class="empty-search" *ngIf="!displayedClasses.length" role="status">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                    <strong>Không tìm thấy lớp</strong>
+                    <span>Thử tên hoặc ký hiệu khác.</span>
+                </li>
+            </ul>
+
+            <ng-template #emptyClasses>
+                <div class="empty-state">
+                    <span class="empty-state-visual"><i class="fa fa-clone" aria-hidden="true"></i></span>
+                    <strong>Chưa có lớp học phần</strong>
+                    <span>Chọn phạm vi để tải danh sách lớp và sinh viên từ EDU.</span>
+                    <button type="button" class="empty-state-action" (click)="openDownloadSelection()"
+                        [disabled]="busy || !yearOptions.length || facultyScopeBlocked">
+                        Chọn phạm vi tải
+                    </button>
+                </div>
+            </ng-template>
+        </section>
+
+        <section class="student-panel" aria-label="Danh sách sinh viên">
+            <p-table
+                [value]="displayedStudents | filter : searchStudent : ['studentCode','fullName','email','className'] | paginatorLocal : studentPage : studentPageSize"
+                styleClass="student-table table-scroll-able table-able-dropdown-p-table table-has-caption table-reBorder">
+                <ng-template pTemplate="caption">
+                    <div class="student-caption">
+                        <div class="student-caption-title">
+                            <span class="section-kicker">Dữ liệu đối chiếu</span>
+                            <strong>Danh sách sinh viên</strong>
+                            <span class="count-badge">{{displayedStudents.length}}</span>
+                        </div>
+                        <div class="student-caption-tools">
+                            <button type="button" class="filter-button filter-change"
+                                [class.active]="studentStatusFilter === 'changed'"
+                                [attr.aria-pressed]="studentStatusFilter === 'changed'"
+                                (click)="toggleStudentChangeFilter()">
+                                <i class="fa fa-exchange" aria-hidden="true"></i>
+                                Chỉ xem thay đổi
+                            </button>
+                            <button type="button" class="filter-button filter-error"
+                                [class.active]="studentStatusFilter === 'error'"
+                                [attr.aria-pressed]="studentStatusFilter === 'error'"
+                                (click)="toggleStudentErrorFilter()">
+                                <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                                Chỉ xem lỗi
+                            </button>
+                            <label class="student-search">
+                                <span class="sr-only">Tìm sinh viên</span>
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                                <input type="text" [(ngModel)]="searchStudent" (ngModelChange)="studentPage = 0"
+                                    placeholder="Tìm mã, họ tên, email, lớp" />
+                            </label>
+                        </div>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 60px; text-align: center;">TT</th>
+                        <th style="width: 150px;">Mã sinh viên</th>
+                        <th style="width: 220px;">Họ và tên</th>
+                        <th style="width: 110px; text-align: center;">Ngày sinh</th>
+                        <th style="width: 220px;">Email</th>
+                        <th style="width: 220px;">Lớp học phần</th>
+                        <th style="width: 150px; text-align: center;">Thay đổi</th>
+                        <th style="width: 150px; text-align: center;">Trạng thái</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-student let-rowIndex="rowIndex">
+                    <tr>
+                        <td class="cell-center cell-index">{{studentPage * studentPageSize + rowIndex + 1}}</td>
+                        <td><strong class="student-code">{{student.studentCode}}</strong></td>
+                        <td>{{student.fullName || 'Chưa tìm thấy'}}</td>
+                        <td class="cell-center">{{student.birthday || '-'}}</td>
+                        <td>{{student.email || '-'}}</td>
+                        <td>
+                            <div class="student-class-name">{{student.className}}</div>
+                        </td>
+                        <td class="cell-center">
+                            <span *ngIf="student.differenceStatus; else noDifference" class="status-chip"
+                                [ngClass]="statusClasses[student.differenceStatus]">
+                                {{differenceStatusLabels[student.differenceStatus]}}
+                            </span>
+                            <small *ngIf="student.differenceStatus === 'reordered'" class="ordering-change">
+                                {{student.currentOrdering || '-'}} → {{student.remoteOrdering || '-'}}
+                            </small>
+                            <ng-template #noDifference><span class="muted-text">-</span></ng-template>
+                        </td>
+                        <td class="cell-center">
+                            <span *ngIf="student.status" class="status-chip" [ngClass]="statusClasses[student.status]">
+                                {{studentStatusLabels[student.status]}}
+                            </span>
+                            <span *ngIf="!student.status" class="muted-text">Dữ liệu hiện tại</span>
+                            <small *ngIf="student.errorMessage" class="student-error">{{student.errorMessage}}</small>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="8" class="empty-table">
+                            <span class="empty-state-visual"><i class="fa fa-users" aria-hidden="true"></i></span>
+                            <strong>Chưa có dữ liệu sinh viên</strong>
+                            <span>Tải dữ liệu từ EDU để xem trước kết quả đối chiếu.</span>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+
+            <p-paginator *ngIf="displayedStudents.length" (onPageChange)="onStudentPageChange($event)"
+                [rows]="studentPageSize" [totalRecords]="displayedStudents.length">
+            </p-paginator>
+        </section>
+    </main>
+</div>
+
+<p-dialog appendTo="body" header="Chọn phạm vi tải dữ liệu" [(visible)]="showDownloadDialog"
+    styleClass="import-scope-dialog" [modal]="true" [style]="{width: '560px', maxWidth: 'calc(100vw - 24px)'}"
+    [baseZIndex]="1099" [draggable]="false" [resizable]="false" [closable]="!busy">
+    <div class="download-selection-content">
+        <div class="dialog-intro">
+            <span class="dialog-intro-icon"><i class="fa fa-cloud-download" aria-hidden="true"></i></span>
+            <div>
+                <strong>Tải dữ liệu theo đúng phạm vi</strong>
+                <p>Chọn lần lượt năm học, học kỳ và khóa. Danh sách lớp phù hợp sẽ được tải trước khi đối chiếu sinh
+                    viên.</p>
+            </div>
+        </div>
+        <div class="download-selection-fields">
+            <label class="filter-field">
+                <span class="field-heading"><b>1</b> Năm học</span>
+                <select [(ngModel)]="downloadYear" (ngModelChange)="onDownloadYearChange()" [disabled]="busy">
+                    <option [ngValue]="null">Chọn năm học</option>
+                    <option *ngFor="let option of yearOptions" [ngValue]="option.value">{{option.label}}</option>
+                </select>
+            </label>
+            <label class="filter-field">
+                <span class="field-heading"><b>2</b> Học kỳ</span>
+                <select [(ngModel)]="downloadSemester" (ngModelChange)="onDownloadSemesterChange()"
+                    [disabled]="busy || !downloadYear">
+                    <option [ngValue]="null">Chọn học kỳ</option>
+                    <option *ngFor="let option of semesterOptions" [ngValue]="option.value">{{option.label}}</option>
+                </select>
+            </label>
+            <label class="filter-field">
+                <span class="field-heading"><b>3</b> Khóa</span>
+                <select [(ngModel)]="downloadKhoa" [disabled]="busy || !downloadSemester">
+                    <option [ngValue]="null">Chọn khóa</option>
+                    <option *ngFor="let option of khoaOptions" [ngValue]="option.value">{{option.label}}</option>
+                </select>
+            </label>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <button style="line-height: 1;" type="button" class="btn btn-secondary" [disabled]="busy"
+            (click)="showDownloadDialog = false">
+            Hủy
+        </button>
+        <button style="line-height: 1;" type="button" class="btn btn-success"
+            [disabled]="busy || !downloadYear || !downloadSemester || !downloadKhoa"
+            (click)="confirmDownloadSelection()">
+            <i class="fa fa-cloud-download" aria-hidden="true"></i>
+            Tải dữ liệu
+        </button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog styleClass="dialog-waiting import-progress-dialog" appendTo="body" [showHeader]="false" [closable]="false"
+    [(visible)]="showProgressDialog" [modal]="true" [style]="{width: '520px', maxWidth: 'calc(100vw - 24px)'}"
+    [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+    <div class="progress-dialog" role="status" aria-live="polite">
+        <span class="progress-visual"><i class="fa fa-exchange" aria-hidden="true"></i></span>
+        <div class="progress-heading">
+            <strong>{{progressTitle}}</strong>
+            <span *ngIf="progressDetail">{{progressDetail}}</span>
+        </div>
+        <div class="progress-stats">
+            <span><strong>{{progressCompleted}}/{{progressTotal}}</strong> Hoàn thành</span>
+            <span [class.has-errors]="progressErrors"><strong>{{progressErrors}}</strong> Lỗi</span>
+        </div>
+        <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+        <span class="progress-percent">{{progressValue | number:'1.0-0'}}%</span>
+        <small>Vui lòng giữ cửa sổ này mở cho đến khi quá trình hoàn tất.</small>
+    </div>
+</p-dialog>
+
+<p-dialog appendTo="body" header="Xác nhận thay thế danh sách sinh viên" [(visible)]="showConfirmDialog"
+    styleClass="import-confirm-dialog" [modal]="true" [style]="{width: '680px', maxWidth: 'calc(100vw - 24px)'}"
+    [baseZIndex]="1099" [draggable]="false" [resizable]="false" [closable]="!isImporting">
+    <div class="confirm-content">
+        <div class="confirm-warning">
+            <span class="warning-icon"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></span>
+            <div>
+                <strong>Lớp có thay đổi sẽ được thay thế dữ liệu</strong>
+                <span>Chỉ lớp có thay đổi bị xóa danh sách hiện tại trước khi import; lớp không thay đổi được bỏ
+                    qua.</span>
+            </div>
+        </div>
+        <dl class="confirm-stats">
+            <div>
+                <dt>Năm học</dt>
+                <dd>{{selectedYear}}</dd>
+            </div>
+            <div>
+                <dt>Học kỳ</dt>
+                <dd>{{selectedSemester}}</dd>
+            </div>
+            <div>
+                <dt>Khóa</dt>
+                <dd>{{selectedKhoa}}</dd>
+            </div>
+            <div>
+                <dt>Số lớp xử lý</dt>
+                <dd>{{confirmationClasses.length}}</dd>
+            </div>
+            <div>
+                <dt>Liên kết sinh viên</dt>
+                <dd>{{totalEligibleStudents}}</dd>
+            </div>
+            <div>
+                <dt>Lớp có danh sách rỗng</dt>
+                <dd>{{emptyEligibleClassCount}}</dd>
+            </div>
+            <div>
+                <dt>Lớp có thay đổi</dt>
+                <dd>{{confirmationChangedClassCount}}</dd>
+            </div>
+            <div>
+                <dt>Lớp không thay đổi</dt>
+                <dd>{{confirmationUnchangedClassCount}}</dd>
+            </div>
+            <div>
+                <dt>Sinh viên sẽ thêm</dt>
+                <dd>+{{confirmationAddedStudentCount}}</dd>
+            </div>
+            <div>
+                <dt>Sinh viên sẽ xóa</dt>
+                <dd>−{{confirmationRemovedStudentCount}}</dd>
+            </div>
+            <div>
+                <dt>Đổi thứ tự</dt>
+                <dd>{{confirmationReorderedStudentCount}}</dd>
+            </div>
+        </dl>
+        <div *ngIf="confirmationDestructiveClasses.length" class="destructive-class-warning" role="alert">
+            <strong>Lớp có dữ liệu sẽ bị xóa hoặc bất thường</strong>
+            <ul>
+                <li *ngFor="let item of confirmationDestructiveClasses">
+                    {{item.kyhieu || item.name}}:
+                    {{item.removedStudentCount}} sinh viên sẽ xóa<span *ngIf="item.invalidCurrentStudentCount">,
+                        {{item.invalidCurrentStudentCount}} bản ghi bất thường</span>
+                </li>
+            </ul>
+        </div>
+        <p class="transaction-warning">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            Nếu lỗi mạng hoặc API xảy ra sau bước xóa, một lớp có thể chỉ được import một phần do luồng hiện tại không
+            có transaction xuyên API.
+        </p>
+        <div class="confirm-checkbox">
+            <p-checkbox [(ngModel)]="confirmImportAgreed" [binary]="true"
+                inputId="agreeImportClassStudents"></p-checkbox>
+            <label for="agreeImportClassStudents">Tôi đã xem số sinh viên thêm, xóa, đổi thứ tự và đồng ý tiếp
+                tục</label>
+        </div>
+        <div *ngIf="requiresDestructiveConfirmation" class="confirm-checkbox confirm-checkbox-danger">
+            <p-checkbox [(ngModel)]="confirmDestructiveChangesAgreed" [binary]="true"
+                inputId="agreeDeleteCurrentClassStudents"></p-checkbox>
+            <label for="agreeDeleteCurrentClassStudents">
+                Tôi chấp nhận xóa sinh viên và bản ghi hiện tại bất thường được liệt kê phía trên
+            </label>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <button style="line-height: 1;" type="button" class="btn btn-secondary"
+            (click)="showConfirmDialog = false">Hủy</button>
+        <button style="line-height: 1;" type="button" class="btn btn-primary" [disabled]="!canConfirmImport"
+            (click)="confirmAndImport()">
+            <i class="fa fa-refresh" aria-hidden="true"></i>
+            Xác nhận import
+        </button>
+    </ng-template>
+</p-dialog>

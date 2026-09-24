@@ -127,6 +127,10 @@ export class NotificationService {
 		return this.OBSERVE_LOADING_ANIMATION.asObservable();
 	}
 
+	private openModal(component: any, options: NgbModalOptions) {
+		return this.ngZone.run(() => this.modalService.open(component, options));
+	}
+
 	isProcessing(isLoading = true) {
 		this.ngZone.run(() => {
 			this.OBSERVE_LOADING_ANIMATION.next(isLoading);
@@ -208,7 +212,7 @@ export class NotificationService {
 	}
 
 	confirmRounded(htmlBody: string, textHead = '', buttons: OvicButton[] = []): Promise<OvicButton> {
-		const confirmModalRef = this.modalService.open(ConfirmRoundedComponent, NORMAL_MODAL_OPTIONS_ROUND);
+		const confirmModalRef = this.openModal(ConfirmRoundedComponent, NORMAL_MODAL_OPTIONS_ROUND);
 		confirmModalRef.componentInstance.head = textHead || this.messConfirmAction;
 		if (htmlBody) {
 			confirmModalRef.componentInstance.body = htmlBody;
@@ -220,7 +224,7 @@ export class NotificationService {
 	}
 
 	confirm(htmlBody: string, textHead = '', buttons: OvicButton[] = []): Promise<OvicButton> {
-		const confirmModalRef = this.modalService.open(ConfirmComponent, NORMAL_MODAL_OPTIONS);
+		const confirmModalRef = this.openModal(ConfirmComponent, NORMAL_MODAL_OPTIONS);
 		confirmModalRef.componentInstance.head = textHead || this.messConfirmAction;
 		if (htmlBody) {
 			confirmModalRef.componentInstance.body = htmlBody;
@@ -232,7 +236,7 @@ export class NotificationService {
 	}
 
 	popup(htmlBody: string, textHead = ''): Promise<any> {
-		const confirmModalRef = this.modalService.open(PopupComponent, NORMAL_MODAL_OPTIONS);
+		const confirmModalRef = this.openModal(PopupComponent, NORMAL_MODAL_OPTIONS);
 		confirmModalRef.componentInstance.textHead = textHead || this.mesNotice;
 		if (htmlBody) {
 			confirmModalRef.componentInstance.htmlBody = htmlBody;
@@ -241,7 +245,7 @@ export class NotificationService {
 	}
 
 	confirmDelete(message: string = null, head: string = null): Promise<boolean> {
-		const c = this.modalService.open(ConfirmDeleteComponent, NORMAL_MODAL_OPTIONS);
+		const c = this.openModal(ConfirmDeleteComponent, NORMAL_MODAL_OPTIONS);
 		if (head) {
 			c.componentInstance.head = head;
 		}
@@ -352,7 +356,7 @@ export class NotificationService {
 	 * Alert
 	 * ***************************************************/
 	alert(options: AlertOptions): Promise<OvicButton> {
-		const c = this.modalService.open(AlertComponent, ALERT_MODAL_OPTIONS);
+		const c = this.openModal(AlertComponent, ALERT_MODAL_OPTIONS);
 		c.componentInstance.options = options;
 		return c.result;
 	}
@@ -502,7 +506,7 @@ export class NotificationService {
 			centered: true,
 			windowClass: 'ovic-modal-class'
 		};
-		const popup = this.modalService.open(OvicMediaPlayerComponent, options);
+		const popup = this.openModal(OvicMediaPlayerComponent, options);
 		popup.componentInstance.data = data;
 		return popup.result;
 	}

@@ -1,1 +1,240 @@
-﻿<div class="p-3">sinhvien-cathi-hvu.component works!</div>
+<div style="height: 100%;">
+    <p-tabView [(activeIndex)]="activityIndex" (onChange)="changeTap()"
+        styleClass="tab-lesson-view no-padding-panel panel-height-100">
+        <p-tabPanel header="Thêm sinh viên">
+            <ng-container [ngTemplateOutlet]="templateAddSinhvien">
+            </ng-container>
+        </p-tabPanel>
+        <p-tabPanel header="Danh sách sinh viên trong ca thi">
+            <ng-container [ngTemplateOutlet]="templateListSinhvien">
+            </ng-container>
+        </p-tabPanel>
+    </p-tabView>
+</div>
+
+<ng-template #templateAddSinhvien>
+    <div class="layout-add-student">
+        <div class="layout-add-student-top">
+            <div class="layout-add-student-action">
+                <button (click)="downLoadFileSinhVienEx()" class="btn btn-secondary"><i class="fa fa-download"></i>Tải
+                    file excel mẫu</button>
+                <button (click)="onGetFileExcelImport()" class="btn btn-success"><i class="fa fa-upload"></i>Chọn file
+                    excel</button>
+                <button (click)="startImportShiftStudent()"
+                    [disabled]="list_student_import && list_student_import.length?false:true" class="btn btn-primary"><i
+                        class="fa fa-play"></i>Bắt đầu import</button>
+                <input type="file" #inputImport style="visibility: hidden; display: contents;"
+                    (change)="changeInputImport($event)" accept=".xlsx, .xls" />
+            </div>
+            <div class="layout-add-student-info">
+
+            </div>
+        </div>
+        <div class="layout-add-student-bottom">
+            <div style="height: calc(100% - 40px); padding: 5px;">
+                <div *ngIf="list_student_import" style="height: 100%;">
+                    <p-table
+                        [value]="list_student_import | filter : search_student_import : ['masv' , 'full_name'] | filter : status_import_filter : ['status'] | paginatorLocal : pageImport : 25"
+                        styleClass="table-scroll-able table-able-dropdown-p-table table-has-caption table-reBorder">
+                        <ng-template pTemplate="caption">
+                            <div class="flex" style="display: flex; align-items: center;">
+                                <div style="flex: 1; font-weight: 500;">
+                                    <span (click)="status_import_filter = null"
+                                        class="padding-5px hover-underline">Tổng:
+                                        {{list_student_import.length}}</span> |
+                                    <span (click)="status_import_filter = '-1'"
+                                        class="padding-5px hover-underline orange">Chưa có tài khoản:
+                                        {{status_object.no_account}} </span> |
+                                    <span (click)="status_import_filter = '0'"
+                                        class="padding-5px hover-underline gray">Chưa import:
+                                        {{status_object.no_import}} </span> |
+                                    <span (click)="status_import_filter = '1'"
+                                        class="padding-5px hover-underline blue">Thành công:
+                                        {{status_object.import_done}} </span> |
+                                    <span (click)="status_import_filter = '-2'"
+                                        class="padding-5px hover-underline red">Thất bại:
+                                        {{status_object.import_fail}} </span>
+                                </div>
+                                <div>
+                                    <input type="text" [(ngModel)]="search_student_import"
+                                        style="line-height: 1; width:200px;" placeholder="Nhập tên hoặc mã sv" />
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th style="width: 3rem; text-align: center;">TT</th>
+                                <th style="width: 250px;">Họ và tên</th>
+                                <th style="width: 250px;">Mã sinh viên</th>
+                                <th style="width:100px; text-align: center;">Ngày sinh</th>
+                                <th style="width:120px;text-align: center;">SBD</th>
+                                <th style="width:120px;text-align: center;">Phòng thi</th>
+                                <th style="max-width: 150px; width:150px;text-align: center;">Trạng thái</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-student>
+                            <tr>
+                                <td style="text-align: center;">{{student['index']}}</td>
+                                <td>{{student.full_name}}</td>
+                                <td>{{student.masv}}</td>
+                                <td style="text-align: center;">{{student.birthday}}</td>
+                                <td style="text-align: center;">{{student.sbd}}</td>
+                                <td style="text-align: center;">{{student.room}}</td>
+                                <td style="text-align: center;">
+                                    <div [ngSwitch]="student['status']">
+                                        <span *ngSwitchCase="-1" class="student-status-shift">
+                                            Chưa có tài khoản
+                                        </span>
+                                        <span *ngSwitchCase="0" class="student-status-shift status-deactive">
+                                            Chưa import
+                                        </span>
+                                        <span *ngSwitchCase="1" class="student-status-shift status-activite">
+                                            Thành công
+                                        </span>
+                                        <span *ngSwitchCase="-2" class="student-status-shift import-fail">
+                                            Thất bại
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+            <div *ngIf="list_student_import" class="page-layout-set">
+                <p-paginator #paginator_shift (onPageChange)="onChangePageImport($event)" [rows]="25"
+                    [totalRecords]="list_student_import ? list_student_import.length:0"></p-paginator>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #templateListSinhvien>
+    <div class="layout-add-student" style="display: flex;">
+        <div class="layout-add-student-left">
+            <div class="filter-layout">
+                <input [(ngModel)]="searRoom" style="width: 100%;" placeholder="Nhập tên phòng" type="text">
+            </div>
+            <div class="layout-add-student-left-bottom list-course-layout"
+                *ngIf="(list_room |filter: searRoom : ['room']).length > 0; else noResults">
+                <mat-selection-list [multiple]="false" class="selection-list-mat" #courses>
+                    <mat-list-option (click)="onSelectedRoom(room)"
+                        [selected]="selectedRoom && selectedRoom.room === room.room ? true: false"
+                        *ngFor="let room of list_room | filter : searRoom : ['room'] " [value]="room">
+                        <div mat-line style="font-weight: 600; margin-bottom: 5px;">
+                            {{!room.id ? 'Phòng':''}} {{room.room}}</div>
+                        <div mat-line style="display: flex; justify-content: space-between;">
+                            <span>Tổng sinh viên: {{room['count_students']}}</span>
+                            <span class="blue">Có đề: {{room['shift_Students']}}</span>
+                        </div>
+                    </mat-list-option>
+                </mat-selection-list>
+            </div>
+            <ng-template #noResults>
+                <div style="height: calc(100% - 42px);" class="result-search-none">Không tìm thấy...</div>
+            </ng-template>
+        </div>
+        <div class="layout-add-student-right">
+            <div class="layout-add-student-right-table">
+                <p-table [value]="list_student_in_room"
+                    styleClass="table-scroll-able table-able-dropdown-p-table table-has-caption table-reBorder">
+                    <ng-template pTemplate="caption">
+                        <div class="flex" style="display: flex; align-items: center;">
+                            <div style="flex: 1; font-weight: normal;">
+                                <input [(ngModel)]="search_student_in_room" (keyup)="filterStudent($event)" type="text"
+                                    style="line-height: 1; width:300px;"
+                                    placeholder="Nhập đầy đủ mã sinh viên rồi nhấn enter" />
+                            </div>
+                            <div>
+                                <button class="btn btn-danger" (click)="deleteAllStudentInRoom()"><i
+                                        class="fa fa-trash"></i> Xóa tất cả sinh viên trong phòng</button>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width: 3rem; text-align: center;">TT</th>
+                            <th style="width: 250px;">Họ và tên</th>
+                            <th style="width: 250px;">Mã sinh viên</th>
+                            <th style="width:100px; text-align: center;">Ngày sinh</th>
+                            <th style="width:120px;text-align: center;">SBD</th>
+                            <th style="width:120px;text-align: center;">Phòng thi</th>
+                            <th style="width:120px;text-align: center;">Có đề</th>
+                            <th style="width:120px;text-align: center;">Thao tác</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-student>
+                        <tr>
+                            <td style="text-align: center;">{{student['index_']}}</td>
+                            <td>{{student.student.full_name}}</td>
+                            <td>{{student.student.student_code}}</td>
+                            <td style="text-align: center;">{{student.student.birthday}}</td>
+                            <td style="text-align: center;">{{student.sbd}}</td>
+                            <td style="text-align: center;">{{student.room}}</td>
+                            <td style="text-align: center;">
+                                <span *ngIf="student['thi_question_bank_tn_id']" class='blue'><i
+                                        class='fa fa-check'></i></span>
+                                {{!student['thi_question_bank_tn_id']?'-':''}}
+                            </td>
+                            <td style="text-align: center;">
+                                <div>
+                                    <button (click)="deleteOneStudent(student)" class="btn btn-danger btn-icon"><i
+                                            class="fa fa-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+            <div *ngIf="list_student_in_room" class="page-layout-set">
+                <p-paginator #paginator_room (onPageChange)="onChangePageStudentInRoom($event)" [rows]="limit_student"
+                    [totalRecords]="total_Student_in_room"></p-paginator>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<p-dialog header="Thông báo" styleClass="p-dialog-add-student" [(visible)]="display_add_student" appendTo="body"
+    [dismissableMask]="true" [modal]="true" [draggable]="false" [resizable]="false">
+    <div *ngIf="student_one_add && selectedRoom" style="text-align: center;">
+        <span style="padding: 5px; color: red;">Sinh viên này chưa có trong phòng thi <span
+                style="font-weight: 600;">{{selectedRoom.room}}</span></span>
+
+        <div style="border-top: 1px solid #c8c8c8; padding: 5px; ">
+            <span style="font-size: 14px; font-weight: bold;">Thông tin sinh viên:</span>
+            <div
+                style="display: flex; flex-direction: column; margin-top: 10px; line-height: 1.25; width: 280px; margin: 10px auto; text-align: left;">
+                <span><label style="width: 100px;">Họ và
+                        tên</label>: {{student_one_add['full_name']}}</span>
+                <span><label style="width: 100px;">Mã
+                        SV</label>: {{student_one_add['student_code']}}</span>
+                <span><label style="width: 100px;">Ngày
+                        sinh</label>: {{student_one_add['birthday']}}</span>
+            </div>
+            <div style="margin: 0 auto; width: 280px; display: flex; line-height: 1; align-items: center;">
+                <span
+                    style="padding: 5px; line-height: 1.25; border: 1px solid #c8c8c8; border-right: none; background: var(--blue-gray-100); font-weight: 600;width: 100px;">SBD</span>
+                <input [(ngModel)]="student_one_add['SBD']" type="text" class="ovic-input-field">
+            </div>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <div style="display: flex; flex-direction: row; align-items: center;">
+            <span style="font-size: 14px; color: red; margin-right: 5px;">Thầy/Cô có muốn thêm sinh viên này vào phòng
+                thi <span style="font-weight: 600;">{{selectedRoom.room}}</span> không?</span>
+            <p-button (click)="addOneStudent()" autofocus icon="pi pi-check" label="Có"
+                styleClass="p-button-info"></p-button>
+            <p-button (click)="display_add_student = false" label="Không" styleClass="p-button-danger"></p-button>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+    [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+    <div class="popup-waiting-loading">
+        <label style="width: 100%;">{{waitting_title}}</label>
+        <div class="tn-import-student-progressbar">
+            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+        </div>
+    </div>
+</p-dialog>

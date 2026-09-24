@@ -20,21 +20,18 @@
         }
       </div>
       <div class="list-course-layout">
-        <mat-selection-list (selectionChange)="onSelectCourse($event)" [multiple]="false" [hideSingleSelectionIndicator]="true" class="selection-list-mat"
-          #courses>
-          @for (course of dmKhoahoc ; track course) {
-            <mat-list-option [selected]="courseSelected && courseSelected.id === course.id ? true: false"
-              [value]="course">
-              <div mat-line style="font-weight: 600;">{{course.title + ' (' + course.maso + ')'}}</div>
-              <div mat-line>{{course['creator_name'] + course['info_']}}</div>
+        <div class="course-item-list">
+          @for (course of dmKhoahoc; track course) {
+            <div class="course-item" [class.activity]="courseSelected && courseSelected.id === course.id"
+              (click)="onSelectCourseItem(course)">
+              <div class="course-item-title">{{course.title}} ({{course.maso}})</div>
+              <div class="course-item-info">{{course['creator_name']}}{{course['info_']}}</div>
               @if (course['status_question']) {
-                <div mat-line>
-                  <span [innerHTML]="course['status_question']"></span>
-                </div>
+                <div class="course-item-status" [innerHTML]="course['status_question']"></div>
               }
-            </mat-list-option>
+            </div>
           }
-        </mat-selection-list>
+        </div>
       </div>
       <div class="page-layout-set">
         <p-paginator #paginator (onPageChange)="changePage($event)" [rows]="limitCourse"
@@ -44,10 +41,9 @@
     <div class="layout_component_container-noidung mat-tab-chuandaura">
       @if (courseSelected) {
         <div style="height: 100%;">
-          <mat-tab-group [selectedIndex]="indexTap">
+          <mat-tab-group [selectedIndex]="indexTap" (selectedIndexChange)="onSelectTapIndex($event)">
             @for (lvl of list_typeQuestion_practice; track lvl; let i = $index) {
-              <mat-tab labelClass="mat-tab-chuandaura-title"
-                [disabled]="true">
+              <mat-tab labelClass="mat-tab-chuandaura-title">
                 <ng-template mat-tab-label>
                   <div class="normal-color">
                     {{lvl.label}} ({{courseSelected[lvl.key]?courseSelected[lvl.key]:'0'}})
@@ -126,18 +122,10 @@
                                       </button>
                                     }
                                     @if (quest.status !== 1) {
-                                      <button (click)="editQuestion(quest)"
+                                      <button (click)="editQuestion(quest)" ngbTooltip="Sửa câu hỏi"
                                         class="btn btn-primary btn-icon btn-transparent"><i
                                       class="fa fa-pencil"></i></button>
                                     }
-                                    <!-- <button *ngIf="canUpdate && quest.status !== 1" container="body"
-                                    placement="top"
-                                    [ngbTooltip]="quest.status === 1?'Cập nhật hướng dẫn chấm điểm':'Sửa'"
-                                    (click)="editQuestion(quest)"
-                                    class="btn btn-primary btn-icon btn-transparent">
-                                    <i class="fa"
-                                    [ngClass]="quest.status === 1?'fa-pencil-square-o':'fa-pencil'"></i>
-                                  </button> -->
                                   @if (quest.status !== 1 && canDelete) {
                                     <button
                                       (click)="deleteQuestion(quest)"
@@ -181,33 +169,24 @@
                                   </span>
                                 </span>
                                 <div class="header-question-number-action">
-                                  @if (quest.status !== 1) {
                                     <button ngbTooltip="Nhập tiêu chí chấm"
                                       container="body" placement="left" (click)="openAddTieuchicham(quest)"
                                       class="btn btn-success btn-icon btn-transparent">
                                       <i class="fa fa-list-ul"></i>
                                     </button>
+                                  @if (quest.status !== 1) {
+                                    <button (click)="editQuestion(quest)" ngbTooltip="Sửa đề"
+                                      class="btn btn-primary btn-icon btn-transparent"><i
+                                    class="fa fa-pencil"></i></button>
                                   }
-                                  <!-- <button *ngIf="canUpdate && quest.status !== 1" container="body"
-                                  placement="top"
-                                  [ngbTooltip]="quest.status === 1?'Cập nhật hướng dẫn chấm điểm':'Sửa'"
-                                  (click)="editQuestion(quest)"
-                                  class="btn btn-primary btn-icon btn-transparent">
-                                  <i class="fa"
-                                  [ngClass]="quest.status === 1?'fa-pencil-square-o':'fa-pencil'"></i>
-                                </button> -->
-                                @if (quest.status !== 1) {
-                                  <button (click)="editQuestion(quest)"
-                                    class="btn btn-primary btn-icon btn-transparent"><i
-                                  class="fa fa-pencil"></i></button>
-                                }
-                                @if (quest.status !== 1 && canDelete) {
-                                  <button
-                                    (click)="deleteQuestion(quest)"
-                                    class="btn btn-danger btn-icon btn-transparent">
-                                    <i class="fa fa-trash"></i>
-                                  </button>
-                                }
+                                  @if (quest.status !== 1 && canDelete) {
+                                    <button
+                                      (click)="deleteQuestion(quest)"
+                                      ngbTooltip="Xóa đề"
+                                      class="btn btn-danger btn-icon btn-transparent">
+                                      <i class="fa fa-trash"></i>
+                                    </button>
+                                  }
                                 <button (click)="extendQuestion(quest)"
                                   class="btn btn-icon btn-transparent">
                                   <i [ngClass]="quest['extend']? 'pi pi-minus' : 'pi pi-plus'"></i>

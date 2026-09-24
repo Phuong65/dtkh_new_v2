@@ -227,6 +227,7 @@ export const ACCEPT_ROUTER = [
     'monhoc-muctieu',
     'monhoc-noidung',
     'monhoc-question-cdr',
+    'monhoc-question-cd',
     'monhoc-kiemtra-danhgia',
     'monhoc-formde',
     'monhoc-cauhinh',

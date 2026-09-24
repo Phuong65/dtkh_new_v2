@@ -1,1 +1,710 @@
-﻿<div class="p-3">duyet-cauhoi.component works!</div>
+<div class="duyet-cauhoi-layout">
+    <p-table [value]="list_cdr"
+        styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table ovic-ui-table table-reBorder th-td-padding-5px">
+        <ng-template pTemplate="caption">
+            <div class="flex"
+                style="font-weight: 500; justify-content: end; align-items: center; padding: 5px; display: flex;">
+                <div>
+                    <p-checkbox [binary]="true" (onChange)="checkValue($event,'_chuaduyet')" name="_chuaduyet"
+                        label="Lọc chưa duyệt"></p-checkbox>
+                </div>
+                <div *ngIf="kd_uyvien" style="margin-left: 20px;">
+                    <p-checkbox [binary]="true" (onChange)="checkValue($event,'_chuanhanxet')" name="_chuanhanxet"
+                        label="Lọc câu hỏi bạn chưa nhận xét"></p-checkbox>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th rowspan="2" style="text-align: center; width: 160px;">Câu hỏi</th>
+                <th rowspan="2" style="text-align: center; width: 100px;">Mã câu hỏi</th>
+                <th rowspan="2" style="text-align: center; width: 120px;">Kết quả test</th>
+                <th rowspan="2" style="text-align: center; width: 96px;">Kết quả cấp khoa</th>
+                <th rowspan="2" style="text-align: center; width: 96px;">Kết quả cấp trường</th>
+                <th [colSpan]="hoidong.length" style="text-align: center;">Nhận xét</th>
+            </tr>
+            <tr>
+                <th *ngFor="let thanhvien of hoidong, index as i" style="text-align: center; width: 100px;">
+                    <span *ngIf="thanhvien.vaitro === 'CHUTICH'">
+                        Chủ tịch<br>
+                        ({{thanhvien['display_name']}})
+                    </span>
+                    <span *ngIf="thanhvien.vaitro !== 'CHUTICH'">
+                        Ủy viên {{i}}<br>
+                        ({{thanhvien['display_name']}})
+                    </span>
+                </th>
+            </tr>
+            <tr *ngIf="activity && activity.week !== 100">
+                <th [colSpan]="5 + hoidong.length" style="background-color: #eaeaea;"><span
+                        innerHTML="Bài {{selectedActivity.week+' '+selectedActivity['count_question']}}"></span></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-cdr>
+            <tr>
+                <td [colSpan]="5 + hoidong.length" style="font-weight: 600; background-color: #cae1fc;">
+                    {{cdr.kyhieu+'('+cdr['cdr_cauhoi_label']+')'}}</td>
+            </tr>
+
+
+            <tr style="cursor: pointer;"
+                [ngClass]="selectedQuestion && selectedQuestion.id === question.id?'question-activity':''"
+                *ngFor="let question of cdr['question_cdr'] | filter : _chuanhanxet : ['_chuanhanxet'] | filter : _chuaduyet : ['_chuaduyet'] , index as i"
+                (click)="chooseQuestion(question, i + 1)">
+                <td>
+                    <div style="display: flex; align-items: center;">
+                        <span style="flex:1">
+                            - {{courseSelected.av ?'No.':'Câu: '}}{{question['index_question']}} <span
+                                *ngIf="courseSelected.av">({{question['children'].length}})</span>
+                            -
+                            {{object_chuandaura[question.cdr]}}
+                        </span>
+                        <!-- <span *ngIf="rejectRole">
+                            <span container="body" ngbTooltip="Mở khóa, cho phép sửa" placement="top"
+                                *ngIf="question.status === 1" (click)="reDoAction($event, question,0)"
+                                style="font-size: 14px;" class="action-icon-redo red"><i class="pi pi-lock"></i></span>
+                            <span (click)="reDoAction($event,question,1)" ngbTooltip="Khóa, không cho phép sửa"
+                                placement="top" container="body" *ngIf="question.status !== 1" style="font-size: 14px;"
+                                class="action-icon-redo gray"><i style="font-size: 16px;"
+                                    class="pi pi-lock-open"></i></span>
+                        </span> -->
+                    </div>
+                </td>
+                <td style="text-align: center;">#{{question.id}}</td>
+                <td style="text-align: center;">
+                    <div *ngIf="question['old_status'] === 1">
+                        Đang rà soát
+                    </div>
+                    <div *ngIf="question['old_status'] !== 1">
+                        <div *ngIf="question['question_root_id'] === 0">
+                            <span *ngIf="selectedCourse.av !== 1 ">{{question[ 'count_answer_true' ]+' - '+question[
+                                'count_answer_false' ]+' - '+question.count_answer_later+' | '+question[ 'count_teacher'
+                                ]}}
+                            </span>
+                        </div>
+                        <div *ngIf="question['question_root_id'] !== 0">
+                            Đã test
+                        </div>
+                    </div>
+                </td>
+                <td style="text-align: center;">
+                    <div [ngSwitch]="question['status']">
+                        <span *ngSwitchCase="0" class="action-icon status-is-deactive">
+                            Chờ duyệt
+                        </span>
+                        <span *ngSwitchCase="1" class="action-icon status-is-active">
+                            Đạt
+                        </span>
+                        <span *ngSwitchCase="-1" class="action-icon status-is-redo">
+                            Chưa đạt
+                        </span>
+                        <span *ngSwitchCase="-2" class="action-icon status-is-require">
+                            Đã sửa
+                        </span>
+                    </div>
+                </td>
+                <td style="text-align: center;">
+                    <div [ngSwitch]="question['status_captruong']">
+                        <span *ngSwitchCase="0" class="action-icon status-is-deactive">
+                            Chờ duyệt
+                        </span>
+                        <span *ngSwitchCase="1" class="action-icon status-is-active">
+                            Đạt
+                        </span>
+                        <span *ngSwitchCase="-1" class="action-icon status-is-redo">
+                            Chưa đạt
+                        </span>
+                        <span *ngSwitchCase="-2" class="action-icon status-is-require">
+                            Đã sửa
+                        </span>
+                    </div>
+                </td>
+                <td *ngFor="let thanhvien of hoidong, index as k" style="text-align: center;">
+                    <span class="danhanxet" *ngIf="question['hoidong_comment'][thanhvien.user_id]">Đã nhận
+                        xét</span>
+                    <span class="chuanhanxet" *ngIf="!question['hoidong_comment'][thanhvien.user_id]">Chưa nhận
+                        xét</span>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<ng-template #templateQuestionView>
+    <div class="ovic-over-right-section" style="height: 100%;">
+        <div class="ovic-over-right-section__head" style="display: flex; align-items: center;">
+            <h3 class="ovic-over-right-section__header" style="flex: 1;">Nhận xét câu hỏi</h3>
+            <div class="action-button-next-back">
+                <button (click)="openNewQuestion('back')" class="btn btn-success btn-angle"><i
+                        class="pi pi-angle-double-left"></i>Câu trước</button>
+                <button (click)="openNewQuestion('next')" class="btn btn-success btn-angle">Câu sau<i
+                        class="pi pi-angle-double-right" style="margin-left: 5px; margin-right: 0px;"></i></button>
+            </div>
+            <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
+        </div>
+        <div class="ovic-over-right-section__body footer-no-hint no-footer"
+            style="padding: 0px; height: calc(100% - 58px);">
+            <div class="list-questions__contents d-flex flex-fill">
+                <ul class="list-questions__contents__list">
+                    <ng-container *ngIf="courseSelected.av === 1; else tplTestNormalSubjectType">
+                        <ng-container>
+                            <li class="list-questions__contents__list__elements">
+                                <div
+                                    class="list-questions__contents__block list-questions__contents__block--head d-flex align-items-center flex-wrap">
+                                    <small class="list-questions__contents__block__code">{{selectedQuestion['in_cdr']}}
+                                        |
+                                        {{courseSelected.av ?'No.':'Câu '}}{{selectedQuestion['index_question']}} |
+                                        #{{ selectedQuestion.id}} | {{object_chuandaura[selectedQuestion.cdr]}} |
+                                        <span [ngSwitch]="selectedQuestion['status_captruong']">
+                                            <span *ngSwitchCase="0" class="action-icon status-is-deactive">
+                                                Chờ duyệt
+                                            </span>
+                                            <span *ngSwitchCase="1" class="action-icon status-is-active">
+                                                Đạt
+                                            </span>
+                                            <span *ngSwitchCase="-1" class="action-icon status-is-redo">
+                                                Chưa đạt
+                                            </span>
+                                            <span *ngSwitchCase="-2" class="action-icon status-is-require">
+                                                Đã sửa
+                                            </span>
+                                        </span>
+                                    </small>
+                                    <span class="list-questions__contents__block__q-info__separator">|</span>
+                                    <small class="list-questions__contents__block__code">#{{ selectedQuestion.code
+                                        }}</small>
+                                    <div
+                                        class="list-questions__contents__block__q-info ml-auto d-inline-flex align-items-center">
+                                        <ng-container
+                                            *ngIf="['group-input','group-radio','checkbox','radio'].includes(selectedQuestion.question_type)">
+                                            <p class="list-questions__contents__block__q-info__inverted-answer">
+                                                <i class="pi"
+                                                    [ngClass]="selectedQuestion.config['invertedAnswer'] ? 'pi-check':'pi-times'"></i>
+                                                Đảo vị trí của phương án trả lời
+                                            </p>
+                                            <span class="list-questions__contents__block__q-info__separator">|</span>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                                <div class="list-questions__contents__block">
+                                    <div class="lqc-present-single-question__direction"
+                                        [appLoadMediaOnText]="selectedQuestion.id"
+                                        [innerHTML]="selectedQuestion.question_direction | safeHtmlSingle"></div>
+                                    <div class="lqc-present-single-question__direction__media mt-3"
+                                        *ngIf="selectedQuestion.media">
+                                        <audio controls>
+                                            <source
+                                                [src]="selectedQuestion.media.path | ictuMediaLink : selectedQuestion.media.source : token | ovicSafeUrl">
+                                        </audio>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-questions__contents__list__elements"
+                                *ngIf="selectedQuestion.question_type ==='drag_drop'">
+                                <div class="list-questions__contents__block">
+                                    <div class="list-questions__contents__list__elements__av_drag_and_drop"
+                                        *ngFor="let child of selectedQuestion.children">
+                                        <div class="list-questions__contents__list__elements__av_drag_and_drop__index">
+                                            {{
+                                            child.question_number }}</div>
+                                        <div class="list-questions__contents__list__elements__av_drag_and_drop__direction lqc-present-single-question__direction"
+                                            [appLoadMediaOnText]="child.id"
+                                            [innerHTML]="child.question_direction | safeHtmlSingle">
+                                        </div>
+                                        <div class="list-questions__contents__list__elements__av_drag_and_drop__answer">
+                                            {{
+                                            child.answer_correct | extractCorrectAnswer }}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <ng-container *ngIf="selectedQuestion.question_type !=='drag_drop'">
+                                <li class="list-questions__contents__list__elements"
+                                    *ngFor="let child of selectedQuestion.children">
+                                    <div
+                                        class="list-questions__contents__block list-questions__contents__block--head d-flex align-items-center flex-wrap">
+                                        <small class="list-questions__contents__block__code">#{{ child.id }}</small>
+                                        <div
+                                            class="list-questions__contents__block__q-info ml-auto d-inline-flex align-items-center">
+                                            <ng-container
+                                                *ngIf="['group-input','group-radio','checkbox','radio'].includes(child.question_type)">
+                                                <p class="list-questions__contents__block__q-info__inverted-answer">
+                                                    <i class="pi"
+                                                        [ngClass]="child.config['invertedAnswer'] ? 'pi-check':'pi-times'"></i>
+                                                    Đảo
+                                                    vị trí của phương án trả lời
+                                                </p>
+                                                <span
+                                                    class="list-questions__contents__block__q-info__separator">|</span>
+                                            </ng-container>
+                                        </div>
+                                    </div>
+                                    <div class="list-questions__contents__block">
+                                        <div class="lqc-present-single-question__direction"
+                                            [appLoadMediaOnText]="child.id"
+                                            [innerHTML]="child.question_direction | safeHtmlSingle">
+                                        </div>
+
+                                    </div>
+                                    <div class="list-questions__contents__block list-questions__contents__block--body"
+                                        [ngSwitch]="child.question_type">
+                                        <group-input-question *ngSwitchCase="'group-input'"
+                                            [present]="child"></group-input-question>
+                                        <group-radio-question *ngSwitchCase="'group-radio'"
+                                            [present]="child"></group-radio-question>
+                                        <question-type-radio-editor *ngSwitchCase="'checkbox'" [multiple]="true"
+                                            [present]="child"></question-type-radio-editor>
+                                        <ng-container *ngSwitchCase="'drag_drop'"></ng-container>
+                                        <ng-container *ngSwitchCase="'radio'">
+                                            <div class="question-type-radio">
+                                                <ul class="question-type-radio__list">
+                                                    <li class="question-type-radio__list__element"
+                                                        [ngClass]="'question-type-radio__list__element--size-'+child.config?.cols"
+                                                        *ngFor="let o of child.answer_option; index as i">
+                                                        <!--                                            <span class="question-type-radio__radio-button" [class.question-type-radio__radio-button&#45;&#45;highlight]="o.id | isAnswerCorrect : child.answer_correct"></span>-->
+                                                        <span class="question-type-radio__radio-button__index"
+                                                            [class.question-type-radio__radio-button__index--highlight]="o.id | isAnswerCorrect : child.answer_correct">{{
+                                                            i | questionPrefix }}</span>
+                                                        <div class="question-type-radio__option"
+                                                            [appLoadMediaOnText]="o.id"
+                                                            [innerHTML]="o.value | safeHtmlSingle"></div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </ng-container>
+                                        <ng-container *ngSwitchCase="'grouping'">
+                                            <div
+                                                class="list-questions__contents__block__grouping d-flex justify-content-center align-items-center flex-wrap">
+                                                <span class="list-questions__contents__block__grouping__choice"
+                                                    *ngFor="let o of child.answer_option">{{ o.value }}</span>
+                                            </div>
+                                            <div
+                                                class="list-questions__contents__block__grouping__pairs d-flex align-items-start flex-wrap">
+                                                <div class="list-questions__contents__block__grouping__pairs__elm"
+                                                    *ngFor="let c of child['children']">
+                                                    <b
+                                                        class="list-questions__contents__block__grouping__pairs__elm__heading">{{
+                                                        c.question_direction }}</b>
+                                                    <textarea [rows]="5" [cols]="30" [disabled]="true"
+                                                        placeholder="Các đáp án..."
+                                                        class="list-questions__contents__block__grouping__pairs__elm__body"
+                                                        pInputTextarea>{{ c.answer_correct | answerLabel : child.answer_option }}</textarea>
+                                                </div>
+                                            </div>
+                                        </ng-container>
+                                        <ng-container *ngSwitchCase="'inputbox'">
+                                            <div *ngIf="!child['children'] || child['children'].length === 0">
+                                                <mat-chip-list class="example-chip">
+                                                    <mat-chip class="example-box"
+                                                        *ngFor="let ansc of child.answer_correct | stringToArrayPipe : '|'">
+                                                        {{ansc}}
+                                                    </mat-chip>
+                                                </mat-chip-list>
+                                            </div>
+                                            <div *ngIf="child['children'] && child['children'].length">
+                                                <ng-container *ngFor="let c of child['children']">
+                                                    <span class="list-questions__contents__block__separator"></span>
+                                                    <div
+                                                        class="list-questions__contents__block list-questions__contents__input-box">
+                                                        <span class="list-questions__contents__input-box__number"
+                                                            *ngIf="c.question_number ">{{ c.question_number
+                                                            }}</span>
+                                                        <div class="list-questions__contents__input-box__direction lqc-present-single-question__direction"
+                                                            *ngIf="c.question_direction" [appLoadMediaOnText]="c.id"
+                                                            [innerHTML]="c.question_direction | safeHtmlSingle"></div>
+                                                        <div
+                                                            class="list-questions__contents__input-box__correct-answer">
+                                                            {{
+                                                            c.answer_correct | json }}</div>
+                                                    </div>
+                                                </ng-container>
+                                            </div>
+
+                                        </ng-container>
+                                        <ng-container *ngSwitchCase="'reorder_words'">
+                                            <div
+                                                class="list-questions__contents__block__drag_drop__pairs d-flex align-items-start flex-wrap">
+                                                <div
+                                                    class="list-questions__contents__block__drag_drop__pairs__elm m-0 w-100">
+                                                    <input [disabled]="true"
+                                                        class="list-questions__contents__block__drag_drop__pairs__elm__answer-correct w-100"
+                                                        type="text" pInputText
+                                                        [value]="child.answer_correct | extractCorrectAnswer"
+                                                        placeholder="Đáp án...">
+                                                </div>
+                                            </div>
+                                        </ng-container>
+                                        <ng-container *ngSwitchCase="'matching'"></ng-container>
+                                        <div *ngSwitchDefault
+                                            class="d-flex flex-fill w-100 h-100 justify-content-center align-items-center">
+                                            <p class="alert alert-secondary m-0 primary-font --fs-14">Vui lòng chọn loại
+                                                câu hỏi
+                                            </p>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ng-container>
+                        </ng-container>
+                    </ng-container>
+                    <ng-template #tplTestNormalSubjectType>
+                        <li class="list-questions__contents__list__elements">
+                            <div
+                                class="list-questions__contents__block list-questions__contents__block--head d-flex align-items-center flex-wrap">
+                                <small class="list-questions__contents__block__code">{{selectedQuestion['in_cdr']}} |
+                                    {{courseSelected.av ?'No.':'Câu '}}{{selectedQuestion['index_question']}} |
+                                    #{{ selectedQuestion.id}} | {{object_chuandaura[selectedQuestion.cdr]}} | {{
+                                    selectedQuestion[ 'count_answer_true']+' - '+selectedQuestion['count_answer_false'
+                                    ]+' - '+selectedQuestion.count_answer_later+' ('+selectedQuestion[
+                                    'count_teacher']+')'}} | <span [ngSwitch]="selectedQuestion['status_captruong']">
+                                        <span *ngSwitchCase="0" class="action-icon status-is-deactive">
+                                            Chờ duyệt
+                                        </span>
+                                        <span *ngSwitchCase="1" class="action-icon status-is-active">
+                                            Đạt
+                                        </span>
+                                        <span *ngSwitchCase="-1" class="action-icon status-is-redo">
+                                            Chưa đạt
+                                        </span>
+                                        <span *ngSwitchCase="-2" class="action-icon status-is-require">
+                                            Đã sửa
+                                        </span>
+                                    </span>
+                                </small>
+                                <div
+                                    class="list-questions__contents__block__q-info ml-auto d-inline-flex align-items-center">
+                                    <ng-container
+                                        *ngIf="['group-input','group-radio','checkbox','radio'].includes(selectedQuestion.question_type)">
+                                        <!--<p-checkbox [disabled]="true" [(ngModel)]="q.config['invertedAnswer']" [binary]="true" label="Đảo vị trí của phương án trả lời"></p-checkbox>-->
+                                        <p class="list-questions__contents__block__q-info__inverted-answer">
+                                            <i class="pi"
+                                                [ngClass]="selectedQuestion.config['invertedAnswer'] ? 'pi-check':'pi-times'"></i>
+                                            Đảo vị
+                                            trí của phương án trả lời
+                                        </p>
+                                        <span class="list-questions__contents__block__q-info__separator">|</span>
+                                    </ng-container>
+                                </div>
+                            </div>
+                            <div class="list-questions__contents__block list-questions__contents__block--body">
+                                <div class="lqc-present-single-question__direction"
+                                    [appLoadMediaOnText]="selectedQuestion.id"
+                                    [innerHTML]="selectedQuestion.question_direction | safeHtmlSingle"></div>
+                            </div>
+                            <div class="list-questions__contents__block">
+                                <ng-container [ngSwitch]="selectedQuestion.question_type">
+                                    <group-input-question *ngSwitchCase="'group-input'"
+                                        [present]="selectedQuestion"></group-input-question>
+                                    <group-radio-question *ngSwitchCase="'group-radio'"
+                                        [present]="selectedQuestion"></group-radio-question>
+                                    <question-type-radio-editor *ngSwitchCase="'checkbox'" [multiple]="true"
+                                        [present]="selectedQuestion"></question-type-radio-editor>
+                                    <ng-container *ngSwitchCase="'drag_drop'">
+                                        <div
+                                            class="list-questions__contents__block__grouping d-flex justify-content-center align-items-center flex-wrap">
+                                            <span class="list-questions__contents__block__grouping__choice"
+                                                *ngFor="let o of selectedQuestion.answer_option">{{ o.value }}</span>
+                                        </div>
+                                        <div
+                                            class="list-questions__contents__block__drag_drop__pairs d-flex align-items-start flex-wrap">
+                                            <div class="list-questions__contents__block__drag_drop__pairs__elm"
+                                                *ngFor="let c of selectedQuestion.children">
+                                                <b
+                                                    class="list-questions__contents__block__drag_drop__pairs__elm__heading">{{
+                                                    c.question_direction }}</b>
+                                                <input [disabled]="true"
+                                                    class="list-questions__contents__block__drag_drop__pairs__elm__answer-correct"
+                                                    type="text" pInputText
+                                                    [value]="c.answer_correct | answerLabel : selectedQuestion.answer_option"
+                                                    placeholder="Đáp án...">
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'radio'">
+                                        <div class="question-type-radio">
+                                            <ul class="question-type-radio__list">
+                                                <li class="question-type-radio__list__element"
+                                                    [ngClass]="'question-type-radio__list__element--size-'+selectedQuestion.config?.cols"
+                                                    *ngFor="let o of selectedQuestion.answer_option; index as i">
+                                                    <!--                                            <span class="question-type-radio__radio-button" [class.question-type-radio__radio-button&#45;&#45;highlight]="o.id | isAnswerCorrect : q.answer_correct"></span>-->
+                                                    <span class="question-type-radio__radio-button__index"
+                                                        [class.question-type-radio__radio-button__index--highlight]="o.id | isAnswerCorrect : selectedQuestion.answer_correct">{{
+                                                        i | questionPrefix }}</span>
+                                                    <div class="question-type-radio__option" [appLoadMediaOnText]="o.id"
+                                                        [innerHTML]="o.value | safeHtmlSingle"></div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'grouping'">
+                                        <div
+                                            class="list-questions__contents__block__grouping d-flex justify-content-center align-items-center flex-wrap">
+                                            <span class="list-questions__contents__block__grouping__choice"
+                                                *ngFor="let o of selectedQuestion.answer_option">{{ o.value }}</span>
+                                        </div>
+                                        <div
+                                            class="list-questions__contents__block__grouping__pairs d-flex align-items-start flex-wrap">
+                                            <div class="list-questions__contents__block__grouping__pairs__elm"
+                                                *ngFor="let c of selectedQuestion.children">
+                                                <b
+                                                    class="list-questions__contents__block__grouping__pairs__elm__heading">{{
+                                                    c.question_direction }}</b>
+                                                <textarea [rows]="5" [cols]="30" [disabled]="true"
+                                                    placeholder="Các đáp án..."
+                                                    class="list-questions__contents__block__grouping__pairs__elm__body"
+                                                    pInputTextarea
+                                                    [autoResize]="true">{{ c.answer_correct | answerLabel : selectedQuestion.answer_option }}</textarea>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'inputbox'">
+                                        <ng-container *ngFor="let child of selectedQuestion.children">
+                                            <span class="list-questions__contents__block__separator"></span>
+                                            <div
+                                                class="list-questions__contents__block list-questions__contents__input-box">
+                                                <span class="list-questions__contents__input-box__number"
+                                                    *ngIf="child.question_number ">{{
+                                                    child.question_number }}</span>
+                                                <div class="list-questions__contents__input-box__direction lqc-present-single-question__direction"
+                                                    *ngIf="child.question_direction" [appLoadMediaOnText]="child.id"
+                                                    [innerHTML]="child.question_direction | safeHtmlSingle"></div>
+                                                <div class="list-questions__contents__input-box__correct-answer">{{
+                                                    child.answer_correct | json }}</div>
+                                            </div>
+                                        </ng-container>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'reorder_words'"></ng-container>
+                                    <ng-container *ngSwitchCase="'matching'"></ng-container>
+                                    <div *ngSwitchDefault
+                                        class="d-flex flex-fill w-100 h-100 justify-content-center align-items-center">
+                                        <p class="alert alert-secondary m-0 primary-font --fs-14">Vui lòng chọn loại câu
+                                            hỏi</p>
+                                    </div>
+                                </ng-container>
+                            </div>
+                            <ng-template #showMultipleRadio>
+                                <ng-container *ngFor="let child of selectedQuestion.children;">
+                                    <span class="list-questions__contents__block__separator"></span>
+                                    <div class="list-questions__contents__block">
+                                        <div class="lqc-present-single-question__direction"
+                                            [appLoadMediaOnText]="child.id"
+                                            [innerHTML]="child.question_direction | safeHtmlSingle"></div>
+                                    </div>
+                                    <div class="list-questions__contents__block">
+                                        <ng-container [ngSwitch]="child.question_type">
+                                            <ng-container *ngSwitchCase="'group-input'"></ng-container>
+                                            <group-radio-question *ngSwitchCase="'group-radio'"
+                                                [present]="child"></group-radio-question>
+                                            <question-type-radio-editor *ngSwitchCase="'checkbox'" [multiple]="true"
+                                                [present]="child"></question-type-radio-editor>
+                                            <ng-container *ngSwitchCase="'drag_drop'"></ng-container>
+                                            <ng-container *ngSwitchCase="'radio'"></ng-container>
+                                            <ng-container *ngSwitchCase="'grouping'"></ng-container>
+                                            <ng-container *ngSwitchCase="'inputbox'"></ng-container>
+                                            <ng-container *ngSwitchCase="'reorder_words'"></ng-container>
+                                            <ng-container *ngSwitchCase="'matching'"></ng-container>
+                                            <div *ngSwitchDefault
+                                                class="d-flex flex-fill w-100 h-100 justify-content-center align-items-center">
+                                                <p class="alert alert-secondary m-0 primary-font --fs-14">Vui lòng chọn
+                                                    loại câu
+                                                    hỏi
+                                                </p>
+                                            </div>
+                                        </ng-container>
+                                    </div>
+                                </ng-container>
+                            </ng-template>
+                        </li>
+                    </ng-template>
+                </ul>
+            </div>
+            <ng-container [ngTemplateOutlet]="templateDuyet" [ngTemplateOutletContext]="{ activity: selectedQuestion}">
+            </ng-container>
+        </div>
+    </div>
+</ng-template>
+
+
+<ng-template #templateDuyet let-activity="activity">
+    <div class="class-duyet-layout"
+        [ngClass]="(!activity['comments'] || !activity['comments'].length) && !kd_hoidong && !kd_hoidong?'no-border-top':''">
+        <div *ngIf="activity['comments'] && activity['comments'].length" style="width: 100%; padding: 15px;"
+            class="list-comment-layout">
+            <div class="ketqua-duyet-hoidong row">
+                <div class="ketqua-duyet-hoidong-left col-6"
+                    style="border-right: 1px solid #c8c8c8; margin-bottom: 10px;">
+                    <label style="font-weight: 600; margin-bottom: 10px;">
+                        KẾT QUẢ DUYỆT CỦA HỘI ĐỒNG KHOA:
+                    </label>
+
+                    <div class="ketquaduyet-hoidong row"
+                        *ngIf="activity['status'] === 1 || activity['status'] === -1; else choduyetTemplate"
+                        style="padding-bottom: 10px; ">
+
+                        <div class="ketquaduyet-hoidong-left col-6">
+                            <div class="ketquaduyet-hoidong-left-status" style="text-align: center;"
+                                [ngSwitch]="activity['status']">
+                                <span *ngSwitchCase="1" class="true-blue status-duyet-hoidong">Đạt</span>
+                                <span *ngSwitchCase="-1" class="red status-duyet-hoidong">Yêu cầu sửa</span>
+                            </div>
+                        </div>
+                        <div class="ketquaduyet-hoidong-right col-6">
+                            <div>Duyệt lúc:</div>
+                            <div>{{activity['approved_at'] | ovicDateTime}}</div>
+                        </div>
+                    </div>
+                    <ng-template #choduyetTemplate>
+                        <div class="ketquaduyet-hoidong" style="padding-bottom: 10px; ">
+                            <div style="text-align: center;" [ngSwitch]="activity['status']">
+                                <span *ngSwitchCase="0" class="gray status-duyet-hoidong">Chờ duyệt</span>
+                                <span *ngSwitchCase="-2" class="blue status-duyet-hoidong">Đã sửa, chờ duyệt</span>
+                            </div>
+                        </div>
+                    </ng-template>
+
+                </div>
+                <div class="ketqua-duyet-hoidong-right col-6">
+                    <label style="font-weight: 600; margin-bottom: 10px;">
+                        KẾT QUẢ DUYỆT CỦA HỘI ĐỒNG TRƯỜNG:
+                    </label>
+
+                    <div class="ketquaduyet-hoidong row"
+                        *ngIf="activity['status_captruong'] === 1 || activity['status_captruong'] === -1; else choduyetCaptruongTemplate"
+                        style="padding-bottom: 10px; ">
+
+                        <div class="ketquaduyet-hoidong-left col-6">
+                            <div class="ketquaduyet-hoidong-left-status" style="text-align: center;"
+                                [ngSwitch]="activity['status_captruong']">
+                                <span *ngSwitchCase="1" class="true-blue status-duyet-hoidong">Đạt</span>
+                                <span *ngSwitchCase="-1" class="red status-duyet-hoidong">Yêu cầu sửa</span>
+                            </div>
+                        </div>
+                        <div class="ketquaduyet-hoidong-right col-6">
+                            <div>Duyệt lúc:</div>
+                            <div>{{activity['approved_captruong_at'] | ovicDateTime}}</div>
+                        </div>
+                    </div>
+                    <ng-template #choduyetCaptruongTemplate>
+                        <div class="ketquaduyet-hoidong" style="padding-bottom: 10px; ">
+                            <div style="text-align: center;" [ngSwitch]="activity['status_captruong']">
+                                <span *ngSwitchCase="0" class="gray status-duyet-hoidong">Chờ duyệt</span>
+                                <span *ngSwitchCase="-2" class="blue status-duyet-hoidong">Đã sửa, chờ duyệt</span>
+                            </div>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+            <div style="border-bottom: 1px solid #c8c8c8; margin-bottom: 10px;"></div>
+
+            <div *ngFor="let comment of activity['comments'], index as index" class="comment-box">
+                <div class="inner-comment">
+                    <div class="inner-comment-header">
+                        <div style="flex: 1;">
+                            <span [ngClass]="comment['user_id'] === userId ? 'blue':''"
+                                style="font-weight: 600; margin-right: 10px; text-decoration: underline;">
+                                {{comment['display_name'] + ' ('+HOIDONGDUYET[comment['cap_hoidong']]+')' + ':'}}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div *ngIf="comment['children'] && comment['children'].length">
+                        <div *ngFor="let children of comment['children']" style="margin-bottom: 15px; ">
+                            <div [ngClass]="children['status'] === 1?'duyet-comment':'yeucausua-comment'"
+                                class="conten-comment-box">
+                                <div class="conten-comment-inner-box" [innerHTML]="children.comment">
+
+                                </div>
+                            </div>
+                            <div style="margin-left: 20px; margin-top: 5px;">
+                                <span
+                                    style="font-size: 12px; color: #898989; margin-right: 20px; font-style: italic;">{{children.created_at
+                                    | ovicDateTime}}</span>
+                                <span style="color: #898989; cursor: pointer;" (click)="openReply(children,index)">Phản
+                                    hồi ({{children['count_reply']}})</span>
+                            </div>
+                            <div *ngIf="children['reply_open'] === true" class="reply-layout">
+                                <div class="list_reply_comments">
+                                    <div style="margin-bottom: 15px;"
+                                        *ngFor="let reply_comment of children['reply_comments']">
+                                        <div style="text-align: right; margin-bottom: 5px;">
+                                            <span [ngClass]="reply_comment['my_reply_comment']?'blue':''">
+                                                {{reply_comment['display_name'] }}
+                                                {{' ('+HOIDONGDUYET[reply_comment['cap_hoidong']]+')'}}
+                                            </span>
+                                        </div>
+                                        <div class="conten-comment-box-left"
+                                            [ngClass]="reply_comment['my_reply_comment']?'my-reply-comment':''">
+                                            <div class="conten-comment-inner-box-left"
+                                                [innerHTML]="reply_comment.comment">
+
+                                            </div>
+                                        </div>
+                                        <div style="margin-right: 20px; margin-top: 5px; text-align: right;">
+                                            <span
+                                                style="font-size: 12px; color: #898989; font-style: italic;">{{reply_comment.created_at
+                                                | ovicDateTime}}</span>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; position: relative;"
+                                    *ngIf="canReply || kd_hoidong || kd_uyvien || (courseSelected && userId === courseSelected.creator_plan_id)">
+                                    <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;"><img
+                                            style="width: 100%;" src="../../../assets/images/a_none.jpg"></div>
+                                    <textarea style="height: 40px; margin-left: 10px; flex: 1; padding-right: 130px;"
+                                        placeholder="Nhập phản hồi... "
+                                        [(ngModel)]="children['textarea_comment']"></textarea>
+                                    <button (click)="saveCommentReply(children , activity, index)"
+                                        style="position: absolute; bottom: 5px; right:5px" class="btn btn-primary"><i
+                                            class="fa fa-paper-plane" ></i>Gửi
+                                        phản hồi</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div [ngClass]="(!activity['comments'] || !activity['comments'].length) ? 'padding-top-15px':''"
+            class="comment-edit-layout"
+            *ngIf="(kd_uyvien || kd_hoidong) && activity['status'] === 1 && activity['status_captruong'] !== 1">
+            <textarea placeholder="Nhập nội dung nhận xét trước khi duyệt hoặc yêu cầu sửa... "
+                [(ngModel)]="activity['textarea_comment']"></textarea>
+            <div class="action-edit-layout">
+                <button (click)="saveComment(1,activity)" style="line-height: 1; margin-bottom: 10px;"
+                    class="btn-primary">Đồng ý duyệt
+                </button>
+                <button (click)="saveComment(-1,activity)" style="line-height: 1;" class="btn-danger">Yêu cầu
+                    sửa</button>
+            </div>
+        </div>
+        <div *ngIf="activity['status'] === 1 && kd_hoidong && activity['status_captruong'] !== -1 && activity['status_captruong'] !== 1 && activity['comments'] && activity['comments'].length"
+            style="padding: 0px 15px 15px 15px">
+            <div class="hozion-lay" style="position: relative;">
+                <label
+                    style="font-weight: 600; z-index: 1; position: relative; background: whitesmoke; padding-right: 5px;">KẾT
+                    LUẬN CỦA CHỦ TỊCH HỘI ĐỒNG: </label>
+            </div>
+            <div style="display: flex; justify-content: space-evenly;">
+                <button style="margin-right: 5px; width: 150px; line-height: 1;" (click)="duyetNoidung(activity, 1)"
+                    *ngIf="kd_hoidong" class="btn btn-primary">Đồng ý duyệt</button>
+                <button style="margin-left: 5px; width: 150px;line-height: 1;" (click)="duyetNoidung(activity, -1)"
+                    *ngIf="kd_hoidong" class="btn btn-danger">Yêu cầu sửa</button>
+            </div>
+
+        </div>
+
+        <!-- <div *ngIf="rejectRole && (activity['status'] === -1 || activity['status'] === 1)"
+            style="padding: 0px 15px 15px 15px">
+            <div class="hozion-lay" style="position: relative;">
+                <label
+                    style="font-weight: 600; z-index: 1; position: relative; background: whitesmoke; padding-right: 5px;">KẾT
+                    LUẬN CỦA CHỦ TỊCH HỘI ĐỒNG: </label>
+            </div>
+            <div style="display: flex; justify-content: space-evenly;">
+                <button style="margin: 0px 5px; width: 200px; line-height: 1;" (click)="huyTrangThai(activity)"
+                    *ngIf="rejectRole" class="btn btn-secondary">
+                    {{activity['status'] === -1?'Huỷ trạng thái yêu cầu sửa': 'Huỷ trạng thái đã duyệt'}}</button>
+            </div>
+        </div> -->
+    </div>
+</ng-template>

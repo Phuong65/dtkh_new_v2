@@ -1,1 +1,196 @@
-﻿<div class="p-3">import-lophoc.component works!</div>
+<div class="import-monhoc-layout">
+    <input type="file" #inputImport style="visibility: hidden; display: contents;" (change)="changeInputImport($event)"
+        accept=".xlsx, .xls" />
+    <div class="import-monhoc-header" style="display:flex; align-items: center;">
+        <div class="import-monhoc-header-left" style="flex:1">
+            <button (click)="backToDongbo()" class="btn btn-icon btn-secondary" ngbTooltip="Quay lại trang đồng bộ"
+                container="body" placement="top">
+                <i class="fa fa-arrow-left"></i>
+            </button>
+            <!-- <button (click)="downLoadExLophoc()" class="btn btn-success"><i class="fa fa-download"></i>Tải file
+                mẫu</button> -->
+            <button (click)="displaySyncClass = true" class="btn btn-success">
+                <i class="fa fa-random"></i>
+                Tải từ hệ thống EDU
+            </button>
+            <!-- <button [matMenuTriggerFor]="menuImport" [disabled]="!isReferenceDataReady" class="btn btn-success">
+                <i class="fa fa-upload"></i>
+                Tải lên lớp học
+            </button>
+            <mat-menu #menuImport="matMenu">
+                <button (click)="triggerImport()" mat-menu-item>
+                    <i style="margin-right: 10px;" class="fa fa-file-excel-o"></i>
+                    <span>Chọn từ file excel</span>
+                </button>
+                <button (click)="displaySyncClass = true" mat-menu-item>
+                    <i style="margin-right: 10px;" class="fa fa-random"></i>
+                    <span>Từ hệ thống dangky.hvu.edu.vn</span>
+                </button>
+            </mat-menu> -->
+            <button (click)="startImportLophoc()" [disabled]="!isReferenceDataReady || !list_lophoc.length"
+                class="btn btn-primary"><i class="fa fa-play"></i>Bắt đầu</button>
+        </div>
+
+        <div class="import-monhoc-header-right form-row-flex-row ghi-de-dulieu">
+            <p-checkbox [(ngModel)]="ghi_de" [binary]="true" label="Ghi đè dữ liệu nếu trùng tên lớp"></p-checkbox>
+        </div>
+    </div>
+    <div class="import-monhoc-bottom">
+        <div style="height: calc(100% - 40px); padding: 5px;">
+            <div *ngIf="list_lophoc.length" style="height: 100%;">
+                <p-table [value]="filtered_lophoc | paginatorLocal : pageImport : 25"
+                    styleClass="table-scroll-able table-able-dropdown-p-table table-has-caption table-reBorder">
+                    <ng-template pTemplate="caption">
+                        <div class="flex" style="display: flex; align-items: center;">
+                            <div style="flex: 1; font-weight: 500;">
+                                <span (click)="setStatusImportFilter(null)" class="padding-5px hover-underline">Tổng:
+                                    {{list_lophoc.length}}</span> |
+                                <span (click)="setStatusImportFilter(0)" class="padding-5px hover-underline gray">Chưa
+                                    import:
+                                    {{status_object.no_import}} </span> |
+                                <span (click)="setStatusImportFilter(1)" class="padding-5px hover-underline blue">Thành
+                                    công:
+                                    {{status_object.import_done}} </span> |
+                                <span (click)="setStatusImportFilter(-1)" class="padding-5px hover-underline red">Thất
+                                    bại:
+                                    {{status_object.import_fail}} </span> |
+                                <span (click)="setStatusImportFilter('skipped')"
+                                    class="padding-5px hover-underline gray">Bỏ qua:
+                                    {{status_object.import_skipped}} </span>
+                            </div>
+                            <div>
+                                <input type="text" [(ngModel)]="search_lophoc" (ngModelChange)="onSearchLophocChange()"
+                                    style="line-height: 1; width:250px;" placeholder="Nhập tên hoặc mã " />
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width: 3rem; text-align: center;">TT</th>
+                            <th style="width: 350px; text-align: center;">Lớp học</th>
+                            <!-- <th style="width: 250px; text-align: center;">Khoa / Bộ môn</th> -->
+                            <th style="width: 100px; text-align: center;">Khóa</th>
+                            <th style="width: 150px; text-align: center;">Trạng thái</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-lophoc>
+                        <tr>
+                            <td style="text-align: center;">{{lophoc['index']}}</td>
+                            <td>
+                                <div style="display: flex; flex-direction: column;">
+                                    <div style="font-weight: 600; margin-bottom: 5px;">{{lophoc['name']}}</div>
+                                    <div>
+                                        {{lophoc['name_giaovien']?lophoc['name_giaovien']:'Chưa có giảng viên'}} -
+                                        {{"TC: "+ lophoc['sotinchi']}} -
+                                        {{"HK: "+lophoc['hocky']}}
+                                    </div>
+                                </div>
+                            </td>
+                            <!-- <td>{{lophoc['khoa_bomon']}}</td> -->
+                            <td style="text-align: center;">{{lophoc['khoa']}}</td>
+                            <td style="text-align: center;">
+                                <div [ngSwitch]="lophoc['status_import']">
+                                    <span *ngSwitchCase="0" class="student-status-shift status-deactive">
+                                        {{lophoc['import_result_status'] === 'skipped' ? 'Bỏ qua' : 'Chưa import'}}
+                                    </span>
+                                    <span *ngSwitchCase="1" class="student-status-shift status-activite">
+                                        Thành công
+                                    </span>
+                                    <span *ngSwitchCase="-1" class="student-status-shift import-fail">
+                                        Thất bại
+                                    </span>
+                                </div>
+                                <div *ngIf="lophoc['import_label']" class="red" style="margin-top: 5px;">
+                                    {{lophoc['import_label']}}
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+            <div *ngIf="list_lophoc.length" class="page-layout-set">
+                <p-paginator #paginator_shift (onPageChange)="onChangePageImport($event)" [rows]="25"
+                    [first]="pageImport * 25" [totalRecords]="filtered_lophoc.length"></p-paginator>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+    [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+    <div class="popup-waiting-loading">
+        <label style="width: 100%;">{{waitting_title}}</label>
+        <label *ngIf="show_return">{{returnValueWaiting()}}</label>
+        <div class="tn-import-student-progressbar">
+            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+        </div>
+    </div>
+</p-dialog>
+
+<ng-template #templateChooseExcel let-c="close" let-d="dismiss">
+    <div class="modal-header ">
+        <h4 class="modal-title">Chọn năm học</h4>
+        <button type="button" class="close" aria-label="Close" (click)="close(d)">
+            <span>&times;</span>
+        </button>
+    </div>
+    <div class="modal-body ovic-modal-body home-work-layout class-add-layout no-footer">
+        <div class="row">
+            <div style="text-align: center;" class="col-6" *ngFor="let day of arrayYear">
+                <button (click)="openImportClass(day['value'],d)"
+                    [ngClass]="selectedYear === day['value']?'btn btn-success':'btn btn-secondary'">{{day['value']}}</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer center-footer">
+        <button type="button" class="btn btn-primary " (click)="clearDataImport()">
+            <i class="fa fa-refresh"></i>Làm mới
+        </button>
+        <button type="button" class="btn btn-secondary " (click)="close(d)">
+            <i class="fa fa-times"></i>Đóng
+        </button>
+    </div>
+</ng-template>
+
+
+<p-dialog styleClass="report-create-plan-dialog" [showHeader]="false" appendTo="body" position="center"
+    [draggable]="false" [resizable]="false" [modal]="true" header="Title" [(visible)]="displaySyncClass"
+    [style]="{width: '700px'}" [closable]="false">
+    <div class="step-sync-plans" style="background-color: #fff;">
+        <div class="step-sync-plans-header" style="display: flex; align-items: center;">
+            <span style="flex: 1;">Tải lớp học từ hệ thống dangky.hvu.edu.vn</span>
+            <span (click)="displaySyncClass = false" class="action-span"
+                style="margin-right: 0px; height: 20px; width: 20px; padding: 0px; line-height: 20px;text-align: center; cursor: pointer;">
+                <i style="color: red; margin: 0px;" class="fa fa-times"></i>
+            </span>
+        </div>
+        <div class="step-sync-plans-body ovic-vertical__inputs">
+            <div class="row form-row form-row-flex-row">
+                <div class="col-4 flex-div">
+                    <label for="title">Nhập năm học:<span class="ovic-mark" style="color: red;">*</span></label>
+                    <input [(ngModel)]="classFilter.namhoc" type="number" id="student_code" class="ovic-input-field"
+                        autocomplete="off">
+                </div>
+                <div class="col-4 flex-div">
+                    <label for="title">Nhập học kỳ:<span class="ovic-mark" style="color: red;">*</span></label>
+                    <input [(ngModel)]="classFilter.hocky" type="number" id="student_code" class="ovic-input-field"
+                        autocomplete="off">
+                </div>
+                <div class="col-4 flex-div">
+                    <label for="title">Nhập niên khóa:<span class="ovic-mark" style="color: red;">*</span></label>
+                    <p-inputMask [(ngModel)]="classFilter.nien_khoa" mask="9999-9999"
+                        characterPattern="[0-9]"></p-inputMask>
+                </div>
+            </div>
+            <div class="row form-row form-row-flex-row">
+                <div class="col-12" style="text-align: right;">
+                    <button style="line-height: 1;" (click)="startGetClassFromDkSys()"
+                        [disabled]="!isReferenceDataReady" class="btn btn-primary">
+                        Tải lớp học
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>

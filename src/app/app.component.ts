@@ -59,7 +59,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 	) {
 		(window as any).katex = katex;
 		const observerOnLoading = this.notification.onAppLoading.pipe(
-			distinctUntilChanged()
+			distinctUntilChanged(),
+			switchMap(isLoading => isLoading ? of(true) : timer(50).pipe(map(() => false)))
 		).subscribe(isLoading => {
 			this.ngZone.run(() => {
 				this.isLoading = isLoading;

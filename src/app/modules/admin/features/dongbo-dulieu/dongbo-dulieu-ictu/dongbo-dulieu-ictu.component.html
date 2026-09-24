@@ -1,1 +1,788 @@
-﻿<div class="p-3">dongbo-dulieu-ictu.component works!</div>
+<div class="layout_component_container" style="padding: 5px;">
+    <input accept=".xls,.xlsx" [(ngModel)]="inputImportValue" type="file" #inputImport style="clip: rect(1px, 1px, 1px, 1px);
+        height: 1px;
+        overflow: hidden;
+        position: absolute !important;
+        width: 1px;" (change)="changeInputImport($event)" />
+    <div class="row">
+        <div class="card-1000">
+            <div class="card">
+                <div class="card-title">
+                    Tạo tài khoản sinh viên
+                </div>
+                <div class="card-action row">
+                    <div class="col-3">
+                        <button (click)="downloadEx('sinhvien')"
+                            class="btn btn-transparent btn-border btn-transparent-v2">
+                            <i class="fa fa-download"></i>
+                            Tải mẫu import sinh viên
+                        </button>
+                    </div>
+                    <div class="col-3">
+                        <button (click)="openImport('sinhvien')"
+                            class="btn btn-transparent btn-border btn-transparent-v2">
+                            <i class="fa fa-upload"></i>
+                            Import sinh viên
+                        </button>
+                    </div>
+                    <div class="col-3">
+                        <button [disabled]="true" class="btn btn-transparent btn-border btn-transparent-v2">
+                            <i class="fa fa-lock"></i>
+                            Tải mẫu xóa sinh viên
+                        </button>
+                    </div>
+                    <div class="col-3">
+                        <button [disabled]="true" class="btn btn-transparent-v2 btn-danger">
+                            <i class="fa fa-lock"></i>
+                            Xóa sinh viên
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-1000">
+            <div class="card">
+                <div class="card-title">
+                    Cán bộ giảng viên
+                </div>
+                <div class="card-action row">
+                    <div class="col-3">
+                        <button (click)="downloadEx('cbgv')" class="btn btn-transparent btn-border btn-transparent-v2">
+                            <i class="fa fa-download"></i>
+                            Tải mẫu import
+                        </button>
+                    </div>
+                    <div class="col-3">
+                        <button (click)="openImport('cbgv')"
+                            class="btn btn-transparent btn-border btn-transparent-v2 btn-lock">
+                            <i class="fa fa-upload"></i>
+                            Import CBGV
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-1000">
+            <div class="card">
+                <div class="card-title">
+                    Môn học
+                </div>
+                <div class="card-action row">
+                    <!-- <div class="col-3">
+                        <button (click)="downloadEx('monhoc')"
+                            class="btn btn-transparent btn-border btn-transparent-v2">
+                            <i class="fa fa-download"></i>
+                            Tải mẫu import môn học
+                        </button>
+                    </div> -->
+                    <div class="col-3">
+                        <button (click)="openImport('monhoc')"
+                            class="btn btn-transparent btn-border btn-transparent-v2 btn-lock">
+                            <i class="fa fa-upload"></i>
+                            Import môn học
+                        </button>
+                    </div>
+                    <div class="col-3">
+                        <button (click)="export('monhoc')" class="btn btn-transparent btn-border btn-transparent-v2">
+                            <i class="fa fa-bar-chart"></i>
+                            Thống kê số liệu về bài giảng
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-1000">
+            <div class="card">
+                <div class="card-title">
+                    Lớp học phần
+                </div>
+                <div class="card-action row">
+                    <div class="col-3">
+                        <button (click)="downloadEx('lophoc')"
+                            class="btn btn-transparent btn-border btn-transparent-v2">
+                            <i class="fa fa-download"></i>
+                            Tải mẫu import lớp học phần
+                        </button>
+                    </div>
+                    <div class="col-3">
+                        <button (click)="openImport('lophoc')"
+                            class="btn btn-transparent btn-border btn-transparent-v2">
+                            <i class="fa fa-upload"></i>
+                            Import lớp học phần mới
+                        </button>
+                    </div>
+                    <div class="col-3">
+                        <button (click)="deleteDonwload('lophoc')"
+                            class="btn btn-transparent btn-border btn-transparent-v2">
+                            <i class="fa fa-file-excel-o"></i>
+                            Tải lớp học phần ( có mã lớp )
+                        </button>
+                    </div>
+                    <div class="col-3">
+                        <button [disabled]="true" class="btn btn-transparent-v2 btn-danger">
+                            <i class="fa fa-lock"></i>
+                            Xóa lớp học phần theo mã
+                        </button>
+                    </div>
+                </div>
+                <div class="card-action row" style="padding-top: 0px; margin-top: 10px;">
+                    <div class="col-3">
+                        <button (click)="downloadEx('sinhvien_lophoc')"
+                            class="btn btn-transparent btn-border btn-transparent-v2">
+                            <i class="fa fa-download"></i>
+                            Tải mẫu import sinh viên
+                        </button>
+                    </div>
+                    <div class="col-3">
+                        <button (click)="openImport('sinhvien_lophoc')"
+                            class="btn btn-transparent btn-border btn-transparent-v2">
+                            <i class="fa fa-upload"></i>
+                            Import sinh viên
+                        </button>
+                    </div>
+                    <div class="col-3">
+                        <button (click)="deleteDonwload('sinhvien_lophoc')"
+                            class="btn btn-transparent btn-border btn-transparent-v2">
+                            <i class="fa fa-file-excel-o"></i>
+                            Tải mẫu xóa sinh viên
+                        </button>
+                    </div>
+                    <div class="col-3">
+                        <button [disabled]="true" class="btn btn-transparent-v2 btn-danger">
+                            <i class="fa fa-lock"></i>
+                            Xóa sinh viên
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-1000">
+            <div class="card">
+                <div class="card-title">
+                    Lịch giảng dạy
+                </div>
+                <div class="card-action row">
+                    <div class="col-3">
+                        <button (click)="downloadEx('calendar')"
+                            class="btn btn-transparent btn-border btn-transparent-v2">
+                            <i class="fa fa-download"></i>
+                            Tải mẫu import
+                        </button>
+                    </div>
+                    <div class="col-3">
+                        <button (click)="openImport('calendar')"
+                            class="btn btn-transparent btn-border btn-transparent-v2">
+                            <i class="fa fa-upload"></i>
+                            Import
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Sinh viên -->
+<ng-template #importSinhVienTemplate let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">{{slide_title}}</h3>
+            <button [disabled]="startProgress" class="btn ovic-over-right-section__close-button"
+                (click)="d(true)"></button>
+        </div>
+        <div class="ovic-over-right-section__body no-footer footer-no-hint modal-ex"
+            style="padding: 0px; line-height: 1;">
+            <div class="import-header import-header-right form-row-flex-row">
+                <div class="import-header-left">
+                    <button [disabled]="startProgress" (click)="triggerImport()" class="btn btn-success"><i
+                            class="fa fa-file-excel-o"></i>Chọn
+                        file</button>
+                    <button (click)="startImportSinhvien(0)"
+                        [disabled]="list_userImport && list_userImport.length? false: true" class="btn btn-primary"><i
+                            class="fa fa-play"></i>Bắt
+                        đầu</button>
+                    <!-- <button [disabled]="startProgress" (click)="startImportSinhvien(1)"
+                        [disabled]="list_userImport? false: true" class="btn btn-primary"><i class="fa fa-play"></i>Ghi
+                        đè</button> -->
+                </div>
+                <div class="import-header-right form-row-flex-row ghi-de-dulieu">
+                    <p-checkbox [(ngModel)]="ghi_de" [binary]="true"
+                        label="Ghi đè dữ liệu nếu trùng mã sinh viên khi import"></p-checkbox>
+                    <input (input)="dt.filterGlobal($event.target['value'], 'contains')" type="text"
+                        class="ovic-input-field" placeholder="Tìm kiếm" style="margin-right: 10px;">
+                    <ovic-dropdown (onChange)="onChangeFilterImportDt($event,dt)"
+                        [placeholder]="'---Chọn trạng thái---'" [options]="STATUS_IMPORT" optionId="label"
+                        optionLabel="label">
+                    </ovic-dropdown>
+                </div>
+            </div>
+            <div class="import-body scroll-table-layout-set">
+                <p-table #dt [globalFilterFields]="['display_name','username','import_label']" [paginator]="true"
+                    [rows]="20" [showCurrentPageReport]="true" [value]="list_userImport"
+                    styleClass="tbl-danhSachUser table-scroll-able-page table-able-dropdown-p-table table-none-header table-reBorder">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th width="50" style="text-align: center;">#</th>
+                            <th [width]="col['width']" [ngClass]="col['class']" *ngFor="let col of cols_sinhvien">
+                                {{col['label']}}
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+                        <tr class="{{row['import']?'import-thanhcong':''}}">
+                            <td style="text-align: center;">{{rowIndex +1}}</td>
+                            <td [width]="col['width']" [ngClass]="col['class']" *ngFor="let col of cols_sinhvien">
+                                <span>{{row[col['key']]}}</span>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Lớp học -->
+<ng-template #importLopHocTemplate let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">{{slide_title}}</h3>
+            <button [disabled]="startProgress" class="btn ovic-over-right-section__close-button"
+                (click)="d(true)"></button>
+        </div>
+        <div class="ovic-over-right-section__body no-footer footer-no-hint modal-ex"
+            style="padding: 0px; line-height: 1;">
+            <div class="import-header import-header-right form-row-flex-row">
+                <div class="import-header-left">
+                    <button [disabled]="startProgress" (click)="triggerImport()" class="btn btn-success"><i
+                            class="fa fa-file-excel-o"></i>Chọn
+                        file</button>
+                    <button (click)="startImportLophoc()"
+                        [disabled]="list_lopImport && list_lopImport.length? false: true" class="btn btn-primary"><i
+                            class="fa fa-play"></i>Bắt
+                        đầu</button>
+                    <!-- <button [disabled]="startProgress" (click)="startImportSinhvien(1)"
+                        [disabled]="list_userImport? false: true" class="btn btn-primary"><i class="fa fa-play"></i>Ghi
+                        đè</button> -->
+                </div>
+                <div class="import-header-right form-row-flex-row ghi-de-dulieu">
+                    <p-checkbox [(ngModel)]="ghi_de" [binary]="true"
+                        label="Ghi đè dữ liệu nếu trùng mã lớp khi import"></p-checkbox>
+                    <input (input)="dt1.filterGlobal($event.target['value'], 'contains')" type="text"
+                        class="ovic-input-field" placeholder="Tìm kiếm" style="margin-right: 10px;">
+                    <ovic-dropdown (onChange)="onChangeFilterImportDt($event,dt1)"
+                        [placeholder]="'---Chọn trạng thái---'" [options]="STATUS_IMPORT" optionId="label"
+                        optionLabel="label">
+                    </ovic-dropdown>
+                </div>
+            </div>
+            <div class="import-body scroll-table-layout-set">
+                <p-table #dt1 [globalFilterFields]="['name','email','khoa_bomon','import_label']" [paginator]="true"
+                    [rows]="20" [showCurrentPageReport]="true" [value]="list_lopImport"
+                    styleClass="tbl-danhSachUser table-scroll-able-page table-able-dropdown-p-table table-none-header table-reBorder">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th width="50" style="text-align: center;">#</th>
+                            <th [width]="col['width']" [ngClass]="col['class']" *ngFor="let col of cols_lophop">
+                                {{col['label']}}
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+                        <tr class="{{row['import']?'import-thanhcong':''}}">
+                            <td style="text-align: center;">{{rowIndex +1}}</td>
+                            <td [width]="col['width']" [ngClass]="col['class']" *ngFor="let col of cols_lophop">
+                                <span>{{row[col['key']]}}</span>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+
+<!-- sinh viên lớp học -->
+<ng-template #importSinhvienLopHocTemplate let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">{{slide_title}}</h3>
+            <button [disabled]="startProgress" class="btn ovic-over-right-section__close-button"
+                (click)="d(true)"></button>
+        </div>
+        <div class="ovic-over-right-section__body no-footer footer-no-hint modal-ex"
+            style="padding: 0px; line-height: 1;">
+            <div class="import-header import-header-right form-row-flex-row">
+                <div class="import-header-left">
+                    <button [disabled]="startProgress" (click)="triggerImport()" class="btn btn-success"><i
+                            class="fa fa-file-excel-o"></i>Chọn
+                        file</button>
+                    <button (click)="startImportSinhVienClass()"
+                        [disabled]="list_student_class && list_student_class.length? false: true"
+                        class="btn btn-primary"><i class="fa fa-play"></i>Bắt
+                        đầu</button>
+                    <!-- <button [disabled]="startProgress" (click)="startImportSinhvien(1)"
+                        [disabled]="list_userImport? false: true" class="btn btn-primary"><i class="fa fa-play"></i>Ghi
+                        đè</button> -->
+                </div>
+                <div class="import-header-right form-row-flex-row ghi-de-dulieu">
+                    <p-checkbox [(ngModel)]="ghi_de" [binary]="true"
+                        label="Ghi đè dữ liệu nếu trùng mã lớp khi import"></p-checkbox>
+                    <input (input)="dt2.filterGlobal($event.target['value'], 'contains')" type="text"
+                        class="ovic-input-field" placeholder="Tìm kiếm" style="margin-right: 10px;">
+                    <ovic-dropdown (onChange)="onChangeFilterImportDt($event,dt2)"
+                        [placeholder]="'---Chọn trạng thái---'" [options]="STATUS_IMPORT_STUDENT_CLASS" optionId="label"
+                        optionLabel="label">
+                    </ovic-dropdown>
+                </div>
+            </div>
+            <div class="import-body scroll-table-layout-set">
+                <p-table #dt2 [globalFilterFields]="['email','student_code','import_label','class_name']"
+                    [paginator]="true" [rows]="20" [showCurrentPageReport]="true" [value]="list_student_class"
+                    styleClass="tbl-danhSachUser table-scroll-able-page table-able-dropdown-p-table table-none-header table-reBorder">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th width="50" style="text-align: center;">#</th>
+                            <th [width]="col['width']" [ngClass]="col['class']"
+                                *ngFor="let col of cols_sinhvien_lophoc">
+                                {{col['label']}}
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-row let-rowIndex="rowIndex" let-rowspan="rowspan">
+                        <tr class="{{row['import']?'import-thanhcong':''}}">
+                            <!-- <td [attr.rowspan]="row['rowspan']?row['rowspan']:1" [width]="col['width']"
+                                [ngClass]="col['class']" *ngFor="let col of cols_sinhvien_lophoc_row_span">
+                                <span *ngIf="row['rowspan']">{{row[col['key']]}}</span>
+                            </td> -->
+                            <!-- <td *ngIf="row['rowspan']" [attr.rowspan]="row['rowspan']?row['rowspan']:1">
+                                <span *ngIf="row['rowspan']">{{rowIndex + 1}}</span>
+                            </td>
+                            <td *ngIf="row['rowspan']" [attr.rowspan]="row['rowspan']?row['rowspan']:1">
+                                <span *ngIf="row['rowspan']">{{row['student_code']}}</span>
+                            </td>
+                            <td *ngIf="row['rowspan']" [attr.rowspan]="row['rowspan']?row['rowspan']:1">
+                                <span *ngIf="row['rowspan']">{{row['full_name']}}</span>
+                            </td>
+                            <td *ngIf="row['rowspan']" [attr.rowspan]="row['rowspan']?row['rowspan']:1">
+                                <span *ngIf="row['rowspan']">{{row['birthday']}}</span>
+                            </td>
+                            <td *ngIf="row['rowspan']" [attr.rowspan]="row['rowspan']?row['rowspan']:1">
+                                <span *ngIf="row['rowspan']">{{row['email']}}</span>
+                            </td> -->
+                            <td style="text-align: center;">{{rowIndex +1}}</td>
+                            <td [width]="col['width']" [ngClass]="col['class']"
+                                *ngFor="let col of cols_sinhvien_lophoc">
+                                <span>{{row[col['key']]}}</span>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #templateChooseExcel let-c="close" let-d="dismiss">
+    <div class="modal-header ">
+        <h4 class="modal-title">Chọn năm học</h4>
+        <button type="button" class="close" aria-label="Close" (click)="close(d)">
+            <span >&times;</span>
+        </button>
+    </div>
+    <div class="modal-body ovic-modal-body home-work-layout class-add-layout no-footer">
+        <div class="row">
+            <div style="text-align: center;" class="col-6" *ngFor="let day of arrayYear">
+                <button (click)="openImportClass(day['value'],d)"
+                    [ngClass]="selectedYear === day['value']?'btn btn-success':'btn btn-secondary'">{{day['value']}}</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer center-footer">
+        <button type="button" class="btn btn-primary " (click)="clearDataImport()">
+            <i class="fa fa-refresh" ></i>Làm mới
+        </button>
+        <button type="button" class="btn btn-secondary " (click)="close(d)">
+            <i class="fa fa-times" ></i>Đóng
+        </button>
+    </div>
+</ng-template>
+
+<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+    [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+    <div class="popup-waiting-loading">
+        <p-steps *ngIf="open_step" [model]="step_menu" [readonly]="true" [activeIndex]="activeIndex_step"></p-steps>
+        <label style="width: 100%;">{{waitting_title}}</label>
+        <label *ngIf="show_return">{{returnValueWaiting()}}</label>
+        <div class="tn-import-student-progressbar">
+            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+        </div>
+    </div>
+</p-dialog>
+
+<ng-template #templateExportMaLop let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">Chọn thông tin để tải {{ type_action === 'lophoc' ?'lớp học':
+                'môn học'}}</h3>
+            <button [disabled]="startProgress" class="btn ovic-over-right-section__close-button"
+                (click)="d(true)"></button>
+        </div>
+        <div class="ovic-over-right-section__body footer-no-hint" style="height: calc(100vh / 2);">
+            <div class="ovic-vertical__inputs">
+                <div class="row form-row form-row-flex-row">
+                    <div class="col-6">
+                        <label for="name">Năm học<span class="ovic-mark">*</span></label>
+                        <ovic-dropdown (onChange)="onChangeFilter($event, 'namhoc')" [showClear]="false"
+                            [defaultValue]="objectFilter?objectFilter['namhoc']: null" style="margin-left: 5px;"
+                            placeholder="- Năm học -" [options]="listNamhoc" optionId="value" optionLabel="label"
+                            [filter]="true">
+                        </ovic-dropdown>
+                    </div>
+                    <div class="col-6">
+                        <label for="name">Học kỳ<span class="ovic-mark">*</span></label>
+                        <ovic-dropdown (onChange)="onChangeFilter($event, 'hocky' )" [showClear]="false"
+                            [defaultValue]="objectFilter?objectFilter['hocky']: null" style="margin-left: 5px;"
+                            [options]="listHocky" placeholder="- Học kỳ -" optionId="value" optionLabel="label"
+                            [filter]="true">
+                        </ovic-dropdown>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ovic-over-right-section__foot-wrap-buttons flex-footer-right">
+            <button *ngIf="type_action === 'lophoc'" type="button" class="btn btn-primary " (click)="exportClass(d)">
+                <i class="fa fa-download" ></i>Tài về
+            </button>
+            <button *ngIf="type_action === 'monhoc'" type="button" class="btn btn-primary "
+                (click)="readyToDownLoadCourse(d)">
+                <i class="fa fa-download" ></i>Tài về
+            </button>
+            <button type="button" class="btn btn-secondary " (click)="close(d)">
+                <i class="fa fa-times" ></i>Đóng
+            </button>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Lịch giảng dạy -->
+
+<ng-template #importTKBTemplate let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">{{slide_title}}</h3>
+            <button [disabled]="startProgress" class="btn ovic-over-right-section__close-button"
+                (click)="d(true)"></button>
+        </div>
+        <div class="ovic-over-right-section__body no-footer footer-no-hint modal-ex"
+            style="padding: 0px; line-height: 1;">
+            <div class="import-header import-header-right form-row-flex-row">
+                <div class="import-header-left">
+                    <button [disabled]="startProgress" (click)="triggerImport()" class="btn btn-success"><i
+                            class="fa fa-file-excel-o"></i>Chọn
+                        file</button>
+                    <button (click)="startImportCalendar()"
+                        [disabled]="list_calendarImport && list_calendarImport.length? false: true"
+                        class="btn btn-primary"><i class="fa fa-play"></i>Bắt
+                        đầu</button>
+                    <!-- <button [disabled]="startProgress" (click)="startImportSinhvien(1)"
+                        [disabled]="list_userImport? false: true" class="btn btn-primary"><i class="fa fa-play"></i>Ghi
+                        đè</button> -->
+                </div>
+                <div class="import-header-right form-row-flex-row ghi-de-dulieu">
+                    <p-checkbox [(ngModel)]="ghi_de" [binary]="true"
+                        label="Xóa lịch chưa thực hiện tính từ thời điểm hiện tại trở đi."></p-checkbox>
+                    <input (input)="dt3.filterGlobal($event.target['value'], 'contains')" type="text"
+                        class="ovic-input-field" placeholder="Tìm kiếm" style="margin-right: 10px;">
+                    <ovic-dropdown (onChange)="onChangeFilterImportDt($event,dt3)"
+                        [placeholder]="'---Chọn trạng thái---'" [options]="STATUS_IMPORT_STUDENT_CLASS" optionId="label"
+                        optionLabel="label">
+                    </ovic-dropdown>
+                </div>
+            </div>
+            <div class="import-body scroll-table-layout-set">
+                <p-table #dt3 [globalFilterFields]="['class_name','import_label']" [paginator]="true" [rows]="20"
+                    [showCurrentPageReport]="true" [value]="list_calendarImport"
+                    styleClass="tbl-danhSachUser table-scroll-able-page table-able-dropdown-p-table table-none-header table-reBorder">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th width="50" style="text-align: center;">#</th>
+                            <th [width]="col['width']" [ngClass]="col['class']" *ngFor="let col of cols_calendar">
+                                {{col['label']}}
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-row let-rowIndex="rowIndex" let-rowspan="rowspan">
+                        <tr class="{{row['import']?'import-thanhcong':''}}">
+                            <td style="text-align: center;">{{rowIndex +1}}</td>
+                            <td [width]="col['width']" [ngClass]="col['class']" *ngFor="let col of cols_calendar">
+                                <span *ngIf="!col['innerHTML']">{{row[col['key']]}}</span>
+                                <div *ngIf="col['innerHTML']" [innerHTML]="row[col['key']]"></div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #importMonhocTemplate let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">{{slide_title}}</h3>
+            <button [disabled]="startProgress" class="btn ovic-over-right-section__close-button"
+                (click)="d(true)"></button>
+        </div>
+        <div class="ovic-over-right-section__body no-footer footer-no-hint modal-ex"
+            style="padding: 0px;">
+            <app-import-monhoc></app-import-monhoc>
+            <!-- <div class="import-header import-header-right form-row-flex-row">
+                <div class="import-header-left">
+                    <button [disabled]="startProgress" (click)="triggerImport()" class="btn btn-success"><i
+                            class="fa fa-file-excel-o"></i>Chọn
+                        file</button>
+                    <button (click)="startImportMonhoc()" [disabled]="list_monhoc.length? false: true"
+                        class="btn btn-primary"><i class="fa fa-play"></i>Bắt
+                        đầu</button>
+                </div>
+                <div class="import-header-right form-row-flex-row ghi-de-dulieu">
+                    <p-checkbox [(ngModel)]="ghi_de" [binary]="true"
+                        label="Ghi đè dữ liệu nếu trùng mã môn khi import"></p-checkbox>
+                    <input (input)="dt2.filterGlobal($event.target['value'], 'contains')" type="text"
+                        class="ovic-input-field" placeholder="Tìm kiếm" style="margin-right: 10px;">
+                    <ovic-dropdown (onChange)="onChangeFilterImportDt($event,dt2)"
+                        [placeholder]="'---Chọn trạng thái---'" [options]="STATUS_IMPORT" optionId="label"
+                        optionLabel="label">
+                    </ovic-dropdown>
+                </div>
+            </div>
+            <div class="import-body scroll-table-layout-set">
+                <p-table #dt2 [globalFilterFields]="['title','ten_khoa']" [paginator]="true" [rows]="20"
+                    [showCurrentPageReport]="true" [value]="list_monhoc"
+                    styleClass="tbl-danhSachUser table-scroll-able-page table-able-dropdown-p-table table-none-header table-reBorder">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th width="50" style="text-align: center;">#</th>
+                            <th [width]="col['width']" [ngClass]="col['class']" *ngFor="let col of cols_monhoc">
+                                {{col['label']}}
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-row let-rowIndex="rowIndex" let-rowspan="rowspan">
+                        <tr class="{{row['import']?'import-thanhcong':''}}">
+                            <td style="text-align: center;">{{rowIndex +1}}</td>
+                            <td [width]="col['width']" [ngClass]="col['class']" *ngFor="let col of cols_monhoc">
+                                <span>{{row[col['key']]}}</span>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div> -->
+        </div>
+    </div>
+</ng-template>
+<!-- Import cán bộ giảng viên -->
+<ng-template #importTeacherTemplate let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">{{slide_title}}</h3>
+            <button [disabled]="startProgress" class="btn ovic-over-right-section__close-button"
+                (click)="d(true)"></button>
+        </div>
+        <div class="ovic-over-right-section__body no-footer footer-no-hint modal-ex"
+            style="padding: 0px; line-height: 1;">
+            <div class="import-header import-header-right form-row-flex-row">
+                <div class="import-header-left">
+                    <button [disabled]="startProgress" (click)="triggerImport()" class="btn btn-success"><i
+                            class="fa fa-file-excel-o"></i>Chọn
+                        file</button>
+                    <button (click)="startImportGiangvien()"
+                        [disabled]="list_giangvien && list_giangvien.length? false: true" class="btn btn-primary"><i
+                            class="fa fa-play"></i>Bắt
+                        đầu</button>
+                    <!-- <button [disabled]="startProgress" (click)="startImportSinhvien(1)"
+                        [disabled]="list_userImport? false: true" class="btn btn-primary"><i class="fa fa-play"></i>Ghi
+                        đè</button> -->
+                </div>
+                <div class="import-header-right form-row-flex-row ghi-de-dulieu">
+                    <p-checkbox [(ngModel)]="ghi_de" [binary]="true"
+                        label="Ghi đè dữ liệu nếu trùng email"></p-checkbox>
+                    <input (input)="dt.filterGlobal($event.target['value'], 'contains')" type="text"
+                        class="ovic-input-field" placeholder="Tìm kiếm" style="margin-right: 10px;">
+                    <ovic-dropdown (onChange)="onChangeFilterImportDt($event,dt)"
+                        [placeholder]="'---Chọn trạng thái---'" [options]="STATUS_IMPORT_USER" optionId="label"
+                        optionLabel="label">
+                    </ovic-dropdown>
+                </div>
+            </div>
+            <div class="import-body scroll-table-layout-set">
+                <p-table #dt [globalFilterFields]="['display_name','username','import_label','is_password','is_email']"
+                    [paginator]="true" [rows]="20" [showCurrentPageReport]="true" [value]="list_giangvien"
+                    styleClass="tbl-danhSachUser table-scroll-able-page table-able-dropdown-p-table table-none-header table-reBorder">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th width="50" style="text-align: center;">#</th>
+                            <th [width]="col['width']" [ngClass]="col['class']" *ngFor="let col of cols_giangvien">
+                                {{col['label']}}
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+                        <tr class="{{row['import']?'import-thanhcong':''}}">
+                            <td style="text-align: center;">{{rowIndex +1}}</td>
+                            <td [width]="col['width']" [ngClass]="col['class']" *ngFor="let col of cols_giangvien">
+                                <span>{{row[col['key']]}}</span>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+
+
+<!-- lớp học và lịch -->
+
+<ng-template #importLopHocCalendarTemplate let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">{{slide_title}}</h3>
+            <button [disabled]="startProgress" class="btn ovic-over-right-section__close-button"
+                (click)="d(true)"></button>
+        </div>
+        <div class="ovic-over-right-section__body no-footer footer-no-hint modal-ex"
+            style="padding: 0px; line-height: 1;">
+            <div class="import-header import-header-right form-row-flex-row">
+                <div class="import-header-left">
+                    <button [disabled]="startProgress" (click)="triggerImport()" class="btn btn-success"><i
+                            class="fa fa-file-excel-o"></i>Chọn
+                        file</button>
+                    <button (click)="startImportLophocCalendar()"
+                        [disabled]="list_lopImport && list_lopImport.length? false: true" class="btn btn-primary"><i
+                            class="fa fa-play"></i>Bắt
+                        đầu</button>
+
+                </div>
+                <div class="import-header-right form-row-flex-row ghi-de-dulieu">
+                    <p-checkbox [(ngModel)]="ghide_calendar" [binary]="true"
+                        label="Xóa lịch chưa thực hiện tính từ thời điểm hiện tại trở đi."></p-checkbox>
+
+                    <p-checkbox [(ngModel)]="ghi_de" [binary]="true"
+                        label="Ghi đè dữ liệu nếu trùng mã lớp khi import"></p-checkbox>
+
+                    <div class="total-data-confirm"
+                        style="margin-right: 5px; background: var(--yellow-100);cursor: unset;">
+                        <span>Import lịch thất bại: {{calendar_import_count['failed']}}</span>
+                    </div>
+                    <div class="total-data-confirm">
+                        <span>{{search_class && select_key_status? select_key_status['label']+': '+
+                            show_count_status[select_key_status['key']]:'Tổng: '+ list_lopImport.length}}<i
+                                style="margin-left: 10px;" class="fa fa-angle-down"></i></span>
+                        <div class="status-key">
+                            <span [ngClass]="search_class && search_class === status['key']?'active':'' "
+                                (click)="filterByKeyStatus(status)" *ngFor="let status of STATUS_IMPORT_CLASS">
+                                {{status['label'] + ': '+show_count_status[status['key']]}}
+                            </span>
+                        </div>
+                    </div>
+
+
+                    <!-- <input (input)="dt1.filterGlobal($event.target['value'], 'contains')" type="text"
+                        class="ovic-input-field" placeholder="Tìm kiếm" style="margin-right: 10px;"> -->
+                    <!-- <ovic-dropdown (onChange)="onChangeFilterImportDt($event,dt1)"
+                        [placeholder]="'---Chọn trạng thái---'" [options]="STATUS_IMPORT" optionId="label"
+                        optionLabel="label">
+                    </ovic-dropdown> -->
+                </div>
+            </div>
+            <div class="import-body scroll-table-layout-set" style="display: flex; flex-direction: row; padding: 0px;">
+                <div class="import-body-left">
+                    <div class="import-body-left-header">
+                        <input (click)="clickToInputFilter()" type="text" class="ovic-input-field"
+                            [(ngModel)]="search_class" placeholder="Tìm lớp học" style="width: 100%;">
+                    </div>
+                    <div class="import-body-left-body"
+                        *ngIf="(list_lopImport |filter: search_class : ['name','key_status','class_type']).length > 0; else noResults">
+                        <div style="padding: 2px;"
+                            *ngFor="let class of list_lopImport | filter: search_class : ['name','key_status','class_type'], index as i">
+                            <div (click)="chooseClassCalendar(class)"
+                                [ngClass]="select_class_calendar && select_class_calendar.slug === class.slug?'active':''"
+                                class="import-body-left-body-class-name"
+                                style="font-size: 14px; line-height: 1.25; padding: 5px; background: #eeeeee; display: flex; flex-direction: row;">
+                                <span>{{(i + 1)}}.&nbsp;</span>
+                                <div style="flex: 1; display: flex; flex-direction: column;">
+                                    <span>{{class['name']}}</span>
+                                    <span
+                                        style="border-top: 1px solid #c8c8c8; padding-top: 5px; margin-top: 5px; text-transform: uppercase;">MGV:
+                                        {{class['show_teacher_code']}}</span>
+                                    <span style="border-top: 1px solid #c8c8c8; padding-top: 5px; margin-top: 5px;">MMH:
+                                        {{class['mahp']}}</span>
+                                </div>
+                                <span *ngIf="class['import']"><i class="fa fa-check"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <ng-template #noResults>
+                        <div style="height: calc(100% - 42px);" class="result-search-none">Không tìm thấy...</div>
+                    </ng-template>
+                </div>
+                <div class="import-body-right" style="padding: 5px; overflow: auto;">
+                    <p-table #dt3 [globalFilterFields]="['class_name','import_label']" [paginator]="true" [rows]="20"
+                        [showCurrentPageReport]="true" [value]="list_class_calendar"
+                        styleClass="tbl-danhSachUser table-scroll-able-page table-scroll-able table-able-dropdown-p-table table-reBorder table-has-caption">
+                        <ng-template pTemplate="caption">
+                            <div *ngIf="select_class_calendar" class="flex align-items-center justify-content-between"
+                                style="padding: 11px 5px;">
+                                {{select_class_calendar['name'] }}<span style="text-transform: uppercase;">{{' | MGV:
+                                    '+select_class_calendar['show_teacher_code']}}</span>{{' | MMH:
+                                '+select_class_calendar['mahp'] }}
+                            </div>
+                        </ng-template>
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th width="50" style="text-align: center;">#</th>
+                                <th [width]="col['width']" [ngClass]="col['class']"
+                                    *ngFor="let col of cols_class_calendar">
+                                    {{col['label']}}
+                                </th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-row let-rowIndex="rowIndex" let-rowspan="rowspan">
+                            <tr class="{{row['import']?'import-thanhcong':''}}">
+                                <td style="text-align: center;">{{rowIndex +1}}</td>
+                                <td [width]="col['width']" [ngClass]="col['class']"
+                                    *ngFor="let col of cols_class_calendar">
+                                    <span *ngIf="!col['innerHTML']">{{row[col['key']]}}</span>
+                                    <div *ngIf="col['innerHTML']" [innerHTML]="row[col['key']]"></div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+                <!-- <p-table #dt1 [globalFilterFields]="['name','email','khoa_bomon','import_label']" [paginator]="true"
+                    [rows]="20" [showCurrentPageReport]="true" [value]="list_lopImport"
+                    styleClass="tbl-danhSachUser table-scroll-able-page table-able-dropdown-p-table table-none-header table-reBorder">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th width="50" style="text-align: center;">#</th>
+                            <th [width]="col['width']" [ngClass]="col['class']" *ngFor="let col of cols_lophop">
+                                {{col['label']}}
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+                        <tr class="{{row['import']?'import-thanhcong':''}}">
+                            <td style="text-align: center;">{{rowIndex +1}}</td>
+                            <td [width]="col['width']" [ngClass]="col['class']" *ngFor="let col of cols_lophop">
+                                <span>{{row[col['key']]}}</span>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table> -->
+            </div>
+        </div>
+    </div>
+</ng-template>

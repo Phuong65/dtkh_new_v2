@@ -70,7 +70,7 @@
         }
         <div class="ovic-vertical__inputs ovic-vertical__inputs--layout-2">
           <p class="form-row mt-0">
-            <p-dropdown class="input-element ovic-dropdown-style" [filter]="false" [options]="colOptions"
+            <p-dropdown appendTo="body" class="input-element ovic-dropdown-style" [filter]="false" [options]="colOptions"
               [(ngModel)]="question.config.cols" optionLabel="label" optionValue="value" optionDisabled="disable"
             placeholder="--Lựa chọn--"></p-dropdown>
           </p>

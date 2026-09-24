@@ -1,1 +1,339 @@
-﻿<div class="p-3">form-de-kthp-ictu-v2.component works!</div>
+<div class="layout-form-details">
+    <div class="layout-form-details-body">
+        <div *ngIf="_course" style="overflow: auto; height: 100%; padding: 10px;">
+            <div [ngSwitch]="_course.av">
+                <div *ngSwitchCase="0">
+                    <p-table [value]="list_course_plan" styleClass="tbl-danhSachUser table-reBorder table-scroll-able">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th style="width: 150px;"></th>
+                                <th [ngClass]="cdr.disabled ? 'display-none':''" *ngFor="let cdr of chuan_dau_ra"
+                                    style="text-align: center; width: 150px;">
+                                    {{cdr.label}}
+                                </th>
+                                <th style="width: 150px; text-align: center;">
+                                    Tổng số câu
+                                    <span
+                                        *ngIf="_course['question_take_total'] || _course['question_take_total_private']">
+                                        (<span>
+                                            {{_course['question_take_total']}}
+                                        </span>
+                                        +
+                                        <span style="color: orange;">
+                                            {{_course['question_take_total_private']}}
+                                        </span>
+                                        =
+                                        {{sum([_course['question_take_total'],_course['question_take_total_private']])}})
+                                    </span>
+                                </th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-row>
+                            <tr [ngClass]="row['require_question']?'require-cdr-backgroud-color':''">
+                                <td>
+                                    <span class="true-blue" *ngIf="row['week'] === 100">
+                                        BS20
+                                    </span>
+                                    <span class="true-blue" *ngIf="row['week'] !== 100">
+                                        {{label_week + ' ' + row['week']}}
+                                    </span>
+                                </td>
+                                <td style="text-align: center; width: 150px;"
+                                    [ngClass]="cdr.disabled ? 'display-none':''" *ngFor="let cdr of chuan_dau_ra">
+                                    <div
+                                        *ngIf="((row.cdr_cauhoi && row.cdr_cauhoi[cdr.id]) || (row.cdr_cauhoi_private && row.cdr_cauhoi_private[cdr.id]))&& !cdr.disabled ">
+                                        <div class="p-inputgroup" *ngIf="row.cdr_cauhoi && row.cdr_cauhoi[cdr.id]">
+                                            <input *ngIf="row['canEdit']" [disabled]="!row['canEdit']"
+                                                [(ngModel)]="row['question_take'][cdr.id]" #inputNumberQuestion
+                                                class="ovic-input-field"
+                                                (keydown)="pointQuestionKeyDown($event,inputNumberQuestion)"
+                                                (keyup)="setNumberQuestiontype0(row,cdr)"
+                                                style="text-align: center; flex:1; width: 100%;" type="number">
+                                            <span class="cant-edit-question" *ngIf="!row['canEdit']">
+                                                {{row['question_take'][cdr.id]}}
+                                            </span>
+                                            <span class="p-inputgroup-addon tag-cdr-cauhoi-percent">
+                                                / {{row.cdr_cauhoi[cdr.id]}}
+                                            </span>
+                                        </div>
+                                        <span class="no-question-input"
+                                            *ngIf="!row.cdr_cauhoi || !row.cdr_cauhoi[cdr.id]">
+                                            -
+                                        </span>
+                                        <hr style="margin: 5px 0px;" />
+                                        <div class="p-inputgroup"
+                                            *ngIf="row.cdr_cauhoi_private && row.cdr_cauhoi_private[cdr.id]">
+                                            <input *ngIf="row['canEdit']" [disabled]="!row['canEdit']"
+                                                [(ngModel)]="row['question_take_private'][cdr.id]" #inputNumberQuestion
+                                                class="ovic-input-field"
+                                                (keydown)="pointQuestionKeyDown($event,inputNumberQuestion)"
+                                                (keyup)="setNumberQuestiontype0(row,cdr)"
+                                                style="text-align: center; flex:1; width: 100%;" type="number">
+                                            <span class="cant-edit-question" *ngIf="!row['canEdit']">
+                                                {{row['question_take_private'][cdr.id]}}
+                                            </span>
+                                            <span class="p-inputgroup-addon tag-cdr-cauhoi-percent private-color">
+                                                / {{row.cdr_cauhoi_private[cdr.id]}}
+                                            </span>
+                                        </div>
+                                        <span class="no-question-input"
+                                            *ngIf="!row.cdr_cauhoi_private || !row.cdr_cauhoi_private[cdr.id]">
+                                            -
+                                        </span>
+                                    </div>
+                                    <span
+                                        *ngIf="(!row.cdr_cauhoi && !row.cdr_cauhoi[cdr.id] && !row.cdr_cauhoi_private && !row.cdr_cauhoi_private[cdr.id]) || cdr.disabled">
+                                        -
+                                    </span>
+                                </td>
+                                <td style="text-align: center; width: 150px;">
+                                    <div *ngIf="row['question_take_total'] || row['question_take_total_private']">
+                                        <span>
+                                            {{row['question_take_total']}}
+                                        </span>
+                                        +
+                                        <span style="color: orange;">
+                                            {{row['question_take_total_private']}}
+                                        </span>
+                                        = {{sum([row['question_take_total'],row['question_take_total_private']])}}
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+                <div *ngSwitchCase="1">
+                    <p-table [value]="list_course_plan" styleClass="tbl-danhSachUser table-reBorder table-scroll-able">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th style="width: 150px; text-align: center;"></th>
+                                <th [ngClass]="cdr.disabled ? 'display-none':''" *ngFor="let cdr of chuan_dau_ra"
+                                    style="text-align: center; width: 150px;">
+                                    {{cdr.label}}
+                                </th>
+                                <th style="text-align: center; width: 150px;">
+                                    Tổng câu hỏi
+                                    <span
+                                        *ngIf="_course['question_take_total'] || _course['question_take_total_private']">
+                                        (<span>
+                                            {{_course['question_take_total']}}
+                                        </span>
+                                        +
+                                        <span style="color: orange;">
+                                            {{_course['question_take_total_private']}}
+                                        </span>
+                                        =
+                                        {{sum([_course['question_take_total'],_course['question_take_total_private']])}})
+                                    </span>
+                                </th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-row>
+                            <tr>
+                                <th style="text-align: left; background-color: #f8f9fa;">
+                                    <div style="display: flex;">
+                                        <span style="flex: 1;">
+                                            {{row['week']!== 100? label_week +' '+row['week']:'Câu hỏi thi KTHP'}}
+                                        </span>
+                                    </div>
+                                </th>
+                                <th style="background-color: #f8f9fa;" [colSpan]="5">
+                                </th>
+                            </tr>
+                            <tr *ngFor="let child of row['question_parts']"
+                                [ngClass]="child['require_question']?'background-color-red':''">
+                                <td style="text-align: left; color: #3B82F6;">
+                                    {{child['part']}}
+                                </td>
+                                <td [ngClass]="cdr.disabled?'display-none':''" style="text-align: center;"
+                                    *ngFor="let cdr of chuan_dau_ra">
+                                    <div
+                                        *ngIf="((child.cdr_cauhoi && child.cdr_cauhoi[cdr.id]) || (child.cdr_cauhoi_private && child.cdr_cauhoi_private[cdr.id])) && !cdr.disabled">
+                                        <div class="p-inputgroup" *ngIf="child.cdr_cauhoi && child.cdr_cauhoi[cdr.id]">
+                                            <input *ngIf="row['canEdit']" [disabled]="!row['canEdit']"
+                                                [(ngModel)]="child['question_take'][cdr.id]" #inputNumberQuestion
+                                                class="ovic-input-field" (keyup)="setNumberQuestiontype1()"
+                                                (keydown)="pointQuestionKeyDown($event,inputNumberQuestion)"
+                                                style="text-align: center; flex:1; width: 100%;" type="number">
+                                            <span class="cant-edit-question" *ngIf="!row['canEdit']">
+                                                {{child['question_take'][cdr.id]}}
+                                            </span>
+                                            <span class="p-inputgroup-addon tag-cdr-cauhoi-percent">
+                                                / {{child.cdr_cauhoi[cdr.id]}}
+                                            </span>
+                                        </div>
+                                        <span class="no-question-input"
+                                            *ngIf="!child.cdr_cauhoi || !child.cdr_cauhoi[cdr.id]">
+                                            -
+                                        </span>
+                                        <hr style="margin: 5px 0px;" />
+                                        <div class="p-inputgroup"
+                                            *ngIf="child.cdr_cauhoi_private && child.cdr_cauhoi_private[cdr.id]">
+                                            <input *ngIf="row['canEdit']" [disabled]="!row['canEdit']"
+                                                [(ngModel)]="child['question_take_private'][cdr.id]"
+                                                #inputNumberQuestion class="ovic-input-field"
+                                                (keyup)="setNumberQuestiontype1()"
+                                                (keydown)="pointQuestionKeyDown($event,inputNumberQuestion)"
+                                                style="text-align: center; flex:1; width: 100%;" type="number">
+                                            <span class="cant-edit-question" *ngIf="!row['canEdit']">
+                                                {{child['question_take_private'][cdr.id]}}
+                                            </span>
+                                            <span class="p-inputgroup-addon tag-cdr-cauhoi-percent private-color">
+                                                / {{child.cdr_cauhoi_private[cdr.id]}}
+                                            </span>
+                                        </div>
+                                        <span class="no-question-input"
+                                            *ngIf="!child.cdr_cauhoi_private || !child.cdr_cauhoi_private[cdr.id]">
+                                            -
+                                        </span>
+                                    </div>
+                                    <span
+                                        *ngIf="(!child.cdr_cauhoi && !child.cdr_cauhoi[cdr.id] && !child.cdr_cauhoi_private && !child.cdr_cauhoi_private[cdr.id]) || cdr.disabled">
+                                        -
+                                    </span>
+                                </td>
+                                <td style="text-align: center;">
+                                    <div *ngIf="child['question_take_total'] || child['question_take_total_private']">
+                                        <span>
+                                            {{child['question_take_total']}}
+                                        </span>
+                                        +
+                                        <span style="color: orange;">
+                                            {{child['question_take_total_private']}}
+                                        </span>
+                                        = {{sum([child['question_take_total'],child['question_take_total_private']])}}
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+                <div *ngSwitchCase="2">
+                    <p-table [value]="list_course_plan" styleClass="tbl-danhSachUser table-reBorder table-scroll-able">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th style="width: 150px; text-align: center;"></th>
+                                <th [ngClass]="cdr.disabled ? 'display-none':''" *ngFor="let cdr of chuan_dau_ra"
+                                    style="text-align: center; width: 150px;">
+                                    {{cdr.label}}
+                                </th>
+                                <th style="text-align: center; width: 150px;">
+                                    Tổng câu hỏi
+                                    <span
+                                        *ngIf="_course['question_take_total'] || _course['question_take_total_private']">
+                                        (<span>
+                                            {{_course['question_take_total']}}
+                                        </span>
+                                        +
+                                        <span style="color: orange;">
+                                            {{_course['question_take_total_private']}}
+                                        </span>
+                                        =
+                                        {{sum([_course['question_take_total'],_course['question_take_total_private']])}})
+                                    </span>
+                                </th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-row>
+                            <tr
+                                [ngClass]="!row['children'] || row['children'].length === 0?'require-cdr-backgroud-color':''">
+                                <th style="text-align: left; background-color: #f8f9fa;">
+                                    <div style="display: flex;">
+                                        <span style="flex: 1;">
+                                            {{row['week']!== 100? label_week +' '+row['week']:'Câu hỏi thi KTHP'}}
+                                        </span>
+                                    </div>
+                                </th>
+                                <th style="background-color: #f8f9fa;" [colSpan]="5">
+
+                                </th>
+                            </tr>
+                            <tr *ngFor="let child of row['children']"
+                                [ngClass]="child['require_question']?'background-color-red':''">
+                                <td style="text-align: left; color: #3B82F6;">
+                                    {{row['week']!== 100?child['kyhieu']+' - '+child['cdr_name']:child['kyhieu']}}
+                                </td>
+                                <td [ngClass]="cdr.disabled?'display-none':''" style="text-align: center;"
+                                    *ngFor="let cdr of chuan_dau_ra">
+                                    <div
+                                        *ngIf="((child.cdr_cauhoi && child.cdr_cauhoi[cdr.id]) || (child.cdr_cauhoi_private && child.cdr_cauhoi_private[cdr.id]) ) && !cdr.disabled">
+                                        <div class="p-inputgroup" *ngIf="child.cdr_cauhoi && child.cdr_cauhoi[cdr.id]">
+                                            <input *ngIf="row['canEdit']" [disabled]="!row['canEdit']"
+                                                [(ngModel)]="child['question_take'][cdr.id]" #inputNumberQuestion
+                                                class="ovic-input-field" (keyup)="setNumberQuestiontype2()"
+                                                (keydown)="pointQuestionKeyDown($event,inputNumberQuestion)"
+                                                style="text-align: center; flex:1; width: 100%;" type="number">
+                                            <span class="cant-edit-question" *ngIf="!row['canEdit']">
+                                                {{child['question_take'][cdr.id]}}
+                                            </span>
+                                            <span class="p-inputgroup-addon tag-cdr-cauhoi-percent">
+                                                / {{child.cdr_cauhoi[cdr.id]}}
+                                            </span>
+                                        </div>
+                                        <span class="no-question-input"
+                                            *ngIf="!child.cdr_cauhoi || !child.cdr_cauhoi[cdr.id]">
+                                            -
+                                        </span>
+                                        <hr style="margin: 5px 0px;" />
+                                        <div class="p-inputgroup"
+                                            *ngIf="child.cdr_cauhoi_private && child.cdr_cauhoi_private[cdr.id]">
+                                            <input *ngIf="row['canEdit']" [disabled]="!row['canEdit']"
+                                                [(ngModel)]="child['question_take_private'][cdr.id]"
+                                                #inputNumberQuestion class="ovic-input-field"
+                                                (keyup)="setNumberQuestiontype2()"
+                                                (keydown)="pointQuestionKeyDown($event,inputNumberQuestion)"
+                                                style="text-align: center; flex:1; width: 100%;" type="number">
+                                            <span class="cant-edit-question" *ngIf="!row['canEdit']">
+                                                {{child['question_take_private'][cdr.id]}}
+                                            </span>
+                                            <span class="p-inputgroup-addon tag-cdr-cauhoi-percent private-color">
+                                                / {{child.cdr_cauhoi_private[cdr.id]}}
+                                            </span>
+                                        </div>
+                                        <span class="no-question-input"
+                                            *ngIf="!child.cdr_cauhoi_private || !child.cdr_cauhoi_private[cdr.id]">
+                                            -
+                                        </span>
+                                    </div>
+                                    <span
+                                        *ngIf="(!child.cdr_cauhoi && !child.cdr_cauhoi[cdr.id] && !child.cdr_cauhoi_private && !child.cdr_cauhoi_private[cdr.id]) || cdr.disabled">
+                                        -
+                                    </span>
+                                </td>
+                                <td style="text-align: center;">
+                                    <div *ngIf="child['question_take_total'] || child['question_take_total_private']">
+                                        <span>
+                                            {{child['question_take_total']}}
+                                        </span>
+                                        +
+                                        <span style="color: orange;">
+                                            {{child['question_take_total_private']}}
+                                        </span>
+                                        = {{sum([child['question_take_total'],child['question_take_total_private']])}}
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <p style="font-size: 14px; color: red; text-align: left; margin-left: 10px; margin-bottom: 5px; margin-top: 5px;">
+        Lưu ý: Kiểm tra lại cấu trúc đề trước và sau khi <span style="font-weight: bold;">Lưu lại</span></p> -->
+    <!-- <div class="layout-form-details-footer">
+        <button [disabled]="false" (click)="saveFormDetail()" class="btn btn-primary">
+            <i class="fa fa-floppy-o" ></i>Lưu lại
+        </button>
+    </div> -->
+</div>
+
+<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+    [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+    <div class="popup-waiting-loading">
+        <label style="width: 100%;">{{waitting_title}}</label>
+        <div class="tn-import-student-progressbar">
+            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+        </div>
+    </div>
+</p-dialog>

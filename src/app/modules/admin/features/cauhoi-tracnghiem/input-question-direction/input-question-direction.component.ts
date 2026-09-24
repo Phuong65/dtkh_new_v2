@@ -10,7 +10,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { OpenFileManagerService } from '@shared/services/open-file-manager.service';
 import { OvicVideoSourceObject } from '@shared/utils/syscat';
-import * as DecoupledEditor from '../../../../shared/components/ovic-ckeditor-document/build/ckeditor';
+import DecoupledEditor from '../../../../shared/components/ovic-ckeditor-document/build/ckeditor';
 import { AbstractControl } from '@angular/forms';
 import { Answers } from '@shared/models/question';
 import { LatexHandleService } from '@modules/shared/services/latex-handle.service';
@@ -138,7 +138,9 @@ export class InputQuestionDirectionComponent implements OnInit, OnDestroy, OnCha
     }
 
     ngAfterViewInit(): void {
-        this.initLazyLoad();
+        this.isReadyToLoad = true;
+        this.cd.detectChanges();
+        this.createEditor();
     }
 
     initLazyLoad(): void {

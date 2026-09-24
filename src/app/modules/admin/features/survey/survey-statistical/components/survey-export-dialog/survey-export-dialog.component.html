@@ -1,1 +1,79 @@
-﻿<div class="p-3">survey-export-dialog.component works!</div>
+<p-dialog
+    [(visible)]="visible"
+    (onShow)="open()"
+    (onHide)="close()"
+    [modal]="true"
+    [dismissableMask]="true"
+    [closeOnEscape]="true"
+    [style]="{width: '560px', maxWidth: '95vw'}"
+    header="Tùy chọn xuất Excel">
+
+    <div class="export-filter">
+        <div *ngIf="showFacultyFilter" class="export-filter__field">
+            <label>Khoa</label>
+            <p-multiSelect
+                [options]="facultyOptions"
+                [(ngModel)]="facultyIds"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+                placeholder="Chọn khoa"
+                [filter]="true"
+                [maxSelectedLabels]="1"
+                selectedItemsLabel="Đã chọn {0} khoa"
+                styleClass="w-full"
+                (onChange)="onSelectionChange('faculty', $event)">
+            </p-multiSelect>
+        </div>
+
+        <div class="export-filter__field">
+            <label>Khóa</label>
+            <p-multiSelect
+                [options]="cohortOptions"
+                [(ngModel)]="cohorts"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+                placeholder="Chọn khóa"
+                [filter]="true"
+                [maxSelectedLabels]="1"
+                selectedItemsLabel="Đã chọn {0} khóa"
+                styleClass="w-full"
+                (onChange)="onSelectionChange('cohort', $event)">
+            </p-multiSelect>
+        </div>
+
+        <div class="export-filter__field">
+            <label>Nhóm câu hỏi</label>
+            <p-multiSelect
+                [options]="groupOptions"
+                [(ngModel)]="groupIds"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+                placeholder="Chọn nhóm câu hỏi"
+                [filter]="true"
+                [maxSelectedLabels]="1"
+                selectedItemsLabel="Đã chọn {0} nhóm"
+                styleClass="w-full"
+                (onChange)="onSelectionChange('group', $event)">
+            </p-multiSelect>
+        </div>
+
+        <div class="export-filter__summary">
+            <span>Số dòng dự kiến:</span>
+            <strong>{{ estimatedRows | number:'1.0-0' }}</strong>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button type="button" class="btn btn-light" (click)="close()">Hủy</button>
+        <button type="button"
+                class="btn btn-success"
+                [disabled]="exporting || estimatedRows <= 0"
+                (click)="submit()">
+            <i class="pi" [ngClass]="exporting ? 'pi-spin pi-spinner' : 'pi-file-excel'"></i>
+            Xuất Excel
+        </button>
+    </ng-template>
+</p-dialog>

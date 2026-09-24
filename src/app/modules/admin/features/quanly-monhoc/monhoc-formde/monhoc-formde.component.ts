@@ -2,7 +2,7 @@ import { CourseFormCommentService } from './../../../../shared/services/course-f
 import { HoidongThamdinhService } from '@modules/shared/services/hoidong-thamdinh.service';
 import { HoidongThamdinhMonhocThanhvienService } from '@modules/shared/services/hoidong-thamdinh-monhoc-thanhvien.service';
 import { CourseFormDuyetService } from './../../../../shared/services/course-form-duyet.service';
-import { AfterViewInit, Component, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from '@modules/shared/shared.module';
 import { FormDeKthpComponent } from '../form-de-kthp/form-de-kthp.component';
@@ -111,11 +111,11 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
     canAdded: boolean = false;
 
-    list_cdr_cauhoi: PlanActivityCdr[];
+    list_cdr_cauhoi: PlanActivityCdr[] = [];
 
-    list_part: string[];
+    list_part: string[] = [];
 
-    list_test_tx: PlanActivityCdr[];
+    list_test_tx: PlanActivityCdr[] = [];
 
     activeIndexTab: number = 0;
 
@@ -127,17 +127,17 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
     displayModal: boolean = false;
 
-    list_course_plan: PlanActivityCdr[];
+    list_course_plan: PlanActivityCdr[] = [];
 
-    list_week: PlanActivityCdr[];
+    list_week: PlanActivityCdr[] = [];
 
-    list_question_txt1: CourseQuestions[];
+    list_question_txt1: CourseQuestions[] = [];
 
-    list_question_txt2: CourseQuestions[];
+    list_question_txt2: CourseQuestions[] = [];
 
     selectedTestTx: PlanActivityCdr;
 
-    list_test_dg: PlanActivityCdr[];
+    list_test_dg: PlanActivityCdr[] = [];
 
     tuluan15pRows: Tuluan15pRow[] = [];
 
@@ -183,7 +183,8 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
         private hoidongThamdinhService: HoidongThamdinhService,
         private hoidongThamdinhMonhocService: HoidongThamdinhMonhocService,
         private hoidongThamdinhMonhocThanhvienService: HoidongThamdinhMonhocThanhvienService,
-        private courseFormCommentService: CourseFormCommentService
+        private courseFormCommentService: CourseFormCommentService,
+        private cdr: ChangeDetectorRef
     ) {
         this.isManager = this.auth.userHasRole(ROLES.manager) || this.auth.userHasRole(ROLES.admin) || this.auth.userHasRole(ROLES.troly_pdt) || this.auth.userHasRole(ROLES.chuyenvien_pdt) ? true : false;
 
@@ -720,7 +721,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                                 }
                             })
 
-                        c['kyhieu_stt'] = parseFloat(c.kyhieu.replace(/\D/gi, ''));
+                        c['kyhieu_stt'] = parseFloat((c.kyhieu || '').replace(/\D/gi, ''));
 
                         c['total_question_cdr'] = 0;
 
@@ -736,7 +737,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
                         this.setQuestionTakeVisibility(c);
 
-                        if (c.params && c.params.cdr && c.params.cdr.cdr_info) {
+                        if (c.params && c.params.cdr && Array.isArray(c.params.cdr.cdr_info)) {
                             const index = c.params.cdr.cdr_info.findIndex(m => m.id === 'level_require');
                             if (index !== -1) {
                                 c['cdr_name'] = c.params.cdr.cdr_info[index].value;
@@ -762,7 +763,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                     f['children'] = this.helperService.sort(children, 'kyhieu_stt');
                 })
 
-                this.list_cdr_cauhoi = parent;
+                this.list_cdr_cauhoi = [...parent]; this.cdr.detectChanges();
             },
 
             error: () => {
@@ -950,7 +951,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                 const parent = _plan_activity.data.filter(m => m.parent_id === 0);
 
                 _question.data.forEach(c => {
-                    c['stt_code'] = parseFloat(c.code.replace(/\D/gi, ''));
+                    c['stt_code'] = parseFloat((c.code || '').replace(/\D/gi, ''));
                 })
 
                 const parent_question = _question.data.filter(m => m.group_id === 0);
@@ -986,7 +987,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
                     children.forEach(c => {
 
-                        c['kyhieu_stt'] = parseFloat(c.kyhieu.replace(/\D/gi, ''));
+                        c['kyhieu_stt'] = parseFloat((c.kyhieu || '').replace(/\D/gi, ''));
 
                         c['total_question_cdr'] = 0;
 
@@ -994,7 +995,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
                         c['parts'] = {};
 
-                        if (c.params && c.params.cdr && c.params.cdr.cdr_info) {
+                        if (c.params && c.params.cdr && Array.isArray(c.params.cdr.cdr_info)) {
                             const index = c.params.cdr.cdr_info.findIndex(m => m.id === 'level_require');
                             if (index !== -1) {
                                 c['cdr_name'] = c.params.cdr.cdr_info[index].value;
@@ -1050,7 +1051,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
                 });
 
-                this.list_cdr_cauhoi = parent;
+                this.list_cdr_cauhoi = [...parent]; this.cdr.detectChanges();
             },
 
             error: () => {
@@ -1338,7 +1339,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                     }
                 })
 
-                this.list_test_tx = this.helperService.sort(test_tx, 'ordering');
+                this.list_test_tx = [...this.helperService.sort(test_tx, 'ordering')]; this.cdr.detectChanges();
 
                 if (this.list_test_tx && this.list_test_tx.length) {
                     this.show_test_tx = true;
@@ -1542,7 +1543,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                 // this.list_question_txt1 = _question.data;
 
                 _question.data.forEach(c => {
-                    c['stt_code'] = parseFloat(c.code.replace(/\D/gi, ''));
+                    c['stt_code'] = parseFloat((c.code || '').replace(/\D/gi, ''));
                 })
 
                 const parent_question = _question.data.filter(m => m.group_id === 0);
@@ -1627,7 +1628,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
                             children.forEach(c => {
 
-                                c['kyhieu_stt'] = parseFloat(c.kyhieu.replace(/\D/gi, ''));
+                                c['kyhieu_stt'] = parseFloat((c.kyhieu || '').replace(/\D/gi, ''));
 
                                 c['total_question_cdr'] = this.list_question_txt1.filter(m => m.group_id !== 0 && m.reference_id === c.id && m.private === 0).length;
 
@@ -1643,7 +1644,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
                                 c['parts_private'] = {};
 
-                                if (c.params && c.params.cdr && c.params.cdr.cdr_info) {
+                                if (c.params && c.params.cdr && Array.isArray(c.params.cdr.cdr_info)) {
                                     const index = c.params.cdr.cdr_info.findIndex(m => m.id === 'level_require');
                                     if (index !== -1) {
                                         c['cdr_name'] = c.params.cdr.cdr_info[index].value;
@@ -1717,7 +1718,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
 
 
-                this.list_test_tx = this.helperService.sort(test_tx, 'ordering');
+                this.list_test_tx = [...this.helperService.sort(test_tx, 'ordering')]; this.cdr.detectChanges();
 
                 if (this.list_test_tx && this.list_test_tx.length) {
                     this.show_test_tx = true;
@@ -2026,9 +2027,9 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
                                 c['total_question_cdr_private'] = 0;
 
-                                c['stt_code'] = parseFloat(c.kyhieu.replace(/\D/gi, ''));
+                                c['stt_code'] = parseFloat((c.kyhieu || '').replace(/\D/gi, ''));
 
-                                if (c.params && c.params.cdr && c.params.cdr.cdr_info) {
+                                if (c.params && c.params.cdr && Array.isArray(c.params.cdr.cdr_info)) {
                                     const index = c.params.cdr.cdr_info.findIndex(m => m.id === 'level_require');
                                     if (index !== -1) {
                                         c['cdr_name'] = c.params.cdr.cdr_info[index].value;
@@ -2095,7 +2096,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                     }
                 })
 
-                this.list_test_tx = this.helperService.sort(test_tx, 'ordering');
+                this.list_test_tx = [...this.helperService.sort(test_tx, 'ordering')]; this.cdr.detectChanges();
 
                 if (this.list_test_tx && this.list_test_tx.length) {
                     this.show_test_tx = true;
@@ -2270,7 +2271,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
                             w['children'].forEach(c => {
 
-                                c['kyhieu_stt'] = parseFloat(c.kyhieu.replace(/\D/gi, ''));
+                                c['kyhieu_stt'] = parseFloat((c.kyhieu || '').replace(/\D/gi, ''));
 
                                 c['total_question_cdr'] = this.list_question_txt1.filter(m => m.group_id !== 0 && m.reference_id === c.id && m.private === 0).length;
 
@@ -2284,7 +2285,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
                                 c['parts_private'] = {};
 
-                                if (c.params && c.params.cdr && c.params.cdr.cdr_info) {
+                                if (c.params && c.params.cdr && Array.isArray(c.params.cdr.cdr_info)) {
                                     const index = c.params.cdr.cdr_info.findIndex(m => m.id === 'level_require');
                                     if (index !== -1) {
                                         c['cdr_name'] = c.params.cdr.cdr_info[index].value;
@@ -2388,9 +2389,9 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
                             c['total_question_cdr_private'] = 0;
 
-                            c['stt_code'] = parseFloat(c.kyhieu.replace(/\D/gi, ''));
+                            c['stt_code'] = parseFloat((c.kyhieu || '').replace(/\D/gi, ''));
 
-                            if (c.params && c.params.cdr && c.params.cdr.cdr_info) {
+                            if (c.params && c.params.cdr && Array.isArray(c.params.cdr.cdr_info)) {
                                 const index = c.params.cdr.cdr_info.findIndex(m => m.id === 'level_require');
                                 if (index !== -1) {
                                     c['cdr_name'] = c.params.cdr.cdr_info[index].value;
@@ -2840,7 +2841,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                                 }
                             })
 
-                        c['kyhieu_stt'] = parseFloat(c.kyhieu.replace(/\D/gi, ''));
+                        c['kyhieu_stt'] = parseFloat((c.kyhieu || '').replace(/\D/gi, ''));
 
                         c['total_question_cdr'] = 0;
 
@@ -2868,7 +2869,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
                         this.setQuestionTakeVisibility(c);
 
-                        if (c.params && c.params.cdr && c.params.cdr.cdr_info) {
+                        if (c.params && c.params.cdr && Array.isArray(c.params.cdr.cdr_info)) {
                             const index = c.params.cdr.cdr_info.findIndex(m => m.id === 'level_require');
                             if (index !== -1) {
                                 c['cdr_name'] = c.params.cdr.cdr_info[index].value;
@@ -2907,7 +2908,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
                 this.tuluan15pRows = this.buildTuluan15pRows(parent, _tuluan15pForm.data || []);
                 this.attachTuluan15pRows(parent);
-                this.list_test_dg = parent;
+                this.list_test_dg = [...parent]; this.cdr.detectChanges();
             },
 
             error: () => {
@@ -3086,7 +3087,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                 const parent = _plan_activity.data.filter(m => m.parent_id === 0);
 
                 _question.data.forEach(c => {
-                    c['stt_code'] = parseFloat(c.code.replace(/\D/gi, ''));
+                    c['stt_code'] = parseFloat((c.code || '').replace(/\D/gi, ''));
                 })
 
                 const parent_question = _question.data.filter(m => m.group_id === 0);
@@ -3123,7 +3124,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
                     children.forEach(c => {
 
-                        c['kyhieu_stt'] = parseFloat(c.kyhieu.replace(/\D/gi, ''));
+                        c['kyhieu_stt'] = parseFloat((c.kyhieu || '').replace(/\D/gi, ''));
 
                         c['total_question_cdr'] = 0;
 
@@ -3137,7 +3138,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
                         c['parts_private'] = {};
 
-                        if (c.params && c.params.cdr && c.params.cdr.cdr_info) {
+                        if (c.params && c.params.cdr && Array.isArray(c.params.cdr.cdr_info)) {
                             const index = c.params.cdr.cdr_info.findIndex(m => m.id === 'level_require');
                             if (index !== -1) {
                                 c['cdr_name'] = c.params.cdr.cdr_info[index].value;
@@ -3218,7 +3219,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
                 this.tuluan15pRows = this.buildTuluan15pRows(parent, _tuluan15pForm.data || []);
                 this.attachTuluan15pRows(parent);
-                this.list_test_dg = parent;
+                this.list_test_dg = [...parent]; this.cdr.detectChanges();
             },
 
             error: () => {

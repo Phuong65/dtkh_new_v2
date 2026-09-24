@@ -263,7 +263,7 @@
                                 pRipple type="button" icon="pi pi-ellipsis-h"
                                 class="p-button-info p-button-text">
                               </button>
-                              <mat-menu #menuActionTest="matMenu">
+                              <mat-menu #menuActionTest="matMenu" panelClass="student-action-menu">
                                 <button (click)="openViolationSet(row)" mat-menu-item>
                                   <i class="pi pi-file-edit margin-right-5px"></i>
                                   <span>Xử lý vi phạm quy chế</span>
@@ -273,8 +273,8 @@
                                   <i class="pi pi-file-excel margin-right-5px"></i>
                                   <span>Hủy xử lý vi phạm quy chế</span>
                                 </button>
-                                                <button (click)="resetTestStudent(row)" [disabled]="!row['student_test'] ?
-                                                true : false" mat-menu-item>
+                                <button (click)="resetTestStudent(row)" [disabled]="!row['student_test'] ? true : false"
+                                  mat-menu-item>
                                   <i class="pi pi-refresh margin-right-5px"></i>
                                   <span>Nhận đề mới</span>
                                 </button>

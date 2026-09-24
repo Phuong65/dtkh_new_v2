@@ -3,6 +3,10 @@
     overflow: hidden;
 }
 
+::ng-deep .ovic-input-line-dropdown-panel {
+    z-index: 1000001 !important;
+}
+
 .title-col-flex {
     display: flex;
     flex-direction: row;

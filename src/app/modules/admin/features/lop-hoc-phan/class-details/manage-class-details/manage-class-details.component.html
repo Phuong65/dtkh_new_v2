@@ -19,7 +19,7 @@
   </div>
   <div class="class-details-right">
     <!-- <div class="class-section-grid-background"></div> -->
-    @if (selectedMenu) {
+    @if (selectedMenu && selectedClass) {
       <ng-container>
         @switch (selectedMenu.id) {
           @default {

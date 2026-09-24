@@ -1,1 +1,171 @@
-﻿<div class="p-3">import-lichhoc.component works!</div>
+<div class="import-monhoc-layout">
+    <input type="file" #inputImport style="visibility: hidden; display: contents;" (change)="changeInputImport($event)"
+        accept=".xlsx, .xls" />
+    <div class="import-monhoc-header" style="display:flex; align-items: center;">
+        <div class="import-monhoc-header-left" style="flex:1">
+            <button (click)="backToDongbo()" class="btn btn-icon btn-secondary" ngbTooltip="Quay lại trang đồng bộ"
+                container="body" placement="top">
+                <i class="fa fa-arrow-left"></i>
+            </button>
+            <button (click)="downLoadExLichHoc()" class="btn btn-secondary">
+                <i class="fa fa-download"></i>Tải file mẫu
+            </button>
+            <!-- <button (click)="triggerImport()" class="btn btn-success">
+                <i class="fa fa-file-excel-o"></i>Chọn file
+            </button> -->
+            <button [matMenuTriggerFor]="menuImport" class="btn btn-success">
+                <i class="fa fa-upload"></i>
+                Tải lên lịch học
+            </button>
+            <mat-menu #menuImport="matMenu">
+                <button (click)="triggerImport()" mat-menu-item>
+                    <i style="margin-right: 10px;" class="fa fa-file-excel-o"></i>
+                    <span>Chọn từ file excel</span>
+                </button>
+                <button (click)="displaySyncCalendar = true" mat-menu-item>
+                    <i style="margin-right: 10px;" class="fa fa-random"></i>
+                    <span>Từ hệ thống dangky.hvu.edu.vn</span>
+                </button>
+            </mat-menu>
+
+            <button (click)="startImportLichHoc()" [disabled]="list_lichhoc.length? false: true"
+                class="btn btn-primary"><i class="fa fa-play"></i>Bắt đầu</button>
+        </div>
+
+        <div class="import-monhoc-header-right form-row-flex-row ghi-de-dulieu">
+            <p-checkbox [(ngModel)]="ghi_de" [binary]="true" label="Xóa toàn bộ lịch bắt đầu từ ngày mai"></p-checkbox>
+        </div>
+    </div>
+    <div class="import-monhoc-bottom">
+        <div style="height: calc(100% - 40px); padding: 5px;">
+            <div *ngIf="list_lichhoc.length" style="height: 100%;">
+                <p-table
+                    [value]="list_lichhoc | filter : search_lichhoc : ['kyhieu' , 'teacher_name', 'class_name'] | filter : status_import_filter : ['status_import'] | paginatorLocal : pageImport : 25"
+                    styleClass="table-scroll-able table-able-dropdown-p-table table-has-caption table-reBorder">
+                    <ng-template pTemplate="caption">
+                        <div class="flex" style="display: flex; align-items: center;">
+                            <div style="flex: 1; font-weight: 500;">
+                                <span (click)="status_import_filter = null" class="padding-5px hover-underline">Tổng:
+                                    {{list_lichhoc.length}}</span> |
+                                <span (click)="status_import_filter = 0" class="padding-5px hover-underline gray">Chưa
+                                    import:
+                                    {{status_object.no_import}} </span> |
+                                <span (click)="status_import_filter = 1" class="padding-5px hover-underline blue">Thành
+                                    công:
+                                    {{status_object.import_done}} </span> |
+                                <span (click)="status_import_filter = -1" class="padding-5px hover-underline red">
+                                    Thất bại:
+                                    {{status_object.import_fail}} </span> |
+                                <span (click)="status_import_filter = -2" class="padding-5px hover-underline orange">
+                                    Không tìm thấy GV:
+                                    {{status_object.no_teacher}}
+                                </span> |
+                                <span (click)="status_import_filter = -3" class="padding-5px hover-underline orange">
+                                    Không tìm thấy LHP:
+                                    {{status_object.no_class}}
+                                </span>
+                            </div>
+                            <div>
+                                <input type="text" [(ngModel)]="search_lichhoc" style="line-height: 1; width:250px;"
+                                    placeholder="Nhập tên hoặc mã " />
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width: 3rem; text-align: center;">TT</th>
+                            <th style="width: 250px; text-align: center;">Lớp học</th>
+                            <th style="width: 100px; text-align: center;">Thứ</th>
+                            <th style="width: 100px; text-align: center;">Ngày</th>
+                            <th style="width: 100px; text-align: center;">Tiết</th>
+                            <th style="width: 150px; text-align: center;">Địa điểm</th>
+                            <th style="width: 250px; text-align: center;">Giảng viên</th>
+                            <th style="width: 150px; text-align: center;">Trạng thái</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-calendar>
+                        <tr>
+                            <td style="text-align: center;">{{calendar['index']}}</td>
+                            <td style="width: 250px;">{{calendar['class_name']}}</td>
+                            <td style="width: 100px; text-align: center;">{{calendar['thu']}}</td>
+                            <td style="width: 100px; text-align: center;">{{calendar['ngay'] | date:'dd/MM/yyyy'}}</td>
+                            <td style="width: 150px; text-align: center;">{{calendar['tiet']}}</td>
+                            <td style="width: 150px; text-align: center;">{{calendar['diadiem']}}</td>
+                            <td>{{calendar['teacher_name']}}</td>
+                            <td style="text-align: center;">
+                                <div [ngSwitch]="calendar['status_import']">
+                                    <span *ngSwitchCase="0" class="student-status-shift status-deactive">
+                                        Chưa import
+                                    </span>
+                                    <span *ngSwitchCase="1" class="student-status-shift status-activite">
+                                        Thành công
+                                    </span>
+                                    <span *ngSwitchCase="-1" class="student-status-shift import-fail">
+                                        Thất bại
+                                    </span>
+                                    <span *ngSwitchCase="-2" class="student-status-shift no-teacher">
+                                        Không tìm thấy GV
+                                    </span>
+                                    <span *ngSwitchCase="-3" class="student-status-shift no-teacher">
+                                        Không tìm thấy LHP
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+            <div *ngIf="list_lichhoc.length" class="page-layout-set">
+                <p-paginator #paginator_shift (onPageChange)="onChangePageImport($event)" [rows]="25"
+                    [totalRecords]="(list_lichhoc | filter : search_lichhoc : ['kyhieu' , 'teacher_name' , 'class_name'] | filter : status_import_filter : ['status_import']).length"></p-paginator>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+    [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+    <div class="popup-waiting-loading">
+        <label style="width: 100%;">{{waitting_title}}</label>
+        <!-- <label *ngIf="show_return">{{returnValueWaiting()}}</label> -->
+        <div class="tn-import-student-progressbar">
+            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+        </div>
+    </div>
+</p-dialog>
+
+
+<p-dialog styleClass="report-create-plan-dialog" [showHeader]="false" appendTo="body" position="center"
+    [draggable]="false" [resizable]="false" [modal]="true" header="Title" [(visible)]="displaySyncCalendar"
+    [style]="{width: '500px'}" [closable]="false">
+    <div class="step-sync-plans" style="background-color: #fff;">
+        <div class="step-sync-plans-header" style="display: flex; align-items: center;">
+            <span style="flex: 1;">Tải lịch học từ hệ thống dangky.hvu.edu.vn</span>
+            <span (click)="displaySyncCalendar = false" class="action-span"
+                style="margin-right: 0px; height: 20px; width: 20px; padding: 0px; line-height: 20px;text-align: center; cursor: pointer;">
+                <i style="color: red; margin: 0px;" class="fa fa-times"></i>
+            </span>
+        </div>
+        <div class="step-sync-plans-body ovic-vertical__inputs">
+            <div class="row form-row form-row-flex-row">
+                <div class="col-6 flex-div">
+                    <label for="title">Nhập năm học:<span class="ovic-mark" style="color: red;">*</span></label>
+                    <input [(ngModel)]="calendarFilter.namhoc" type="number" id="student_code" class="ovic-input-field"
+                        autocomplete="off">
+                </div>
+                <div class="col-6 flex-div">
+                    <label for="title">Nhập học kỳ:<span class="ovic-mark" style="color: red;">*</span></label>
+                    <input [(ngModel)]="calendarFilter.hocky" type="number" id="student_code" class="ovic-input-field"
+                        autocomplete="off">
+                </div>
+            </div>
+            <div class="row form-row form-row-flex-row">
+                <div class="col-12" style="text-align: right;">
+                    <button style="line-height: 1;" (click)="startGetCalendarFromDkSys()" class="btn btn-primary">
+                        Tải lịch học
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>

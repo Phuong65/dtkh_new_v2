@@ -192,8 +192,9 @@
                     </td>
                     <td style="text-align: left;">{{ctdt.label}}</td>
                     <td style="text-align: left;">
-                      <p-dropdown [showClear]="true" placeholder="------" [options]="ctdt.items"
-                        [(ngModel)]="ctdt['select_item']" [ngModelOptions]="{standalone: true}">
+                      <p-dropdown appendTo="body" [showClear]="true" placeholder="------" [options]="ctdt.items"
+                        optionLabel="label" optionValue="value" [(ngModel)]="ctdt['select_item']"
+                        [ngModelOptions]="{standalone: true}">
                       </p-dropdown>
                     </td>
                   </tr>

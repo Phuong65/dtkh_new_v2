@@ -8,7 +8,7 @@ describe('DongboDulieuIctuComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DongboDulieuIctuComponent ]
+      imports: [DongboDulieuIctuComponent]
     })
     .compileComponents();
 
