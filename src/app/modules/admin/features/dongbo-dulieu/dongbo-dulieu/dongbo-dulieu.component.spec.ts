@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+=======
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
+>>>>>>> parent of 4e11996 (a)
 
 import { DongboDulieuComponent } from './dongbo-dulieu.component';
 
@@ -8,7 +12,11 @@ describe('DongboDulieuComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+<<<<<<< HEAD
       declarations: [ DongboDulieuComponent ]
+=======
+      imports: [ DongboDulieuComponent ]
+>>>>>>> parent of 4e11996 (a)
     })
     .compileComponents();
 
@@ -21,3 +29,7 @@ describe('DongboDulieuComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+<<<<<<< HEAD
+=======
+
+>>>>>>> parent of 4e11996 (a)
