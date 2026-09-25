@@ -1,49 +1,75 @@
-ANGULAR REFACTOR PROMPT: ANGULAR 14 TO ANGULAR LATEST (STANDALONE & CONTROL FLOW)
-Bạn là một chuyên gia lập trình Frontend Angular cấp cao. Hãy duyệt và refactor TOÀN BỘ các file .html và .ts thuộc thư mục/mã nguồn được chỉ định từ cú pháp Angular 14 lên phiên bản Angular mới nhất (Angular 17+ / 18+ / 19+).
+# ANGULAR REFACTOR PROMPT: MIGRATION TO ANGULAR LATEST / ANGULAR 21 (SIGNAL-FIRST & MODERN CONTROL FLOW)
 
+Bạn là một Chuyên gia Lập trình Frontend Angular cấp cao (Principal Angular Architect). Nhiệm vụ của bạn là duyệt và refactor TOÀN BỘ các file .html và .ts thuộc thư mục/mã nguồn được chỉ định từ cú pháp cũ lên chuẩn Angular mới nhất (Angular 18+ / 19+ / 21+).
 🎯 TẬP FILE CẦN XỬ LÝ
-Tất cả các file *.component.html trong thư mục chỉ định.
+Tất cả các file *.component.html trong thư mục được chỉ định.
 
-Tất cả các file *.component.ts trong thư mục chỉ định.
+Tất cả các file *.component.ts trong thư mục được chỉ định.
 
-🚨 QUY TẮC BẮT BUỘC (STRICT RULES)
-1. GIỮ NGUYÊN GIAO DIỆN & LOGIC NGHIỆP VỤ (CRITICAL)
-UI/UX & DOM: Tuyệt đối không thay đổi cấu trúc HTML DOM, thứ tự phần tử, các class CSS/Tailwind/Bootstrap hoặc bất kỳ thuộc tính giao diện nào.
+🚨 QUY TẮC BẮT BUỘC KHÔNG THỂ VƯỢT RÀO (STRICT NON-NEGOTIABLE RULES)
+1. BẢO TOÀN TUYỆT ĐỐI GIAO DIỆN & LOGIC NGHIỆP VỤ (CRITICAL)
+UI/UX & DOM Structure (100% Pixel-Perfect):
 
-Business Logic: Giữ nguyên tên biến, tên hàm, logic nghiệp vụ, các dịch vụ injection (inject() hoặc constructor), luồng xử lý dữ liệu và giá trị trả về.
+Tuyệt đối KHÔNG thêm, bớt, hay sửa đổi bất kỳ thẻ HTML DOM, thứ tự phần tử, thẻ bao ngoài, class CSS (Tailwind, Bootstrap, Custom CSS), id, style inline hay bất kỳ thuộc tính giao diện nào.
+
+KHÔNG tự ý sửa đổi nội dung văn bản, biểu tượng (icon), hoặc cấu trúc bố cục (layout) hiển thị.
+
+Business Logic & State Management:
+
+Giữ nguyên toàn bộ tên biến, tên hàm, logic nghiệp vụ, luồng xử lý dữ liệu và giá trị trả về.
+
+Sử dụng inject() thay cho constructor() injection chuẩn hóa Angular mới nhưng giữ nguyên toàn bộ các dependency hiện có.
 
 2. CÚ PHÁP FILE HTML (*.component.html)
-Control Flow Syntax:
+Control Flow Syntax chuẩn hóa:
 
-Chuyển *ngIf="condition" -> @if (condition) { ... }
+*ngIf="condition" -> @if (condition) { ... }
 
-Chuyển *ngIf="condition; else elseBlock" -> @if (condition) { ... } @else { ... }
+*ngIf="condition; else elseBlock" -> @if (condition) { ... } @else { ... }
 
-Chuyển *ngFor="let item of list" -> @for (item of list; track trackByFn(item)) { ... }
+*ngFor="let item of list" -> @for (item of list; track trackByFn(item)) { ... }
 
-Chuyển *ngSwitch="condition" -> @switch (condition) { @case (val) { ... } @default { ... } }
+*ngSwitch="condition" -> @switch (condition) { @case (val) { ... } @default { ... } }
 
-Vòng lặp @for: Mọi vòng lặp @for bắt buộc phải có khai báo track (ưu tiên track item.id, track item.code hoặc track $index).
+Tối ưu biến cục bộ với cú pháp @let (Angular 18.1+):
 
-Bindings: Giữ nguyên tất cả các event/property binding khác ([ngClass], [ngStyle], (click), [(ngModel)],...).
+Chuyển đổi các đoạn gán biến phức tạp trong template hoặc *ngIf="stream$ | async as data" sang cú pháp @let data = stream$ | async; hoặc @let total = calculatedValue();.
+
+Khai báo track bắt buộc trong @for:
+
+Thứ tự ưu tiên: track item.id -> track item.code -> track item.key -> track $index (nếu đối tượng không có thuộc tính định danh cố định).
+
+Bindings & Directives:
+
+Giữ nguyên tất cả các event/property binding khác: [ngClass], [ngStyle], (click), [(ngModel)], [formControl],...
 
 3. CÚ PHÁP FILE TYPESCRIPT (*.component.ts)
 Standalone Component:
 
-Bổ sung standalone: true bên trong decorator @Component.
+Bổ sung standalone: true vào @Component({...}).
 
-Tự động kiểm tra, bổ sung và cập nhật đầy đủ danh sách imports: [...] trong @Component (bao gồm: CommonModule, FormsModule, ReactiveFormsModule, các Shared Component, Directive, Pipe cần thiết phục vụ cho file HTML tương ứng).
+Tự động kiểm tra, bổ sung và quét đầy đủ danh sách imports: [...] trong @Component (bao gồm: CommonModule, FormsModule, ReactiveFormsModule, các Shared Component, Directive, Pipe phục vụ trực tiếp cho file HTML tương ứng).
 
-Signals & Decorators Refactoring:
+Chuyển đổi triệt để sang Signal APIs:
 
-Refactor @Input() -> input() hoặc input.required().
+@Input() prop: type -> prop = input(); hoặc prop = input.required();
 
-Refactor @Output() -> output().
+@Output() propChange -> propChange = output();
 
-Refactor @ViewChild() / @ViewChildren() -> viewChild() / viewChildren().
+@ViewChild(Selector) -> myChild = viewChild(Selector);
 
-Imports Optimization:
+@ViewChildren(Selector) -> myChildren = viewChildren(Selector);
 
-Tự động dọn dẹp các import thừa không còn sử dụng.
+@ContentChild() / @ContentChildren() -> contentChild() / contentChildren()
 
-Thêm đầy đủ import cho các cú pháp mới (input, output, viewChild, signal,...) từ @angular/core và các thư viện liên quan.
+Thay thế state nội bộ đơn giản bằng signal() và các biến phụ thuộc tính toán bằng computed().
+
+Dependency Injection Modernization:
+
+Thay thế việc inject qua constructor(...) sang cú pháp private myService = inject(MyService);.
+
+Clean Code & Imports Optimization:
+
+Loại bỏ các import directive thừa từ @angular/common (NgIf, NgFor, NgSwitch).
+
+Import đầy đủ các Signal primitives (signal, computed, input, output, viewChild, inject) từ @angular/core.

@@ -229,7 +229,8 @@
     <!-- <a href="#" class="mobile-menu-overlay" (click)="toggleMenuForMobile($event)"></a> -->
 </div>
 
-<div class="ovic-side-navigation__right" [style.--side-navigation-offset-top]="navigationOffsetTop"
+<div class="ovic-side-navigation__right" [class.--side-navigation-open]="navigationMenuState === 'open'"
+    [style.--side-navigation-offset-top]="navigationOffsetTop"
     [style.--side-navigation-init-right]="initRight" [style.--side-navigation-size]="menuSize"
     [@navigationMenuEffect]="navigationMenuState">
     <ng-container

@@ -87,6 +87,7 @@ export class DonviComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.noitifi.isProcessing(true);
         const url = this.router.url.substring(7).split('?')[0];
         this.canAdded = this.oauth.userCanAdd(url);
         this.canUpdate = this.oauth.userCanEdit(url);
@@ -124,7 +125,8 @@ export class DonviComponent implements OnInit, OnDestroy {
         ).set('limit', '-1').set("order", "ASC").set("orderby", "title")
         this.donViService.getDonViByCols(condition_donvi).subscribe({
             next: (dsDonVi) => {
-                this.dmDonvi = dsDonVi
+                this.dmDonvi = dsDonVi;
+                this.noitifi.isProcessing(false);
             },
             error: () => {
                 this.noitifi.toastError('Không load được danh mục khoa')

@@ -265,7 +265,7 @@ export class NganhBomonComponent implements OnInit {
     editChuyenmuc(chuyenmucId: number) {
         this.resetForm();
         this.slugIsValid = true;
-        this.selectedChuyenmuc = this.dmChuyenmuc.find(m => m.id === chuyenmucId);
+        this.selectedChuyenmuc = this.dmChuyenmuc.find(m => m.id === chuyenmucId); 
         if (this.selectedChuyenmuc) {
             this.f['title'].setValue(this.selectedChuyenmuc.title);
             this.f['desc'].setValue(this.selectedChuyenmuc.desc);

@@ -118,6 +118,11 @@
 
 .p-select-overlay {
     border-radius: 0;
+    z-index: 2147483647 !important;
+}
+
+.ovic-input-line-dropdown-panel {
+    z-index: 2147483647 !important;
 }
 
 .p-select-overlay .p-select-list-container,

@@ -144,7 +144,7 @@
 
 .ovic-side-navigation__right {
     position: fixed;
-    z-index: 1090;
+    z-index: 10001;
     width: var(--side-navigation-size, 300px);
     right: var(--side-navigation-init-right, -310px);
     top: var(--side-navigation-offset-top, 60px);
@@ -153,9 +153,13 @@
     transition: all .3s ease;
 }
 
+.ovic-side-navigation__right.--side-navigation-open {
+    right: 0 !important;
+}
+
 .ovic-side-navigation__overlay {
     position: fixed;
-    z-index: 1089;
+    z-index: 10000;
     background-color: rgba(52, 58, 64, .55);
     top: 0;
     left: 0;
