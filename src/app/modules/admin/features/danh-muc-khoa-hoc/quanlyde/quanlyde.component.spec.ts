@@ -1,4 +1,4 @@
-﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { QuanlydeComponent } from './quanlyde.component';
 
@@ -21,5 +21,3 @@ describe('QuanlydeComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-
-

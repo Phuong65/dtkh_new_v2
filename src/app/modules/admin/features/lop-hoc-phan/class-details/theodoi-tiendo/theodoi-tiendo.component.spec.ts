@@ -1,4 +1,4 @@
-﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TheodoiTiendoComponent } from './theodoi-tiendo.component';
 
@@ -8,7 +8,7 @@ describe('TheodoiTiendoComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ TheodoiTiendoComponent ]
+      declarations: [ TheodoiTiendoComponent ]
     })
     .compileComponents();
 
@@ -21,4 +21,3 @@ describe('TheodoiTiendoComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-

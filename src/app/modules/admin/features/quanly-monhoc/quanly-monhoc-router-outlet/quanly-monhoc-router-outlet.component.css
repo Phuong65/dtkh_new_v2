@@ -1,7 +1,0 @@
-::ng-deep .ovic-input-line-dropdown-panel {
-	z-index: 1000001 !important;
-}
-
-::ng-deep .p-dropdown-panel {
-	z-index: 1000001 !important;
-}

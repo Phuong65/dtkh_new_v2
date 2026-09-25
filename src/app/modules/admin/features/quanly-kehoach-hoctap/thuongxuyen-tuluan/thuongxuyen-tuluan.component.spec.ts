@@ -1,4 +1,4 @@
-﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ThuongxuyenTuluanComponent } from './thuongxuyen-tuluan.component';
 
@@ -8,7 +8,7 @@ describe('ThuongxuyenTuluanComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ ThuongxuyenTuluanComponent ]
+      declarations: [ ThuongxuyenTuluanComponent ]
     })
     .compileComponents();
 
@@ -21,4 +21,3 @@ describe('ThuongxuyenTuluanComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-

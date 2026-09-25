@@ -1,4 +1,4 @@
-﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { KehoachComponent } from './kehoach.component';
 
@@ -8,7 +8,7 @@ describe('KehoachComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ KehoachComponent ]
+      declarations: [ KehoachComponent ]
     })
     .compileComponents();
 
@@ -21,4 +21,3 @@ describe('KehoachComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-

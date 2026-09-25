@@ -1,4 +1,4 @@
-﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NhanxetNoidungComponent } from './nhanxet-noidung.component';
 
@@ -8,7 +8,7 @@ describe('NhanxetNoidungComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ NhanxetNoidungComponent ]
+      declarations: [ NhanxetNoidungComponent ]
     })
     .compileComponents();
 
@@ -21,4 +21,3 @@ describe('NhanxetNoidungComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-

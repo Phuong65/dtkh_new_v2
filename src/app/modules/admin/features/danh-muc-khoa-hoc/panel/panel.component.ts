@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import {RouterModule} from '@angular/router';
 
-@Component({standalone: false, 
+@Component({
     selector: 'app-panel',
     templateUrl: './panel.component.html',
     styleUrls: ['./panel.component.css'],

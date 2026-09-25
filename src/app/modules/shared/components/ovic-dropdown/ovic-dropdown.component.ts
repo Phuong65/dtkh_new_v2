@@ -1,10 +1,13 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit, Input, OnChanges, Output, EventEmitter, SimpleChanges } from '@angular/core';
-import { AbstractControl } from '@angular/forms';
+import { AbstractControl, FormsModule,  } from '@angular/forms';
+import { Select } from 'primeng/select';
 
 @Component( {standalone: true, 
     selector: 'ovic-dropdown',
     templateUrl: './ovic-dropdown.component.html',
-    styleUrls: [ './ovic-dropdown.component.css' ]
+    styleUrls: [ './ovic-dropdown.component.css' ],
+    imports: [Select, CommonModule,FormsModule]
 } )
 export class OvicDropdownComponent implements OnInit, OnChanges {
 

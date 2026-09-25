@@ -1,20 +1,17 @@
-import { HelperService } from '@core/services/helper.service';
 import { AfterViewInit, Component, ElementRef, Inject, OnInit, ViewChild, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { NotificationService } from '@core/services/notification.service';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import * as Latex from 'latex.js';
-import { parse, HtmlGenerator } from 'latex.js';
-import * as EqEditor from 'src/assets/js/latex-toolbar.min.js';
 import katex from 'katex';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import renderMathInElement from 'katex/contrib/auto-render';
+import { FormsModule, NgModel } from '@angular/forms';
 // declare var EqEditor;
 
 @Component({standalone: true, 
     selector: 'latex-handle',
     templateUrl: './latex-handle.component.html',
     styleUrls: ['./latex-handle.component.css'],
-    providers: [NgbActiveModal]
+    providers: [NgbActiveModal,NgModel,FormsModule]
 })
 export class LatexHandleComponent implements OnInit, AfterViewInit, OnChanges {
     // @Input() income_latex: string;

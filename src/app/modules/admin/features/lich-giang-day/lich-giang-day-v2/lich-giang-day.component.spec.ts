@@ -1,4 +1,4 @@
-﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { LichGiangDayComponent } from './lich-giang-day.component';
 
@@ -8,7 +8,7 @@ describe('LichGiangDayComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ LichGiangDayComponent ]
+      declarations: [ LichGiangDayComponent ]
     })
     .compileComponents();
 
@@ -21,4 +21,3 @@ describe('LichGiangDayComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-

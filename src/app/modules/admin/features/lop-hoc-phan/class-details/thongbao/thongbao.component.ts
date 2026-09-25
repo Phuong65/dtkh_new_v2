@@ -1,15 +1,16 @@
-import {Component, OnInit} from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import {RouterModule} from '@angular/router';
 
-@Component( {
+@Component({
     selector: 'app-thongbao',
     templateUrl: './thongbao.component.html',
-    styleUrls: [ './thongbao.component.css' ]
-} )
+    styleUrls: [ './thongbao.component.css' ],
+})
 export class ThongbaoComponent implements OnInit {
-
-    constructor () {}
-
-    ngOnInit(): void {
-    }
-
+    constructor() {}
+    ngOnInit(): void {}
 }
+
+
+

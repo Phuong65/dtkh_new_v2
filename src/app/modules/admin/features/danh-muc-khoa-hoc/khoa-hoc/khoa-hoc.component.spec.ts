@@ -1,4 +1,4 @@
-﻿import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { KhoaHocComponent } from './khoa-hoc.component';
 
@@ -6,7 +6,7 @@ describe('KhoaHocComponent', () => {
   let component: KhoaHocComponent;
   let fixture: ComponentFixture<KhoaHocComponent>;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ KhoaHocComponent ]
     })
@@ -23,5 +23,3 @@ describe('KhoaHocComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-
-

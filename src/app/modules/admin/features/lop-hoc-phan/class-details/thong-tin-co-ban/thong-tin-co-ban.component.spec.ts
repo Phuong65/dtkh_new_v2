@@ -1,4 +1,4 @@
-﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ThongTinCoBanComponent } from './thong-tin-co-ban.component';
 
@@ -8,7 +8,7 @@ describe('ThongTinCoBanComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ ThongTinCoBanComponent ]
+      declarations: [ ThongTinCoBanComponent ]
     })
     .compileComponents();
 
@@ -21,4 +21,3 @@ describe('ThongTinCoBanComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-

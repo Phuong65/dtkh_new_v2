@@ -1,4 +1,4 @@
-﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DuyetCauhoiThuchanhKthpComponent } from './duyet-cauhoi-thuchanh-kthp.component';
 
@@ -8,7 +8,7 @@ describe('DuyetCauhoiThuchanhKthpComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ DuyetCauhoiThuchanhKthpComponent ]
+      declarations: [ DuyetCauhoiThuchanhKthpComponent ]
     })
     .compileComponents();
 
@@ -21,4 +21,3 @@ describe('DuyetCauhoiThuchanhKthpComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-

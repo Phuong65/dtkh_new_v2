@@ -1,12 +1,1 @@
-<div *ngIf="questionParams as question" class="layout_component_container_survey_question_date">
-        <div class="survey_question_date_title">
-            <app-editable-text [(text)]="question.title" [title]="true"></app-editable-text>
-        </div>
-        
-        <div class="survey_question_date_answer">
-            <div class="date-view">
-                <span>{{question.question_type == 'DATE' ? 'Tháng, ngày, năm' : 'Giờ, phút'}}</span>
-                <i class="pi" [ngClass]="question.question_type === 'DATE' ? 'pi-calendar' : 'pi-clock'"></i>
-            </div>
-        </div>
-</div>
+﻿<div class="p-3">survey-question-date.component works!</div>

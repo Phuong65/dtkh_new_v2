@@ -1,4 +1,4 @@
-﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { KiemtraKynangComponent } from './kiemtra-kynang.component';
 
@@ -8,7 +8,7 @@ describe('KiemtraKynangComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ KiemtraKynangComponent ]
+      declarations: [ KiemtraKynangComponent ]
     })
     .compileComponents();
 
@@ -21,4 +21,3 @@ describe('KiemtraKynangComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-
