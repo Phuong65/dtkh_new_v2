@@ -1,1 +1,29 @@
-﻿<div class="p-3">ovic-select-classmanagement.component works!</div>
+<div class="sl-cm-container">
+  <div class="row">
+    <div class="col-6">
+      <ovic-dropdown (onChange)="selectDonvi($event)" placeholder="--- chọn khoa ---"
+        [options]="listDonvi" optionId="id" optionLabel="title" [filter]="true"
+        [showClear]="false"
+      [defaultValue]="objectFilter.donvi_id" filterBy="title"></ovic-dropdown>
+    </div>
+    <div class="col-6">
+      <ovic-dropdown (onChange)="selectKhoa($event)" placeholder="--- chọn khóa đào tạo ---"
+        [options]="listKhoa" optionId="khoa" optionLabel="_khoa_convert" [filter]="true"
+        [showClear]="false"
+      [defaultValue]="objectFilter.khoa" filterBy="khoa"></ovic-dropdown>
+    </div>
+  </div>
+
+  @if (listClassManagement.length>0) {
+    <div class="list-sl">
+      <div class="checkbox-layout-form-parent">
+        @for (item of listClassManagement; track item) {
+          <div class="checkbox-layout-form">
+            <mat-checkbox [checked]="item['checked']" (change)="onChangeClass($event, item)"
+            [value]="item['id'].toString()">{{item['title']}}</mat-checkbox>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

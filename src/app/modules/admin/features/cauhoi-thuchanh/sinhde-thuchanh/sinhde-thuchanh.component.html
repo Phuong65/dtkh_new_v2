@@ -1,1 +1,276 @@
-﻿<div class="p-3">sinhde-thuchanh.component works!</div>
+<div class="layout_component_container" [ngClass]="closeLeft?'close-left-body':''">
+    <div class="layout_component_container-course" style="position: relative;">
+        <button style="margin-left: 5px; padding: 0px; min-width: 0px; z-index: 50;" (click)="closeLeftBody()"
+            class="btn btn-success button-close-left-body">
+            <i style="margin: 0px;vertical-align: middle; font-size: 13px;"
+                [ngClass]="closeLeft?'pi pi-angle-double-right':'pi pi-angle-double-left'"></i>
+        </button>
+        <div class="search-layout">
+            <div class="search-layout-top" style="display: flex; align-items: center;">
+                <input (keyup.enter)="onSearchByTitle()" [(ngModel)]="searchCourse" type="text" class="ovic-input-field"
+                    placeholder="Nhập tên rồi nhấn enter" type="text" style="width: 100%;">
+                <button *ngIf="isManager || isLanhDaoKhoa || isLanhDaoBomon" (click)="changeToMyCourse()"
+                    [ngbTooltip]="!my_course?'Lọc theo khóa học của tôi':'Bỏ lọc'" placement="top" container="body"
+                    style="margin-left: 5px;" class="btn " [ngClass]="my_course?'btn-primary':'btn-secondary'">
+                    <i style="margin: 0px;" class="fa fa-filter" ></i>
+                </button>
+            </div>
+            <div style="margin-top: 5px;" *ngIf="isManager">
+                <ovic-dropdown (onChange)="onChangeFilterChuyenmon($event)" placeholder="--- chọn khoa ---"
+                    [options]="list_donvi_chuyenmon" optionId="id" optionLabel="title" [filter]="true"
+                    [defaultValue]="categoryFilter" filterBy="title"></ovic-dropdown>
+            </div>
+        </div>
+        <div class="list-course-layout">
+            <mat-selection-list (selectionChange)="onSelectCourse($event)" [multiple]="false" class="selection-list-mat"
+                #courses>
+                <mat-list-option [selected]="courseSelected && courseSelected.id === course.id ? true: false"
+                    *ngFor="let course of dmKhoahoc " [value]="course">
+                    <div mat-line style="font-weight: 600;">{{course.title + ' (' + course.maso + ')'}}</div>
+                    <div mat-line>{{course['creator_name'] + course['info_']}}</div>
+                    <div mat-line *ngIf="course['status_question']">
+                        <span [innerHTML]="course['status_question']"></span>
+                    </div>
+                </mat-list-option>
+            </mat-selection-list>
+        </div>
+        <div class="page-layout-set">
+            <p-paginator #paginator (onPageChange)="changePage($event)" [rows]="limitCourse"
+                [totalRecords]="totalCourse"></p-paginator>
+        </div>
+    </div>
+    <div class="layout_component_container-noidung mat-tab-chuandaura">
+        <div class="right-top-content">
+            <div>
+                <button class="btn btn-succes"><i class="fa fa-download"></i>Tải xuống</button>
+            </div>
+        </div>
+        <div style="height: calc(100% - 41px);" *ngIf="courseSelected" class="table-list-de-tuluan">
+            <!-- <div class="table-list-de-tuluan" style="height: calc(100% - 40px);"> -->
+            <p-table [(selection)]="selectTuluanForDownload" dataKey="id" [paginator]="true" [rows]="25"
+                [value]="list_tuluan"
+                styleClass="tbl-danhSachUser table-scroll-able-page table-able-dropdown-p-table table-none-header ovic-ui-table table-reBorder th-td-padding-5px">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 4rem;text-align: center;">
+                            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                        </th>
+                        <th style="text-align: center; width: 80px;">TT</th>
+                        <th style="text-align: center;">Tiêu đề</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-question let-rowIndex="rowIndex">
+                    <tr>
+                        <td style="text-align: center;">
+                            <p-tableCheckbox [value]="question"></p-tableCheckbox>
+                        </td>
+                        <td style="text-align: center;">{{rowIndex + 1}}</td>
+                        <td style="text-align: left;">
+                            {{question.type === 'GROUP_QUESTION'? question.title:'Câu '+question.ordering}}
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <!-- </div> -->
+
+            <!-- <div class="page-layout-set">
+                <p-paginator #paginator_q (onPageChange)="changePageQuestion($event)" [rows]="limit_tuluan"
+                    [totalRecords]="total_tuluan"></p-paginator>
+            </div> -->
+            <!-- <div class="mat-tab-list-cauhoi">
+                <div class="mat-tab-list-cauhoi-list">
+                    <div class="mat-tab-list-cauhoi-doc" *ngFor="let quest of list_tuluan">
+                        <div class="header-question" [ngSwitch]="quest.type">
+                            <div class="header-question-number" *ngSwitchCase="'QUESTION'">
+                                <span class="name-code-question">
+                                    #{{quest.id}} - Câu: {{quest.ordering}} ({{quest.point+' Điểm'}})
+                                    <span style="margin-left: 5px;" [ngSwitch]="quest['status']">
+                                        <span *ngSwitchCase="0" class="action-icon status-is-deactive">
+                                            (Chờ duyệt)
+                                        </span>
+                                        <span *ngSwitchCase="1" class="action-icon status-is-active">
+                                            (Đạt)
+                                        </span>
+                                        <span *ngSwitchCase="-1" class="action-icon status-is-redo">
+                                            (Chưa đạt)
+                                        </span>
+                                        <span *ngSwitchCase="-2" class="action-icon status-is-require">
+                                            (Yêu cầu duyệt)
+                                        </span>
+                                    </span>
+                                </span>
+                                <div class="header-question-number-action">
+                                    <button (click)="extendQuestion(quest)" class="btn btn-icon btn-transparent">
+                                        <i [ngClass]="quest['extend']? 'pi pi-minus' : 'pi pi-plus'"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="header-question-number" *ngSwitchCase="'GROUP_QUESTION'">
+                                <span class="name-code-question">
+                                    #{{quest.id}} - Thời gian làm bài: {{quest.time_duration+' Phút'}}
+                                    <span style="margin-left: 5px;" [ngSwitch]="quest['status']">
+                                        <span *ngSwitchCase="0" class="action-icon status-is-deactive">
+                                            (Chờ duyệt)
+                                        </span>
+                                        <span *ngSwitchCase="1" class="action-icon status-is-active">
+                                            (Đạt)
+                                        </span>
+                                        <span *ngSwitchCase="-1" class="action-icon status-is-redo">
+                                            (Chưa đạt)
+                                        </span>
+                                        <span *ngSwitchCase="-2" class="action-icon status-is-require">
+                                            (Yêu cầu duyệt)
+                                        </span>
+                                    </span>
+                                </span>
+                                <div class="header-question-number-action">
+                                    <button (click)="extendQuestion(quest)" class="btn btn-icon btn-transparent">
+                                        <i [ngClass]="quest['extend']? 'pi pi-minus' : 'pi pi-plus'"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-bottom document-editor__editable-body"
+                            [ngClass]="quest['extend']?'extend-content-true':'extend-content-false'">
+                            <div *ngIf="quest.title" class="question-title">
+                                {{quest.title}}
+                            </div>
+
+                            <div class="question-content">
+                                <div class="question-content-desc">
+                                    <div [appLoadMediaOnText]="quest.id" style="border:none"
+                                        class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                                        [innerHTML]="quest.desc | safeHtml">
+                                    </div>
+                                </div>
+                                <div *ngIf="quest.note" style="margin-top: 40px;" class="question-content-note">
+                                    <p-divider align="left" type="dashed">
+                                        <b>Hướng dẫn chấm điểm</b>
+                                    </p-divider>
+
+                                    <div [appLoadMediaOnText]="quest.id" style="border:none"
+                                        class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                                        [innerHTML]="quest.note | safeHtml">
+                                    </div>
+                                </div>
+
+                                <div *ngIf="quest['tuluan_in_name']" style="margin-top: 40px;"
+                                    class="question-content-note">
+                                    <p-divider align="left" type="dashed">
+                                        <b>Đề tham chiếu</b>
+                                    </p-divider>
+                                    <ul style="font-size: 14px; list-style: decimal;">
+                                        <li *ngFor="let item of quest['tuluan_in_name']">{{item}}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-layout-set">
+                    <p-paginator #paginator_q (onPageChange)="changePageQuestion($event)" [rows]="limit_tuluan"
+                        [totalRecords]="total_tuluan"></p-paginator>
+                </div>
+            </div> -->
+        </div>
+    </div>
+</div>
+
+<ng-template #templateQuestion let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+            <button class="btn ovic-over-right-section__close-button" (click)="closeSideMenu()"></button>
+        </div>
+        <div style="line-height: 1.25; padding: 15px; height: calc(100vh - 51px - 57px);"
+            class="ovic-over-right-section__body footer-no-hint">
+            <div class="ovic-vertical__inputs form-setting-lesson " style="line-height: 1.5;">
+                <form [formGroup]="formData">
+                    <div class="row form-row form-row-flex-row" *ngIf="type_question.key === 'GROUP_QUESTION'">
+                        <div class="col-12">
+                            <label>Tiêu đề:<span class="ovic-mark">*</span></label>
+                            <input type="text" class="ovic-input-field" formControlName="title">
+                        </div>
+                    </div>
+                    <div class="row form-row form-row-flex-row" *ngIf="type_question.key === 'GROUP_QUESTION'">
+                        <div class="col-6">
+                            <label>Thời gian làm bài (phút):<span class="ovic-mark">*</span></label>
+                            <input type="number" class="ovic-input-field" formControlName="time_duration">
+                        </div>
+                        <div class="col-6">
+                            <label>Chọn đề từ ngân hàng thường xuyên:<span class="ovic-mark"></span></label>
+                            <ovic-multi-select appendTo="body" placeholder="------" [options]="list_unprivate_tuluan"
+                                optionId="id" [formField]="f['tuluan_id']" [filter]="true"
+                                [defaultValue]="f['tuluan_id'].value" filterBy="show_label"
+                                optionLabel="label"></ovic-multi-select>
+                        </div>
+                    </div>
+                    <div class="row form-row form-row-flex-row" *ngIf="type_question.key === 'QUESTION'">
+                        <div class="col-4">
+                            <label>Số thứ tự câu hỏi:<span class="ovic-mark">*</span></label>
+                            <!-- <input type="number" class="ovic-input-field" formControlName="ordering"> -->
+                            <div class="radio-question-number-select" style="padding: 6px 0px;">
+                                <ovic-groups-radio-v2 group_name="ordering" [columns]="2" [formField]="f['ordering']"
+                                    [options]="list_question" optionId="id" optionLabel="label"
+                                    [defaultValue]="f['ordering'].value"></ovic-groups-radio-v2>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <label>Điểm:<span class="ovic-mark">*</span></label>
+                            <input #input_point type="text" class="ovic-input-field" formControlName="point"
+                                (keydown)="pointQuestionKeyDown($event,input_point)"
+                                (keyup)="pointQuestionKeyup($event,input_point)">
+                        </div>
+                        <div class="col-4">
+                            <label>Chọn đề từ ngân hàng thường xuyên:<span class="ovic-mark"></span></label>
+                            <ovic-dropdown placeholder="------" [options]="list_unprivate_tuluan" optionId="id"
+                                [formField]="f['tuluan_id']" [filter]="true" [defaultValue]="f['tuluan_id'].value"
+                                filterBy="show_label" optionLabel="label"></ovic-dropdown>
+                            <!-- <input #input_point type="text" class="ovic-input-field" formControlName="point"
+                                (keydown)="pointQuestionKeyDown($event,input_point)"
+                                (keyup)="pointQuestionKeyup($event,input_point)"> -->
+                        </div>
+                    </div>
+                    <div class="row form-row form-row-flex-row edit-hight-500">
+                        <div class="col-12">
+                            <label style="width: 100%;">
+                                <span style="display: flex; width: 100%;">
+                                    <span style="flex:1">Nội dung {{type_question?type_question.label:''}}:<span
+                                            class="ovic-mark">*</span></span>
+                                    <a style="font-weight: normal;" *ngIf="f['tuluan_id'].value" href="#"
+                                        (click)="startCopyDesc($event)">
+                                        Copy nội dung đề từ ngân hàng thường xuyên đã chọn
+                                    </a>
+                                </span>
+                            </label>
+                            <app-input-question-direction (ckEditor)="ckEditorSetup($event,'editor1')"
+                                styleClass="vietbaocao-doctument-content"
+                                [abstractControl]="f['desc']"></app-input-question-direction>
+                        </div>
+                    </div>
+                    <div class="row form-row form-row-flex-row edit-hight-200">
+                        <div class="col-12">
+                            <label>Hướng dẫn chấm điểm (nếu có):</label>
+                            <app-input-question-direction (ckEditor)="ckEditorSetup($event,'editor2')"
+                                styleClass="vietbaocao-doctument-content"
+                                [abstractControl]="f['note']"></app-input-question-direction>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="ovic-dynamic-right-section__foot">
+            <p class="ovic-over-right-section__foot-wrap-buttons">
+                <button *ngIf="selectedTuluan && selectedTuluan.status === -1" (click)="saveCourseTuluan(true)"
+                    type="button" class="btn ovic-over-right-section__foot-btn btn-primary"><i class="fa fa-floppy-o"
+                        ></i>Lưu lại và yêu cầu duyệt
+                </button>
+                <button (click)="saveCourseTuluan()" type="button"
+                    class="btn ovic-over-right-section__foot-btn btn-primary"><i class="fa fa-floppy-o"
+                        ></i>Lưu lại
+                </button>
+            </p>
+        </div>
+    </div>
+</ng-template>

@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import {RouterModule} from '@angular/router';
 
-@Component({
+@Component({standalone: false, 
     selector: 'bank-audio-viewer',
     templateUrl: './bank-audio-viewer.component.html',
     styleUrls: [ './bank-audio-viewer.component.css' ],

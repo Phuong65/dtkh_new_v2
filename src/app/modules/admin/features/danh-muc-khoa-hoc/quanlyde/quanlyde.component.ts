@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import {RouterModule} from '@angular/router';
 
-@Component({
+@Component({standalone: false, 
     selector: 'app-quanlyde',
     templateUrl: './quanlyde.component.html',
     styleUrls: ['./quanlyde.component.css'],

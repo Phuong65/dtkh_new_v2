@@ -1,1 +1,15 @@
-﻿<div class="p-3">input-question-direction.component works!</div>
+<div class="input-question-direction">
+  @if (!isReadyToLoad) {
+    <div class="editor-skeleton">
+      <div class="skeleton-toolbar"></div>
+      <div class="skeleton-content">Đang tải trình soạn thảo...</div>
+    </div>
+  }
+  @if (isReadyToLoad) {
+    <div class="document-editor_basic" [appLoadMediaOnText]="countChanges"
+      [appKatexImg]="countChanges">
+      <div #editorContent id="editor" class="document-editor__editable {{styleClass}}">
+      </div>
+    </div>
+  }
+</div>

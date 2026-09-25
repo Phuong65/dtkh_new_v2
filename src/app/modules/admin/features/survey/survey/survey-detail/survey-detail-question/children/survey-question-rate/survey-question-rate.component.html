@@ -1,1 +1,14 @@
-﻿<div class="p-3">survey-question-rate.component works!</div>
+<div *ngIf="questionParams as question" class="layout-component-container-survey-question-rate">
+        <div class="survey-question-rate-title">
+            <app-editable-text [disable]="!questionParams.active" [(text)]="question.title" [title]="true"></app-editable-text>
+        </div>
+        
+        <div class="survey-question-rate-answer">
+            <div class="survey-question-rate-rating">
+                <div class="survey-question-rate-rating__item" *ngFor="let star of [1,2,3,4,5]">
+                    <span class="survey-question-rate-rating__number">{{star}}</span>
+                    <i class="pi pi-star-fill  survey-question-rate-rating__star"></i>
+                </div>
+            </div>
+        </div>
+</div>

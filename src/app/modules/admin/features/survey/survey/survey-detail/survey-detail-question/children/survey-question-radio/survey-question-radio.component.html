@@ -1,1 +1,37 @@
-﻿<div class="p-3">survey-question-radio.component works!</div>
+<div *ngIf="questionParams as question" class="layout-component-container-survey-question-radio">
+        <div class="survey-question-radio-title">
+            <!-- <label style="font-weight: 500; font-size: 18px;">Tiêu đề</label> -->
+            <app-editable-text [disable]="!questionParams.active" [(text)]="question.title" [title]="true"></app-editable-text>
+        </div>
+        
+        <div class="survey-question-radio-answer survey-question-radio-answer--columns"
+            [style.grid-template-columns]="'repeat(' + (question.config?.cols || 1) + ', minmax(0, 1fr))'"
+            *ngIf="question.question_type != 'YES_NO'">
+            <!-- <label style="font-weight: 500; font-size: 18px;">Phương án trả lời</label> -->
+            <div class="survey-question-radio-answer__list-option-item" *ngFor="let item of question.answer_options">
+                <div class="survey-question-radio-answer__list-option-item" *ngIf="questionParams.active == true">
+                    <div class="survey-question-square-number">{{item.id}}</div>
+                    <app-editable-text [(text)]="item.label" style="flex: 1"></app-editable-text>
+                    <button (click)="delAnswer(item.id)" class="btn btn-danger btn-icon btn-transparent">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </div>
+                <div class="survey-question-radio-answer__list-option-item" *ngIf="questionParams.active == false">
+                    <div class="survey-question-radio-view"></div>
+                    <app-editable-text [disable]="!questionParams.active" [(text)]="item.label" style="flex: 1"></app-editable-text>
+                </div>
+            </div>
+            <button *ngIf="questionParams.active == true" class="btn btn-icon btn-success survey-question-radio-answer__add" style="width: 20vw;" container="body" placement="left" (click)="addAnswer()">
+                Thêm đáp án <i style="margin-right: 0px;" class="pi pi-plus"></i>
+            </button>
+        </div>
+
+        <div class="survey-question-radio-answer" *ngIf="question.question_type == 'YES_NO'">
+            <div class="survey-question-radio-answer__list-option-item" *ngFor="let item of question.answer_options">
+                <div class="survey-question-radio-answer__list-option-item">
+                    <div class="survey-question-radio-view"></div>
+                    <app-editable-text [disable]="true" [(text)]="item.label" style="flex: 1"></app-editable-text>
+                </div>
+            </div>
+        </div>
+</div>

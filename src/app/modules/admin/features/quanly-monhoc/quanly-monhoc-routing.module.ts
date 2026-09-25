@@ -29,6 +29,10 @@ const routes: Routes = [
                 loadComponent: () => import('@modules/admin/features/quanly-monhoc/monhoc-question-cdr/monhoc-question-cdr.component').then(c => c.MonhocQuestionCdrComponent),
             },
             {
+                path: 'monhoc-question-cd',
+                loadComponent: () => import('@modules/admin/features/quanly-monhoc/monhoc-question-cdr/monhoc-question-cdr.component').then(c => c.MonhocQuestionCdrComponent),
+            },
+            {
                 path: 'monhoc-kiemtra-danhgia',
                 loadComponent: () => import('@modules/admin/features/quanly-monhoc/monhoc-kiemtra-danhgia/monhoc-kiemtra-danhgia.component').then(c => c.MonhocKiemtraDanhgiaComponent),
             },

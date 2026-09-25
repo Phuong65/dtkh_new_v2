@@ -1,1 +1,69 @@
-﻿<div class="p-3">baitap-chuyende-v2.component works!</div>
+<div class="baitap-chuyende-layout">
+  <div style="height: calc(100% - 40px); padding: 5px;">
+    <div style="padding:5px; height: 100%; background: #fff;">
+      <p-table [value]="list_student"
+        styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-has-caption table-reBorder">
+        <ng-template pTemplate="caption">
+          <div class="flex" style="display: flex; align-items: center;">
+            <div>
+              <span>{{selectClassGroup? selectClassGroup.name+': ':'Tất cả SV | '}} </span>
+              @if (selectClassGroup && selectClassGroup['teaching_day']) {
+                <span>
+                  {{selectClassGroup['teaching_day'] | date : 'dd/MM/yyyy HH:mm':'UTC+7'}}{{' | '}}
+                </span>
+              }
+              <span>Tổng: {{total_student}}</span>
+              <span class="blue"> - Đạt: {{passnumber}}</span>
+              <span class="red"> - Chưa đạt: {{total_student - passnumber}}</span>
+            </div>
+            <div class="p-input-icon-left ml-auto"
+              style="display: flex; align-items: center; flex-wrap: wrap;">
+              <input (keyup.enter)="onSearchStudent($event['target']['value'])"
+                style="width: 250px; margin-right: 5px;" type="text"
+                placeholder="Nhập tên hoặc mã sv rồi nhấn enter" />
+                <button [matMenuTriggerFor]="menu" class="btn btn-icon btn-success">
+                  <i class="fa fa-ellipsis-h"></i>
+                </button>
+                <mat-menu #menu="matMenu">
+                  <button (click)="filterBygroup(null)" mat-menu-item>
+                    <span>Tất cả</span>
+                  </button>
+                  @for (group of list_group; track group) {
+                    <button (click)="filterBygroup(group)" mat-menu-item>
+                      <span>{{group.name}}</span>
+                    </button>
+                  }
+                </mat-menu>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              @for (col of cols_student; track col) {
+                <th [ngClass]="col['class']">{{col['label']}}
+                </th>
+              }
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-row>
+            <tr>
+              @for (col of cols_student; track col) {
+                <td [ngClass]="col['class']">
+                  @if (!col['html']) {
+                    <span>{{row[col['key']]}}</span>
+                  }
+                  @if (col['html']) {
+                    <span [innerHtml]="row[col['key']]"></span>
+                  }
+                </td>
+              }
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+    <div class="page-layout-set">
+      <p-paginator #paginator (onPageChange)="changePage_student($event)" [rows]="limit_student"
+      [totalRecords]="total_student"></p-paginator>
+    </div>
+  </div>

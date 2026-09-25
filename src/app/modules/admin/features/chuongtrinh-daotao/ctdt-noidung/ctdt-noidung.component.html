@@ -1,1 +1,183 @@
-﻿<div class="p-3">ctdt-noidung.component works!</div>
+<div class="layout_component_container">
+  <div class="document-type-a4-vertical">
+    <div>
+      <p-table [value]="list_cdt_hocphan" styleClass="table-reBorder">
+        <ng-template pTemplate="caption">
+          <div style="text-align: right;" class="table-header">
+            <button style="line-height: 1.5;" (click)="saveUpdateCtdtHocPhan()" class="btn btn-primary">
+              <i class="fa fa-floppy-o"></i>
+              Lưu lại
+            </button>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 5rem; text-align: center;">TT</th>
+            <th style="width:120px; text-align: center;">Mã HP</th>
+            <th style="text-align: center;">Tên học phần</th>
+            <th style="text-align: center; width: 80px;">Số TC</th>
+            <th style="text-align: center; width: 80px;">TCTH</th>
+            <th style="text-align: center; width: 80px;">Học kỳ</th>
+            <th style="text-align: center; width: 120px;">HP học trước</th>
+            <th style="text-align: center; width: 120px;">HP tiên quyết</th>
+            <th style="text-align: center; width: 120px;">HP song hành</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-khoi let-rowIndex="rowIndex">
+          <tr style="background-color: antiquewhite;">
+            <td style="text-align: center;">
+              <strong>{{rowIndex + 1}}</strong>
+            </td>
+            <td colspan="8">
+              <div style="display: flex; align-items: center;">
+                <strong style="flex:1">{{khoi.title}}</strong>
+                <button (click)="openSelectedMonhoc(khoi)"
+                  style="line-height: 1.25!important; margin-left: 10px;" class="btn btn-success">
+                  <i class="fa fa-plus"></i>
+                  Thêm học phần
+                </button>
+              </div>
+            </td>
+          </tr>
+          @for (child of khoi['children']; track child; let index = $index) {
+            <tr>
+              <td style="text-align: center;">
+                {{index + 1}}
+              </td>
+              <td style="text-align: center;">
+                {{child['maso']}}
+              </td>
+              <td>
+                {{child['course_name']}}
+              </td>
+              <td style="text-align: center;">
+                {{child['sotinchi']}}
+              </td>
+              <td style="text-align: center;">
+                {{child['sotinchi_thuchanh']}}
+              </td>
+              <td>
+                <input #input_point (keydown)="pointQuestionKeyDown($event)"
+                  style="width: 100%; text-align: center; border:none" [(ngModel)]="child['hocky']"
+                  type="text" />
+                </td>
+                <td class="hover-td" (click)="togglePanel(child,opCtdtHp,$event,'hp_hoctruoc')"
+                  style="text-align: center; cursor: pointer;">
+                  <div>
+                    @if (child['hp_hoctruoc']) {
+                      <span>
+                        {{child['hp_hoctruoc'].length}} HP
+                      </span>
+                    }
+                  </div>
+                </td>
+                <td class="hover-td" (click)="togglePanel(child,opCtdtHp,$event,'hp_tienquyet')"
+                  style="text-align: center; cursor: pointer;">
+                  <div>
+                    @if (child['hp_tienquyet']) {
+                      <span>
+                        {{child['hp_tienquyet'].length }} HP
+                      </span>
+                    }
+                  </div>
+                </td>
+                <td class="hover-td" (click)="togglePanel(child,opCtdtHp,$event,'hp_songhanh')"
+                  style="text-align: center; cursor: pointer;">
+                  <div>
+                    @if (child['hp_songhanh']) {
+                      <span>
+                        {{child['hp_songhanh'].length}} HP
+                      </span>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+
+  <p-overlayPanel #opCtdtHp appendTo="body">
+    <ng-template pTemplate>
+      <div style="height: 300px; overflow: hidden; width: 400px;">
+        <div class="search-layout">
+          <div class="search-layout-top" style="display: flex; align-items: center;">
+            <input [(ngModel)]="searchCourse_hp" type="text" class="ovic-input-field"
+              placeholder="Nhập tên rồi nhấn enter" type="text" style="width: 100%;">
+            </div>
+          </div>
+          <div class="list-course-layout" style="line-height: 1.5;">
+            <mat-selection-list (selectionChange)="onSelectedHp($event)" [multiple]="true"
+              class="selection-list-mat" #courses>
+              @for (course of list_course_dk | filter : searchCourse_hp : ['title','maso'] ; track course) {
+                <mat-list-option [selected]="course['selected_hp']"
+                  [value]="course">
+                  <div mat-line style="font-weight: 600;">
+                    {{course.title + ' (' + course.maso + ')'}}
+                  </div>
+                  @if (course.params && course.params.exam_format) {
+                    <div mat-line>{{course.params.exam_format |
+                    showlabel : type_test : 'key' : 'label'}}</div>
+                  }
+                </mat-list-option>
+              }
+            </mat-selection-list>
+          </div>
+        </div>
+      </ng-template>
+    </p-overlayPanel>
+
+    <ng-template #templateChooseMonhoc>
+      <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+          <h3 class="ovic-over-right-section__header">
+            {{selectedKhoiKienthuc?selectedKhoiKienthuc.title:'Chọn môn học'}}
+          </h3>
+          <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
+        </div>
+        <div class="ovic-over-right-section__body" style="height: calc(100vh - 51px - 57px);">
+          <div class="search-layout">
+            <div class="search-layout-top" style="display: flex; align-items: center;">
+              <input [(ngModel)]="searchCourse" type="text" class="ovic-input-field"
+                placeholder="Nhập tên rồi nhấn enter" type="text" style="width: 100%;">
+              </div>
+            </div>
+            <div class="list-course-layout" style="line-height: 1.5;">
+              <mat-selection-list (selectionChange)="changeSelecCourse($event)" [multiple]="true"
+                class="selection-list-mat" #courses>
+                @for (course of list_selected_course | filter : searchCourse : ['title','maso'] ; track course) {
+                  <mat-list-option [selected]="course['checked']"
+                    [value]="course">
+                    <div mat-line style="font-weight: 600;">
+                      {{course.title + ' (' + course.maso + ')'}}
+                    </div>
+                    @if (course.params && course.params.exam_format) {
+                      <div mat-line>{{course.params.exam_format |
+                      showlabel : type_test : 'key' : 'label'}}</div>
+                    }
+                  </mat-list-option>
+                }
+              </mat-selection-list>
+            </div>
+          </div>
+          <div class="ovic-dynamic-right-section__foot">
+            <p class="ovic-over-right-section__foot-wrap-buttons">
+              <button (click)="saveCtdtHocPhan()" class="btn ovic-over-right-section__foot-btn btn-primary">
+                <i class="fa fa-floppy-o"></i>Lưu lại
+              </button>
+            </p>
+          </div>
+        </div>
+      </ng-template>
+
+      <p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+        [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+        <div class="popup-waiting-loading">
+          <label style="width: 100%;">{{waitting_title}}</label>
+          <div class="tn-import-student-progressbar">
+            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+          </div>
+        </div>
+      </p-dialog>

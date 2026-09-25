@@ -1,1 +1,21 @@
-﻿<div class="p-3">import-tueba-main.component works!</div>
+<div class="layout_component_container">
+    <div style="width: 100%; height: 100%;" [ngSwitch]="keyImport">
+        <div class="import-content row" *ngSwitchDefault>
+            <div *ngFor="let item of list_import_function" class="col-4 item-card-import">
+                <div class="card-import">
+                    <a [routerLink]="[]" [queryParams]="{code: item.key}" class="card-import-desc">
+                        <span [innerHTML]="item['icon']"></span>
+                        <span>
+                            {{item['label']}}
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <app-import-monhoc-tueba *ngSwitchCase="'mon-hoc'"></app-import-monhoc-tueba>
+        <app-import-sinhvien-tueba *ngSwitchCase="'sinh-vien'"></app-import-sinhvien-tueba>
+        <app-import-giangvien-tueba *ngSwitchCase="'giang-vien'"></app-import-giangvien-tueba>
+        <app-import-lophoc-tueba *ngSwitchCase="'lop-hoc'"></app-import-lophoc-tueba>
+        <app-import-lichhoc-tueba *ngSwitchCase="'lich-hoc'"></app-import-lichhoc-tueba>
+    </div>
+</div>

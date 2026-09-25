@@ -1,1 +1,490 @@
-﻿<div class="p-3">topical-question-bank-v2.component works!</div>
+<div class="layout_component_container" [ngClass]="closeLeft?'close-left-body':''">
+  <div class="layout_component_container-course" style="position: relative;">
+    <button style="margin-left: 5px; padding: 0; min-width: 0; z-index: 50;" (click)="closeLeftBody()"
+      class="btn btn-success button-close-left-body">
+      <i style="margin: 0;vertical-align: middle; font-size: 13px;"
+      [ngClass]="closeLeft?'pi pi-angle-double-right':'pi pi-angle-double-left'"></i>
+    </button>
+    <div class="search-layout">
+      <div class="search-layout-top" style="display: flex; align-items: center;">
+        <input (keyup.enter)="onSearchByTitle()" [(ngModel)]="searchCourse" type="text" class="ovic-input-field"
+          placeholder="Nhập tên rồi nhấn enter" type="text" style="width: 100%;">
+          @if (isManager || isLanhDaoKhoa || isLanhDaoBomon) {
+            <button (click)="changeToMyCourse()"
+              [ngbTooltip]="!my_course?'Lọc theo khóa học của tôi':'Bỏ lọc'" placement="top" container="body"
+              style="margin-left: 5px;" class="btn " [ngClass]="my_course?'btn-primary':'btn-secondary'">
+              <i style="margin: 0px;" class="fa fa-filter" ></i>
+            </button>
+          }
+        </div>
+        @if (isManager) {
+          <div style="margin-top: 5px;">
+            <ovic-dropdown (onChange)="onChangeFilterChuyenmon($event)" placeholder="--- chọn khoa ---"
+              [options]="list_donvi_chuyenmon" optionId="id" optionLabel="title" [filter]="true"
+            [defaultValue]="categoryFilter" filterBy="title"></ovic-dropdown>
+          </div>
+        }
+      </div>
+      @if (dmKhoahoc && dmKhoahoc.length>0) {
+        <div class="list-course-layout">
+          <mat-selection-list (selectionChange)="onSelectCourse($event)" [multiple]="false" class="selection-list-mat"
+            #courses>
+            @for (course of dmKhoahoc ; track course) {
+              <mat-list-option [selected]="courseSelected && courseSelected.id === course.id "
+                [value]="course" font-size: 14px>
+                <div mat-line style="font-weight: 600;">{{course.title + ' (' + course.maso + ')'}}</div>
+                <div mat-line>{{course['creator_name'] + course['info_']}}</div>
+                <!--                    <div mat-line *ngIf="course['status_question']">-->
+                <!--                        <span [innerHTML]="course['status_question']"></span>-->
+              <!--                    </div>-->
+            </mat-list-option>
+          }
+        </mat-selection-list>
+      </div>
+    } @else {
+      <div class="list-course-layout">
+        <div class="w-100 h-100 d-flex flex-column justify-content-center">
+          <div class="text-empty">{{emptyMenu}}</div>
+        </div>
+      </div>
+    }
+    <div class="page-layout-set">
+      <p-paginator #paginator (onPageChange)="changePage($event)" [rows]="limitCourse"
+      [totalRecords]="totalCourse"></p-paginator>
+    </div>
+  </div>
+  <div class="layout_component_container-noidung mat-tab-chuandaura">
+    @if (courseSelected) {
+      <div class="right-container-bottom">
+        <div class="ovic-form-layout import-question-body-right lesson-info-right ovic-is-loading--size-normal"
+          [class.ovic-is-loading]="loadingCourse" style="width: 100%; height: 100%;">
+          @if (loadingCourseFail) {
+            <div
+              class="layout_component_container__error d-flex justify-content-center align-items-center w-100 h-100">
+              <p
+                class="layout_component_container__error__message alert alert-danger m-0 primary-font --fs-14">
+                Mất kết nối với máy chủ.
+                <button (click)="reloadingCourse()"
+                class="btn layout_component_container__btn-reload text-primary">Tải lại</button>
+              </p>
+            </div>
+          } @else {
+            <table class="table tbl topical-question-tbl">
+              <thead>
+                <tr class="text-left">
+                  <th class="text-left" colspan="8">
+                    <div style="display: flex; align-items: center;">
+                      <p style="flex: 1;" class="topical-question-tb__tbl-heading">Phân bổ câu
+                        hỏi theo CDR
+                        @if (unLimitQuestion) {
+                          <span style="color: red; font-size: 14px;">
+                            (Lưu ý: Không bị giới hạn câu hỏi bởi form)
+                          </span>
+                        }
+                      </p>
+                      @if (show_button_create_week_100) {
+                        <button (click)="addQuestionLastExam()"
+                          ngbTooltip="Tạo ngân hàng bổ sung câu hỏi TKHP" container="body"
+                          placement="left" class="btn btn-success">
+                          <i class="fa fa-plus"></i>
+                          {{keyServer == 'hvu' ? 'KTHP':'BS' }}
+                        </button>
+                      }
+                    </div>
+                  </th>
+                </tr>
+                <tr class="text-left">
+                  <th class="text-left tqb-tbl-col-code">Ký hiệu CDR</th>
+                  <th class="text-left tqb-tbl-col-level">Tiêu đề CDR</th>
+                  <th class="text-center tqb-tbl-col-know">Biết</th>
+                  <th class="text-center tqb-tbl-col-understand">Hiểu</th>
+                  <th class="text-center tqb-tbl-col-apply">Vận dụng</th>
+                  <th class="text-center tqb-tbl-col-analysis">Phân tích</th>
+                  <th class="text-center tqb-tbl-col-total" style="min-width: 170px;">Tổng</th>
+                  <th class="text-left tqb-tbl-col-buttons"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (chapter of chapters; track chapter) {
+                  <tr class="text-left tr-chapter-name">
+                    <td class="text-left" colspan="8">
+                      <span class="topical-question-tb__tbl-heading-2"
+                        [class.text-danger]="!chapter.verify"
+                        [class.text-primary]="chapter.verify">{{chapter.week !== 100?
+                        chapter.heading:'Câu hỏi thi kết thúc học phần' }}
+                      </span>
+                      <!--                                         <button style="margin-right: 5px; line-height: 1;"-->
+                      <!--                                            *ngIf="chapter.week === 100 && chapter.cdrList && chapter.cdrList[0] && canAdd"-->
+                      <!--                                            (click)="setThiKetThucHocPhan(chapter, true)"-->
+                      <!--                                            ngbTooltip="Đồng bộ lại thiết lập" placement="top" container="body"-->
+                      <!--                                            class="btn btn-success btn-icon btn-transparent">-->
+                      <!--                                            <i class="fa fa-refresh"></i>-->
+                    <!--                                        </button> -->
+                    @if (chapter.week === 100 && chapter.cdrList && chapter.cdrList[0] && canAdd) {
+                      <button style="line-height: 1;"
+                        (click)="addQuestionLastExam(chapter)"
+                        ngbTooltip="Bổ sung số lượng câu hỏi KTHP" placement="top"
+                        container="body" class="btn btn-icon btn-transparent btn-success">
+                        <i class="fa fa-plus"></i>
+                      </button>
+                    }
+                    @if (chapter.week === 100 && chapter.cdrList && chapter.cdrList[0] && canAdd) {
+                      <button style="margin-left: 5px; line-height: 1;"
+                        (click)="resetToMinCdrCauhoi(chapter)"
+                        ngbTooltip="Hủy số lượng câu hỏi chưa nhập" placement="top" container="body"
+                        class="btn btn-danger btn-icon btn-transparent">
+                        <i class="fa fa-repeat"></i>
+                      </button>
+                    }
+                  </td>
+                </tr>
+                @for (cdr of chapter.cdrList; track cdr) {
+                  <tr class="text-left tr-score"
+                    [class.text-danger]="!(cdr.cdr_cauhoi && cdr.cdr_cauhoi.status === 1)"
+                    >
+                    <td class="text-left tqb-tbl-col-code">{{ cdr.kyhieu }}</td>
+                    <td class="text-left tqb-tbl-col-level">{{ cdr.title }}</td>
+                    <td [ngClass]="!cdr.group.know.require && !unLimitQuestion ?'color-secondary':''"
+                      class="text-center tqb-tbl-col-know {{cdr.group.know['count_question'] < cdr.group.know.require ?'color-danger':''}}"
+                      tooltipStyleClass="ictu-p-tooltip"
+                      pTooltip="Nhập số lượng câu hỏi cho Cdr" tooltipPosition="top"
+                      [tooltipDisabled]="cdr.group.understand.require > 0 && !unLimitQuestion ? false : true">
+                      {{ cdr.group.know['count_question'] }}
+                      @if (!unLimitQuestion) {
+                        <span>
+                          / {{ cdr.group.know.require}}
+                        </span>
+                      }
+                      @if ((cdr.group.know.require || unLimitQuestion) && chapter.verify && (cdr.cdr_cauhoi && cdr.cdr_cauhoi.status === 1)) {
+                        <div class="tqb-tbl-col-cdr-number__buttons"
+                          >
+                          @if (canAdd) {
+                            <button
+                              [disabled]="cdr.group.know.reachRequirement && !unLimitQuestion ? true : false"
+                              (click)="openFormInput(cdr,'know','create')"
+                              class="btn tqb-col__btn">
+                              <i class="pi pi-plus"></i></button>
+                            }
+                            <button (click)="openFormInput(cdr,'know', 'list')"
+                              class="btn tqb-col__btn">
+                              <i class="pi pi-search"></i></button>
+                            </div>
+                          }
+                        </td>
+                        <td [ngClass]="!cdr.group.understand.require && !unLimitQuestion ?'color-secondary':''"
+                          class="text-center tqb-tbl-col-understand {{cdr.group.understand['count_question'] < cdr.group.understand.require ?'color-danger':''}}"
+                          tooltipStyleClass="ictu-p-tooltip"
+                          pTooltip="Nhập số lượng câu hỏi cho Cdr" tooltipPosition="top"
+                          [tooltipDisabled]="cdr.group.understand.require > 0 && !unLimitQuestion ? false : true ">
+                          {{cdr.group.understand['count_question'] }}
+                          @if (!unLimitQuestion) {
+                            <span>
+                              / {{cdr.group.understand.require }}
+                            </span>
+                          }
+                          @if ((cdr.group.understand.require || unLimitQuestion)&& chapter.verify && (cdr.cdr_cauhoi && cdr.cdr_cauhoi.status === 1)) {
+                            <div class="tqb-tbl-col-cdr-number__buttons"
+                              >
+                              @if (canAdd) {
+                                <button
+                                  [disabled]="cdr.group.understand.reachRequirement && !unLimitQuestion ? true : false"
+                                  (click)="openFormInput(cdr,'understand','create')"
+                                  class="btn tqb-col__btn">
+                                  <i class="pi pi-plus"></i></button>
+                                }
+                                <button (click)="openFormInput(cdr,'understand', 'list')"
+                                  class="btn tqb-col__btn">
+                                  <i class="pi pi-search"></i></button>
+                                </div>
+                              }
+                            </td>
+                            <td [ngClass]="!cdr.group.apply.require && !unLimitQuestion?'color-secondary':''"
+                              class="text-center tqb-tbl-col-apply {{cdr.group.apply['count_question'] < cdr.group.apply.require ?'color-danger':''}}"
+                              tooltipStyleClass="ictu-p-tooltip"
+                              pTooltip="Nhập số lượng câu hỏi cho Cdr" tooltipPosition="top"
+                              [tooltipDisabled]="cdr.group.apply.require > 0 && !unLimitQuestion ? false : true">
+                              {{ cdr.group.apply['count_question'] }}
+                              @if (!unLimitQuestion) {
+                                <span>
+                                  / {{ cdr.group.apply.require}}
+                                </span>
+                              }
+                              @if ((cdr.group.apply.require || unLimitQuestion)&& chapter.verify && (cdr.cdr_cauhoi && cdr.cdr_cauhoi.status === 1)) {
+                                <div class="tqb-tbl-col-cdr-number__buttons"
+                                  >
+                                  @if (canAdd) {
+                                    <button
+                                      [disabled]="cdr.group.apply.reachRequirement && !unLimitQuestion ? true : false"
+                                      (click)="openFormInput(cdr,'apply','create')"
+                                      class="btn tqb-col__btn">
+                                      <i class="pi pi-plus"></i></button>
+                                    }
+                                    <button (click)="openFormInput(cdr,'apply', 'list')"
+                                      class="btn tqb-col__btn">
+                                      <i class="pi pi-search"></i></button>
+                                    </div>
+                                  }
+                                </td>
+                                <td [ngClass]="!cdr.group.analysis.require && !unLimitQuestion?'color-secondary':''"
+                                  class="text-center tqb-tbl-col-analysis {{cdr.group.analysis['count_question'] < cdr.group.analysis.require ?'color-danger':''}}"
+                                  tooltipStyleClass="ictu-p-tooltip"
+                                  pTooltip="Nhập số lượng câu hỏi cho Cdr" tooltipPosition="top"
+                                  [tooltipDisabled]="cdr.group.analysis.require > 0 && !unLimitQuestion ? false : true">
+                                  {{ cdr.group.analysis['count_question'] }}
+                                  @if (!unLimitQuestion) {
+                                    <span>
+                                      / {{ cdr.group.analysis.require }}
+                                    </span>
+                                  }
+                                  @if ((cdr.group.analysis.require || unLimitQuestion) && chapter.verify && (cdr.cdr_cauhoi && cdr.cdr_cauhoi.status === 1)) {
+                                    <div class="tqb-tbl-col-cdr-number__buttons"
+                                      >
+                                      @if (canAdd) {
+                                        <button
+                                          [disabled]="cdr.group.analysis.reachRequirement && !unLimitQuestion ? true : false"
+                                          (click)="openFormInput(cdr,'analysis','create')"
+                                          class="btn tqb-col__btn">
+                                          <i class="pi pi-plus"></i></button>
+                                        }
+                                        <button (click)="openFormInput(cdr,'analysis', 'list')"
+                                          class="btn tqb-col__btn">
+                                          <i class="pi pi-search"></i></button>
+                                        </div>
+                                      }
+                                    </td>
+                                    <td class="text-center tqb-tbl-col-total">
+                                      <!-- {{
+                                      cdr.group.know['count_question'] +
+                                      cdr.group.understand['count_question'] +
+                                      cdr.group.apply['count_question'] + cdr.group.analysis['count_question']
+                                      }}  -->
+                                      <span
+                                      [innerHTML]="cdr.group[ 'total_quesion' ][ 'status_question' ]"></span>
+                                      @if (!unLimitQuestion) {
+                                        <span>
+                                          / {{ cdr.group.know.require + cdr.group.understand.require +
+                                          cdr.group.apply.require + cdr.group.analysis.require }}
+                                        </span>
+                                      }
+                                      <div class="tqb-tbl-col-cdr-number__buttons">
+                                        <button (click)="openFormInput(cdr,null, 'list')"
+                                          class="btn tqb-col__btn">
+                                          <i class="pi pi-search"></i></button>
+                                        </div>
+                                      </td>
+                                      <td class="text-left tqb-tbl-col-buttons"></td>
+                                    </tr>
+                                  }
+                                  @if (!chapter.cdrList.length) {
+                                    <tr class="text-left">
+                                      <td class="text-left" colspan="8">
+                                        @if (chapter['week'] !== 100) {
+                                          <span>
+                                            Chưa được thiết lập
+                                          </span>
+                                        } @else {
+                                          <div style="text-align: center;">
+                                            @if (canAdd) {
+                                              <button (click)="addQuestionLastExam(chapter)"
+                                                style="line-height: 1;" class="btn btn-success">
+                                                <i class="fa fa-cog"></i>
+                                                Thiết lập câu hỏi thi kết thúc học phần
+                                              </button>
+                                            }
+                                          </div>
+                                        }
+                                      </td>
+                                    </tr>
+                                  }
+                                }
+                              </tbody>
+                            </table>
+                          }
+                        </div>
+                      </div>
+                    } @else {
+                      <div
+                        class="layout_component_container__error d-flex justify-content-center align-items-center w-100 h-100">
+                        <p class="alert alert-secondary m-0 primary-font --fs-14">Vui lòng chọn môn học</p>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+
+                <!--<ng-template #errorTemplate>-->
+                <!--    <div class="layout_component_container__error d-flex justify-content-center align-items-center w-100 h-100">-->
+                <!--        <p *ngIf="error" class="layout_component_container__error__message alert alert-danger m-0 primary-font &#45;&#45;fs-14">-->
+                <!--            Mất kết nối với máy chủ.-->
+                <!--            <button (click)="reload()" class="btn layout_component_container__btn-reload text-primary">Tải lại</button>-->
+              <!--        </p>-->
+              <!--        <p *ngIf="invalidRole"-->
+              <!--           class="layout_component_container__error__message alert alert-danger m-0 primary-font &#45;&#45;fs-14">Bạn không có-->
+            <!--            quyền truy cập vào nội dung này. Vui lòng liên hệ với quản trị viên để được hỗ trợ</p>-->
+          <!--    </div>-->
+        <!--</ng-template>-->
+
+        <p-sidebar [dismissible]="false" [(visible)]="inputQuestion.enable" position="right" appendTo="body"
+          styleClass="topical-question-sidebar">
+          <div class="topical-question-sidebar__header">
+            <div class="d-flex align-items-center justify-content-between w-100 h-100 ">
+              <h4 class="topical-question-sidebar__heading">Cập nhật ngân hàng đề</h4>
+              <div class="topical-question-sidebar__header__left create-edit-question-section ml-auto">
+                @if (inputQuestion.mode === 'list') {
+                  <div class="p-inputgroup" style="width: auto;">
+                    <span class="p-inputgroup-addon">#</span>
+                    <input style="width: 120px;" type="number" placeholder="Nhập mã câu hỏi"
+                      [(ngModel)]="search_id">
+                    </div>
+                    <span class="topical-question-sidebar__header__left__separator">|</span>
+                    <div class="ovic-vertical__inputs ovic-vertical__inputs--layout-2" style="width: 150px;">
+                      <p class="form-row mt-0">
+                        <p-dropdown
+                          appendTo="body"
+                          class="input-element ovic-dropdown-style p-dropdown-trigger--size-150 p-dropdown-trigger--label-minimal"
+                          [filter]="false" [options]="question_status" [(ngModel)]="selected_status"
+                          optionLabel="label" optionValue="value" optionDisabled="disable"
+                          placeholder="--Tất cả--" [showClear]="true">
+                        </p-dropdown>
+                      </p>
+                    </div>
+                    <span class="topical-question-sidebar__header__left__separator">|</span>
+                    <b class="topical-question-sidebar__header__left__label">Cdr</b>
+                    <div class="ovic-vertical__inputs ovic-vertical__inputs--layout-2">
+                      <p class="form-row mt-0">
+                        <p-dropdown
+                          appendTo="body"
+                          class="input-element ovic-dropdown-style p-dropdown-trigger--size-20 p-dropdown-trigger--label-minimal"
+                          [filter]="false" [options]="cdrOptions" [(ngModel)]="inputQuestion.cdrName"
+                          (ngModelChange)="changeCdrSelect()" optionLabel="label" optionValue="value"
+                        optionDisabled="disable" placeholder="--Chọn cdr--"></p-dropdown>
+                      </p>
+                    </div>
+                    <span class="topical-question-sidebar__header__left__separator">|</span>
+                    @if (inputQuestion.btnFormAddNew && canAdd  ) {
+                      <button (click)="btnOpenFormCreate()"
+                        class="topical-question-sidebar__header__left__btn" pButton pRipple icon="pi pi-plus"
+                      label="Thêm câu hỏi"></button>
+                    }
+                    @if (!inputQuestion.btnFormAddNew && canAdd) {
+                      <button disabled="disabled"
+                        class="topical-question-sidebar__header__left__btn ovic-button--invisible" pButton pRipple
+                      icon="pi pi-plus" label="Thêm câu hỏi"></button>
+                    }
+                    <span class="topical-question-sidebar__header__left__separator">|</span>
+                  } @else {
+                    <button (click)="changeMode('list')" class="topical-question-sidebar__header__left__btn" pButton
+                    pRipple icon="pi pi-bars" label="Danh sách câu hỏi"></button>
+                    <span class="topical-question-sidebar__header__left__separator">|</span>
+                  }
+                </div>
+                <button class="topical-question-sidebar__header__btn-close p-button-danger" pButton pRipple
+                (click)="inputQuestion.enable = false" icon="pi pi-times"></button>
+              </div>
+            </div>
+            <div class="topical-question-sidebar__content">
+              @if (inputQuestion.ready) {
+                @switch (inputQuestion.mode) {
+                  @case ('create') {
+                    <app-create-question
+                      [testFormat]="courseSelected && courseSelected['av'] === 1 ? 'tienganh' : 'monkhac'" [data]="inputQuestion.info"
+                    (close)="onFormCreateResponse($event)" [dataCdr]="chapters"></app-create-question>
+                  }
+                  @case ('list') {
+                    <app-list-questions
+                      [testFormat]="courseSelected && courseSelected['av'] === 1 ? 'tienganh' : 'monkhac'" [data]="inputQuestion.info"
+                      [mode]="inputQuestion.cdrName" (openEdit)="openEdit($event)" [question_status]="selected_status"
+                    [searchInput]="search_id"></app-list-questions>
+                  }
+                  @case ('edit') {
+                    <app-create-question [dataCdr]="chapters"
+                      [testFormat]="courseSelected && courseSelected['av'] === 1 ? 'tienganh' : 'monkhac'" [update]="inputQuestion.info"
+                    (close)="onFormCreateResponse($event)"></app-create-question>
+                  }
+                }
+              }
+            </div>
+          </p-sidebar>
+
+
+
+          <ng-template #autoCdrQuestion let-c="close" let-d="dismiss">
+            <div class="ovic-over-right-section">
+              <div class="ovic-over-right-section__head">
+                <h3 class="ovic-over-right-section__header">Bổ sung số lượng câu hỏi thi KTHP:</h3>
+                <button class="btn ovic-over-right-section__close-button" (click)="closeForm(d)"></button>
+              </div>
+              <div class="ovic-over-right-section__body users-layout-form"
+                style="height: auto; font-size: 14px; line-height: 1.25;">
+                <div class="ovic-vertical__inputs form-auto-cdr table-reBorder">
+                  <div class="form-row"
+                    style="padding: 10px; background-color: #faedc4; border-radius: 6px; margin-bottom: 10px;">
+                    <div style="line-height: 1.5; color: red;">
+                      <p>
+                        - Thầy/Cô nhập số câu hỏi muốn thêm hoặc bổ sung.
+                        <br>
+                          - Số câu hỏi mức <strong>{{courseSelected.params.cdr | showlabel : chuandaura : "id" :
+                        "label"}}</strong> > 50%
+                        <br>
+                          - Số câu hỏi mức <span [innerHTML]="returnOrtherLvlCdr('less')"></span> < 40%
+                          <br>
+                            - Số câu hỏi mức <span [innerHTML]="returnOrtherLvlCdr('greater')"></span> < 10%
+                            <br>
+                              - Thao tác này không thể hoàn tác số câu hỏi trước đó.
+                            </p>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <table class="table-add-cdr-last-exam">
+                            <tr>
+                              @for (cdr of chuandaura; track cdr) {
+                                <th style="text-align: center;"
+                                  [ngClass]="cdr.disabled? 'disabled-label-table':'activity-label-table'"
+                                  >
+                                  {{cdr.label}}
+                                </th>
+                              }
+                              <th style="text-align: center; width: 100px;">
+                                Tổng
+                              </th>
+                            </tr>
+                            <tr>
+                              @for (cdr of chuandaura; track cdr) {
+                                <td>
+                                  @if (!cdr.disabled) {
+                                    <div [ngClass]="cdr_cauhoi_kthp_require[cdr.id]?'require-cdr-backgroud-color':''"
+                                      class="p-inputgroup">
+                                      <input (keyup)="changeCdrCauhoi()" #inputNumberQuestion
+                                        class="ovic-input-field no-border-left-right"
+                                        (keydown)="pointQuestionKeyDown($event,inputNumberQuestion)"
+                                        style="text-align: center; flex:1; width: 100%; min-width: 50px;" type="number"
+                                        [(ngModel)]="cdr_cauhoi_kthp[cdr.id]">
+                                        <span style="min-width: 60px;" class="p-inputgroup-addon tag-cdr-cauhoi-percent">
+                                          = {{returnPercentOnCdrItem(cdr_cauhoi_kthp[cdr.id])}} %
+                                        </span>
+                                      </div>
+                                    }
+                                  </td>
+                                }
+                                <td style="text-align: center;">
+                                  {{returnTotalCdrLastExam()}} ({{returnPercent()}}%)
+                                </td>
+                              </tr>
+                            </table>
+                          </div>
+                          <div class="row form-row form-row-flex-row">
+                            <div class="col-12 flex-div ghi-de-dulieu">
+                              <p-checkbox [(ngModel)]="checkboxCdrCauhoi" [binary]="true"
+                                label="Tôi chắc chắn với phân bổ số lượng câu hỏi như trên">
+                              </p-checkbox>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="ovic-over-right-section__foot-wrap-buttons flex-footer-right">
+                        <button [disabled]="!checkboxCdrCauhoi" (click)="addBS20(d)" type="button" class="btn btn-primary">
+                          Lưu lại
+                        </button>
+                      </div>
+                    </div>
+                  </ng-template>

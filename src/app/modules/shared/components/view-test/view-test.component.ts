@@ -9,14 +9,11 @@ import { ClassPlanActivityStudentTests } from '@modules/shared/models/class-plan
 import { CourseQuestions } from '@modules/shared/models/course-questions';
 import { ThiShiftStudents } from '@modules/shared/models/thi-shift-students';
 import { KEY_ANSWER_new } from '@modules/shared/utils/syscat';
-import { KatexImgDirective } from '@modules/shared/directives/katex-img.directive';
-import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 
 @Component({standalone: true, 
     selector: 'app-view-test',
     templateUrl: './view-test.component.html',
-    styleUrls: ['./view-test.component.css'],
-    imports: [KatexImgDirective, SafeHtmlPipe]
+    styleUrls: ['./view-test.component.css']
 })
 export class ViewTestComponent implements OnInit, OnChanges {
     @ViewChild("bodyTest") bodyTest: ElementRef;

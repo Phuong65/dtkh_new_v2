@@ -1,1 +1,188 @@
-﻿<div class="p-3">ctdt-cdr.component works!</div>
+<div class="layout_component_container">
+  <div class="document-type-a4-vertical">
+    <div style="padding-bottom: 20px;">
+      <p-table [value]="list_ctdt_cdr" styleClass="table-reBorder">
+        <ng-template pTemplate="caption">
+          <div style="display: flex; align-items: center;" class="table-header">
+            <span style="flex: 1;"><strong>CHUẨN ĐẦU RA CỦA CHƯƠNG TRÌNH ĐÀO TẠO</strong></span>
+            <button (click)="openAddCtdtCdr()" class="btn btn-success">
+              <i class="fa fa-plus" ></i>
+              Thêm mới
+            </button>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width:120px; text-align: center;">Ký hiệu</th>
+            <th style="width:120px; text-align: center;">PLO</th>
+            <th style="text-align: center;">Nội dung</th>
+            <th style="text-align: center; width: 120px;">Tỷ lệ % của PI</th>
+            <th style="text-align: center; width: 150px;">Thao tác</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-cdr let-rowIndex="rowIndex">
+          <tr style="background-color: antiquewhite;">
+            <td style="text-align: center;">
+              <strong>{{cdr.kyhieu}}</strong>
+            </td>
+            <td style="text-align: center;">
+              <strong>{{cdr.ordering}}</strong>
+            </td>
+            <td>
+              <div style="min-height: auto; font-weight: bold;" class="info-desc ql-editor"
+              [innerHTML]="cdr['noidung'] | safeHtmlDecode"></div>
+            </td>
+            <td>
+
+            </td>
+            <td class="action-td-table">
+              <button ngbTooltip="Thêm PI" placement="top" container="body" (click)="openAddCtdtCdr(cdr)"
+                class="btn btn-success btn-icon">
+                <i class="fa fa-plus"></i>
+              </button>
+              <button (click)="editCtdtCdr(cdr)" ngbTooltip="Sửa" placement="top" container="body"
+                class="btn btn-primary btn-icon">
+                <i class="fa fa-pencil"></i>
+              </button>
+              <button (click)="deleteCtdtCdr(cdr)" ngbTooltip="Xóa" placement="top" container="body"
+                class="btn btn-danger btn-icon">
+                <i class="fa fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+          @for (child of cdr['children']; track child) {
+            <tr>
+              <td style="text-align: center;">
+                {{child.kyhieu}}
+              </td>
+              <td style="text-align: center;">
+              </td>
+              <td>
+                <div style="min-height: auto; " class="info-desc ql-editor"
+                [innerHTML]="child['noidung'] | safeHtmlDecode"></div>
+              </td>
+              <td style="text-align: center;">
+                {{child['percent_pi']}}
+              </td>
+              <td class="action-td-table">
+                <button (click)="editCtdtCdr(child,cdr)" ngbTooltip="Sửa" placement="top" container="body"
+                  class="btn btn-primary btn-icon">
+                  <i class="fa fa-pencil"></i>
+                </button>
+                <button (click)="deleteCtdtCdr(child)" ngbTooltip="Xóa" placement="top" container="body"
+                  class="btn btn-danger btn-icon">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          }
+        </ng-template>
+      </p-table>
+    </div>
+    <div class="tuong-thich-ctdt">
+      <p-divider align="left" type="dashed">
+        <div class="inline-flex align-items-center">
+          <b style="font-size: 14px;">Tương thích giữa chuẩn đầu ra và mục tiêu của chương trình đào tạo</b>
+        </div>
+      </p-divider>
+      <p-table [value]="list_cdr_muctieu" styleClass="table-reBorder">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 100px; text-align: center;" rowspan="2">PEOs</th>
+            <th style="text-align: center;" [attr.colspan]="list_ctdt_cdr?.length || 1">Chuẩn đầu ra CTĐT
+            (PLOs)</th>
+          </tr>
+          <tr>
+            @for (_muctieu of list_ctdt_cdr; track _muctieu) {
+              <th style="text-align: center;">
+                {{_muctieu.ordering}}
+              </th>
+            }
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-poe>
+          <tr>
+            <td style="text-align: center;">
+              <div>
+                {{poe.ordering}}
+              </div>
+            </td>
+            @for (_cdr of list_ctdt_cdr; track _cdr) {
+              <td style="width: 50px; text-align: center;">
+                @if (checkTuongthich(poe.id,_cdr)) {
+                  <span>
+                    X
+                  </span>
+                }
+              </td>
+            }
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<ng-template #templateCtdtCdr>
+  <div class="ovic-over-right-section">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+      <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
+    </div>
+    <div class="ovic-over-right-section__body" style="height: calc(100vh - 51px - 57px - 18px);">
+      <div class="ovic-vertical__inputs" style="line-height: 1.5;">
+        <form [formGroup]="formCtdtCdr" class="formCtdt" style="line-height: 1;">
+          <div class="row form-row form-row-flex-row">
+            <div class="flex-div" [ngClass]="selectedParentCtdtCdr?'col-6':'col-12'">
+              <label for="kyhieu">Ký hiệu:<span class="ovic-mark">*</span></label>
+              <div class="p-inputgroup">
+                <span style="padding: 0px; border-radius: 0px; font-size: 14px;"
+                  class="p-inputgroup-addon">
+                  {{kyhieu_cdr}}
+                </span>
+                <input (keydown)="pointQuestionKeyDown($event)" type="text" id="ten"
+                  class="ovic-input-field" formControlName="ordering" autocomplete="off">
+                </div>
+              </div>
+              @if (selectedParentCtdtCdr) {
+                <div class="col-6 flex-div">
+                  <label for="kyhieu">Tỷ lệ % của PI:<span class="ovic-mark">*</span></label>
+                  <input (keydown)="pointQuestionKeyDown($event)" type="text" id="ten"
+                    class="ovic-input-field" formControlName="percent_pi" autocomplete="off">
+                  </div>
+                }
+              </div>
+              @if (!selectedParentCtdtCdr) {
+                <div class="row form-row form-row-flex-row">
+                  <div class="col-12 flex-div">
+                    <label for="ten">Tương thích PEOs:<span class="ovic-mark">*</span></label>
+                    <p-multiSelect optionValue="id" optionLabel="kyhieu" [options]="list_cdr_muctieu"
+                      formControlName="tuongthich_peos">
+                    </p-multiSelect>
+                  </div>
+                </div>
+              }
+              <div class="row form-row form-row-flex-row">
+                <div class="col-12 flex-div">
+                  <label for="ten">Nội dung:<span class="ovic-mark">*</span></label>
+                  <ovic-editor height="auto" [formField]="f['noidung']"
+                  [default]="f['noidung']['value']"></ovic-editor>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="ovic-dynamic-right-section__foot">
+          <p class="ovic-form-notes ovic-over-right-section__foot-ovic-input-line">
+            <i class="pi pi-info-circle"></i>các trường có đánh dấu ( <span class="ovic-mark">*</span> ) là bắt
+            buộc phải nhập
+          </p>
+          <p class="ovic-over-right-section__foot-wrap-buttons">
+            <button (click)="saveCtdtCdr()" class="btn ovic-over-right-section__foot-btn btn-primary">
+              <i class="fa fa-floppy-o" ></i>Lưu lại
+            </button>
+          </p>
+        </div>
+      </div>
+    </ng-template>

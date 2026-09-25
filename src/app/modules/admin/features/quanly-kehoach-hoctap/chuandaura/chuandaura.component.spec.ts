@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ChuandauraComponent } from './chuandaura.component';
 
@@ -8,7 +8,7 @@ describe('ChuandauraComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ChuandauraComponent ]
+      imports: [ ChuandauraComponent ]
     })
     .compileComponents();
 
@@ -21,3 +21,4 @@ describe('ChuandauraComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+

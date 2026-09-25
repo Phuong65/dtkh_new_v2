@@ -1,1 +1,4 @@
-﻿<div class="p-3">import-sinhvien-main.component works!</div>
+<div class="layout_component_container" [ngSwitch]="key_server">
+    <app-import-sinhvien-hvu *ngSwitchCase="'hvu'" [hide_back]="true"></app-import-sinhvien-hvu>
+    <app-import-sinhvien-ictu *ngSwitchCase="'ictu'" [hide_back]="true"></app-import-sinhvien-ictu>
+</div>

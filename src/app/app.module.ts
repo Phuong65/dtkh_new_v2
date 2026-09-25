@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HTTP_INTERCEPTORS , HttpClient  } from '@angular/common/http';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HTTP_INTERCEPTORS , HttpClient , HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { MessageService, PrimeNGConfig } from 'primeng/api';
 import { ConfirmComponent } from '@core/components/confirm/confirm.component';
 import { PopupComponent } from '@core/components/popup/popup.component';
 import { AppSafeHtmlPipe } from '@core/pipes/app-safe-html.pipe';
@@ -34,13 +35,13 @@ export function HttpLoaderFactory( httpClient : HttpClient ) {
 
 @NgModule( {
 	declarations : [
-		
+		AppComponent ,
 	] ,
 	imports      : [
 		BrowserModule ,
-		
+		BrowserAnimationsModule ,
 		ToastModule ,
-		
+		HttpClientModule ,
 		AppRoutingModule ,
 		NgApexchartsModule ,
 		OverlayModule ,
@@ -79,4 +80,11 @@ export function HttpLoaderFactory( httpClient : HttpClient ) {
 	exports      : [] ,
 	bootstrap    : [ AppComponent ]
 } )
-export class AppModule { }
+export class AppModule {
+	constructor(private primeConfig: PrimeNGConfig) {
+		this.primeConfig.overlayOptions = {
+			styleClass: '',
+			contentStyleClass: ''
+		};
+	}
+}

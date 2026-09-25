@@ -1,1 +1,508 @@
-﻿<div class="p-3">sinhvien.component works!</div>
+<div class="sinhvien-layout">
+  <div class="sinhvien-layout-top">
+    <input type="file" #inputImport style="visibility: hidden; display: contents;"
+      (change)="changeInputImport($event)" />
+      <span class="sinhvien-layout-top-title">Danh sách sinh viên</span>
+      <div class="action-layout-top" style="display: flex;">
+        @if (!openGroupStudent) {
+          <button class="btn btn-success" (click)="downloadFile()"><i class="fa fa-download"
+          style="margin-right: 5px!important;"></i>Tải
+        mẫu import</button>
+      }
+      @if (!openGroupStudent) {
+        <button class="btn btn-primary" (click)="openAddImportSinhvien()"><i
+        class="fa fa-refresh" style="margin-right: 5px!important;"></i>Đồng bộ sinh viên
+      </button>
+    }
+    <!-- <button [attr.disabled]="list_student && list_student.length ? null: ''" container="body" placement="left"
+    ngbTooltip="Hiển thị theo nhóm" [ngClass]="openGroupStudent? 'btn btn-primary':'btn btn-cancel'"
+    (click)="changeShowStudent()" class="btn-icon"><i class="fa fa-users"></i></button> -->
+    @if (!openGroupStudent) {
+      <button container="body" placement="left"
+        ngbTooltip="Xóa toàn bộ sinh viên trong lớp" class="btn btn-danger btn-icon"
+        (click)="deleteStudents()"><i class="fa fa-trash"></i></button>
+      }
+    </div>
+  </div>
+  <div class="sinhvien-layout-bottom">
+    <div class="action-own-class-data-layout-bottom-table" style="height: 100%;">
+      <ng-container *ngTemplateOutlet="openGroupStudent?nhomHocvienTemplate:hocvienTemplate">
+      </ng-container>
+      <ng-template #hocvienTemplate>
+        <div style="height: calc(100% - 40px); padding: 10px;">
+          <p-table [value]="list_student"
+            styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-has-caption table-reBorder">
+            <ng-template pTemplate="caption">
+              <div class="flex" style="text-align: right;">
+                <span class="p-input-icon-left ml-auto">
+                  <input (keyup.enter)="onSearchStudent($event['target']['value'])"
+                    style="width: 250px;" type="text"
+                    placeholder="Nhập tên hoặc mã sv rồi nhấn enter" />
+                  </span>
+                </div>
+              </ng-template>
+              <ng-template pTemplate="header">
+                <tr>
+                  @for (col of cols_student; track col) {
+                    <th [ngClass]="col['class']">{{col['label']}}
+                    </th>
+                  }
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-row>
+                <tr>
+                  @for (col of cols_student; track col) {
+                    <td [ngClass]="col['class']">
+                      @if (col['key'] !== 'action') {
+                        <span>{{row[col['key']]}}</span>
+                      }
+                      @if (col['key'] === 'action') {
+                        <div>
+                          <button (click)="loadClassInCourse(row)"
+                            style="margin-right: 5px; line-height: 1;" container="body" placement="left"
+                            ngbTooltip="Lấy dữ liệu từ lớp học cũ sang lớp học hiện tại"
+                            class="btn btn-success btn-icon">
+                            <i class="fa fa-exchange"></i>
+                          </button>
+                          <button (click)="deleteStudentClass(row['id'])"
+                            class="btn btn-icon btn-danger"><i class="fa fa-trash"></i></button>
+                          </div>
+                        }
+                      </td>
+                    }
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+            <div class="page-layout-set">
+              <p-paginator #paginator (onPageChange)="changePage_student($event)" [rows]="limit_student"
+              [totalRecords]="total_student"></p-paginator>
+            </div>
+          </ng-template>
+          <ng-template #nhomHocvienTemplate>
+            <div style="height: 100%; padding: 10px;">
+              <p-table [value]="listStudentGroup"
+                styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-has-caption table-reBorder">
+                <ng-template pTemplate="caption">
+                  <div style="text-align:right ;flex-direction: row-reverse; display: flex;"
+                    class="ovic-input-line">
+                    <div style="display: flex; width: 100%;" class="ovic-input-item">
+                      <div style="flex: 1; display: flex; align-items: center;">
+                        @if (classSelected) {
+                          <span>
+                            {{'Tổng sv: ' + total_student}}
+                          </span>
+                        }
+                        @if (classSelected && classSelected.params && !classSelected.params.block_group) {
+                          <span
+                            >
+                            {{' - Tổng đăng ký: ' + group_member.register_member}}
+                          </span>
+                        }
+                      </div>
+                      <input
+                        [disabled]="!classSelected.params || (classSelected.params && !classSelected.params.block_group)?false:true"
+                        style="text-align: center; width: 100px;" placeholder="Nhập số nhóm"
+                        type="number" [(ngModel)]="max_group" class="ovic-input-field" />
+                        <button style="margin-left: 5px;"
+                          [disabled]="!classSelected.params || (classSelected.params && !classSelected.params.block_group)?false:true"
+                          class="btn btn-success" (click)="createGroup()"><i class="fa fa-plus"></i>Tạo
+                        nhóm</button>
+                        <button style="margin-left: 5px;"
+                          [disabled]="!classSelected.params || (classSelected.params && !classSelected.params.block_group)?true:false"
+                          (click)="randomStudentGroup()" class="btn btn-primary"><i
+                        class="fa fa-refresh"></i>Phân
+                        nhóm ngẫu
+                      nhiên</button>
+                      <button style="margin-left: 5px; width: 127px;"
+                        [disabled]="!classSelected.params?true: false" class="btn"
+                        [ngClass]="classSelected.params && !classSelected.params.block_group?'btn-danger':'btn-secondary'"
+                        (click)="blockRegisterGroup()">{{classSelected.params &&
+                        !classSelected.params.block_group?'Kết thúc đăng ký':'Mở đăng ký'
+                      }}</button>
+                    </div>
+
+                  </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th style="width: 50px!important;text-align: center">#</th>
+                    <th style="width: 200px;">Mã SV</th>
+                    <th style="min-width: 200px;">Họ tên</th>
+                    <th class="ovic-w-150px">Ngày sinh</th>
+                    <th class="ovic-w-150px text-center">Thao tác</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
+                  @if (rowData['group']) {
+                    <tr class="ui-widget-header title-group-class">
+                      <td colspan="5">
+                        <div class="name-group-class">
+                          <div style="font-weight:bold; flex: 1; font-size: 14px;">
+                            {{rowData['group_name']}}
+                            <span style="font-weight: normal;">
+                              {{' - ['+rowData['member_number'] +
+                              '/'+classSelected.params.group_size+']'}}
+                            </span>
+                            @if (classSelected && classSelected.params && !classSelected.params.block_group) {
+                              <span style="font-weight: normal;"
+                                >
+                                {{' - SV chờ duyệt: '+rowData['register_member']}}
+                              </span>
+                            }
+                            @if (!rowData['leader_profile']) {
+                              <span style="font-weight: normal;">
+                                {{' - Chưa chọn nhóm trưởng'}}
+                              </span>
+                            }
+                            @if (rowData['leader_profile']) {
+                              <span style="font-weight: normal;">
+                                {{' - Nhóm trưởng: ['+rowData['leader_profile']['student_code']
+                                + '] - ' +
+                                rowData['leader_profile']['full_name']}}
+                              </span>
+                            }
+                          </div>
+                          <button [disabled]="!classSelected.params.block_group"
+                            (click)="getGroupMember(rowData)"
+                            style="padding: 0.2em 5px; margin-left: 5px;" class="btn"
+                            [ngClass]="rowData['children'] && rowData['children'].length?'btn-secondary':'btn-primary'">{{rowData['children']
+                            &&
+                          rowData['children'].length?'Đóng':'Xem SV'}}</button>
+                          <button [disabled]="!classSelected.params.block_group"
+                            (click)="addStudentToGroup(rowData)"
+                            style="padding: 0.2em 5px; margin-left: 5px;" class="btn btn-success"><i
+                          class="fa fa-plus"></i>Thêm</button>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                  @for (child of rowData['children']; track child; let i = $index) {
+                    <tr>
+                      <td style="text-align: center">{{i+1}}</td>
+                      <td>{{child['student_code']}}</td>
+                      <td>
+                        <div class="group-student-full-name"><button
+                          (click)="chooseLeaderGroup(child,rowData)" class="btn btn-cancel"
+                          container="body" placement="left"
+                          ngbTooltip="{{child['student_id'] === rowData.leader_id?'Nhóm trưởng':'Chọn làm nhóm trưởng'}}"><i
+                          [ngClass]="child && child['student_id'] === rowData['leader_id']?'hight-star-color':''"
+                        class="fa fa-star"></i></button>{{child['full_name']}}</div>
+                      </td>
+                      <td>{{child['birthday']}}</td>
+                      <td class="ovic-w-150px text-center">
+                        <button (click)="clearStudentFromGroup(child,rowData)" style="padding: 2px 8.18px;"
+                          class="btn btn-danger"><i style="margin:0px; font-size:11px"
+                        class="fa fa-minus"></i></button>
+                      </td>
+                    </tr>
+                  }
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                  <tr>
+                    <td [attr.colspan]="4" style="text-align:left">Chưa tạo nhóm</td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #templateListStudentGroup let-c="close" let-d="dismiss">
+      <div class="ovic-over-right-section right-slide-class">
+        <div class="ovic-over-right-section__head">
+          <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+          <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+          (click)="closeSideMenu()"></button>
+        </div>
+        <div style="line-height: 1; padding: 5px;" class="ovic-over-right-section__body footer-no-hint">
+          <div style="height: 100%;" class="phanquyen-dulieu-content-left student-group-none">
+            <div class="ovic-input-line" style="padding: 5px;">
+              <input style="width: 100%;" class="ovic-input-field" type="text" placeholder="Tìm kiếm"
+                [(ngModel)]="search_student" (keyup.enter)="paginater_group.changePage(0)">
+              </div>
+              <mat-selection-list class="selection-list-mat" #clases
+                (selectionChange)="selectedStudentToGroup($event)">
+                @for (clase of listStudentNoneGroup; track clase; let i = $index) {
+                  <mat-list-option [selected]="clase['check']"
+                    [value]="clase">
+                    <div mat-line><label style="width: 40px; margin: 0px; line-height: 1.25;">
+                    {{clase['index_']+'.'}}</label>
+                    {{clase['full_name'] + ' - '+ clase['birthday']}}
+                  </div>
+                  <div mat-line><label
+                  style="width: 40px; margin: 0px;line-height: 1.25;">&nbsp;</label>{{clase['student_code']}}
+                </div>
+              </mat-list-option>
+            }
+          </mat-selection-list>
+          <p-paginator #paginater_group (onPageChange)="changePage_student_group($event)" [rows]="50"
+          [totalRecords]="total_student_group"></p-paginator>
+          <ng-template #noResults>
+            <div class="result-search-none">Không có sinh viên nào...</div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+    <div class="ovic-dynamic-right-section__foot">
+      <p class="ovic-over-right-section__foot-wrap-buttons">
+        <button (click)="saveStudentToGroup()" type="button"
+          class="btn btn ovic-over-right-section__foot-btn btn-primary btn-primary"><i
+        class="fa fa-floppy-o"></i>Lưu lại
+      </button>
+    </p>
+  </div>
+</ng-template>
+
+<ng-template #templateImportSinhvien let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section right-slide-class">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">Import sinh viên vào lớp học</h3>
+      <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+      (click)="d(true)"></button>
+    </div>
+    <div style="line-height: 1; padding: 0px;height: calc(100vh - 50px)!important;"
+      class="ovic-over-right-section__body footer-no-hint no-footer">
+      <div class="import-header import-header-right form-row-flex-row">
+        <div class="import-header-left">
+          <button [disabled]="displayModal" (click)="triggerToimport()" class="btn btn-success"><i
+          style="color: #fff!important;" class="fa fa-file-excel-o"></i>Chọn
+        file</button>
+        @if (classSelected.sync_class_id && classSelected.sync_class_id !== '0') {
+          <button (click)="onDownLoadFromIctuApi()"
+            [disabled]="displayModal" class="btn btn-warning">
+            <i class="fa fa-random"></i>
+            Tải từ hệ thống đào tạo
+          </button>
+        }
+        <button (click)="startImportStudentToClass()"
+          [disabled]="list_student_import && list_student_import.length?false:true"
+          class="btn btn-primary"><i class="fa fa-play"></i>Bắt
+        đầu import</button>
+      </div>
+      <div class="import-header-right form-row-flex-row ghi-de-dulieu">
+        <p-checkbox [(ngModel)]="ghide_student" [binary]="true"
+        label="Ghi đè dữ liệu sinh viên tồn tại trong lớp"></p-checkbox>
+        @if (show_count_status) {
+          <div class="total-data-confirm">
+            <span>{{select_key_status? select_key_status['label']+': '+
+              show_count_status[select_key_status['key']]:'Tổng: '+ list_student_import.length}}<i
+            style="margin-left: 10px;" class="fa fa-angle-down"></i></span>
+            <div class="status-key">
+              @for (status of STATUS_IMPORT_STUDENT_CLASS; track status) {
+                <span
+                  [ngClass]="select_key_status && select_key_status['key'] === status['key']?'active':'' "
+                  (click)="filterByKeyStatus(status,dt3)"
+                  >
+                  {{status['label'] + ': '+show_count_status[status['key']]}}
+                </span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+    <div class="import-body scroll-table-layout-set">
+      <p-table #dt3 [globalFilterFields]="['class_name','status_import']" [paginator]="true" [rows]="100"
+        [showCurrentPageReport]="true" [value]="list_student_import"
+        styleClass="tbl-danhSachUser table-scroll-able-page table-scroll-able table-able-dropdown-p-table table-reBorder">
+        <ng-template pTemplate="header">
+          <tr>
+            <th width="50" style="text-align: center;">#</th>
+            @for (col of student_import_cols; track col) {
+              <th [width]="col['width']" [ngClass]="col['class']">
+                {{col['label']}}
+              </th>
+            }
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row let-rowIndex="rowIndex" let-rowspan="rowspan">
+          <tr class="{{row['import']?'import-thanhcong':''}}">
+            <td style="text-align: center;">{{rowIndex +1}}</td>
+            @for (col of student_import_cols; track col) {
+              <td [width]="col['width']" [ngClass]="col['class']">
+                @if (!col['object_key']) {
+                  <span>{{row[col['key']]}}</span>
+                }
+                @if (col['object_key']) {
+                  <span>{{OB_STATUS_IMPORT_ONE_STUDENT[row[col['key']]]}}</span>
+                }
+              </td>
+            }
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+</ng-template>
+
+<p-dialog header="Thông báo" styleClass="p-dialog-add-student" [(visible)]="display_add_student" appendTo="body"
+  [dismissableMask]="true" [modal]="true" [draggable]="false" [resizable]="false">
+  @if (student_one_add) {
+    <div style="text-align: center;">
+      <span style="padding: 5px; color: red;">Sinh viên này chưa có trong lớp học phần</span>
+      <div style="border-top: 1px solid #c8c8c8; padding: 5px; ">
+        <span style="font-size: 14px; font-weight: bold;">Thông tin sinh viên:</span>
+        <div
+          style="display: flex; flex-direction: column; margin-top: 10px; line-height: 1.25; width: 280px; margin: 10px auto; text-align: left;">
+          <span><label style="width: 100px;">Họ và
+          tên</label>: {{student_one_add['full_name']}}</span>
+          <span><label style="width: 100px;">Mã
+          SV</label>: {{student_one_add['student_code']}}</span>
+          <span><label style="width: 100px;">Ngày
+          sinh</label>: {{student_one_add['birthday']}}</span>
+        </div>
+      </div>
+    </div>
+  }
+  <ng-template pTemplate="footer">
+    <div style="display: flex; flex-direction: row; align-items: center;">
+      <span style="font-size: 14px; color: red; margin-right: 5px;">Bạn có muốn thêm sinh viên này vào lớp học
+      phần không?</span>
+      <!-- <p-button autofocus icon="p-button-info" (click)="addOneStudent()" label="Có"
+    styleClass="p-button-text"></p-button> -->
+    <button (click)="addOneStudent()" pButton pRipple type="button" label="Có" class="p-button-info"></button>
+    <button (click)="display_add_student = false" pButton pRipple type="button" label="Không"
+    class="p-button-danger"></button>
+    <!-- <p-button (click)="display_add_student = false" label="Không" styleClass="p-button-danger"></p-button> -->
+  </div>
+</ng-template>
+</p-dialog>
+
+<ng-template #templateListClass let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section right-slide-class">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">
+        {{selectedStudent?selectedStudent['full_name'] +' - '+ selectedStudent['student_code']:''}}
+      </h3>
+      <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+      (click)="closeSideMenu()"></button>
+    </div>
+    <div style="line-height: 1; padding: 5px; height: calc(100vh - 58px);"
+      class="ovic-over-right-section__body footer-no-hint">
+      <div style="height: 100%;" class="phanquyen-dulieu-content-left">
+        <div class="ovic-input-line"
+          style="padding: 15px 5px; font-size:14px; color:red; border-bottom:1px solid #c8c8c8">
+          Chọn lớp học và chuyển dữ liệu học tập của sinh viên
+          <strong>{{selectedStudent['full_name']}}</strong> sang lớp hiện tại
+        </div>
+        @if ((list_class | filter: search_class : ['name']).length > 0) {
+          <mat-selection-list
+            [multiple]="false" class="selection-list-mat" #classes>
+            @for (class of list_class | filter: search_class : ['name']; track class; let i = $index) {
+              <mat-list-option (click)="openInfoClass(class)" [selected]="class['check']"
+                [value]="class">
+                <div mat-line>
+                  {{class['name']}}
+                </div>
+              </mat-list-option>
+            }
+          </mat-selection-list>
+        } @else {
+          <div class="result-search-none">Không có lớp học nào...</div>
+        }
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #templateClassInfo let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section right-slide-class">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">
+        {{selectedOtherClass?selectedOtherClass['name']:''}}
+      </h3>
+      <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+      (click)="closeSideMenu()"></button>
+    </div>
+    <div style="line-height: 1; padding: 5px; height: calc(100vh - 58px);"
+      class="ovic-over-right-section__body footer-no-hint">
+      <div style="height: 100%;" class="phanquyen-dulieu-content-left">
+
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<p-dialog styleClass="report-create-plan-dialog" [baseZIndex]="1090" [showHeader]="false" appendTo="body"
+  position="center" [draggable]="false" [resizable]="false" [modal]="true" header="Title"
+  [(visible)]="displaySyncClass" [style]="{width: '700px'}" [closable]="false">
+  <div class="step-sync-plans" style="background-color: #fff;">
+    <div class="step-sync-plans-header" style="display: flex; align-items: center;">
+      <span style="flex: 1;">{{selectedOtherClass?selectedOtherClass['name']:''}}</span>
+      <span (click)="displaySyncClass = false" class="action-span"
+        style="margin-right: 0px; height: 20px; width: 20px; padding: 0px; line-height: 20px;text-align: center; cursor: pointer;">
+        <i style="color: red; margin: 0px;" class="fa fa-times"></i>
+      </span>
+    </div>
+    <div class="step-sync-plans-body ovic-vertical__inputs">
+      @if (list_week_test && list_week_test.length) {
+        <div>
+          <p-divider align="left" type="dashed">
+            <b>Bài tập tuần</b>
+          </p-divider>
+          <div class="row" style="padding: 0px 15px 15px 15px;">
+            @for (week of list_week_test; track week) {
+              <div class="col-6" style="margin-bottom: 5px;">
+                <p-checkbox [(ngModel)]="selectedWeekTest" name="list_week_test" [value]="week.week"
+                label="Bài {{week.week}}"></p-checkbox>
+              </div>
+            }
+          </div>
+        </div>
+      }
+      @if (list_tx_test && list_tx_test.length) {
+        <div>
+          <p-divider align="left" type="dashed">
+            <b>Bài kiểm tra thường xuyên</b>
+          </p-divider>
+          <div class="row" style="padding: 0px 15px 15px 15px;">
+            @for (tx of list_tx_test; track tx) {
+              <div class="col-6" style="margin-bottom: 5px;">
+                <p-checkbox [(ngModel)]="selectedTxTest" name="list_tx_test" [value]="tx.id"
+                label="{{tx.title}}"></p-checkbox>
+              </div>
+            }
+          </div>
+        </div>
+      }
+      <div>
+        <p-divider align="left" type="dashed">
+          <b>Khác</b>
+        </p-divider>
+        <div class="row" style="padding: 0px 15px 15px 15px;">
+          <div class="col-6" style="margin-bottom: 5px;">
+            <p-checkbox [(ngModel)]="selectDiemdanh" name="diemdanh" [binary]="true"
+            label="Điểm danh"></p-checkbox>
+          </div>
+        </div>
+      </div>
+      <div class="row form-row form-row-flex-row" style="margin-top: 10px;">
+        <div class="col-8 red" style="text-align: left;">
+          <p-checkbox [(ngModel)]="ghide_test" name="ghide_test" [binary]="true"
+          label="Ghi đè dữ liệu nếu trùng bài KT thường xuyên"></p-checkbox>
+        </div>
+        <div class="col-4" style="text-align: right;">
+          <button (click)="changeDataToClass()" style="line-height: 1;" class="btn btn-success">
+            <i class="fa fa-exchange"></i>Chuyển dữ liệu
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+
+
+<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+  [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+  <div class="popup-waiting-loading">
+    <label style="width: 100%;">{{waitting_title}}</label>
+    <div class="tn-import-student-progressbar">
+      <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+    </div>
+  </div>
+</p-dialog>

@@ -1,1 +1,393 @@
-﻿<div class="p-3">thuongxuyen-tuluan.component works!</div>
+<div class="thuongxuyen-tracnghiem-layout" [ngClass]="type2Class?'type-2-layout-thuongxuyen':''" #topResize>
+  <div class="thuongxuyen-tracnghiem-layout-top">
+    <div class="flex calendar-set-top">
+      @if (selectedActivity && selectedActivity.nhapdiem_tructiep === 0) {
+        <div class="flex">
+          <span style="padding: 5px; border-radius: 0px;" class="p-inputgroup-addon">Thời gian dự kiến: </span>
+          <p-calendar [showTime]="true" styleClass="date-picker-custom" [(ngModel)]="startDate"
+          [baseZIndex]="1999" appendTo="body" dateFormat="dd/mm/yy"></p-calendar>
+          <button (click)="saveDate()" style="line-height: 1;" class="btn btn-primary"><i
+          class="fa fa-floppy-o"></i>Lưu</button>
+        </div>
+      }
+    </div>
+    <div class="action-top">
+      @if (selectedActivity && selectedActivity.nhapdiem_tructiep === 1) {
+        <div>
+          <button (click)="createTestTrucTiep()" style="line-height: 1; margin-left: 5px; margin-right: 5px;"
+            class="btn btn-success">
+            Nhập điểm
+          </button>
+        </div>
+      }
+
+      @if (selectedActivity && selectedActivity.nhapdiem_tructiep === 0) {
+        <div>
+          @if (tongtest !== 0 && list_course_tuluan && list_course_tuluan.length !== 0) {
+            <button
+              (click)="createTest()" style="line-height: 1; margin-left: 5px; margin-right: 5px;"
+              class="btn btn-success">Phân bổ lại
+            đề</button>
+          }
+          @if (tongtest !== 0 ) {
+            <button (click)="loadStudentAndTest()"
+              style="line-height: 1; margin-right: 5px;" class="btn btn-success"><i class="fa fa-refresh"></i>Làm
+            mới</button>
+          }
+          @if (selectedActivity && selectedActivity.status === 1) {
+            <button (click)="changeStatusActivity(0)"
+              class="btn btn-danger" style="line-height: 1;"><i class="fa fa-stop-circle-o"></i>Đóng bài
+            KT</button>
+          }
+          @if (selectedActivity && selectedActivity.status === 0) {
+            <button class="btn btn-success"
+              (click)="changeStatusActivity(1)" style="line-height: 1;"><i class="fa fa-play-circle"></i>Kích hoạt
+            bài KT</button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+  <div class="thuongxuyen-tracnghiem-layout-bottom">
+    @if (tongtest === 0) {
+      <div style="text-align: center; padding: 15px;">
+        <p style="font-size: 18px; color: #c79807; font-weight: 500;">Chưa có đề kiểm tra, vui lòng phân bổ đề cho
+        sinh viên</p>
+        <div>
+          <button (click)="createTest()" style="line-height: 1;" class="btn btn-success">Phân bổ đề kiểm
+          tra</button>
+          <span style="margin: 0 10px;">hoặc</span>
+          <button (click)="createTestTrucTiep()" style="line-height: 1;" class="btn btn-success">
+            Nhập điểm
+          </button>
+        </div>
+      </div>
+    }
+    @if (tongtest !== 0) {
+      <div style="height: 100%;">
+        <div style="height:calc(100% - 40px)">
+          <p-table
+            [value]="list_student | filter: filter_status_html :['status_test'] | filter: search_student_html : ['full_name','student_code']"
+            styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-has-caption table-reBorder">
+            <ng-template pTemplate="caption">
+              <div class="flex caption-table" style="display: flex; align-items: center;">
+                <div class="caption-table-title">
+                  Tổng đề: {{tongtest+ ' / ' +tongsv}}
+                  <span class="red" style="margin-left: 10px; font-weight: normal;">
+                    (Lưu ý: Nhập điểm rồi nhấn enter để lưu)
+                  </span>
+                  <!-- <span class="blue"> - Đạt: {{passnumber}}</span>
+                  <span class="red"> - Chưa đạt: {{tongsv - passnumber}}</span> -->
+                </div>
+                <div class="p-input-icon-left ml-auto filter-student-test-status" style="display:flex">
+                  <!-- <ovic-dropdown [showClear]="false" [defaultValue]="filterStatusSelect"
+                  (onChange)="onChangeFilterStatus($event)" [options]="filter_status_array" optionId="value"
+                  optionLabel="label">
+                </ovic-dropdown> -->
+                <!-- Khu vực thao tác nhóm -->
+                @if (showNew && selectedActivity && selectedActivity.nhapdiem_tructiep === 0 && classGroups.length) {
+                  <div
+                    class="flex" style="align-items: center; margin-left: 10px;">
+                    <p-dropdown [baseZIndex]="1099" [options]="classGroups" optionLabel="name"
+                      optionValue="id" [(ngModel)]="selectedGroupId" placeholder="Chọn nhóm..."
+                      appendTo="body" (onChange)="onGroupChange()" styleClass="p-dropdown-sm"
+                      [style]="{'min-width': '140px'}">
+                    </p-dropdown>
+                    <button (click)="openGroupActionConfirm('diemdanh')"
+                      style="margin-left: 3px; line-height: 1;" class="btn btn-warning btn-icon"
+                      ngbTooltip="Đánh dấu vắng mặt cho tất cả thành viên trong nhóm"
+                      container="body">
+                      <i class="fa fa-square-o"></i>
+                    </button>
+                    <button (click)="openGroupActionConfirm('huy_diemdanh')"
+                      style="margin-left: 3px; line-height: 1;" class="btn btn-primary btn-icon"
+                      ngbTooltip="Đánh dấu có mặt cho tất cả thành viên trong nhóm" container="body">
+                      <i class="fa fa-check-square-o"></i>
+                    </button>
+                  </div>
+                }
+                <input (keyup)="onSearchStudent($event)" style="width: 200px; margin-left: 5px;"
+                  type="text" placeholder="Nhập tên hoặc mã sv rồi nhấn enter" />
+                </div>
+              </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+              <tr>
+                @for (col of cols_student; track col) {
+                  <th [ngClass]="col['class']">{{col['label']}}
+                  </th>
+                }
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+              <tr>
+                @for (col of cols_student; track col) {
+                  <td [ngClass]="col['class']">
+                    @if (!col['html'] && !col['private']) {
+                      <span>{{row[col['key']]}}</span>
+                    }
+                    @if (col['html']  && !col['private']) {
+                      <span [innerHtml]="row[col['key']]"></span>
+                    }
+                    @if (col['key'] === 'course_plan_activity_tuluan_id'  && col['private']) {
+                      <div style="font-size: 14px;"
+                        >
+                        <a (click)="openViewCode($event, row)" href="#">{{row[col['key']]}}</a>
+                      </div>
+                    }
+                    @if (col['key'] === 'lock'  && col['private']) {
+                      <div style="cursor: pointer; font-size: 16px;" (click)="onChangeLock(row)"
+                        >
+                        <span [ngClass]="row[col['key']] === 1?'vang-mat':'co-mat'">{{row[col['key']] ===
+                        1?'Vắng':'Có'}}</span>
+                      </div>
+                    }
+                    @if (col['key'] === 'stopped'  && col['private']) {
+                      <div style="cursor: pointer; font-size: 16px;" (click)="onChangeStopped(row)"
+                        >
+                        <i [ngClass]="row[col['key']] === 1? 'fa fa-lock':'fa fa-unlock'"></i>
+                      </div>
+                    }
+                    @if (col['key'] === 'point'  && col['private']) {
+                      <div style="cursor: pointer; font-size: 16px; text-align: center;"
+                        >
+                        @if (!row['newTuluan']) {
+                          <div>
+                            <input [attr.disabled]="!row['test_info'] ? '' : null"
+                              (keyup)="savePointTest($event, row, rowIndex)" #input_point
+                              (keydown)="pointQuestionKeyDown($event,input_point)"
+                              style="width: 100%; text-align: center;" [(ngModel)]="row[col['key']]"
+                              type="text" />
+                              {{input_point | focusInput : index_focus : row.id}}
+                            </div>
+                          }
+                          @if (row['newTuluan']) {
+                            <div>
+                              @if (row['test_info'] && row['test_info']['status'] >= 1) {
+                                <div style="display: flex; align-items: center;"
+                                  >
+                                  <!-- <span style="margin-right: 10px; flex: 1;">
+                                  {{row[col['key']] || row[col['key']] === 0 ? row[col['key']] : '-'}}
+                                </span> -->
+                                <input [attr.disabled]="!row['test_info'] ? '' : null"
+                                  (keyup)="savePointTest($event, row, rowIndex)" #input_point
+                                  (keydown)="pointQuestionKeyDown($event,input_point)"
+                                  style="width: 100%; text-align: center;" [(ngModel)]="row[col['key']]"
+                                  type="text" />
+                                  {{input_point | focusInput : index_focus : row.id}}
+                                  <button ngbTooltip="Chấm điểm theo tiêu chí" placement="left"
+                                    container="body" (click)="openPointCode(row)"
+                                    class="btn btn-primary btn-icon">
+                                    <i class="fa fa-pencil-square-o"></i>
+                                  </button>
+                                </div>
+                              }
+                              @if (!row['test_info'] || row['test_info']['status'] === 0) {
+                                <div
+                                  style="text-align: center;">
+                                  <span>-</span>
+                                </div>
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
+                      <!-- <div style="cursor: pointer; font-size: 16px;" (click)="onChangeStopped(row)"
+                      *ngIf="col['key'] === 'stopped'  && col['private']">
+                      <i [ngClass]="row[col['key']] === 1? 'fa fa-lock':'fa fa-unlock'" ></i>
+                    </div> -->
+                  </td>
+                }
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+        <div class="page-layout-set">
+          <p-paginator #paginator (onPageChange)="changePage_student($event)" [rows]="limit_student"
+          [totalRecords]="total_student" [rowsPerPageOptions]="[20,50,100,150,200]"></p-paginator>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<ng-template #templateFormViewTuluan let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section right-slide-class">
+    <div class="ovic-over-right-section__head" style="display: flex; align-items: center;">
+      <h3 class="ovic-over-right-section__header" style="flex:1">
+      {{selectedStudent['full_name'] +' - '+selectedStudent['student_code']}}</h3>
+      <div class="action-button-next-back">
+        <button style="line-height: 1; margin-right: 5px" (click)="openNewQuestion('back')"
+          class="btn btn-success btn-angle"><i class="pi pi-angle-double-left"></i>SV trước</button>
+          <button style="line-height: 1;margin-right: 5px" (click)="openNewQuestion('next')"
+            class="btn btn-success btn-angle">SV sau<i class="pi pi-angle-double-right"
+          style="margin-left: 5px; margin-right: 0px;"></i></button>
+        </div>
+        <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+        (click)="closeForm()"></button>
+      </div>
+      <div style="line-height: 1.25; padding: 0px; height: calc(100vh - 57px); background-color: #eaeaea;"
+        class="ovic-over-right-section__body footer-no-hint tuluan-comment-slide">
+        <app-view-thuongxuyen-tuluan [courseSelected]="classSelected['course_detail']"
+        [tuluan]="selectedTuluan"></app-view-thuongxuyen-tuluan>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #templateFormChamDiem let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section right-slide-class">
+      <div class="ovic-over-right-section__head" style="display: flex; align-items: center; padding: 12px 20px;">
+        <h3 class="ovic-over-right-section__header" style="flex:1">
+          {{selectedStudent['full_name'] +' - '+selectedStudent['student_code']}}
+          {{selectedStudent['point'] && selectedStudent['point'] !== -1?' - '+selectedStudent['point']+'
+        Điểm':''}}</h3>
+        <div class="action-button-next-back">
+          <button
+            [disabled]="selectedStudent && (selectedStudent['lock'] === 1 || (selectedStudent['test_info'] && selectedStudent['test_info']['status'] === 0))?true: false"
+            (click)="savePointTieuchi()" style="line-height: 1; margin-right: 5px" class="btn btn-primary">
+            <i class="fa fa-floppy-o"></i>
+            Lưu lại
+          </button>
+          <button
+            [disabled]="actionView === 'back' && selectedStudent && selectedStudent['index_'] === 1?true: false"
+            style="line-height: 1; margin-right: 5px" (click)="openNewQuestion('back')"
+            class="btn btn-success btn-angle"><i class="pi pi-angle-double-left"></i>SV trước</button>
+            <button
+              [disabled]="actionView === 'next' && selectedStudent && selectedStudent['index_'] === total_student?true: false"
+              style="line-height: 1;margin-right: 5px" (click)="openNewQuestion('next')"
+              class="btn btn-success btn-angle">SV sau<i class="pi pi-angle-double-right"
+            style="margin-left: 5px; margin-right: 0px;"></i></button>
+          </div>
+          <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+          (click)="closeModal(d)"></button>
+        </div>
+        <div style="line-height: 1.25; padding: 0px; height: calc(100vh - 57px); background-color: #eaeaea;"
+          class="ovic-over-right-section__body footer-no-hint tuluan-comment-slide tuluan-view-chamdiem">
+          @if (selectedStudent && selectedStudent['test_info'] && selectedStudent['test_info']['status'] >= 1) {
+            <div style="height: 100%; width: 100%; overflow: auto;"
+              >
+              <app-view-thuongxuyen-tuluan [hideNote]="true" [courseSelected]="classSelected['course_detail']"
+              [tuluan]="selectedTuluan"></app-view-thuongxuyen-tuluan>
+              <div class="tuluan-view-chamdiem-view-tieuchicham">
+                @if (list_tieuchi_cham.length) {
+                  <div style="margin-top: 40px;" class="question-content-note">
+                    <p-divider align="left" type="dashed">
+                      <b>Chấm điểm theo tiêu chí</b>
+                    </p-divider>
+                    <!-- <div style="margin-bottom: 20px; font-size: 14px;">
+                    <div style="margin-bottom: 5px; width: 300px;" class="p-inputgroup">
+                      <span style="border-radius: 0px; padding: 0px 5px" class="p-inputgroup-addon">
+                        <strong>Tổng điểm:</strong>
+                      </span>
+                      <input [(ngModel)]="selectedStudent['point']" style="flex: 1; width: 100px;" type="text"
+                        class="ovic-input-field">
+                        <button (click)="savePointTuluan()" class="btn btn-primary">Lưu điểm</button>
+                      </div>
+                    </div> -->
+                    @for (item of list_tieuchi_cham; track item; let i = $index) {
+                      <div style="margin-bottom: 20px; font-size: 14px;"
+                        >
+                        <p-panel styleClass="panel-item-tieuchicham">
+                          <ng-template pTemplate="header">
+                            @if (item.title) {
+                              <div class="header-tieuchicham">
+                                <strong>{{i + 1}}</strong>.
+                                <strong>{{item.title}} ({{item.cdr | showlabel : chuan_dau_ra }} -
+                                  {{item.point}}
+                                điểm)</strong>
+                              </div>
+                            }
+                          </ng-template>
+                          <div class="content-panel-tieuchicham">
+                            <div style="padding-top: 15px;">
+                              <p-panel #panel_tieuchi [toggleable]="true" [collapsed]="item['collapsed']">
+                                <ng-template pTemplate="header">
+                                  <div style="display: flex; align-items: center; width: 100%;">
+                                    <div style="flex: 1;">
+                                      <strong>Chấm điểm:</strong> {{item['point_cham']}}
+                                    </div>
+                                    <span (click)="openHuongdancham(panel_tieuchi , item)"
+                                      class="label-view-huong-dancham">
+                                      {{item['collapsed']?'Xem hướng dẫn chấm':'Ẩn hướng dẫn chấm' }}
+                                      <i
+                                      [ngClass]="item['collapsed']?'fa fa-angle-double-down':'fa fa-angle-double-up'"></i>
+                                    </span>
+                                  </div>
+                                </ng-template>
+                                @if (item.desc) {
+                                  <div [appLoadMediaOnText]="countChanges"
+                                    style="border:none"
+                                    class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                                    [innerHTML]="item.desc | safeHtml">
+                                  </div>
+                                }
+                                <!-- <span (click)="openHuongdancham(panel_tieuchi , item)" class="label-view-huong-dancham">
+                                Ẩn hướng dẫn chấm
+                                <i class="fa fa-angle-double-up"></i>
+                              </span> -->
+                            </p-panel>
+                          </div>
+                          <div style="padding: 10px 1.25rem; padding-top: 0px;">
+                            <div class="color-slider">
+                              <input #slider type="range" min="0" max="100" step="1"
+                                [(ngModel)]="item['point_change']" (input)="onSliderChange(item)" />
+                                <div class="tick-labels">
+                                  @for (mark of cham_diem_tuluan; track mark) {
+                                    <span
+                                      [style.left.%]="mark.position">
+                                      <strong style="font-size: 14px;">{{ mark.label }}</strong>
+                                    </span>
+                                  }
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </p-panel>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          } @else {
+            <div
+              style="width: 100%; height: 100%; background: transparent; display: flex; align-items: center; justify-content: center;">
+              <div
+                style="padding: 15px; color: orange; font-size: 20px; font-weight: bold; background: #fff;box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;border-radius: 6px;">
+                Sinh viên này chưa nhận đề hoặc đã vắng mặt
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </ng-template>
+
+    <!-- Dialog xác nhận thao tác nhóm -->
+    <p-dialog [baseZIndex]="1099" styleClass="report-create-plan-dialog" [showHeader]="false" appendTo="body"
+      position="center" [draggable]="false" [resizable]="false" [modal]="true" [(visible)]="displayGroupActionConfirm"
+      [style]="{width: '500px'}" [closable]="false">
+      <div class="step-sync-plans" style="background-color: #fff;">
+        <div class="step-sync-plans-header" style="display: flex; align-items: center;">
+          <span style="flex: 1;">Xác nhận thao tác nhóm</span>
+          <span (click)="displayGroupActionConfirm = false" class="action-span"
+            style="margin-right: 0px; height: 20px; width: 20px; padding: 0px; line-height: 20px;text-align: center; cursor: pointer;">
+            <i style="color: red; margin: 0px;" class="fa fa-times"></i>
+          </span>
+        </div>
+        <div class="step-sync-plans-body">
+          <div class="row form-row form-row-flex-row">
+            <div class="col-12 flex-div" style="font-size: 15px; text-align: center;">
+              <p>{{groupActionMessage}}</p>
+            </div>
+          </div>
+          <div class="row form-row form-row-flex-row" style="margin-top: 10px;">
+            <div class="col-12" style="text-align: right;">
+              <button style="line-height: 1; margin-right: 10px;" (click)="confirmGroupAction()"
+              class="btn btn-primary">Xác nhận</button>
+              <button (click)="displayGroupActionConfirm = false" style="line-height: 1;"
+              class="btn btn-success">Hủy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-dialog>

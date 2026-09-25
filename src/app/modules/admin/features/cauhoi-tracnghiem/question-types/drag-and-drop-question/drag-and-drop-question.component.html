@@ -1,1 +1,24 @@
-﻿<div class="p-3">drag-and-drop-question.component works!</div>
+@if (question) {
+  <div class="drag-and-drop-question" [ngClass]="enableQuestionNumber ? 'drag-and-drop-question--enable-input-question-number' : 'drag-and-drop-question--disable-input-question-number'">
+    <div class="drag-and-drop-question__list">
+      @for (questionChild of answers; track questionChild; let i = $index) {
+        <div class="drag-and-drop-question__list__input">
+          @if (enableQuestionNumber) {
+            <input tooltipStyleClass="ictu-p-tooltip" pTooltip="Question number" tooltipPosition="top" class="drag-and-drop-question__list__input__question-number" type="text" pInputText [(ngModel)]="questionChild.question.question_number" placeholder="Câu số...">
+          }
+          <textarea class="drag-and-drop-question__list__input__direction" [rows]="1" [cols]="1000" pInputTextarea [autoResize]="true" [(ngModel)]="questionChild.question.question_direction" placeholder="Câu hỏi..."></textarea>
+          <input class="drag-and-drop-question__list__input__answer-correct" type="text" pInputText [(ngModel)]="questionChild.answer.value" (ngModelChange)="onChangesAnswers(questionChild)" placeholder="Đáp án...">
+          <button pButton pRipple (click)="deleteQuestion(i)" class="drag-and-drop-question__list__input__btn-delete p-button-danger p-button-rounded p-button-text" icon="pi pi-trash"></button>
+        </div>
+      }
+      <button (click)="addMoreQuestion()" class="drag-and-drop-question__list__btn-add">
+        <i class="pi pi-plus-circle"></i>Thêm câu hỏi
+      </button>
+    </div>
+    <div class="grouping-question__disturbed-answers">
+      <h4 class="grouping-question__disturbed-answers__heading">Các phương án gây nhiễu</h4>
+      <input class="grouping-question__disturbed-answers__input" type="text" pInputText [(ngModel)]="disturbedAnswers" (ngModelChange)="onChangesDisturbedAnswers()">
+      <small class="grouping-question__section__text-guide text-secondary">Các phương án ngăn cách nhau bởi dấu chấm phẩy( ";")</small>
+    </div>
+  </div>
+}

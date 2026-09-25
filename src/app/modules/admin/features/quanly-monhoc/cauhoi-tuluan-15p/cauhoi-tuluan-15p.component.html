@@ -1,1 +1,992 @@
-﻿<div class="p-3">cauhoi-tuluan-15p.component works!</div>
+﻿<div class="layout_component_container cauhoi-tuluan-15p">
+  <div class="lesson-baihocv2 cauhoi-15p-layout" [ngClass]="closeLeft ? 'close-left-body' : ''">
+    <aside class="menu-lesson-baihocv2 cauhoi-15p-sidebar">
+      <div class="cauhoi-15p-sidebar-header">
+        <span class="cauhoi-15p-sidebar-header__icon" aria-hidden="true">
+          <i class="fa fa-book"></i>
+        </span>
+        <div>
+          <h2>Danh sách bài học</h2>
+          <p>Chọn bài để quản lý câu hỏi</p>
+        </div>
+      </div>
+      <button type="button" (click)="closeLeftBody()" class="cauhoi-15p-sidebar-toggle"
+        [attr.aria-label]="closeLeft ? 'Mở danh sách bài học' : 'Thu gọn danh sách bài học'"
+        [attr.aria-expanded]="!closeLeft" ngbTooltip="Thu gọn/Mở danh sách bài học" container="body">
+        <i [ngClass]="closeLeft ? 'pi pi-angle-double-right' : 'pi pi-angle-double-left'"></i>
+      </button>
+      <div class="menu-list-lessonv2 cauhoi-15p-lesson-list">
+        @if (isLoadingLessons) {
+          <div class="cauhoi-15p-loading" role="status">
+            <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+            <span>Đang tải bài học...</span>
+          </div>
+        }
+        @if (!isLoadingLessons) {
+          <div class="cauhoi-15p-lesson-items">
+            @for (lesson of lessons; track lesson) {
+              <div class="parent-lesson-layout cauhoi-15p-lesson-item">
+                <button type="button" class="cauhoi-15p-lesson-button"
+                  [ngClass]="selectedLesson === lesson ? 'cauhoi-15p-lesson-button--active' : ''"
+                  (click)="onSelectLesson(lesson)" [attr.aria-pressed]="selectedLesson === lesson">
+                  <span class="cauhoi-15p-lesson-button__icon" aria-hidden="true">
+                    <i class="fa fa-file-text-o"></i>
+                  </span>
+                  <span class="parent-title">Bài {{lesson.week}}</span>
+                  <i class="pi pi-angle-right cauhoi-15p-lesson-button__arrow" aria-hidden="true"></i>
+                </button>
+              </div>
+            }
+          </div>
+        }
+        @if (!isLoadingLessons && !lessons.length) {
+          <div class="cauhoi-15p-empty-state">
+            <i class="fa fa-folder-open-o cauhoi-15p-empty-state__icon" aria-hidden="true"></i>
+            <h3>Chưa có bài học</h3>
+            <p>Danh sách bài học sẽ hiển thị tại đây khi có dữ liệu.</p>
+          </div>
+        }
+      </div>
+    </aside>
+    <main class="lesson-content-right-monhoc-v2 content-form-lesson-right-top cauhoi-15p-main">
+      @if (selectedLesson && selectedCourse) {
+        <div class="cauhoi-15p-main__content">
+          <ng-container [ngTemplateOutlet]="templateListCauhoi"></ng-container>
+        </div>
+      }
+      @if (!isLoadingLessons && !selectedLesson) {
+        <div
+          class="cauhoi-15p-empty-state cauhoi-15p-empty-state--main">
+          <i class="fa fa-hand-o-left cauhoi-15p-empty-state__icon" aria-hidden="true"></i>
+          <h3>Chọn một bài học</h3>
+          <p>Chọn bài học bên trái để xem và quản lý danh sách câu hỏi.</p>
+        </div>
+      }
+    </main>
+  </div>
+</div>
+
+<ng-template #templateListCauhoi>
+  <section class="layout-tuluan-right cauhoi-15p-workspace">
+    <header class="layout-tuluan-right-top cauhoi-15p-page-header">
+      <div class="cauhoi-15p-page-header__title">
+        <span class="cauhoi-15p-page-header__icon" aria-hidden="true">
+          <i class="fa fa-pencil-square-o"></i>
+        </span>
+        <div>
+          <h1>Câu hỏi tự luận 15 phút</h1>
+          @if (selectedLesson) {
+            <p>Đang quản lý câu hỏi của Bài {{selectedLesson.week}}</p>
+          }
+          @if (isLoadingLessonForm) {
+            <span class="cauhoi-15p-form-status cauhoi-15p-form-status--loading">
+              <i class="pi pi-spin pi-spinner" aria-hidden="true"></i> Đang tải form
+            </span>
+          }
+          @if (!isLoadingLessonForm && lessonFormLoadError) {
+            <span
+              class="cauhoi-15p-form-status cauhoi-15p-form-status--error">
+              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Lỗi tải form
+            </span>
+          }
+          @if (!isLoadingLessonForm && !lessonFormLoadError && isLessonFormSaveIncomplete && !lessonFormRows.length) {
+            <span
+              class="cauhoi-15p-form-status cauhoi-15p-form-status--error">
+              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Form lưu chưa hoàn tất
+            </span>
+          }
+          @if (!isLoadingLessonForm && !lessonFormLoadError && hasLessonForm) {
+            <span
+              class="cauhoi-15p-form-status cauhoi-15p-form-status--success">
+              <i class="fa fa-check-circle" aria-hidden="true"></i> Đã có form
+            </span>
+          }
+          @if (!isLoadingLessonForm && !lessonFormLoadError && !lessonFormRows.length && !isLessonFormSaveIncomplete) {
+            <span
+              class="cauhoi-15p-form-status cauhoi-15p-form-status--warning">
+              <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Chưa có form
+            </span>
+          }
+        </div>
+      </div>
+      <div class="cauhoi-15p-page-header__actions">
+        <label class="cauhoi-15p-cdr-filter" for="cauhoi-15p-cdr-filter-select">
+          <span class="sr-only">Lọc câu hỏi theo CDR</span>
+          <select id="cauhoi-15p-cdr-filter-select" [(ngModel)]="selectedQuestionCdr"
+            (ngModelChange)="onQuestionCdrFilterChange()" class="cauhoi-15p-cdr-filter__select"
+            [disabled]="!hasLessonForm || isLoadingLessonForm">
+            <option [ngValue]="null">Tất cả CDR</option>
+            @for (cdr of questionCdrOptions; track cdr) {
+              <option [ngValue]="cdr.id">
+                {{cdr.label}}
+              </option>
+            }
+          </select>
+        </label>
+        <label class="cauhoi-15p-search" for="cauhoi-15p-search-input">
+          <i class="fa fa-search" aria-hidden="true"></i>
+          <input id="cauhoi-15p-search-input" [(ngModel)]="search_id_question" type="text"
+            class="cauhoi-15p-search__input" placeholder="Tìm kiếm theo mã câu hỏi">
+          </label>
+          @if (lessonFormLoadError) {
+            <button type="button" (click)="retryLoadLessonData()"
+              class="cauhoi-15p-button cauhoi-15p-button--secondary">
+              <i class="fa fa-refresh" aria-hidden="true"></i>
+              <span>Tải lại</span>
+            </button>
+          }
+          @if (!lessonFormLoadError) {
+            <button type="button" (click)="openLessonForm()"
+              class="cauhoi-15p-button cauhoi-15p-button--secondary"
+              [disabled]="isLoadingLessonForm || isSavingLessonForm">
+              <i [ngClass]="lessonFormRows.length ? 'fa fa-pencil' : 'fa fa-file-text-o'" aria-hidden="true"></i>
+              <span>{{lessonFormRows.length ? 'Chỉnh sửa form' : 'Tạo form nhập câu hỏi'}}</span>
+            </button>
+          }
+          <button type="button" (click)="openAddCauhoi()" class="cauhoi-15p-button cauhoi-15p-button--primary"
+            [disabled]="!hasLessonForm || isLoadingLessonForm || isSavingLessonForm">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+            <span>Thêm câu hỏi</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="layout-tuluan-right-bottom a4-list-scroll cauhoi-15p-question-scroll">
+        @if (isLoadingQuestions) {
+          <div class="cauhoi-15p-loading cauhoi-15p-loading--questions" role="status">
+            <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+            <span>Đang tải câu hỏi...</span>
+          </div>
+        }
+        @if (!isLoadingQuestions && !isLoadingLessonForm) {
+          <div class="a4-list-container cauhoi-15p-question-list">
+            @if (lessonFormLoadError) {
+              <div
+                class="cauhoi-15p-empty-state cauhoi-15p-empty-state--questions cauhoi-15p-empty-state--error">
+                <i class="fa fa-exclamation-triangle cauhoi-15p-empty-state__icon" aria-hidden="true"></i>
+                <h3>Không thể tải form nhập câu hỏi</h3>
+                <p>Chưa thể xác định bài đã có form. Vui lòng tải lại dữ liệu.</p>
+                <button type="button" (click)="retryLoadLessonData()"
+                  class="cauhoi-15p-button cauhoi-15p-button--primary">
+                  <i class="fa fa-refresh" aria-hidden="true"></i>
+                  <span>Tải lại</span>
+                </button>
+              </div>
+            }
+            @if (!lessonFormLoadError && !lessonFormRows.length) {
+              <div
+                class="cauhoi-15p-empty-state cauhoi-15p-empty-state--questions">
+                <i class="fa fa-list-alt cauhoi-15p-empty-state__icon" aria-hidden="true"></i>
+                <h3>Chưa có form nhập câu hỏi</h3>
+                <p>Tạo ít nhất một dòng CDR hợp lệ, lưu lên server trước khi thêm câu hỏi.</p>
+                <button type="button" (click)="openLessonForm()"
+                  class="cauhoi-15p-button cauhoi-15p-button--primary">
+                  <i class="fa fa-plus" aria-hidden="true"></i>
+                  <span>Tạo form nhập câu hỏi</span>
+                </button>
+              </div>
+            }
+            @if (hasLessonForm) {
+              @for (cauhoi of cdrFilteredQuestions | filter: search_id_question : ['id']; track cauhoi) {
+                <div
+                  class="question-a4-card cauhoi-15p-question-card">
+                  <div class="question-a4-card-header cauhoi-15p-question-card__header">
+                    <div class="question-a4-card-info cauhoi-15p-question-card__info">
+                      <span class="cauhoi-15p-question-card__number" aria-hidden="true">
+                        <i class="fa fa-file-text-o"></i>
+                      </span>
+                      <div class="cauhoi-15p-question-card__meta">
+                        <strong class="question-a4-card-id">Câu hỏi #{{cauhoi['id']}}</strong>
+                        <span class="box-span dat-box cauhoi-15p-badge">
+                          {{cauhoi['cdr'] | showlabel : chuandaura: 'id' : 'label' }}
+                        </span>
+                        <span class="cauhoi-15p-point-badge">
+                          <i class="fa fa-star" aria-hidden="true"></i>
+                          {{cauhoi['point']}} điểm
+                        </span>
+                        @if (cauhoi.rubric_markdown) {
+                          <span class="cauhoi-15p-rubric-badge">
+                            <i class="fa fa-check-square-o" aria-hidden="true"></i>
+                            Đã có rubric
+                          </span>
+                        }
+                      </div>
+                    </div>
+                    <div class="question-a4-card-actions cauhoi-15p-question-card__actions">
+                      <button type="button" (click)="editCauhoi(cauhoi)"
+                        class="cauhoi-15p-button cauhoi-15p-button--secondary">
+                        <i class="pi pi-file-edit" aria-hidden="true"></i>
+                        <span>Sửa</span>
+                      </button>
+                      <button type="button" (click)="deleteCauhoi(cauhoi)"
+                        class="cauhoi-15p-button cauhoi-15p-button--danger"
+                        [disabled]="deletingQuestionId === cauhoi.id">
+                        <i [ngClass]="deletingQuestionId === cauhoi.id ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
+                        aria-hidden="true"></i>
+                        <span>{{deletingQuestionId === cauhoi.id ? 'Đang xóa...' : 'Xóa'}}</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="question-a4-card-body cauhoi-15p-question-card__body">
+                    <div [appKatexImg]="cauhoi.id" [appLoadMediaOnText]="cauhoi.id"
+                      class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                      [innerHTML]="cauhoi.desc | safeHtml">
+                    </div>
+                  </div>
+                  @if (cauhoi.note) {
+                    <div class="question-a4-card-footer cauhoi-15p-question-card__footer">
+                      <div class="cauhoi-15p-question-card__note-title">
+                        <i class="fa fa-magic" aria-hidden="true"></i>
+                        <strong>Hướng dẫn AI chấm</strong>
+                      </div>
+                            <div [appLoadMediaOnText]="cauhoi.id" class="ck ck-content ck-editor__editable ck-rounded-corners
+                            ck-editor__editable_inline ck-blurred cauhoi-15p-question-card__note"
+                        [innerHTML]="cauhoi.note | safeHtml">
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+              @if (!list_cauhoi.length) {
+                <div class="cauhoi-15p-empty-state cauhoi-15p-empty-state--questions">
+                  <i class="fa fa-inbox cauhoi-15p-empty-state__icon" aria-hidden="true"></i>
+                  <h3>Chưa có câu hỏi</h3>
+                  <p>Thêm câu hỏi đầu tiên cho Bài {{selectedLesson.week}} để bắt đầu.</p>
+                  <button type="button" (click)="openAddCauhoi()"
+                    class="cauhoi-15p-button cauhoi-15p-button--primary">
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                    <span>Thêm câu hỏi</span>
+                  </button>
+                </div>
+              }
+              @if (list_cauhoi.length && (cdrFilteredQuestions | filter: search_id_question : ['id']).length === 0) {
+                <div
+                  class="cauhoi-15p-empty-state cauhoi-15p-empty-state--questions">
+                  <i class="fa fa-search cauhoi-15p-empty-state__icon" aria-hidden="true"></i>
+                  <h3>Không tìm thấy câu hỏi</h3>
+                  <p>Thử chọn CDR khác, nhập mã khác hoặc xóa bộ lọc.</p>
+                </div>
+              }
+            }
+          </div>
+        }
+      </div>
+    </section>
+  </ng-template>
+
+  <ng-template #templateLessonForm let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section cauhoi-tuluan-15p cauhoi-15p-form-panel cauhoi-15p-lesson-form-panel">
+      <div class="ovic-over-right-section__head cauhoi-15p-form-panel__header">
+        <div class="cauhoi-15p-form-panel__title">
+          <span class="cauhoi-15p-form-panel__icon" aria-hidden="true">
+            <i class="fa fa-list-alt"></i>
+          </span>
+          <div style="width:-webkit-fill-available">
+            <h3 class="ovic-over-right-section__header">
+              {{lessonFormRows.length ? 'Chỉnh sửa form nhập câu hỏi' : 'Tạo form nhập câu hỏi'}}
+            </h3>
+            <p>Bài {{selectedLesson?.week}} · Mỗi CDR chỉ xuất hiện một lần</p>
+          </div>
+        </div>
+        <button type="button" class="ovic-over-right-section__close-button cauhoi-15p-form-panel__close"
+        (click)="closeSideMenu()" [disabled]="isSavingLessonForm" aria-label="Đóng form nhập câu hỏi"></button>
+      </div>
+      <div class="ovic-over-right-section__body footer-no-hint cauhoi-15p-form-panel__body">
+        <div class="cauhoi-15p-lesson-form-toolbar">
+          <div>
+            <strong>Cấu hình CDR</strong>
+            <p>Mỗi CDR chỉ xuất hiện một lần trong form.</p>
+          </div>
+          <button type="button" (click)="addLessonFormRow()"
+            class="cauhoi-15p-button cauhoi-15p-button--secondary"
+            [disabled]="isSavingLessonForm || lessonFormDraftRows.length >= lessonFormCdrOptions.length">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+            <span>Thêm dòng CDR</span>
+          </button>
+        </div>
+
+        @if (lessonFormDraftRows.length) {
+          <div class="cauhoi-15p-lesson-form-table-wrap">
+            <table class="cauhoi-15p-lesson-form-table">
+              <thead>
+                <tr>
+                  <th scope="col">STT</th>
+                  <th scope="col">CDR</th>
+                  <th scope="col">Điểm/câu</th>
+                  <th scope="col">Số câu lấy</th>
+                  <th scope="col">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of lessonFormDraftRows; track row; let index = $index) {
+                  <tr
+                    [class.cauhoi-15p-lesson-form-row--error]="row.error">
+                    <td data-label="STT">{{index + 1}}</td>
+                    <td data-label="CDR">
+                      <select [(ngModel)]="row.cdr" [ngModelOptions]="{standalone: true}"
+                        (ngModelChange)="onLessonFormCdrChange(row)"
+                        [disabled]="isSavingLessonForm || isLessonFormCdrLocked(row)"
+                        class="cauhoi-15p-lesson-form-control"
+                        [attr.aria-label]="'CDR dòng ' + (index + 1)">
+                        <option [ngValue]="null">Chọn CDR</option>
+                        @for (cdr of lessonFormCdrOptions; track cdr) {
+                          <option [ngValue]="cdr.id">
+                            {{cdr.label}}
+                          </option>
+                        }
+                      </select>
+                      @if (isLessonFormCdrLocked(row)) {
+                        <small class="cauhoi-15p-form-hint">
+                          CDR đã có câu hỏi, không thể đổi.
+                        </small>
+                      }
+                    </td>
+                    <td data-label="Điểm/câu">
+                      <input type="number" min="0.01" step="0.1" [(ngModel)]="row.point"
+                        [ngModelOptions]="{standalone: true}" [disabled]="isSavingLessonForm"
+                        class="cauhoi-15p-lesson-form-control"
+                        [attr.aria-label]="'Điểm mỗi câu dòng ' + (index + 1)">
+                      </td>
+                      <td data-label="Số câu lấy">
+                        <input type="number" min="1" step="1" [(ngModel)]="row.question_take"
+                          [ngModelOptions]="{standalone: true}" [disabled]="isSavingLessonForm"
+                          class="cauhoi-15p-lesson-form-control"
+                          [attr.aria-label]="'Số câu lấy dòng ' + (index + 1)">
+                        </td>
+                        <td data-label="Thao tác">
+                          <button type="button" (click)="removeLessonFormRow(row)"
+                            class="cauhoi-15p-button cauhoi-15p-button--danger"
+                            [disabled]="isSavingLessonForm || row.hasQuestions"
+                            [attr.aria-label]="'Xóa dòng CDR ' + (index + 1)">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                            <span>Xóa</span>
+                          </button>
+                          @if (row.error) {
+                            <div class="cauhoi-15p-lesson-form-error" role="alert">
+                              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {{row.error}}
+                            </div>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+
+            @if (!lessonFormDraftRows.length) {
+              <div class="cauhoi-15p-empty-state cauhoi-15p-empty-state--questions">
+                <i class="fa fa-list-alt cauhoi-15p-empty-state__icon" aria-hidden="true"></i>
+                <h3>Form cần ít nhất một CDR</h3>
+                <button type="button" (click)="addLessonFormRow()" class="cauhoi-15p-button cauhoi-15p-button--primary">
+                  <i class="fa fa-plus" aria-hidden="true"></i>
+                  <span>Thêm dòng CDR</span>
+                </button>
+              </div>
+            }
+
+            <div class="cauhoi-15p-lesson-form-note">
+              <i class="fa fa-info-circle" aria-hidden="true"></i>
+              <span>Số câu lấy phải là số nguyên lớn hơn 0.</span>
+            </div>
+          </div>
+          <div class="ovic-dynamic-right-section__foot cauhoi-15p-form-panel__footer">
+            <p class="ovic-over-right-section__foot-wrap-buttons cauhoi-15p-form-panel__actions">
+              <button type="button" (click)="closeSideMenu()" class="cauhoi-15p-button cauhoi-15p-button--secondary"
+                [disabled]="isSavingLessonForm">
+                <i class="fa fa-times" aria-hidden="true"></i>
+                <span>Hủy</span>
+              </button>
+              <button type="button" (click)="saveLessonForm()" class="cauhoi-15p-button cauhoi-15p-button--primary"
+                [disabled]="isSavingLessonForm">
+                <i [ngClass]="isSavingLessonForm ? 'pi pi-spin pi-spinner' : 'fa fa-floppy-o'"
+                aria-hidden="true"></i>
+                <span>{{isSavingLessonForm ? 'Đang lưu...' : 'Lưu form'}}</span>
+              </button>
+            </p>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template #templateQuestion let-c="close" let-d="dismiss">
+        <div class="ovic-over-right-section cauhoi-tuluan-15p cauhoi-15p-form-panel">
+          <div class="ovic-over-right-section__head cauhoi-15p-form-panel__header">
+            <div class="cauhoi-15p-form-panel__title">
+              <span class="cauhoi-15p-form-panel__icon" aria-hidden="true">
+                <i class="fa fa-pencil-square-o"></i>
+              </span>
+              <div>
+                <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+                <p>Bài {{selectedLesson?.week}} · Điền đầy đủ các trường bắt buộc</p>
+              </div>
+            </div>
+            <button type="button" class="ovic-over-right-section__close-button cauhoi-15p-form-panel__close"
+            (click)="closeSideMenu()" aria-label="Đóng biểu mẫu"></button>
+          </div>
+          <div #questionFormBody class="ovic-over-right-section__body footer-no-hint cauhoi-15p-form-panel__body">
+            <div class="ovic-vertical__inputs form-setting-lesson cauhoi-15p-form-panel__content">
+              <form [formGroup]="formData">
+                <div class="row form-row form-row-flex-row cauhoi-15p-form-field">
+                  <div class="col-12">
+                    <label class="cauhoi-15p-form-label">
+                      Mức độ/trình độ năng lực trong form câu hỏi<span class="ovic-mark">*</span>
+                    </label>
+                    <ovic-groups-radio-v2 [disabled_item]="true" group_name="CHUAN_DAU_RA" optionLabel="label"
+                      [columns]="3" [options]="questionCdrOptions"
+                      [defaultValue]="formData.controls['cdr'].value" [formField]="formData.controls['cdr']"
+                      optionId="id" styleClass="cauhoi-15p-cdr-radio">
+                    </ovic-groups-radio-v2>
+                    @if (formData.controls['cdr'].invalid && formData.controls['cdr'].touched) {
+                      <div
+                        class="cauhoi-15p-form-error" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>Vui lòng chọn mức độ/trình độ năng lực trong form câu hỏi.</span>
+                      </div>
+                    }
+                    <div class="cauhoi-15p-question-point" aria-live="polite"
+                      [class.cauhoi-15p-question-point--empty]="selectedQuestionPoint === null">
+                      <span class="cauhoi-15p-question-point__icon" aria-hidden="true">
+                        <i class="fa fa-star"></i>
+                      </span>
+                      <div class="cauhoi-15p-question-point__content">
+                        <span class="cauhoi-15p-question-point__label">Điểm câu hỏi</span>
+                        @if (selectedQuestionPoint !== null) {
+                          <strong>
+                            {{selectedQuestionPoint | number:'1.0-2'}} <small>điểm</small>
+                          </strong>
+                        } @else {
+                          <span class="cauhoi-15p-question-point__placeholder">Chọn mức độ để xem điểm</span>
+                        }
+                      </div>
+                      @if (selectedQuestionPoint !== null) {
+                        <span class="cauhoi-15p-question-point__source">
+                          <i class="fa fa-lock" aria-hidden="true"></i>
+                          Theo form câu hỏi
+                        </span>
+                      }
+                    </div>
+                  </div>
+                </div>
+                <div class="row form-row form-row-flex-row cauhoi-15p-form-field">
+                  <div class="col-12">
+                    <label class="cauhoi-15p-form-label">
+                      Nội dung câu hỏi<span class="ovic-mark">*</span>
+                    </label>
+                    <ovic-ckeditor-document class="cauhoi-15p-editor-host"
+                      [changeId]="selectedCauhoi ? selectedCauhoi.id : 0" [autoSave]="true"
+                      [formField]="formData.controls['desc']" [default]="formData.controls['desc'].value"
+                      styleClass="vietbaocao-doctument-content cauhoi-15p-editor">
+                    </ovic-ckeditor-document>
+                    @if (formData.controls['desc'].invalid && formData.controls['desc'].touched) {
+                      <div
+                        class="cauhoi-15p-form-error" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>Vui lòng nhập nội dung câu hỏi.</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+                <div class="row form-row form-row-flex-row cauhoi-15p-form-field">
+                  <div class="col-12">
+                    <label class="cauhoi-15p-form-label" for="cauhoi-15p-note">Hướng dẫn AI chấm điểm</label>
+                    <textarea id="cauhoi-15p-note" class="cauhoi-15p-note-input" formControlName="note"
+                    placeholder="Nhập hướng dẫn để AI chấm điểm chính xác hơn..."></textarea>
+                    <small class="cauhoi-15p-form-hint">
+                      <i class="fa fa-lightbulb-o" aria-hidden="true"></i>
+                      Mô tả đáp án mong đợi, từ khóa hoặc nguyên tắc chấm.
+                    </small>
+
+                    <div class="cauhoi-15p-rubric-field">
+                      <label class="cauhoi-15p-form-label" for="cauhoi-15p-rubric-markdown">
+                        Rubric chấm điểm
+                      </label>
+                      <textarea id="cauhoi-15p-rubric-markdown"
+                        class="cauhoi-15p-note-input cauhoi-15p-rubric-input"
+                        formControlName="rubric_markdown" pInputTextarea [autoResize]="true"
+                      placeholder="Nhập rubric chấm điểm hoặc tạo bản nháp bằng AI..."></textarea>
+                      <small class="cauhoi-15p-form-hint">
+                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                        Giảng viên có thể chỉnh sửa rubric trước khi lưu câu hỏi.
+                      </small>
+                    </div>
+
+                    @if (aiRubricError) {
+                      <div class="cauhoi-15p-ai-error" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>{{aiRubricError}}</span>
+                      </div>
+                    }
+
+                    @if (aiRubricPreview) {
+                      <section class="cauhoi-15p-ai-preview"
+                        aria-labelledby="cauhoi-15p-ai-preview-title">
+                        <div class="cauhoi-15p-ai-preview__header">
+                          <div>
+                            <h4 id="cauhoi-15p-ai-preview-title">Rubric AI đề xuất</h4>
+                            <p>Kiểm tra trước khi đưa vào ô rubric để chỉnh sửa.</p>
+                          </div>
+                          <span>Bản nháp AI</span>
+                        </div>
+                        @if (aiRubricWarnings.length) {
+                          <div class="cauhoi-15p-ai-warning" role="alert">
+                            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                            <div>
+                              <strong>Cảnh báo từ AI</strong>
+                              <ul>
+                                @for (warning of aiRubricWarnings; track warning) {
+                                  <li>{{warning}}</li>
+                                }
+                              </ul>
+                            </div>
+                          </div>
+                        }
+                        <pre class="cauhoi-15p-ai-preview__markdown">{{aiRubricPreview}}</pre>
+                        <div class="cauhoi-15p-ai-preview__actions">
+                          <button type="button" (click)="resetAiRubric()"
+                            class="cauhoi-15p-button cauhoi-15p-button--secondary"
+                            [disabled]="isGeneratingAiRubric || isSavingQuestion">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            <span>Bỏ kết quả</span>
+                          </button>
+                          <button type="button" (click)="generateAiRubric()"
+                            class="cauhoi-15p-button cauhoi-15p-button--secondary"
+                            [disabled]="isGeneratingAiRubric || isSavingQuestion">
+                            <i class="fa fa-refresh" aria-hidden="true"></i>
+                            <span>Tạo lại</span>
+                          </button>
+                          <button type="button" (click)="applyAiRubric()"
+                            class="cauhoi-15p-button cauhoi-15p-button--apply"
+                            [disabled]="isGeneratingAiRubric || isSavingQuestion">
+                            <i class="fa fa-check" aria-hidden="true"></i>
+                            <span>Áp dụng vào biểu mẫu</span>
+                          </button>
+                        </div>
+                      </section>
+                    }
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="ovic-dynamic-right-section__foot cauhoi-15p-form-panel__footer">
+            <p class="ovic-over-right-section__foot-wrap-buttons cauhoi-15p-form-panel__actions">
+              <button type="button" (click)="generateAiRubric()" class="cauhoi-15p-button cauhoi-15p-button--ai"
+                [disabled]="isGeneratingAiRubric || isSavingQuestion">
+                <i [ngClass]="isGeneratingAiRubric ? 'pi pi-spin pi-spinner' : 'fa fa-magic'"
+                aria-hidden="true"></i>
+                <span>{{isGeneratingAiRubric ? 'AI đang tạo rubric...' : 'Tạo rubric chấm điểm bằng AI'}}</span>
+              </button>
+              @if (selectedCauhoi && selectedCauhoi.status === -1) {
+                <button (click)="saveCauhoi(true)" type="button"
+                  class="cauhoi-15p-button cauhoi-15p-button--secondary" [disabled]="isSavingQuestion">
+                  <i [ngClass]="isSavingQuestion ? 'pi pi-spin pi-spinner' : 'fa fa-paper-plane'"
+                  aria-hidden="true"></i>
+                  <span>Lưu và yêu cầu duyệt</span>
+                </button>
+              }
+              <button (click)="saveCauhoi()" type="button" class="cauhoi-15p-button cauhoi-15p-button--primary"
+                [disabled]="isSavingQuestion">
+                <i [ngClass]="isSavingQuestion ? 'pi pi-spin pi-spinner' : 'fa fa-floppy-o'" aria-hidden="true"></i>
+                <span>{{isSavingQuestion ? 'Đang lưu...' : 'Lưu lại'}}</span>
+              </button>
+            </p>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template #templateFormAddTieuchicham let-c="close" let-d="dismiss">
+        <div class="ovic-over-right-section right-slide-class cauhoi-tuluan-15p">
+          <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+            <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+            (click)="closeSideMenu(true)"></button>
+          </div>
+          <div style="line-height: 1.25; padding: 0px; height: calc(100vh - 57px);"
+            class="ovic-over-right-section__body footer-no-hint">
+            @if (selectedCauhoi) {
+              <p-splitter panelStyleClass="class-tieuchi-spliter-panel" [panelSizes]="[50,50]"
+                [style]="{'height': '100%'}">
+                <ng-template pTemplate>
+                  <div style="width: 100%; height: 100%; background-color: #eaeaea; overflow: auto;">
+                    <div class="document-type-a4 document-cauhoi-layout">
+                      <div
+                        style="display: flex; align-items: center; padding: 10px; background: var(--orange-100);">
+                        <span style="flex: 1">
+                          <strong>
+                            Câu {{selectedCauhoi['ordering']}} ({{selectedCauhoi['point']}} điểm)
+                          </strong>
+                        </span>
+                        <span class="box-span dat-box">
+                          {{selectedCauhoi['cdr'] | showlabel : chuandaura: 'id' : 'label' }}
+                        </span>
+                        <span class="box-span da-sua-box">
+                          {{selectedCauhoi['private'] ? 'Private':'Public'}}
+                        </span>
+                      </div>
+                      <div class="cauhoi-content" style="padding: 1cm;">
+                        <div style="border:none; padding: 0px;" [appKatexImg]="selectedCauhoi.id"
+                          [appLoadMediaOnText]="selectedCauhoi.id"
+                          class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                          [innerHTML]="selectedCauhoi.desc | safeHtml">
+                        </div>
+                      </div>
+                      <div style="padding: 1cm;" class="question-content-note">
+                        <p-divider align="left" type="dashed">
+                          <b>Hướng dẫn chấm theo tiêu chí</b>
+                        </p-divider>
+                        @for (item of list_tieuchi_chamdiem; track item; let i = $index) {
+                          <div style="font-size: 14px; padding-bottom: 15px;"
+                            >
+                            @if (item.title) {
+                              <div class="header-tieuchicham">
+                                <strong>{{i + 1}}</strong>.
+                                <strong>{{item.title}} ({{item.point}} điểm)</strong>
+                              </div>
+                            }
+                            @if (item.desc) {
+                              <div [appLoadMediaOnText]="item.id" style="border:none"
+                                class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                                [innerHTML]="item.desc | safeHtml">
+                              </div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+                <ng-template pTemplate>
+                  <div class="content-mat-tab-tieuchicham" style="width: 100%; height: 100%;">
+                    <div style="padding: 5px; display: flex; align-items: center; background-color: #ead6fd;"
+                      class="content-mat-tab-tieuchicham-top">
+                      <span style="flex:1; margin-right: 5px;">
+                        <strong>Tổng tiêu chí:</strong> {{list_tieuchi_chamdiem.length}}
+                        - <strong>Tổng điểm tiêu chí:</strong> {{totalPointTieuChi}}
+                      </span>
+                      @if (list_tieuchi_chamdiem.length && selectedCauhoi && selectedCauhoi.status !== 1) {
+                        <button (click)="saveTieuchiChams()"
+                          style="line-height: 1; margin-right: 5px;" class="btn btn-primary">
+                          <i class="fa fa-floppy-o"></i>
+                          Lưu lại
+                        </button>
+                      }
+                      @if (selectedCauhoi && selectedCauhoi.status !== 1) {
+                        <button (click)="addOneTieuchiChams()"
+                          style="line-height: 1;" class="btn btn-success">
+                          <i class="fa fa-plus"></i>
+                          Thêm tiêu chí
+                        </button>
+                      }
+                    </div>
+                    @if (list_tieuchi_chamdiem && list_tieuchi_chamdiem.length) {
+                      <div style="height: calc(100% - 41px); padding: 5px; overflow: auto;"
+                        >
+                        @for (item of list_tieuchi_chamdiem; track item; let i = $index) {
+                          <div class="tieuchicham-card-panel">
+                            <p-panel #panel_tieuchi [collapsed]="item['collapsed']" [toggleable]="true">
+                              <ng-template pTemplate="header">
+                                <div style="width: 100%;">
+                                  <div style="display: flex;">
+                                    <div class="row form-row" style="flex: 1;margin-right: 5px;">
+                                      <div class="col-9">
+                                        <textarea
+                                          [disabled]="selectedCauhoi && selectedCauhoi.status === 1? true: false"
+                                          style="width: 100%; resize: none; height: -webkit-fill-available;"
+                                          cols="2" placeholder="Nhập tiêu đề cho tiêu chí {{i + 1}}"
+                                          class="ovic-input-field" [(ngModel)]="item.title">
+                                        </textarea>
+                                      </div>
+                                      <div class="col-3">
+                                        <div style="margin-bottom: 5px;" class="p-inputgroup">
+                                          <span style="border-radius: 0px; padding: 0px;"
+                                          class="p-inputgroup-addon">Điểm:</span>
+                                          <input style="width: inherit;"
+                                            [disabled]="selectedCauhoi && selectedCauhoi.status === 1? true: false"
+                                            #input_point_tieuchi
+                                            (keydown)="pointQuestionKeyDown($event,input_point_tieuchi)"
+                                            type="text" class="ovic-input-field"
+                                            [(ngModel)]="item.point"
+                                            (ngModelChange)="updateTotalPointTieuChi()">
+                                          </div>
+                                          <div>
+                                            <p-dropdown
+                                              appendTo="body"
+                                              [disabled]="selectedCauhoi && selectedCauhoi.status === 1? true: false"
+                                              [style]="{'width': '100%'}" optionDisabled="disabled"
+                                              optionValue="id" [options]="chuandaura"
+                                              [(ngModel)]="item.cdr" optionLabel="label">
+                                            </p-dropdown>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div>
+                                        <button (click)="deleteTieuchi(item)"
+                                          class="btn btn-danger btn-icon btn-transparent">
+                                          <i class="fa fa-trash"></i>
+                                        </button>
+                                      </div>
+                                    </div>
+                                    <div style="padding-top: 0.75rem;">
+                                      <span (click)="openHuongdancham(panel_tieuchi,item)"
+                                        class="text-open-huong-dancham">
+                                        <i class="fa fa-angle-double-down"></i>
+                                        Nhập hướng dẫn chấm
+                                      </span>
+                                    </div>
+                                  </div>
+                                </ng-template>
+                                <div class="ovic-vertical__inputs form-setting-lesson edit-hight-200"
+                                  style="padding: 0px;">
+                                  @if (!item['collapsed']) {
+                                    <div class="row form-row form-row-flex-row">
+                                      <div class="col-12">
+                                        <label>Hướng dẫn chấm:</label>
+                                        <ovic-ckeditor-document
+                                          (onSaveData)="onChangeEditorTieuchi($event,item)"
+                                          [changeId]="item.id" [autoSave]="true" [default]="item.desc"
+                                          styleClass="vietbaocao-doctument-content">
+                                        </ovic-ckeditor-document>
+                                      </div>
+                                    </div>
+                                  }
+                                </div>
+                              </p-panel>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </ng-template>
+                </p-splitter>
+              }
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template #templatePmsDuan let-c="close" let-d="dismiss">
+          <div class="ovic-over-right-section right-slide-class cauhoi-tuluan-15p">
+            <div class="ovic-over-right-section__head">
+              <h3 class="ovic-over-right-section__header">Danh sách câu hỏi</h3>
+              <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+              (click)="closeSideMenu()"></button>
+            </div>
+            <div style="line-height: 1.25; padding: 5px; height: calc(100vh - 51px - 57px);"
+              class="ovic-over-right-section__body footer-no-hint">
+              <div style="height: 100%;" class="phanquyen-dulieu-content-left ovic-vertical__inputs">
+                <div class="form-row row">
+                  <div class="col-12">
+                    <input class="ovic-input-field" type="text" [(ngModel)]="searchCauhoi" placeholder="Search">
+                  </div>
+                </div>
+                @if ((list_cauhoi | filter: searchCauhoi : ['ordering','id']).length > 0) {
+                  <mat-selection-list [multiple]="false" class="selection-list-mat" #duans
+                    (selectionChange)="changeSelecDuan($event)"
+                    >
+                    @for (duan of list_cauhoi | filter: searchCauhoi : ['ordering','id']; track duan) {
+                      <mat-list-option
+                        [value]="duan" [disabled]="selectedCauhoi && duan.id === selectedCauhoi.id ? true : false">
+                        <div mat-line style="display: flex; align-items: center;">
+                          <div mat-line style="flex: 1;">
+                            <div mat-line>#{{duan.id}}</div>
+                            <div mat-line style="font-size: 12px;"> </div>
+                          </div>
+                        </div>
+                      </mat-list-option>
+                    }
+                  </mat-selection-list>
+                } @else {
+                  <div class="result-search-none">Không tìm thấy câu hỏi nào...</div>
+                }
+              </div>
+            </div>
+            <div class="ovic-dynamic-right-section__foot">
+              <p class="ovic-over-right-section__foot-wrap-buttons">
+                <button (click)="saveTieuchiChamCopy()" type="button"
+                  class="btn btn ovic-over-right-section__foot-btn btn-primary btn-primary">
+                  <i class="fa fa-floppy-o"></i>Lưu lại
+                </button>
+              </p>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template #templateViewTuluan let-c="close" let-d="dismiss">
+          <div class="ovic-over-right-section right-slide-class cauhoi-tuluan-15p">
+            <div class="ovic-over-right-section__head">
+              <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+              <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+              (click)="closeSideMenu()"></button>
+            </div>
+            <div style="line-height: 1.25; height: calc(100vh - 57px); font-size: 14px; padding: 0px;"
+              class="ovic-over-right-section__body footer-no-hint">
+              <div style="width: 100%; height: 100%; background-color: #eaeaea; padding: 15px;overflow: auto;">
+                <div class="document-type-a4 document-cauhoi-layout" style="margin: 0px auto; min-height: 100%;">
+                  <div style="display: flex; align-items: center; padding: 10px; background: var(--orange-100);">
+                    <span style="flex: 1">
+                      <strong>
+                        Câu {{selectedCauhoi['ordering']}} ({{selectedCauhoi['point']}} điểm)
+                      </strong>
+                    </span>
+                    <span class="box-span dat-box">
+                      {{selectedCauhoi['cdr'] |showlabel : chuandaura: 'id' : 'label' }}
+                    </span>
+                    <span class="box-span da-sua-box">
+                      {{selectedCauhoi['private'] ? 'Private':'Public'}}
+                    </span>
+                  </div>
+                  <div class="cauhoi-content" style="padding: 1cm;">
+                    <div style="border:none; padding: 0px;" [appKatexImg]="selectedCauhoi.id"
+                      [appLoadMediaOnText]="selectedCauhoi.id"
+                      class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                      [innerHTML]="selectedCauhoi.desc | safeHtml">
+                    </div>
+                  </div>
+                  @if (selectedCauhoi.tieuchi && selectedCauhoi.tieuchi.length) {
+                    <div style="padding: 1cm;"
+                      class="question-content-note">
+                      <p-divider align="left" type="dashed">
+                        <b>Hướng dẫn chấm theo tiêu chí</b>
+                      </p-divider>
+                      @for (item of selectedCauhoi.tieuchi; track item; let i = $index) {
+                        <div style="font-size: 14px; padding-bottom: 15px;"
+                          >
+                          @if (item.title) {
+                            <div class="header-tieuchicham">
+                              <strong>{{i + 1}}</strong>.
+                              <strong>{{item.title}} ({{item.point}} điểm)</strong>
+                            </div>
+                          }
+                          @if (item.desc) {
+                            <div [appLoadMediaOnText]="item.id" style="border:none"
+                              class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                              [innerHTML]="item.desc | safeHtml">
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+                  <div style="padding: 15px 0px;">
+                    @if (selectedCauhoi && selectedCauhoi['comments'] && selectedCauhoi['comments'].length) {
+                      <div class="class-duyet-layout"
+                        >
+                        <div style="width: 100%; padding: 15px;" class="list-comment-layout">
+                          <label style="font-weight: 600; margin-bottom: 10px;">Ý KIẾN NHẬN XÉT CỦA THÀNH VIÊN HỘI
+                            ĐỒNG:
+                          </label>
+                          @if (selectedCauhoi['status'] === 1 || selectedCauhoi['status'] === -1) {
+                            <div style="padding-bottom: 10px; border-bottom: 1px solid #c8c8c8; margin-bottom: 10px;"
+                              >
+                              <div>
+                                <label style="width: 150px;">- Duyệt lúc:</label>
+                                {{selectedCauhoi['approved_at'] |
+                                ovicDateTime}}
+                              </div>
+                              <div>
+                                <label style="width: 150px;">- Trạng thái duyệt:</label>
+                                {{selectedCauhoi['status'] === 1?'Đạt':'Yêu cầu sửa'}}
+                              </div>
+                            </div>
+                          }
+                          @for (comment of selectedCauhoi['comments']; track comment; let index = $index) {
+                            <div
+                              class="comment-box">
+                              <div class="inner-comment">
+                                <div class="inner-comment-header">
+                                  <div style="flex: 1;">
+                                    <span
+                                      style="font-weight: 600; margin-right: 10px; text-decoration: underline;">
+                                    {{'Ủy viên'+(index + 1)+':'}}</span>
+                                  </div>
+                                </div>
+                                @if (comment['children'] && comment['children'].length) {
+                                  <div>
+                                    @for (children of comment['children']; track children) {
+                                      <div
+                                        style="margin-bottom: 15px; ">
+                                        <div [ngClass]="children['status'] === 1?'duyet-comment':'yeucausua-comment'"
+                                          class="conten-comment-box">
+                                          <div class="conten-comment-inner-box"
+                                            [innerHTML]="children.comment">
+                                          </div>
+                                        </div>
+                                        <div style="margin-left: 20px; margin-top: 5px;">
+                                          <span
+                                            style="font-size: 12px; color: #898989; margin-right: 20px; font-style: italic;">{{children.created_at
+                                          | ovicDateTime}}</span>
+                                          <span style="color: #898989; cursor: pointer;"
+                                            (click)="openReply(children,index)">Phản hồi
+                                          ({{children['count_reply']}})</span>
+                                        </div>
+                                        @if (children['reply_open'] === true) {
+                                          <div class="reply-layout">
+                                            <div class="list_reply_comments">
+                                              @for (reply_comment of children['reply_comments']; track reply_comment) {
+                                                <div style="margin-bottom: 15px;"
+                                                  >
+                                                  <div style="text-align: right; margin-bottom: 5px;">
+                                                    <span>{{reply_comment['display_name']}}</span>
+                                                  </div>
+                                                  <div class="conten-comment-box-left"
+                                                    [ngClass]="reply_comment['my_reply_comment']?'my-reply-comment':''">
+                                                    <div class="conten-comment-inner-box-left"
+                                                      [innerHTML]="reply_comment.comment">
+                                                    </div>
+                                                  </div>
+                                                  <div
+                                                    style="margin-right: 20px; margin-top: 5px; text-align: right;">
+                                                    <span
+                                                      style="font-size: 12px; color: #898989; font-style: italic;">{{reply_comment.created_at
+                                                    | ovicDateTime}}</span>
+                                                  </div>
+                                                </div>
+                                              }
+                                            </div>
+                                            @if (selectedCourse && userId === selectedCourse.creator_plan_id) {
+                                              <div style="display: flex; position: relative;"
+                                                >
+                                                <div
+                                                  style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
+                                                  <img style="width: 100%;"
+                                                    src="../../../assets/images/a_none.jpg">
+                                                  </div>
+                                                  <textarea
+                                                    style="height: 40px; margin-left: 10px; flex: 1; padding-right: 130px;"
+                                                    placeholder="Nhập phản hồi... "
+                                                  [(ngModel)]="children['textarea_comment']"></textarea>
+                                                  <button
+                                                    (click)="saveCommentReply(children , selectedCauhoi, index)"
+                                                    style="position: absolute; bottom: 5px; right:5px"
+                                                    class="btn btn-primary"><i class="fa fa-paper-plane"></i>Gửi
+                                                  phản hồi</button>
+                                                </div>
+                                              }
+                                            </div>
+                                          }
+                                        </div>
+                                      }
+                                    </div>
+                                  }
+                                </div>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+
+          <p-dialog styleClass="dialog-waiting cauhoi-15p-dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false"
+            [(visible)]="displayModal" [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false"
+            [resizable]="false">
+            <div class="popup-waiting-loading">
+              <label style="width: 100%;">{{waitting_title}}</label>
+              <div class="tn-import-student-progressbar">
+                <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+              </div>
+            </div>
+          </p-dialog>

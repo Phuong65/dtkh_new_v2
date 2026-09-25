@@ -1,1 +1,668 @@
-﻿<div class="p-3">class-noidung-giangday-v2.component works!</div>
+<div class="noidung-giangday-layout">
+  <div class="noidung-giangday-layout-left">
+    <div class="menu-list-lessonv2">
+      <div class="info-course">
+        <div class="info-course-content">
+          <div class="info-course-item">
+            <label>- Tên môn:</label>
+            <span>{{classSelected.course_detail?classSelected.course_detail.title:null}}</span>
+          </div>
+          <div class="info-course-item">
+            <label>- Mã môn:</label>
+            <span>{{classSelected.course_detail?classSelected.course_detail.maso:null}}</span>
+          </div>
+          <div class="info-course-item">
+            <label>- Khoa quản lý:</label>
+            <span>{{classSelected.course_detail?classSelected.course_detail['khoa_label']:null}}</span>
+          </div>
+          <div class="info-course-item">
+            <label>- Số tín chỉ:</label>
+            @if (classSelected.course_detail && classSelected.course_detail.params && classSelected.course_detail.params.sotinchi) {
+              <span
+              >{{classSelected.course_detail.params.sotinchi}}</span>
+            }
+          </div>
+          <div class="info-course-item">
+            <label>- Hình thức thi:</label>
+            @if (classSelected.course_detail && classSelected.course_detail.params && classSelected.course_detail.params.exam_format) {
+              <span
+                >{{classSelected.course_detail.params.exam_format
+              | showlabel : EXAMFORMAT : 'key'}}</span>
+            }
+          </div>
+          <div class="info-course-item">
+            <label>- Yêu cầu CDR:</label>
+            @if (classSelected.course_detail && classSelected.course_detail.params && classSelected.course_detail.params.cdr) {
+              <span
+                >{{classSelected.course_detail.params.cdr
+              | showlabel : CHUAN_DAU_RA }}</span>
+            }
+          </div>
+          <div class="info-course-item">
+            <label>- Giảng viên phụ trách:</label>
+            @if (classSelected.course_detail && classSelected.course_detail['user_label']) {
+              <span
+              >{{classSelected.course_detail['user_label']}}</span>
+            }
+          </div>
+        </div>
+      </div>
+      @for (parent of list_course_plan; track parent) {
+        <div class="parent-lesson-layout">
+          <div class="parent-name {{parent['isSync'] === false?'plan-not-sync':''}} {{!parent['children'] || !parent['children'].length?'no-border-bottom':''}}"
+            [ngClass]="selectedPlanActivity && parent.id === selectedPlanActivity.id ?'activity':''">
+            <div class="parent-name-layout">
+              @if (parent.week > 0 && parent.week< 1000) {
+                <span class="parent-title">{{label_parent_kehoach}}
+                {{parent.week}}</span>
+              }
+              @if (parent.week === 0 || parent.week === 1000 ) {
+                <span
+                class="parent-title">{{parent.title}}</span>
+              }
+            </div>
+          </div>
+          @if (parent['desc']) {
+            <div class="parent-desc" style="padding: 5px;">
+              <div class="parent-desc-content" style="padding: 10px; font-size: 14px;"
+                [innerHtml]="parent['desc'] | safeHtmlDecode">
+              </div>
+            </div>
+          }
+          @for (children of parent['children']; track children; let index = $index) {
+            <div [ngClass]="selectedPlanActivity && children.id === selectedPlanActivity.id?'activity':''"
+              class="child-lesson-layout">
+              <div (click)="onChangePlan(children)" class="child-lesson-layout-title">
+                <i class="{{children['icon']}}"></i>
+                <span style="margin-left: 10px;" class="child-title">{{children.title}}</span>
+                @if (children.type === 'ACTIVITY_TEST' && children['start_date']) {
+                  <span>
+                    <span style="margin: 0px 10px;">
+                      -
+                    </span>
+                    {{children['start_date'] | ovicDateTime}}
+                  </span>
+                }
+              </div>
+              <div class="action-menu">
+                @if (children.files && children.files.length) {
+                  <span class="action-icon">
+                    <i style="color: #007bff;" class="fa fa-paperclip"></i>
+                  </span>
+                }
+                @if (children.week > 0 && children.week < 1000 && children.type !== 'ACTIVITY_TEST') {
+                  <div
+                    >
+                    @switch (children['status']) {
+                      @case (0) {
+                        <span class="action-icon status-is-deactive">
+                          Chờ duyệt
+                        </span>
+                      }
+                      @case (1) {
+                        <span class="action-icon status-is-active">
+                          Đạt
+                        </span>
+                      }
+                      @case (-1) {
+                        <span class="action-icon status-is-redo">
+                          Chưa đạt
+                        </span>
+                      }
+                      @case (-2) {
+                        <span class="action-icon status-is-require">
+                          Yêu cầu duyệt
+                        </span>
+                      }
+                    }
+                  </div>
+                }
+                @if (children.type === 'ACTIVITY_TEST' && children['start_test'] && children['can_edit'] && children['test_ready']) {
+                  <span (click)="openSetStartDateActivityTest(children, parent)"
+                    style="margin: 0px 5px;" container="body" placement="top"
+                    ngbTooltip="Thay đổi thời gian kích hoạt" class="action-icon">
+                    <i class="fa fa-pencil"></i>
+                  </span>
+                }
+                @if (children.type === 'ACTIVITY_TEST' && children['test_ready']) {
+                  <div
+                    >
+                    @switch (children['start_test']) {
+                      @case (false) {
+                        <span (click)="openSetStartDateActivityTest(children, parent)" style="margin: 0px 5px;"
+                          container="body" placement="top" ngbTooltip="Kích hoạt bài test"
+                          class="action-icon ">
+                          <i class="fa fa-calendar"></i>
+                        </span>
+                      }
+                      @case (true) {
+                        <span style="margin: 0px 5px;" container="body" placement="top" ngbTooltip="Đã kích hoạt"
+                          class="action-icon status-is-active">
+                          <i class="fa fa-check-circle-o"></i>
+                        </span>
+                      }
+                    }
+                  </div>
+                }
+                @if (children.type === 'THUONGXUYEN_TRACNGHIEM' || children.type === 'THUONGXUYEN_TULUAN') {
+                  <span
+                    class="action-icon">
+                    @if (children.status === 1) {
+                      <i style="color: #28a745;" class="fa fa-circle"></i>
+                    }
+                    @if (children.status === 0) {
+                      <i style="color: #BDBDBD;" class="fa fa-circle"></i>
+                    }
+                  </span>
+                }
+              </div>
+            </div>
+          }
+          <!-- <div class="child-lesson-layout" *ngIf="!parent['children'] || !parent['children'].length">
+          <div style="justify-content: center; height: 100%; cursor:default;"
+          class="child-lesson-layout-title">Chưa đồng bộ, không có nội dung</div>
+        </div> -->
+      </div>
+    }
+  </div>
+</div>
+<div class="noidung-giangday-layout-right">
+  @if (selectedPlanActivity) {
+    <div class="lesson-content-right-layout " style="height: 100%; ">
+      <ng-container>
+        @switch (selectedPlanActivity['display_type'] || selectedPlanActivity['type']) {
+          @case ('PLAN') {
+            <div class="content-right">
+              <!-- <p-panel [header]="selectedPlanActivity.title" styleClass="panel-plan-activity no-border-top-panel">
+              <div class="ovic-vertical__inputs back-ground-info" style="line-height: 1.5;">
+                <div class="row form-row ">
+                  <div class="col-12">
+                    <div id="editor" class="document-editor__editable"
+                      [innerHtml]="selectedPlanActivity['desc'] | safeHtml">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </p-panel> -->
+          </div>
+        }
+        @case ('COURSE_DESCRIPTION') {
+          <div class="content-right">
+            <ng-container
+              [ngTemplateOutlet]="selectedPlanActivity.desc ? templateGeneralInformation : templateEmptyGeneralInformation"
+              [ngTemplateOutletContext]="{ activity: selectedPlanActivity, emptyMessage: 'Chưa có mô tả môn học' }">
+            </ng-container>
+          </div>
+        }
+        @case ('STUDENT_REQUIREMENTS') {
+          <div class="content-right">
+            <ng-container
+              [ngTemplateOutlet]="selectedPlanActivity.desc ? templateGeneralInformation : templateEmptyGeneralInformation"
+              [ngTemplateOutletContext]="{ activity: selectedPlanActivity, emptyMessage: 'Chưa có yêu cầu đối với sinh viên' }">
+            </ng-container>
+          </div>
+        }
+        @case ('COURSE_DOCUMENTS') {
+          <div class="content-right">
+            <ng-container
+              [ngTemplateOutlet]="selectedPlanActivity['documents'] && selectedPlanActivity['documents'].length ? templateCourseDocuments : templateEmptyGeneralInformation"
+              [ngTemplateOutletContext]="{ activity: selectedPlanActivity, emptyMessage: 'Chưa có tài liệu' }">
+            </ng-container>
+          </div>
+        }
+        @case ('GIOITHIEU') {
+          <div class="content-right">
+            <ng-container
+              [ngTemplateOutlet]="selectedPlanActivity.desc ||  selectedPlanActivity.files ? templateGioiThieu : templateEmptyContent_gioithieu"
+              [ngTemplateOutletContext]="{ activity: selectedPlanActivity}">
+            </ng-container>
+          </div>
+        }
+        @case ('MUCTIEU') {
+          <div class="content-right">
+            @if (selectedPlanActivity.status === 1) {
+              <p-panel
+                [header]="selectedPlanActivity.title" styleClass="panel-plan-activity no-border-top-panel">
+                <div class="ovic-vertical__inputs back-ground-info" style="line-height: 1.5;">
+                  @if (selectedPlanActivity['desc'] && !selectedPlanActivity['kienthuc'] && !selectedPlanActivity['kynang']) {
+                    <div
+                      class="row form-row ">
+                      <div class="col-12">
+                        <div id="editor" class="document-editor__editable">
+                          <div class="ck ck-editor__main" role="presentation">
+                            <div style="border:none"
+                              class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                              [innerHtml]="selectedPlanActivity['desc'] | safeHtml">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                  @if (selectedPlanActivity['kienthuc']) {
+                    <div class="row form-row">
+                      <div class="col-12 flex-div">
+                        <label>Về kiến thức:</label>
+                        <div class="info-desc ql-editor"
+                        [innerHtml]="selectedPlanActivity['kienthuc'] | safeHtmlDecode"></div>
+                      </div>
+                    </div>
+                  }
+                  @if (selectedPlanActivity['kynang']) {
+                    <div class="row form-row">
+                      <div class="col-12 flex-div">
+                        <label>Về kỹ năng:</label>
+                        <div class="info-desc ql-editor"
+                          [innerHtml]="selectedPlanActivity['kynang'] | safeHtmlDecode">
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </p-panel>
+            } @else {
+              <div class="not-ready">
+                {{selectedPlanActivity.title}} chưa được duyệt, vui lòng liên hệ với PHÒNG ĐÀO TẠO
+              </div>
+            }
+          </div>
+        }
+        @case ('ACTIVITY_TEST') {
+          <div class="content-right no-padding" style="height: 100%;">
+            @if (selectedPlanActivity['start_test'] === true && selectedPlanActivity['test_ready'] === true) {
+              <app-baitap-chuyende
+              [activityTest]="selectedPlanActivity" [classSelected]="classSelected"></app-baitap-chuyende>
+            } @else {
+              <div class="not-ready" style="font-weight: 500;">
+                @if (selectedPlanActivity['test_ready'] === true) {
+                  <div>
+                    {{selectedPlanActivity.title}} chưa được kích hoạt
+                  </div>
+                }
+                @if (selectedPlanActivity['test_ready'] === false) {
+                  <div>
+                    {{selectedPlanActivity.title}} <strong style="color: #8c221c">chưa được tạo đề</strong>, vui
+                    lòng liên hệ đến
+                    <strong style="color: #8c221c">Giảng viên phụ trách môn học</strong>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+        @case ('ACTIVITY') {
+          <div class="content-right">
+            <ng-container
+              [ngTemplateOutlet]="selectedPlanActivity.status === 1 ? templateTailieuGiangday: templateEmptyContent"
+              [ngTemplateOutletContext]="{ activity: selectedPlanActivity}">
+            </ng-container>
+          </div>
+        }
+        @case ('CDR') {
+          <div class="content-right">
+            <ng-container
+              [ngTemplateOutlet]="selectedPlanActivity.status === 1 ? templateCdr:templateEmptyContent"
+              [ngTemplateOutletContext]="{ activity: selectedPlanActivity}">
+            </ng-container>
+          </div>
+        }
+        @case ('THUONGXUYEN_TRACNGHIEM') {
+          <div class="content-right" style="padding: 5px;">
+            <!-- <app-thuongxuyen-tracnghiem [classSelected]="classSelected"
+          [activity]="selectedPlanActivity"></app-thuongxuyen-tracnghiem> -->
+        </div>
+      }
+      @case ('THUONGXUYEN_TULUAN') {
+        <div class="content-right" style="padding: 5px;">
+          <!-- <app-thuongxuyen-tuluan [classSelected]="classSelected"
+        [activity]="selectedPlanActivity"></app-thuongxuyen-tuluan> -->
+      </div>
+    }
+  }
+</ng-container>
+<ng-template #templateNotReadyForTest>
+  <div class="not-ready" style="font-weight: 500;">
+    @if (selectedPlanActivity['test_ready'] === true) {
+      <div>
+        {{selectedPlanActivity.title}} chưa được kích hoạt
+      </div>
+    }
+    @if (selectedPlanActivity['test_ready'] === false) {
+      <div>
+        {{selectedPlanActivity.title}} <strong style="color: #8c221c">chưa được tạo đề</strong>, vui
+        lòng liên hệ đến
+        <strong style="color: #8c221c">Giảng viên phụ trách môn học</strong>
+      </div>
+    }
+  </div>
+</ng-template>
+<ng-template #templateEmptyContent_gioithieu>
+  <div class="not-ready">
+    {{selectedPlanActivity.title}} chưa có nội dung, vui lòng liên hệ với giảng viên phụ trách
+  </div>
+</ng-template>
+<ng-template #templateEmptyContent>
+  <div class="not-ready">
+    {{selectedPlanActivity.title}} chưa được duyệt, vui lòng liên hệ với PHÒNG ĐÀO TẠO
+  </div>
+</ng-template>
+</div>
+}
+</div>
+</div>
+
+<ng-template #templateGeneralInformation let-activity="activity">
+  <p-panel [header]="activity.title" styleClass="panel-plan-activity no-border-top-panel">
+    <div class="ovic-vertical__inputs back-ground-info" style="line-height: 1.5;">
+      <div class="general-information-content ql-editor" [innerHtml]="activity.desc | safeHtmlDecode"></div>
+    </div>
+  </p-panel>
+</ng-template>
+
+<ng-template #templateCourseDocuments let-activity="activity">
+  <p-panel [header]="activity.title" styleClass="panel-plan-activity no-border-top-panel">
+    <div class="ovic-vertical__inputs back-ground-info" style="line-height: 1.5;">
+      <div class="files-list-view">
+        @for (document of activity['documents']; track document) {
+          @if (document.type === 'file') {
+            <div class="single-file"
+              (click)="onSelectFileReview(document.file)">
+              <i class="icon-in-open-download-file" [ngClass]="document.file | ovicFileIcon"></i>
+              <div class="info">
+                <div class="document-title-row">
+                  <h4 class="name">{{document.title}}</h4>
+                  <span class="document-group-badge">{{document.document_group}}</span>
+                </div>
+                @if (document.file) {
+                  <p class="size">{{document.file | ovicFileSize}}</p>
+                }
+              </div>
+            </div>
+          }
+          @if (document.type === 'link' && document.link) {
+            <a class="single-file document-link"
+              [href]="document.link" target="_blank" rel="noopener noreferrer">
+              <i class="icon-in-open-download-file fa fa-globe"></i>
+              <div class="info">
+                <div class="document-title-row">
+                  <h4 class="name">{{document.title}}</h4>
+                  <span class="document-group-badge">{{document.document_group}}</span>
+                </div>
+                <p class="size">{{document.link}}</p>
+              </div>
+              <i class="fa fa-external-link document-link-icon"></i>
+            </a>
+          }
+          @if (document.type === 'link' && !document.link) {
+            <div class="single-file document-link-disabled">
+              <i class="icon-in-open-download-file fa fa-book"></i>
+              <div class="info">
+                <div class="document-title-row">
+                  <h4 class="name">{{document.title}}</h4>
+                  <span class="document-group-badge">{{document.document_group}}</span>
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </p-panel>
+</ng-template>
+
+<ng-template #templateEmptyGeneralInformation let-emptyMessage="emptyMessage">
+  <div class="not-ready">{{emptyMessage}}</div>
+</ng-template>
+
+<ng-template #templateGioiThieu let-activity="activity">
+  <p-panel [header]="activity.title" styleClass="panel-plan-activity no-border-top-panel">
+    <div class="ovic-vertical__inputs back-ground-info" style="line-height: 1.5;">
+      <div class="row form-row ">
+        <div class="col-12">
+          <div id="editor" class="document-editor__editable">
+            <div class="ck ck-editor__main" role="presentation">
+              <div style="border:none"
+                class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                [innerHtml]="activity['desc'] | safeHtml">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      @if (activity['files']) {
+        <div class="row form-row form-row-flex-row">
+          <div class="col-12 flex-div">
+            <div class="files-list-view">
+              @for (file of activity['files']; track file; let i = $index) {
+                <div class="single-file" (click)="onSelectFileReview(file)"
+                  >
+                  <i class="icon-in-open-download-file" [ngClass]="file | ovicFileIcon"></i>
+                  <div class="info">
+                    <h4 class="name">{{file.title}}</h4>
+                    <p class="size">{{file['file_size']}}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </p-panel>
+</ng-template>
+
+<ng-template #templateTailieuGiangday let-activity="activity">
+  <p-panel [header]="activity.title" styleClass="panel-plan-activity  no-border-top-panel">
+    <div class="ovic-vertical__inputs back-ground-info" style="line-height: 1.5;">
+      @if (activity['files']) {
+        <div class="row form-row form-row-flex-row">
+          <div class="col-12 flex-div">
+            <div class="files-list-view">
+              @for (file of activity['files']; track file; let i = $index) {
+                <div class="single-file" (click)="onSelectFileReview(file)"
+                  >
+                  <i class="icon-in-open-download-file" [ngClass]="file | ovicFileIcon"></i>
+                  <div class="info">
+                    <h4 class="name">{{file.title}}</h4>
+                    <p class="size">{{file['file_size']}}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+      @if (activity['slides']) {
+        <div class="row form-row form-row-flex-row">
+          <div class="col-12 flex-div">
+            <div class="files-list-view">
+              @for (slide of activity['slides']; track slide; let i = $index) {
+                <div class="single-file" (click)="onSelectFileReview(slide)"
+                  >
+                  <i class="icon-in-open-download-file" [ngClass]="slide | ovicFileIcon"></i>
+                  <div class="info">
+                    <h4 class="name">{{slide.title}}</h4>
+                    <p class="size">{{slide['file_size']}}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (activity['desc']) {
+        <div class="row form-row">
+          <div class="col-12">
+            <div id="editor" class="document-editor__editable">
+              <div class="ck ck-editor__main" role="presentation">
+                <div style="border:none"
+                  class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                  [innerHtml]="activity['desc'] | safeHtml">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+      @if (activity['video'] && activity['video'].length > 0) {
+        <div class="row form-row">
+          <div class="col-12">
+            <audio-viewer [type]="activity['video'][0].type" [path]="activity['video'][0].path"
+              [source]="activity['video'][0].source">
+            </audio-viewer>
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (activity['videos']) {
+      <div class="ovic-vertical__inputs back-ground-info" style="line-height: 1.5;">
+        <div class="d-flex flex-column w-100" style="border-top: 1px solid #ccc;gap:10px;">
+          <div class="my-2" style="font-size: 14px;"><strong>VIDEO BỔ TRỢ:</strong></div>
+          @for (item of activity['videos'] ; track item) {
+            <div class="files-list-view">
+              <div><strong>Video {{item['ordering']}} : </strong> {{item.title}}</div>
+              <div class="single-file" (click)="onSelectFileReview(item['file'])">
+                <i class="icon-in-open-download-file" [ngClass]="item['file'] | ovicFileIcon"></i>
+                <div class="info">
+                  <h4 class="name">{{item['file'].title}}</h4>
+                  <p class="size">{{item['file']['file_size']}}</p>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+  </p-panel>
+</ng-template>
+
+
+<ng-template #templateCdr let-activity="activity">
+  @for (children of activity['children']; track children) {
+    <div class="layout-panel">
+      <p-panel>
+        <ng-template pTemplate="header">
+          <div class="header-panel-cdr">
+            <div><strong>{{children['kyhieu']+'. '+children['title']}}</strong></div>
+            @if (children.params && children.params.cdr && children.params.cdr.cdr_info) {
+              <div
+                class="cdr-content-cdr-info cdr-info-tag">
+                @for (info of children.params.cdr.cdr_info; track info) {
+                  <div>
+                    @if (info['id'] !== 'number_question') {
+                      <span class="value-info {{info['id']}}">
+                        {{info['value']}}
+                      </span>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </ng-template>
+        <div class="add-chuandaura-box chuandaura-layout">
+          <p-panel header="Title" styleClass="form-add-chuandaura" [showHeader]="false">
+            <div class="cdr-content">
+              <div class="cdr-content-cdr-info">
+                <div style="margin-bottom: 1em;"><strong>{{children['desc_title']}}</strong></div>
+                @if (children['desc']) {
+                  <div class="info-desc ql-editor"
+                    [innerHtml]="children['desc'] | safeHtmlDecode">
+                  </div>
+                }
+                @if (children.desc_cpi && children.desc_cpi.length) {
+                  <ul class="custom-dash-list">
+                    @for (item of children.desc_cpi; track item) {
+                      <li class="item-list-value">
+                        <div [innerHTML]="item" class="content-editor-list">
+                        </div>
+                      </li>
+                    }
+                  </ul>
+                }
+              </div>
+            </div>
+          </p-panel>
+        </div>
+      </p-panel>
+    </div>
+  }
+</ng-template>
+
+<ng-template #filesLessonReview let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section" style="height: 100vh;">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">View</h3>
+      <button class="btn ovic-over-right-section__close-button" (click)="d(true)"></button>
+    </div>
+    <div class="ovic-over-right-section__body footer-no-hint no-footer" style="padding: 0px;">
+      <div class="ovic-vertical__inputs" style="height: 100%;">
+        <view-document [file]="selectedFileReview?selectedFileReview:null">
+        </view-document>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<p-dialog styleClass="report-create-plan-dialog" [showHeader]="false" appendTo="body" position="center"
+  [draggable]="false" [resizable]="false" [modal]="true" header="Title" [(visible)]="displaySyncPlan"
+  [style]="{width: '700px'}" [closable]="false">
+  @if (selectedPlan) {
+    <div class="step-sync-plans" style="background-color: #fff;">
+      <div class="step-sync-plans-header" style="display: flex; align-items: center;">
+        <span style="flex: 1;">Thiết lập bài test: {{label_parent_kehoach + ' ' + selectedPlan['week'] }}</span>
+        <span (click)="displaySyncPlan = false" class="action-span"
+          style="margin-right: 0px; height: 20px; width: 20px; padding: 0px; line-height: 20px;text-align: center; cursor: pointer;"><i
+        style="color: red; margin: 0px;" class="fa fa-times"></i></span>
+      </div>
+      <div class="step-sync-plans-body ovic-vertical__inputs">
+        <div class="row form-row form-row-flex-row">
+          <div class="col-12 flex-div">
+            <label style="color: red; font-weight: bold;" for="title">Nhập ngày kích hoạt bài TEST:<span
+            class="ovic-mark" style="color: red;"></span></label>
+            <p-calendar styleClass="date-picker-custom" [(ngModel)]="date_start_plan" appendTo="body"
+              dateFormat="dd/mm/yy" [showTime]="true">
+            </p-calendar>
+          </div>
+        </div>
+        <!-- <p-tabView [(activeIndex)]="activity_date">
+        <p-tabPanel [disabled]="disabled_index_date === 0 ? true: false"
+          header="Nhập ngày kích hoạt cho cả lớp">
+          <div class="row form-row form-row-flex-row">
+            <div class="col-12 flex-div">
+              <label style="color: red; font-weight: bold;" for="title">Nhập ngày kích hoạt bài TEST:<span
+              class="ovic-mark" style="color: red;"></span></label>
+              <p-calendar styleClass="date-picker-custom" [(ngModel)]="date_start_plan" appendTo="body"
+                dateFormat="dd/mm/yy" [showTime]="true">
+              </p-calendar>
+            </div>
+          </div>
+        </p-tabPanel>
+        <p-tabPanel [disabled]="disabled_index_date === 1 ? true: false"
+          header="Nhập ngày kích hoạt cho từng nhóm">
+          <div *ngIf="list_class_group">
+            <div class="row form-row form-row-flex-row" *ngFor="let group of list_class_group">
+              <div class="col-12 flex-div">
+                <label style="color: red; font-weight: bold;" for="title">{{group['name']}}:<span
+                class="ovic-mark" style="color: red;"></span></label>
+                <p-calendar [disabled]="!group['can_edit']" styleClass="date-picker-custom"
+                  [(ngModel)]="group['teaching_day']" appendTo="body" dateFormat="dd/mm/yy"
+                  [showTime]="true">
+                </p-calendar>
+              </div>
+            </div>
+          </div>
+        </p-tabPanel>
+      </p-tabView> -->
+      <div class="row form-row form-row-flex-row" style="margin-top: 10px;">
+        <div class="col-12" style="text-align: right;">
+          <button (click)="startActivityTest()" class="btn btn-primary">Cập nhật</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+</p-dialog>

@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { QuanlyDuyetnoidungHoctapV2Component } from './quanly-duyetnoidung-hoctap-v2.component';
 
@@ -8,7 +8,7 @@ describe('QuanlyDuyetnoidungHoctapV2Component', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ QuanlyDuyetnoidungHoctapV2Component ]
+      imports: [ QuanlyDuyetnoidungHoctapV2Component ]
     })
     .compileComponents();
 
@@ -21,3 +21,4 @@ describe('QuanlyDuyetnoidungHoctapV2Component', () => {
     expect(component).toBeTruthy();
   });
 });
+

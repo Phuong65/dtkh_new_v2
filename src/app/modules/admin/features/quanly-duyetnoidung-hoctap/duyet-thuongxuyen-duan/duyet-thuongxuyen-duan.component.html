@@ -1,1 +1,553 @@
-﻿<div class="p-3">duyet-thuongxuyen-duan.component works!</div>
+<div class="duyet-thuongxuyen-tuluan">
+  <div style="padding: 15px;">
+    <p-table [value]="list_plan_kynang"
+      styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table ovic-ui-table table-reBorder th-td-padding-5px">
+      <ng-template pTemplate="caption">
+        <div class="flex"
+          style="font-weight: 500; justify-content: end; align-items: center; padding: 5px; display: flex; width: 100%;">
+          <div style="flex: 1; margin-right: 10px; display:flex">
+            <button pTooltip="Lọc" (click)="op.toggle($event)" class="btn btn-success btn-icon">
+              <i class="fa fa-filter"></i>
+            </button>
+            <p-overlayPanel #op appendTo="body">
+              <ng-template pTemplate>
+                <ng-container [ngTemplateOutlet]="templateFilterShift">
+                </ng-container>
+              </ng-template>
+            </p-overlayPanel>
+            <!-- <div>
+            <p-checkbox [(ngModel)]="checkBoxChuaDuyet" [binary]="true"
+              (onChange)="checkValue($event,'_chuaduyet')" name="_chuaduyet"
+            label="Lọc chưa duyệt"></p-checkbox>
+          </div>
+          <div *ngIf="kd_uyvien" style="margin-left: 20px;">
+            <p-checkbox [binary]="true" (onChange)="checkValue($event,'_chuanhanxet')"
+            name="_chuanhanxet" label="Lọc câu hỏi bạn chưa nhận xét"></p-checkbox>
+          </div> -->
+        </div>
+        <div class="d-flex justify-content-center align-items-center" style="gap: 10px;">
+          @if (rejectRole) {
+            <div>
+              <button class="btn-lock icon-lock p-button-text p-button-danger p-button-rounded"
+                pTooltip="Khóa" pButton pRipple icon="pi pi-lock"
+              (click)="btnUpdateLockByActivityTuLuan(1)"></button>
+              <button class="btn-lock icon-unlock p-button-text p-button-rounded" pTooltip="Mở khóa"
+                pButton pRipple icon="pi pi-lock-open"
+              (click)="btnUpdateLockByActivityTuLuan(0)"></button>
+            </div>
+          }
+          <button (click)="loadKynangTuluan(planTuluan)" class="btn btn-success"><i
+          class="fa fa-refresh"></i>Làm mới</button>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th rowspan="2" style="text-align: center; width: 150px;">Mã đề</th>
+        <th rowspan="2" style="text-align: center; width: 100px;">Tiêu đề</th>
+        <th rowspan="2" style="text-align: center; width: 120px;">Kết quả cấp khoa</th>
+        <th rowspan="2" style="text-align: center; width: 120px;">Kết quả cấp trường</th>
+        <th [colSpan]="hoidong.length" style="text-align: center;">Nhận xét</th>
+      </tr>
+      <tr>
+        @for (thanhvien of hoidong; track thanhvien; let i = $index) {
+          <th style="text-align: center; width: 100px;">
+            @if (i === 0) {
+              <span>
+                Chủ tịch<br>
+                ({{thanhvien['display_name']}})
+              </span>
+            }
+            @if (i !== 0) {
+              <span>
+                Ủy viên {{i}}<br>
+                ({{thanhvien['display_name']}})
+              </span>
+            }
+          </th>
+        }
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-tuluan>
+      <tr>
+        <td [colSpan]="4 + hoidong.length" style="font-weight: 600; background-color: #cae1fc;">
+          {{tuluan.title}}
+        </td>
+      </tr>
+      @for (question of tuluan['detuluan'] | filter : _chuanhanxet : ['_chuanhanxet'] | filter : _daduyet : ['_daduyet']; track question; let i = $index) {
+        <tr style="cursor: pointer;"
+          [ngClass]="selectedTuluan && selectedTuluan.id === question.id?'question-activity':''"
+          (click)="onSelectDeTuluan(question)">
+          <td style="text-align: center;">
+            <div style="display: flex; align-items: center;">
+              <span style="flex: 1; margin-right: 5px;">#{{question.id}}</span>
+              @if (rejectRole) {
+                <span>
+                  @if (question.status === 1) {
+                    <span container="body" ngbTooltip="Mở khóa, cho phép sửa" placement="top"
+                      (click)="reDoAction($event, question,0)"
+                      style="font-size: 14px;" class="action-icon-redo red"><i
+                    class="pi pi-lock"></i></span>
+                  }
+                  @if (question.status !== 1) {
+                    <span (click)="reDoAction($event,question,1)" ngbTooltip="Khóa, không cho phép sửa"
+                      placement="top" container="body"
+                      style="font-size: 14px;" class="action-icon-redo gray"><i style="font-size: 16px;"
+                    class="pi pi-lock-open"></i></span>
+                  }
+                </span>
+              }
+            </div>
+          </td>
+          <td style="text-align: center;">{{question.title}}</td>
+          <td style="text-align: center;">
+            @if (question['old_status'] === 1 && question['status'] === 0) {
+              <div>
+                <span class="action-icon status-is-active">
+                  Đạt
+                  <hr style="margin: 5px 0px;">
+                  Đang sửa
+                </span>
+              </div>
+            } @else {
+              <div>
+                @switch (question['status']) {
+                  @case (0) {
+                    <span class="action-icon status-is-deactive">
+                      Chờ duyệt
+                    </span>
+                  }
+                  @case (1) {
+                    <span class="action-icon status-is-active">
+                      Đạt
+                    </span>
+                  }
+                  @case (-1) {
+                    <span class="action-icon status-is-redo">
+                      Chưa đạt
+                    </span>
+                  }
+                  @case (-2) {
+                    <span class="action-icon status-is-require">
+                      Đã sửa
+                    </span>
+                  }
+                }
+              </div>
+            }
+            <ng-template #status_>
+              <div>
+                @switch (question['status']) {
+                  @case (0) {
+                    <span class="action-icon status-is-deactive">
+                      Chờ duyệt
+                    </span>
+                  }
+                  @case (1) {
+                    <span class="action-icon status-is-active">
+                      Đạt
+                    </span>
+                  }
+                  @case (-1) {
+                    <span class="action-icon status-is-redo">
+                      Chưa đạt
+                    </span>
+                  }
+                  @case (-2) {
+                    <span class="action-icon status-is-require">
+                      Đã sửa
+                    </span>
+                  }
+                }
+              </div>
+            </ng-template>
+          </td>
+          <td style="text-align: center;">
+            <div>
+              @switch (question['status_captruong']) {
+                @case (0) {
+                  <span class="action-icon status-is-deactive">
+                    Chờ duyệt
+                  </span>
+                }
+                @case (1) {
+                  <span class="action-icon status-is-active">
+                    Đạt
+                  </span>
+                }
+                @case (-1) {
+                  <span class="action-icon status-is-redo">
+                    Chưa đạt
+                  </span>
+                }
+                @case (-2) {
+                  <span class="action-icon status-is-require">
+                    Đã sửa
+                  </span>
+                }
+              }
+            </div>
+          </td>
+          @for (thanhvien of hoidong; track thanhvien; let k = $index) {
+            <td style="text-align: center;">
+              @if (question['hoidong_comment'][thanhvien.user_id]) {
+                <span class="danhanxet">Đã nhận
+                xét</span>
+              }
+              @if (!question['hoidong_comment'][thanhvien.user_id]) {
+                <span class="chuanhanxet">Chưa nhận
+                xét</span>
+              }
+            </td>
+          }
+        </tr>
+      }
+    </ng-template>
+  </p-table>
+</div>
+</div>
+
+<ng-template #templateFilterShift>
+  <div class="layout-filter-shift" style="width: 500px;">
+    <div class="ovic-vertical__inputs" style="line-height: 1.5;">
+      <div class="row form-row form-row-flex-row">
+        <div class="col-12">
+          <ovic-groups-radio-v2 [defaultValue]="100" (onChange)="onSelectStatus($event)" [columns]="3"
+            group_name="list_check_status" [options]="list_check_status" optionId="id" optionLabel="label">
+          </ovic-groups-radio-v2>
+        </div>
+      </div>
+      @if (kd_uyvien) {
+        <div class="row form-row form-row-flex-row">
+          <div class="col-12">
+            <p-checkbox [binary]="true" (onChange)="checkValue($event,'_chuanhanxet')" name="_chuanhanxet"
+            label="Lọc câu hỏi bạn chưa nhận xét"></p-checkbox>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</ng-template>
+
+
+<ng-template #templateFormViewTuluan let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section right-slide-class">
+    <div class="ovic-over-right-section__head" style="display: flex; align-items: center;">
+      <h3 class="ovic-over-right-section__header" style="flex: 1;">{{selectedTuluan.title}}</h3>
+      <div class="action-button-next-back">
+        <button (click)="openNewQuestion('back')" class="btn btn-success btn-angle"><i
+        class="pi pi-angle-double-left"></i>Đề trước</button>
+        <button (click)="openNewQuestion('next')" class="btn btn-success btn-angle">Đề sau<i
+        class="pi pi-angle-double-right" style="margin-left: 5px; margin-right: 0px;"></i></button>
+      </div>
+      <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+      (click)="closeForm()"></button>
+    </div>
+    <div style="line-height: 1.25; padding: 0px; height: calc(100vh - 57px);background: #eaeaea;"
+      class="ovic-over-right-section__body footer-no-hint tuluan-comment-slide duan-view">
+      <app-view-thuongxuyen-tuluan hinhthuc="Dự án" [courseSelected]="selectedCourse" [tuluan]="selectedTuluan"
+      [hideNote]="true"></app-view-thuongxuyen-tuluan>
+      <div class="duyet_tieu_chi_cham">
+        @for (_plan of list_plan_tieu_chi_cham; track _plan) {
+          <div style="margin-top: 40px;"
+            class="question-content-note">
+            <p-divider align="left" type="dashed">
+              <b>{{_plan.title}}</b>
+            </p-divider>
+            @if (_plan['_tieuchicham'] ) {
+              <div>
+                @for (item of _plan['_tieuchicham']; track item; let i = $index) {
+                  <div style="padding: 0 0.6em; font-size: 14px; padding-bottom: 15px;"
+                    >
+                    @if (item.title) {
+                      <div class="header-tieuchicham">
+                        <strong>{{i + 1}}</strong>.
+                        <strong>{{item.title}} ({{item.point}} điểm)</strong>
+                      </div>
+                    }
+                    @if (!item.title) {
+                      <div class="header-tieuchicham">
+                        <strong>{{item.ordering}}</strong>. Chưa có tiêu đề cho tiêu chí
+                      </div>
+                    }
+                    @if (item.desc) {
+                      <div [appLoadMediaOnText]="item.id" style="border:none"
+                        class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                        [innerHTML]="item.desc | safeHtml">
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div style="padding: 15px 0px;">
+        <ng-container [ngTemplateOutlet]="templateDuyet"
+          [ngTemplateOutletContext]="{ activity: selectedTuluan}">
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+
+<ng-template #templateDuyet let-activity="activity">
+  <div class="class-duyet-layout"
+    [ngClass]="(!activity['comments'] || !activity['comments'].length) && !kd_hoidong && !kd_hoidong?'no-border-top':''">
+    <div style="width: 100%; padding: 15px;" class="list-comment-layout">
+      <!-- <label style="font-weight: 600; margin-bottom: 10px;">Ý KIẾN NHẬN XÉT CỦA THÀNH VIÊN HỘI ĐỒNG: </label>
+
+      <div style="padding-bottom: 10px; border-bottom: 1px solid #c8c8c8; margin-bottom: 10px;"
+        *ngIf="activity['status'] === 1 || activity['status'] === -1">
+        <div>
+          <label style="width: 150px;">- Duyệt lúc:</label> {{activity['approved_at'] | ovicDateTime}}
+        </div>
+        <div>
+          <label style="width: 150px;">- Trạng thái duyệt:</label>
+          {{activity['status'] === 1?'Đạt':'Yêu cầu sửa'}}
+        </div>
+      </div> -->
+
+      <div class="ketqua-duyet-hoidong row">
+        <div class="ketqua-duyet-hoidong-left col-6"
+          style="border-right: 1px solid #c8c8c8; margin-bottom: 10px;">
+          <label style="font-weight: 600; margin-bottom: 10px;">
+            KẾT QUẢ DUYỆT CỦA HỘI ĐỒNG KHOA:
+          </label>
+
+          @if (activity['status'] === 1 || activity['status'] === -1) {
+            <div class="ketquaduyet-hoidong row"
+              style="padding-bottom: 10px; ">
+              <div class="ketquaduyet-hoidong-left col-6">
+                <div class="ketquaduyet-hoidong-left-status" style="text-align: center;"
+                  >
+                  @switch (activity['status']) {
+                    @case (1) {
+                      <span class="true-blue status-duyet-hoidong">Đạt</span>
+                    }
+                    @case (-1) {
+                      <span class="red status-duyet-hoidong">Yêu cầu sửa</span>
+                    }
+                  }
+                </div>
+              </div>
+              <div class="ketquaduyet-hoidong-right col-6">
+                <div>Duyệt lúc:</div>
+                <div>{{activity['approved_at'] | ovicDateTime}}</div>
+              </div>
+            </div>
+          } @else {
+            <div class="ketquaduyet-hoidong" style="padding-bottom: 10px; ">
+              <div style="text-align: center;">
+                @switch (activity['status']) {
+                  @case (0) {
+                    <span class="gray status-duyet-hoidong">Chờ duyệt</span>
+                  }
+                  @case (-2) {
+                    <span class="blue status-duyet-hoidong">Đã sửa, chờ duyệt</span>
+                  }
+                }
+              </div>
+            </div>
+          }
+          <ng-template #choduyetTemplate>
+            <div class="ketquaduyet-hoidong" style="padding-bottom: 10px; ">
+              <div style="text-align: center;">
+                @switch (activity['status']) {
+                  @case (0) {
+                    <span class="gray status-duyet-hoidong">Chờ duyệt</span>
+                  }
+                  @case (-2) {
+                    <span class="blue status-duyet-hoidong">Đã sửa, chờ duyệt</span>
+                  }
+                }
+              </div>
+            </div>
+          </ng-template>
+
+        </div>
+        @if (key_server === 'ictu') {
+          <div class="ketqua-duyet-hoidong-right col-6">
+            <label style="font-weight: 600; margin-bottom: 10px;">
+              KẾT QUẢ DUYỆT CỦA HỘI ĐỒNG TRƯỜNG:
+            </label>
+            @if (activity['status_captruong'] === 1 || activity['status_captruong'] === -1) {
+              <div class="ketquaduyet-hoidong row"
+                style="padding-bottom: 10px; ">
+                <div class="ketquaduyet-hoidong-left col-6">
+                  <div class="ketquaduyet-hoidong-left-status" style="text-align: center;"
+                    >
+                    @switch (activity['status_captruong']) {
+                      @case (1) {
+                        <span class="true-blue status-duyet-hoidong">Đạt</span>
+                      }
+                      @case (-1) {
+                        <span class="red status-duyet-hoidong">Yêu cầu sửa</span>
+                      }
+                    }
+                  </div>
+                </div>
+                <div class="ketquaduyet-hoidong-right col-6">
+                  <div>Duyệt lúc:</div>
+                  <div>{{activity['approved_captruong_at'] | ovicDateTime}}</div>
+                </div>
+              </div>
+            } @else {
+              <div class="ketquaduyet-hoidong" style="padding-bottom: 10px; ">
+                <div style="text-align: center;">
+                  @switch (activity['status_captruong']) {
+                    @case (0) {
+                      <span class="gray status-duyet-hoidong">Chờ duyệt</span>
+                    }
+                    @case (-2) {
+                      <span class="blue status-duyet-hoidong">Đã sửa, chờ duyệt</span>
+                    }
+                  }
+                </div>
+              </div>
+            }
+            <ng-template #choduyetCaptruongTemplate>
+              <div class="ketquaduyet-hoidong" style="padding-bottom: 10px; ">
+                <div style="text-align: center;">
+                  @switch (activity['status_captruong']) {
+                    @case (0) {
+                      <span class="gray status-duyet-hoidong">Chờ duyệt</span>
+                    }
+                    @case (-2) {
+                      <span class="blue status-duyet-hoidong">Đã sửa, chờ duyệt</span>
+                    }
+                  }
+                </div>
+              </div>
+            </ng-template>
+          </div>
+        }
+      </div>
+      <div style="border-bottom: 1px solid #c8c8c8; margin-bottom: 10px;"></div>
+      @if ((kd_uyvien || kd_hoidong) && activity['status'] !== 1) {
+        <div [ngClass]="(!activity['comments'] || !activity['comments'].length) ? 'padding-top-15px':''"
+          class="comment-edit-layout">
+          <textarea placeholder="Nhập nội dung nhận xét trước khi duyệt hoặc yêu cầu sửa... "
+          [(ngModel)]="activity['textarea_comment']"></textarea>
+          <div class="action-edit-layout">
+            <button (click)="saveComment(1,activity)" style="line-height: 1; margin-bottom: 10px;"
+              class="btn-primary">Đồng ý duyệt
+            </button>
+            <button (click)="saveComment(-1,activity)" style="line-height: 1;" class="btn-danger">Yêu cầu
+            sửa</button>
+          </div>
+        </div>
+      }
+      @if (kd_hoidong && activity['status'] !== -1 && activity['status'] !== 1 && activity['comments'] && activity['comments'].length) {
+        <div
+          style="padding:15px 0px">
+          <div class="hozion-lay" style="position: relative;">
+            <label
+              style="font-weight: 600; z-index: 1; position: relative; background: whitesmoke; padding-right: 5px;">KẾT
+            LUẬN CỦA CHỦ TỊCH HỘI ĐỒNG: </label>
+          </div>
+          <div style="display: flex; justify-content: space-evenly;">
+            @if (kd_hoidong) {
+              <button style="margin-right: 5px; width: 150px; line-height: 1;" (click)="duyetNoidung(activity, 1)"
+              class="btn btn-primary">Đồng ý duyệt</button>
+            }
+            @if (kd_hoidong) {
+              <button style="margin-left: 5px; width: 150px;line-height: 1;" (click)="duyetNoidung(activity, -1)"
+              class="btn btn-danger">Yêu cầu sửa</button>
+            }
+          </div>
+        </div>
+      }
+      @for (comment of activity['comments']; track comment; let index = $index) {
+        <div class="comment-box">
+          <div class="inner-comment">
+            <div class="inner-comment-header">
+              <div style="flex: 1;">
+                <span
+                  style="font-weight: 600; margin-right: 10px; text-decoration: underline;">{{comment['display_name']
+                +':'}}</span>
+              </div>
+            </div>
+            @if (comment['children'] && comment['children'].length) {
+              <div>
+                @for (children of comment['children']; track children) {
+                  <div style="margin-bottom: 15px; ">
+                    <div [ngClass]="children['status'] === 1?'duyet-comment':'yeucausua-comment'"
+                      class="conten-comment-box">
+                      <div class="conten-comment-inner-box" [innerHTML]="children.comment">
+                      </div>
+                    </div>
+                    <div style="margin-left: 20px; margin-top: 5px;">
+                      <span
+                        style="font-size: 12px; color: #898989; margin-right: 20px; font-style: italic;">{{children.created_at
+                      | ovicDateTime}}</span>
+                      <span style="color: #898989; cursor: pointer;" (click)="openReply(children,index)">Phản
+                      hồi ({{children['count_reply']}})</span>
+                    </div>
+                    @if (children['reply_open'] === true) {
+                      <div class="reply-layout">
+                        <div class="list_reply_comments">
+                          @for (reply_comment of children['reply_comments']; track reply_comment) {
+                            <div style="margin-bottom: 15px;"
+                              >
+                              <div style="text-align: right; margin-bottom: 5px;">
+                                <span>{{reply_comment['display_name']}}</span>
+                              </div>
+                              <div class="conten-comment-box-left"
+                                [ngClass]="reply_comment['my_reply_comment']?'my-reply-comment':''">
+                                <div class="conten-comment-inner-box-left"
+                                  [innerHTML]="reply_comment.comment">
+                                </div>
+                              </div>
+                              <div style="margin-right: 20px; margin-top: 5px; text-align: right;">
+                                <span
+                                  style="font-size: 12px; color: #898989; font-style: italic;">{{reply_comment.created_at
+                                | ovicDateTime}}</span>
+                              </div>
+                            </div>
+                          }
+                        </div>
+                        @if (kd_hoidong || kd_uyvien || (selectedCourse && userId === selectedCourse.creator_plan_id)) {
+                          <div style="display: flex; position: relative;"
+                            >
+                            <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;"><img
+                            style="width: 100%;" src="../../../assets/images/a_none.jpg"></div>
+                            <textarea style="height: 40px; margin-left: 10px; flex: 1; padding-right: 130px;"
+                              placeholder="Nhập phản hồi... "
+                            [(ngModel)]="children['textarea_comment']"></textarea>
+                            <button (click)="saveCommentReply(children , activity, index)"
+                              style="position: absolute; bottom: 5px; right:5px" class="btn btn-primary"><i
+                            class="fa fa-paper-plane" ></i>Gửi
+                          phản hồi</button>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+
+  <!-- <div *ngIf="rejectRole && (activity['status'] === -1 || activity['status'] === 1)"
+  style="padding: 0px 15px 15px 15px">
+  <div class="hozion-lay" style="position: relative;">
+    <label
+      style="font-weight: 600; z-index: 1; position: relative; background: whitesmoke; padding-right: 5px;">KẾT
+    LUẬN CỦA CHỦ TỊCH HỘI ĐỒNG: </label>
+  </div>
+  <div style="display: flex; justify-content: space-evenly;">
+    <button style="margin: 0px 5px; width: 200px; line-height: 1;" (click)="huyTrangThai(activity)"
+      *ngIf="rejectRole" class="btn btn-secondary">
+    {{activity['status'] === -1?'Huỷ trạng thái yêu cầu sửa': 'Huỷ trạng thái đã duyệt'}}</button>
+  </div>
+</div> -->
+</div>
+</ng-template>

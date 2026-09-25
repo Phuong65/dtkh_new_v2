@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ChangeDetectorRef, ElementRef, HostListener, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NotificationService, StateLoadingV2 } from '@core/services/notification.service';
 import { debounceTime, distinctUntilChanged, map, of, Subscription, switchMap, timer } from 'rxjs';
 import { MessageService } from 'primeng/api';
@@ -8,14 +8,10 @@ import { HttpClient } from '@angular/common/http';
 import { AuthService } from '@core/services/auth.service';
 import { APP_CONFIGS } from '@env';
 import katex from 'katex';
-import { Toast } from 'primeng/toast';
-import { AdminRoutingModule } from '@modules/admin/admin-routing.module';
-import { AppSafeHtmlPipe } from './core/pipes/app-safe-html.pipe';
-@Component({standalone: true, 
+@Component({standalone: false,
 	selector: 'app-root',
 	templateUrl: './app.component.html',
-	styleUrls: ['./app.component.css'],
- imports: [Toast, AdminRoutingModule, AppSafeHtmlPipe],
+	styleUrls: ['./app.component.css']
 })
 
 export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -63,37 +59,50 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 		const observerOnLoading = this.notification.onAppLoading.pipe(
 			distinctUntilChanged(),
 			switchMap(isLoading => isLoading ? of(true) : timer(50).pipe(map(() => false)))
-		).subscribe(isLoading => this.isLoading = isLoading);
+		).subscribe(isLoading => {
+			this.ngZone.run(() => {
+				this.isLoading = isLoading;
+				this.cdr.detectChanges();
+			});
+		});
 		this.subscription.add(observerOnLoading);
 
 		const observerOnLoadingV2 = this.notification.onLoadingAnimationV2.pipe(debounceTime(10)).subscribe(state => {
-			if (state.hasOwnProperty('loading')) {
-				this.stateLoadingV2.loading = state.loading;
-			}
-			if (state.hasOwnProperty('icon')) {
-				this.stateLoadingV2.icon = state.icon;
-			}
-			if (state.hasOwnProperty('text')) {
-				this.stateLoadingV2.text = state.text;
-				this.stateLoadingV2['__html_text'] = state.text ? state.text.split('').reduce((html, w) => html + '<span class="app-loading-text-animation__letter">' + w + '</span>', '') : '';
-			}
-			if (state.hasOwnProperty('process') && state.process) {
-				const percent = Math.min(state.process.percent, 100);
-				if (percent === 100) {
-					this.timeOutCloseAnimation = setTimeout(() => this.stateLoadingV2.loading = false, 500);
-				} else {
-					if (this.timeOutCloseAnimation) {
-						clearTimeout(this.timeOutCloseAnimation);
+			this.ngZone.run(() => {
+				if (state.hasOwnProperty('loading')) {
+					this.stateLoadingV2.loading = state.loading;
+				}
+				if (state.hasOwnProperty('icon')) {
+					this.stateLoadingV2.icon = state.icon;
+				}
+				if (state.hasOwnProperty('text')) {
+					this.stateLoadingV2.text = state.text;
+					this.stateLoadingV2['__html_text'] = state.text ? state.text.split('').reduce((html, w) => html + '<span class="app-loading-text-animation__letter">' + w + '</span>', '') : '';
+				}
+				if (state.hasOwnProperty('process') && state.process) {
+					const percent = Math.min(state.process.percent, 100);
+					if (percent === 100) {
+						this.timeOutCloseAnimation = setTimeout(() => {
+							this.ngZone.run(() => {
+								this.stateLoadingV2.loading = false;
+								this.cdr.markForCheck();
+							});
+						}, 500);
+					} else {
+						if (this.timeOutCloseAnimation) {
+							clearTimeout(this.timeOutCloseAnimation);
+						}
+					}
+					this.stateLoadingV2.process = { percent };
+					if (this.progressAnimationPipe) {
+						const percentText = Math.floor(percent).toString(10) + '%';
+						this.progressAnimationPipe.nativeElement.style.width = percentText;
+						this.progressAnimationPipe.nativeElement.innerText = percentText;
+						this.progressAnimationPipe.nativeElement.setAttribute('percent', percentText);
 					}
 				}
-				this.stateLoadingV2.process = { percent };
-				if (this.progressAnimationPipe) {
-					const percentText = Math.floor(percent).toString(10) + '%';
-					this.progressAnimationPipe.nativeElement.style.width = percentText;
-					this.progressAnimationPipe.nativeElement.innerText = percentText;
-					this.progressAnimationPipe.nativeElement.setAttribute('percent', percentText);
-				}
-			}
+				this.cdr.markForCheck();
+			});
 		});
 		this.subscription.add(observerOnLoadingV2);
 

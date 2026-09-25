@@ -1,1 +1,163 @@
-﻿<div class="p-3">chuongtrinh-daotao-manager.component works!</div>
+<div class="layout_component_container">
+  <div class="ctdt-layout-top"
+    style="padding: 5px; border-bottom: 1px solid #c8c8c8; display: flex; justify-content: space-between;">
+    <input type="text" class="ovic-input-field" autocomplete="off" placeholder="Nhập tên rồi nhấn enter"
+      style="width: 300px;" />
+      <div style="display: flex;">
+        <button style="margin-right: 5px;line-height: 1; " class="btn btn-primary">
+          <i class="fa fa-filter"></i>Lọc, Tìm kiếm
+        </button>
+        @if (canAdd) {
+          <button (click)="openAddForm()" class="btn btn-success"
+            style="margin-left: 5px;line-height: 1; ">
+            <i class="fa fa-plus"></i>Thêm mới
+          </button>
+        }
+      </div>
+    </div>
+    <div class="ctdt-layout-bottom">
+      <p-table [value]="list_ctdt"
+        styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-none-header table-reBorder">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 80px;"></th>
+            <th>Tên CTDT</th>
+            <th style="width: 120px; text-align: center;">Thao tác</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            <td style="width: 80px; text-align: center;">
+              {{row['index_']}}
+            </td>
+            <td>
+              <div>
+                <a [routerLink]="['ctdt-thongtin']" [queryParams]="{code: row.id}">
+                  {{row['ten']}}
+                </a>
+              </div>
+            </td>
+            <td style="text-align: center;">
+              <button (click)="deleteCtdt(row)" class="btn btn-danger btn-icon">
+                <i class="fa fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+    <div class="page-layout-set">
+      <p-paginator #paginator (onPageChange)="changePageCtdt($event)" [rows]="limit_ctdt"
+      [totalRecords]="total_ctdt"></p-paginator>
+    </div>
+  </div>
+
+  <ng-template #templateCtdt>
+    <div class="ovic-over-right-section">
+      <div class="ovic-over-right-section__head">
+        <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+        <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
+      </div>
+      <div class="ovic-over-right-section__body" style="height: calc(100vh - 51px - 57px - 18px);">
+        <div class="ovic-vertical__inputs" style="line-height: 1.5;">
+          <form [formGroup]="formCtdt" class="formCtdt" style="line-height: 1;">
+            <div class="row form-row form-row-flex-row">
+              <div class="col-12 flex-div">
+                <label for="ten">Tên CTDT:<span class="ovic-mark">*</span></label>
+                <input type="text" id="ten" class="ovic-input-field" formControlName="ten"
+                  autocomplete="off">
+                </div>
+              </div>
+              <div class="row form-row form-row-flex-row">
+                <div class="col-12 flex-div edit-hight-100 ">
+                  <label for="madt">Mã CTDT:<span class="ovic-mark">*</span></label>
+                  <input type="text" id="madt" class="ovic-input-field" formControlName="madt"
+                    autocomplete="off">
+                  </div>
+                </div>
+                <!-- <div class="row form-row form-row-flex-row">
+                <div class="col-4 flex-div">
+                  <label for="ten">Đơn vị đào tạo:<span class="ovic-mark">*</span></label>
+                  <ovic-dropdown [disabled]="routerDaotao || routerAdmin ? false : true"
+                    (onChange)="onChangeDonviCM($event)" placeholder="---chọn khoa---"
+                    [options]="list_donvi" [defaultValue]="f['category_id'].value" optionId="id"
+                    optionLabel="title" [formField]="f['category_id']" [filter]="true"
+                  filterBy="title"></ovic-dropdown>
+                </div>
+                <div class="col-4 flex-div">
+                  <label for="ten">Ngành đào tạo:<span class="ovic-mark">*</span></label>
+                  <ovic-dropdown placeholder="--- chọn ngành ---"
+                    [options]="list_nganh | filter : f['category_id'].value : ['donvi_chuyenmon_id']"
+                    [defaultValue]="f['nganh_id'].value" optionId="id" optionLabel="title"
+                  [formField]="f['nganh_id']" [filter]="true" filterBy="title"></ovic-dropdown>
+                </div>
+                <div class="col-4 flex-div">
+                  <label for="thoigian_daotao">Hệ đào tạo:<span class="ovic-mark">*</span></label>
+                  <ovic-dropdown placeholder="--- chọn hệ đào tạo ---" [options]="list_hedt"
+                    [defaultValue]="f['he_dt'].value" optionId="kyhieu" optionLabel="title"
+                    [formField]="f['he_dt']" [filter]="true" filterBy="title">
+                  </ovic-dropdown>
+                </div>
+              </div>
+              <div class="row form-row form-row-flex-row">
+                <div class="col-4 flex-div">
+                  <label for="khoa_apdung">Khóa áp dụng:<span class="ovic-mark">*</span></label>
+                  <input (keydown)="pointQuestionKeyDown($event)" type="text" id="khoa_apdung"
+                    class="ovic-input-field" formControlName="khoa_apdung" autocomplete="off">
+                  </div>
+                  <div class="col-4 flex-div">
+                    <label for="thoigian_daotao">Thời gian đào tạo:<span class="ovic-mark">*</span></label>
+                    <input (keydown)="pointQuestionKeyDown($event)" type="text" id="thoigian_daotao"
+                      class="ovic-input-field" formControlName="thoigian_daotao" autocomplete="off">
+                    </div>
+                    <div class="col-4 flex-div" style="line-height: 1.5;">
+                      <label for="thoigian_daotao">Danh hiệu tốt nghiệp:<span class="ovic-mark">*</span></label>
+                      <ovic-groups-radio-v2 group_name="danhhieu_totnghiep" optionLabel="label"
+                        [columns]="danhhieu_totnghiep.length" [options]="danhhieu_totnghiep"
+                        [defaultValue]="f['danhhieu_totnghiep']['value']" [formField]="f['danhhieu_totnghiep']"
+                        optionId="kyhieu">
+                      </ovic-groups-radio-v2>
+                    </div>
+                  </div>
+                  <div class="row form-row form-row-flex-row">
+                    <div class="col-12 flex-div edit-hight-100 ">
+                      <label for="khoa_apdung">Mô tả:<span class="ovic-mark">*</span></label>
+                      <ovic-ckeditor-document [formField]="f['mota']" [default]="f['mota'].value">
+                      </ovic-ckeditor-document>
+                    </div>
+                  </div>
+                  <div class="row form-row form-row-flex-row">
+                    <div class="col-12 flex-div edit-hight-100 ">
+                      <label for="khoa_apdung">Cơ hội học tập sau tốt nghiệp:<span
+                      class="ovic-mark">*</span></label>
+                      <ovic-ckeditor-document [formField]="f['cohoihoctap_sautotnghiep']"
+                        [default]="f['cohoihoctap_sautotnghiep'].value">
+                      </ovic-ckeditor-document>
+                    </div>
+                  </div>
+                  <div class="row form-row form-row-flex-row">
+                    <div class="col-12 flex-div edit-hight-100 ">
+                      <label for="khoa_apdung">Vị trí làm việc sau tốt nghiệp:<span
+                      class="ovic-mark">*</span></label>
+                      <ovic-ckeditor-document [formField]="f['vitri_lamviec_sautotnghiep']"
+                        [default]="f['vitri_lamviec_sautotnghiep'].value">
+                      </ovic-ckeditor-document>
+                    </div>
+                  </div> -->
+                </form>
+              </div>
+            </div>
+
+            <div class="ovic-dynamic-right-section__foot">
+              <p class="ovic-form-notes ovic-over-right-section__foot-ovic-input-line">
+                <i class="pi pi-info-circle"></i>các trường có đánh dấu ( <span class="ovic-mark">*</span> ) là bắt
+                buộc phải nhập
+              </p>
+              <p class="ovic-over-right-section__foot-wrap-buttons">
+                <button class="btn ovic-over-right-section__foot-btn btn-primary" (click)="saveCtdt()">
+                  <i class="fa fa-floppy-o"></i>Lưu lại
+                </button>
+              </p>
+            </div>
+          </div>
+        </ng-template>

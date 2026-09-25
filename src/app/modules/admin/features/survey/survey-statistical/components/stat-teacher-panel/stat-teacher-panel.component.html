@@ -1,1 +1,62 @@
-﻿<div class="p-3">stat-teacher-panel.component works!</div>
+<div class="teacher-panel">
+    <div class="teacher-panel__header">
+        <div class="compare-toggle">
+            <button type="button"
+                    class="compare-toggle__btn"
+                    [class.active]="groupBy === 'teacher'"
+                    (click)="setGroupBy('teacher')">
+                Giảng viên
+            </button>
+            <button type="button"
+                    class="compare-toggle__btn"
+                    [class.active]="groupBy === 'class'"
+                    (click)="setGroupBy('class')">
+                Lớp
+            </button>
+        </div>
+    </div>
+
+    <!-- Chưa chọn đáp án -->
+    <div *ngIf="placeholderShown" class="teacher-panel__placeholder">
+        <i class="pi pi-users" style="font-size: 26px; color:#ccc;"></i>
+        <p>Vui lòng chọn một đáp án<br/>để xem so sánh</p>
+    </div>
+
+    <!-- Bảng giáo viên (theo đáp án đang chọn) -->
+    <ng-container *ngIf="!placeholderShown">
+        <div *ngIf="items.length > 0; else noTeacherData" class="teacher-panel__table-wrap">
+            <table class="teacher-panel__table">
+                <thead>
+                    <tr>
+                        <th>Tên</th>
+                        <ng-container *ngIf="mode === 'count'; else rateHeader">
+                            <th class="text-center">Số lượt</th>
+                            <th class="text-center">Tỷ lệ</th>
+                        </ng-container>
+                        <ng-template #rateHeader>
+                            <th class="text-center">Trung bình</th>
+                        </ng-template>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of items">
+                        <td class="teacher-panel__name" [title]="item.name">{{ item.name }}</td>
+                        <ng-container *ngIf="mode === 'count'; else rateValue">
+                            <td class="text-center">{{ item.count }}</td>
+                            <td class="text-center">{{ item.percentage }}%</td>
+                        </ng-container>
+                        <ng-template #rateValue>
+                            <td class="text-center teacher-panel__average">{{ item.average }} ★</td>
+                        </ng-template>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <ng-template #noTeacherData>
+            <div class="teacher-panel__empty">
+                Không có dữ liệu {{ groupBy === 'teacher' ? 'giảng viên' : 'lớp' }}
+            </div>
+        </ng-template>
+    </ng-container>
+</div>

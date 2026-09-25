@@ -1,1 +1,78 @@
-﻿<div class="p-3">ketqua-duyet-all.component works!</div>
+<div class="layout-ketqua-duyet">
+    <p-table [value]="list_plan_activite" styleClass="tbl-danhSachUser">
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="text-align: center; width: 50px;">{{label_week}}</th>
+                <th style="text-align: center; width: 50px;">CELO</th>
+                <th style="text-align: center; width: 50px;">Mục tiêu</th>
+                <th style="text-align: center; width: 50px;">Tài liệu bài học</th>
+                <th style="text-align: center; width: 50px;">Câu hỏi chuyên đề</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+            <tr>
+                <td style="text-align: center;">{{row['week']}}</td>
+                <td style="text-align: center;">
+                    <span *ngIf="row['total_cdr'] === 0">
+                        -
+                    </span>
+                    <span *ngIf="row['total_cdr'] !== row['duyet_cdr'] && row['total_cdr'] !== 0">
+                        {{row['duyet_cdr']+'/'+row['total_cdr']}}
+                    </span>
+                    <span class="status-is-active"
+                        *ngIf="row['total_cdr'] === row['duyet_cdr'] && row['total_cdr'] !== 0">
+                        <strong>Đạt</strong>
+                    </span>
+                </td>
+                <td style="text-align: center;">
+                    <strong>
+                        <span [ngSwitch]="row['status_muctieu']">
+                            <span *ngSwitchCase="0" class="status-is-deactive">
+                                Chờ duyệt
+                            </span>
+                            <span *ngSwitchCase="1" class="status-is-active">
+                                Đạt
+                            </span>
+                            <span *ngSwitchCase="-1" class="status-is-redo">
+                                Chưa đạt
+                            </span>
+                            <span *ngSwitchCase="-2" class="status-is-require">
+                                Đã sửa
+                            </span>
+                        </span>
+                    </strong>
+                </td>
+                <td style="text-align: center;">
+                    <strong>
+                        <span [ngSwitch]="row['status_tailieu']">
+                            <span *ngSwitchCase="0" class="status-is-deactive">
+                                Chờ duyệt
+                            </span>
+                            <span *ngSwitchCase="1" class="status-is-active">
+                                Đạt
+                            </span>
+                            <span *ngSwitchCase="-1" class="status-is-redo">
+                                Chưa đạt
+                            </span>
+                            <span *ngSwitchCase="-2" class="status-is-require">
+                                Đã sửa
+                            </span>
+                        </span>
+                    </strong>
+                </td>
+                <td style="text-align: center;">
+                    <span *ngIf="row['total_question'] === 0">
+                        -
+                    </span>
+                    <span *ngIf="row['total_question'] !== row['duyet_question'] && row['total_question'] !== 0">
+                        {{row['duyet_question']+'/'+row['total_question']}}
+                    </span>
+                    <span class="status-is-active"
+                        *ngIf="row['total_question'] === row['duyet_question'] && row['total_question'] !== 0">
+                        <strong>Đạt</strong>
+                    </span>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>

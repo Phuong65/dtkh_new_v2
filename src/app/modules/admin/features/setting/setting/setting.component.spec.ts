@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SettingComponent } from './setting.component';
 
@@ -8,7 +8,7 @@ describe('SettingComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SettingComponent ]
+      imports: [ SettingComponent ]
     })
     .compileComponents();
 
@@ -21,3 +21,4 @@ describe('SettingComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+

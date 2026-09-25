@@ -1,1 +1,110 @@
-﻿<div class="p-3">nhanxet-noidung.component works!</div>
+@if (selectedActivity) {
+  <div class="class-duyet-layout"
+    [ngClass]="hideViewAction && !displayComment?'hide-template-comment':''">
+    @if (selectedActivity['comments'] && selectedActivity['comments'].length) {
+      <div style="width: 100%; padding: 15px;"
+        class="list-comment-layout">
+        @if (!hideViewAction) {
+          <div style="text-align: left;">
+            <!-- <label style="font-weight: 600; margin-bottom: 10px;">Ý KIẾN NHẬN XÉT CỦA THÀNH VIÊN HỘI ĐỒNG: </label> -->
+            <div class="view-comment-action" style="text-align: center;">
+              <span (click)="showComment()">{{displayComment?'Ẩn nhận xét':'Hiển thị nhận xét'}}</span>
+            </div>
+          </div>
+        }
+        <!-- <div style="padding-bottom: 10px; border-bottom: 1px solid #c8c8c8; margin-bottom: 10px;"
+        *ngIf="selectedActivity['status'] === 1 || selectedActivity['status'] === -1">
+        <div>
+          <label style="width: 150px;">- Duyệt lúc:</label> {{selectedActivity['approved_at'] | ovicDateTime}}
+        </div>
+        <div style="display: flex; align-items: center;">
+          <div style="flex: 1">
+            <label style="width: 150px;">- Trạng thái duyệt:</label>
+            {{selectedActivity['status'] === 1?'Đạt':'Yêu cầu sửa'}}
+          </div>
+        </div>
+      </div> -->
+      @if (displayComment) {
+        <div >
+          @for (comment of selectedActivity['comments']; track comment; let index = $index) {
+            <div class="comment-box">
+              <div class="inner-comment">
+                <div class="inner-comment-header">
+                  <div style="flex: 1;">
+                    <span style="font-weight: 600; margin-right: 10px; text-decoration: underline;">
+                      {{'Ủy viên'+(index + 1)+':'}}
+                    </span>
+                  </div>
+                </div>
+                @if (comment['children'] && comment['children'].length) {
+                  <div>
+                    @for (children of comment['children']; track children) {
+                      <div style="margin-bottom: 15px; ">
+                        <div [ngClass]="children['status'] === 1?'duyet-comment':'yeucausua-comment'"
+                          class="conten-comment-box">
+                          <div class="conten-comment-inner-box" [innerHTML]="children.comment">
+                          </div>
+                        </div>
+                        <div style="margin-left: 20px; margin-top: 5px;">
+                          <span
+                            style="font-size: 12px; color: #898989; margin-right: 20px; font-style: italic;">{{children.created_at
+                          | ovicDateTime}}</span>
+                          <span style="color: #898989; cursor: pointer;" (click)="openReply(children,index)">Phản
+                          hồi ({{children['count_reply']}})</span>
+                        </div>
+                        @if (children['reply_open'] === true) {
+                          <div class="reply-layout">
+                            <div class="list_reply_comments">
+                              @for (reply_comment of children['reply_comments']; track reply_comment) {
+                                <div style="margin-bottom: 15px;"
+                                  >
+                                  <div style="text-align: right; margin-bottom: 5px;">
+                                    <span>{{reply_comment['display_name']}}</span>
+                                  </div>
+                                  <div class="conten-comment-box-left"
+                                    [ngClass]="reply_comment['my_reply_comment']?'my-reply-comment':''">
+                                    <div class="conten-comment-inner-box-left"
+                                      [innerHTML]="reply_comment.comment">
+                                    </div>
+                                  </div>
+                                  <div style="margin-right: 20px; margin-top: 5px; text-align: right;">
+                                    <span
+                                      style="font-size: 12px; color: #898989; font-style: italic;">{{reply_comment.created_at
+                                    | ovicDateTime}}</span>
+                                  </div>
+                                </div>
+                              }
+                            </div>
+                            @if (selectedCourse && userId === selectedCourse.creator_plan_id) {
+                              <div style="display: flex; position: relative;"
+                                >
+                                <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;"><img
+                                style="width: 100%;" src="../../../assets/images/a_none.jpg"></div>
+                                <textarea style="height: 40px; margin-left: 10px; flex: 1; padding-right: 130px;"
+                                  placeholder="Nhập phản hồi... "
+                                [(ngModel)]="children['textarea_comment']"></textarea>
+                                <button (click)="saveCommentReply(children , selectedActivity, index)"
+                                  style="position: absolute; bottom: 5px; right:5px" class="btn btn-primary"><i
+                                class="fa fa-paper-plane" ></i>Gửi
+                              phản hồi</button>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}
+<!-- <div *ngIf="selectedCourse && userId === selectedCourse['creator_plan_id'] && selectedActivity['status'] === -1"
+style="padding: 0px 15px 15px 15px; text-align: right;">
+<button class="btn btn-primary" (click)="yeucauduyet(selectedActivity)">Đã sửa, yêu cầu duyệt</button>
+</div> -->
+</div>
+}

@@ -1,1 +1,185 @@
-﻿<div class="p-3">ctdt-muctieu-cdr.component works!</div>
+<div class="layout_component_container">
+  <div class="document-type-a4-vertical">
+    <div class="muctieu-chung" style="padding-bottom: 20px;">
+      <p-divider align="left" type="dashed">
+        <div class="inline-flex align-items-center">
+          <b style="font-size: 14px;">Mục tiêu chung</b>
+        </div>
+      </p-divider>
+      @if (selectedCtdt) {
+        <ovic-editor [showSaveButton]="true" height="auto"
+        (saveText)="saveMucTieuChung($event)" [default]="selectedCtdt.muctieu"></ovic-editor>
+      }
+    </div>
+    <div class="muctieu-cuthe" style="padding-bottom: 20px;">
+      <p-divider align="left" type="dashed">
+        <div class="inline-flex align-items-center">
+          <b style="font-size: 14px;">Mục tiêu cụ thể</b>
+        </div>
+      </p-divider>
+      <div class="muctieu-cuthe">
+
+        <p-table [value]="list_ctdt_muctieu_cuthe" styleClass="table-reBorder">
+          <ng-template pTemplate="caption">
+            <div style="text-align: right;" class="table-header">
+              <button (click)="openAddMuctieu()" class="btn btn-success">
+                <i class="fa fa-plus"></i>
+                Thêm mới
+              </button>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 5rem"></th>
+              <th style="width:120px; text-align: center;">Ký hiệu</th>
+              <th style="text-align: center;">Nội dung</th>
+              <th style="text-align: center; width: 120px;">Thao tác</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-muctieu let-rowIndex="rowIndex">
+            <tr style="background-color: antiquewhite;">
+              <td style="text-align: center;">
+                <strong>{{rowIndex + 1}}</strong>
+              </td>
+              <td colspan="3">
+                <strong>{{muctieu.title}}</strong>
+              </td>
+            </tr>
+            @for (child of muctieu['children']; track child; let index = $index) {
+              <tr>
+                <td style="text-align: center;">
+                  {{index + 1}}
+                </td>
+                <td style="text-align: center;">
+                  {{child['kyhieu']}}
+                </td>
+                <td>
+                  <div style="min-height: auto;" class="info-desc ql-editor"
+                  [innerHTML]="child['noidung'] | safeHtmlDecode"></div>
+                </td>
+                <td style="text-align: center;">
+                  <button (click)="editMucTieuchuThe(child)" ngbTooltip="Sửa" placement="top"
+                    container="body" class="btn btn-primary btn-icon">
+                    <i class="fa fa-pencil"></i>
+                  </button>
+                  <button (click)="deleteMuctieu(child)" ngbTooltip="Xóa" placement="top" container="body"
+                    style="margin-left: 5px;" class="btn btn-danger btn-icon">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+    <div class="tuong-thich-ctdt">
+      <p-divider align="left" type="dashed">
+        <div class="inline-flex align-items-center">
+          <b style="font-size: 14px;">Tương thích giữa sứ mạng, tầm nhìn, triết lý giáo dục với mục tiêu của
+          chương trình đào tạo (PEOs)</b>
+        </div>
+      </p-divider>
+      <p-table [value]="list_tuongthich" styleClass="table-reBorder">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 400px; text-align: center;" rowspan="2">
+              Sứ mạng, tầm nhìn, triết lý của cơ sở đào tạo
+            </th>
+            <th style="text-align: center;" [attr.colspan]="list_muctieu_cuthe?.length || 1">
+              Mục tiêu của CTĐT (PEO)
+            </th>
+          </tr>
+          <tr>
+            @for (_muctieu of list_muctieu_cuthe; track _muctieu) {
+              <th style="max-width: 50px; text-align: center;">
+                {{_muctieu.ordering}}
+              </th>
+            }
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-tuongthich>
+          <tr>
+            <td>
+              <div>
+                <strong>{{tuongthich['title']}}:</strong> {{tuongthich['noidung']}}
+              </div>
+            </td>
+            @for (_muctieu of list_muctieu_cuthe; track _muctieu) {
+              <td style="width: 50px; text-align: center;">
+                @if (checkTuongthich(tuongthich.key,_muctieu)) {
+                  <span>
+                    X
+                  </span>
+                }
+              </td>
+            }
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<ng-template #templateCtdtMuctieu>
+  <div class="ovic-over-right-section">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+      <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
+    </div>
+    <div class="ovic-over-right-section__body" style="height: calc(100vh - 51px - 57px - 18px);">
+      <div class="ovic-vertical__inputs" style="line-height: 1.5;">
+        <form [formGroup]="formMuctieuCuthe" class="formCtdt" style="line-height: 1;">
+          <div class="row form-row form-row-flex-row">
+            <div class="col-6 flex-div">
+              <label for="kyhieu">Ký hiệu:<span class="ovic-mark">*</span></label>
+              <div class="p-inputgroup">
+                <span style="padding: 0px; border-radius: 0px; font-size: 14px;"
+                  class="p-inputgroup-addon">
+                  {{kyhieuMutieuCuthe}}
+                </span>
+                <input (keydown)="pointQuestionKeyDown($event)" type="text" id="ten"
+                  class="ovic-input-field" formControlName="ordering" autocomplete="off">
+                </div>
+
+              </div>
+              <div class="col-6 flex-div">
+                <label for="ten">Khung trình độ:<span class="ovic-mark">*</span></label>
+                <ovic-dropdown placeholder="--------" [options]="type_ctdt_muctieu_cuthe"
+                  [defaultValue]="f['type'].value" optionId="key" optionLabel="title"
+                  [formField]="f['type']" filterBy="title">
+                </ovic-dropdown>
+              </div>
+            </div>
+            <div class="row form-row form-row-flex-row">
+              <div class="col-12 flex-div">
+                <label for="ten">Tương thích:<span class="ovic-mark">*</span></label>
+                <p-multiSelect optionValue="key" optionLabel="title" [options]="list_tuongthich"
+                  formControlName="tuongthich">
+                </p-multiSelect>
+              </div>
+            </div>
+            <div class="row form-row form-row-flex-row">
+              <div class="col-12 flex-div">
+                <label for="ten">Nội dung:<span class="ovic-mark">*</span></label>
+                <ovic-editor height="auto" [formField]="f['noidung']"
+                [default]="f['noidung']['value']"></ovic-editor>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="ovic-dynamic-right-section__foot">
+        <p class="ovic-form-notes ovic-over-right-section__foot-ovic-input-line">
+          <i class="pi pi-info-circle"></i>các trường có đánh dấu ( <span class="ovic-mark">*</span> ) là bắt
+          buộc phải nhập
+        </p>
+        <p class="ovic-over-right-section__foot-wrap-buttons">
+          <button (click)="saveMucTieuCuthe()" class="btn ovic-over-right-section__foot-btn btn-primary">
+            <i class="fa fa-floppy-o"></i>Lưu lại
+          </button>
+        </p>
+      </div>
+    </div>
+  </ng-template>

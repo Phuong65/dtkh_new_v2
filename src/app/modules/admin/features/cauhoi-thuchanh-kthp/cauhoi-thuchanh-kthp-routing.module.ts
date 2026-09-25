@@ -10,7 +10,8 @@ const routes: Routes = [
         children: [
             {
                 path: '',
-                loadComponent: () => import('@modules/admin/features/cauhoi-thuchanh-kthp/cauhoi-thuchanh-kthp-manager/cauhoi-thuchanh-kthp-manager.component').then(c => c.CauhoiThuchanhKthpManagerComponent),
+                pathMatch: 'full',
+                loadComponent: () => import('@modules/admin/features/cauhoi-thuchanh/cauhoi-ketthuc-hocphan/cauhoi-ketthuc-hocphan.component').then(c => c.CauhoiKetthucHocphanComponent),
             },
             {
                 path: 'form-th-kthp',

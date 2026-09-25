@@ -1,1 +1,325 @@
-﻿<div class="p-3">cauhoi-tracnghiem-manager.component works!</div>
+<div class="layout_component_container" [ngClass]="closeLeft?'close-left-body':''">
+  <div class="layout_component_container-course" style="position: relative;">
+    <button style="margin-left: 5px; padding: 0px; min-width: 0px; z-index: 50;" (click)="closeLeftBody()"
+      class="btn btn-success button-close-left-body">
+      <i style="margin: 0px;vertical-align: middle; font-size: 13px;"
+      [ngClass]="closeLeft?'pi pi-angle-double-right':'pi pi-angle-double-left'"></i>
+    </button>
+    <div class="search-layout">
+      <div class="search-layout-top" style="display: flex; align-items: center;">
+        <input (keyup.enter)="onSearchByTitle()" [(ngModel)]="searchCourse" type="text" class="ovic-input-field"
+          placeholder="Nhập tên rồi nhấn enter" type="text" style="width: 100%;">
+        </div>
+        @if (routerAdmin || routerDaotao || routerKhaothi) {
+          <div style="margin-top: 5px;">
+            <ovic-dropdown (onChange)="onChangeFilterChuyenmon($event)" placeholder="--- chọn khoa ---"
+              [options]="list_donvi_chuyenmon" optionId="id" optionLabel="title" [filter]="true"
+              [defaultValue]="categoryFilter" filterBy="title">
+            </ovic-dropdown>
+          </div>
+        }
+      </div>
+      <div class="list-course-layout">
+        <mat-selection-list (selectionChange)="onSelectCourse($event)" [multiple]="false" [hideSingleSelectionIndicator]="true" class="selection-list-mat"
+          #courses>
+          @for (course of dmKhoahoc ; track course) {
+            <mat-list-option [selected]="courseSelected && courseSelected.id === course.id ? true: false"
+              [value]="course">
+              <div mat-line style="font-weight: 600;">{{course.title + ' (' + course.maso + ')'}}</div>
+              <div mat-line>{{course['creator_name'] + course['info_']}}</div>
+              <!-- <div mat-line *ngIf="course['status_question']">
+              <span [innerHTML]="course['status_question']"></span>
+            </div> -->
+          </mat-list-option>
+        }
+      </mat-selection-list>
+    </div>
+    <div class="page-layout-set">
+      <p-paginator #paginator (onPageChange)="changePage($event)" [rows]="limitCourse"
+      [totalRecords]="totalCourse"></p-paginator>
+    </div>
+  </div>
+  <div class="layout_component_container-noidung mat-tab-chuandaura">
+    @if (courseSelected) {
+      <div class="table-container">
+        <div class="table-header-title">
+          <span style="flex:1">Danh sách câu hỏi theo CDR</span>
+          @if (show_button_create_week_100) {
+            <button (click)="addQuestionLastExam()" style="line-height: 1;"
+              ngbTooltip="Tạo ngân hàng bổ sung câu hỏi TKHP" container="body" placement="left"
+              class="btn btn-success">
+              <i class="fa fa-plus"></i>
+              KTHP
+            </button>
+          }
+        </div>
+        <div class="table-responsive border-0">
+          <table class="table table-bordered mb-0">
+            <thead>
+              <tr>
+                <th class="bg-soft-blue text-dark main-col gray-200 ">Bài học / CDR / Mức độ</th>
+                <th class="text-center bg-soft-blue gray-200 ">Public</th>
+                <th class="text-center bg-soft-orange col-private-main gray-200 ">Private</th>
+                <th class="text-center bg-soft-green gray-200 ">Đã duyệt</th>
+                <th class="text-center bg-soft-red gray-200 ">Chưa duyệt</th>
+                <th class="text-center bg-soft-gray gray-200 ">Tổng số</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (plan of list_plan; track plan) {
+                <tr class="lesson-row">
+                  <td class="font-weight-bold" style="font-size: 13px;">
+                    <div style="display: flex; align-items: center;">
+                      <div style="flex: 1; margin-right:5px; display: flex; align-items: center;">
+                        <button style="margin-right: 5px;" class="btn-toggle"
+                          (click)="toggleLesson(plan)">
+                          <i class="fas"
+                          [ngClass]="plan['isExpanded'] ? 'fa-minus-square' : 'fa-plus-square'"></i>
+                        </button>
+                        @if (plan.week === 100) {
+                          <span>
+                            Câu hỏi thi kết thúc học phần
+                          </span>
+                        }
+                        @if (plan.week !== 100) {
+                          <span>
+                            {{ label_week+" "+plan.week }}
+                          </span>
+                        }
+                      </div>
+                      @if (plan.week === 100 && plan.children && plan.children[0] && canAdd) {
+                        <button style="line-height: 0;font-size: 13px;"
+                          (click)="addQuestionLastExam(plan)"
+                          ngbTooltip="Bổ sung số lượng câu hỏi KTHP" placement="top" container="body"
+                          class="btn btn-icon btn-transparent btn-success">
+                          <i class="fa fa-plus"></i>
+                        </button>
+                      }
+                      @if (plan.week === 100 && plan.children && plan.children[0] && canAdd) {
+                        <button style="margin-left: 5px; line-height: 0;font-size: 13px;"
+                          (click)="resetToMinCdrCauhoi(plan)"
+                          ngbTooltip="Hủy số lượng câu hỏi chưa nhập" placement="top" container="body"
+                          class="btn btn-danger btn-icon btn-transparent">
+                          <i class="fa fa-repeat"></i>
+                        </button>
+                      }
+                      <button (click)="moveToAddQuestion(plan)"
+                        style="margin-left: 5px; line-height: 0;font-size: 13px;"
+                        ngbTooltip="Thêm câu hỏi" placement="top" container="body"
+                        class="btn btn-icon btn-transparent btn-success">
+                        <i class="fa fa-external-link"></i>
+                      </button>
+                      @if (canDelete) {
+                        <button (click)="openDeleteQuestionsByLesson($event, plan)"
+                          style="margin-left: 5px; line-height: 0;font-size: 13px;"
+                          ngbTooltip="Xóa câu hỏi chưa duyệt của bài" placement="top" container="body"
+                          class="btn btn-icon btn-transparent btn-danger">
+                          <i class="fa fa-trash"></i>
+                        </button>
+                      }
+                    </div>
+                  </td>
+                  <td class="text-center bg-soft-blue">
+                    {{getTotalQuestionPlanByKey(plan,'public')?getTotalQuestionPlanByKey(plan,'public'):'-'}}
+                  </td>
+                  <td class="text-center bg-soft-orange col-private-lesson">
+                    {{getTotalQuestionPlanByKey(plan,'private')?getTotalQuestionPlanByKey(plan,'private'):'-'}}
+                  </td>
+                  <td class="text-center bg-soft-green">
+                    {{getTotalQuestionPlanByKey(plan,'approved')?getTotalQuestionPlanByKey(plan,'approved'):'-'}}
+                  </td>
+                  <td class="text-center bg-soft-red">
+                    {{getTotalQuestionPlanByKey(plan,'pending')?getTotalQuestionPlanByKey(plan,'pending'):'-'}}
+                  </td>
+                  <td class="text-center" style="color:#333">
+                    @if (getTotalPlanQuestionLimit(plan) !== 0) {
+                      <span>
+                        {{getTotalQuestionPlan(plan)?getTotalQuestionPlan(plan):'-'}}
+                        {{!unLimitQuestion?'/'+getTotalPlanQuestionLimit(plan):''}}
+                      </span>
+                    }
+                    @if (getTotalPlanQuestionLimit(plan) === 0) {
+                      <span>
+                        -
+                      </span>
+                    }
+                  </td>
+                </tr>
+                @if (plan['isExpanded']) {
+                  @for (child of plan['children']; track child) {
+                    <tr class="group-row">
+                      <td class="pl-4 font-italic true-blue">
+                        <div class="question-scope-row">
+                          @if (plan.week === 100) {
+                            <span>
+                              {{child.kyhieu}}
+                            </span>
+                          }
+                          @if (plan.week !== 100) {
+                            <span>
+                              {{child['kyhieu']+' - '+child['cdr_name']}}
+                            </span>
+                          }
+                          @if (canDelete) {
+                            <button
+                              (click)="openDeleteQuestionsByCdr($event, child)"
+                              ngbTooltip="Xóa câu hỏi chưa duyệt của CDR" placement="top"
+                              container="body"
+                              class="btn btn-icon btn-transparent btn-danger question-scope-delete">
+                              <i class="fa fa-trash"></i>
+                            </button>
+                          }
+                        </div>
+                      </td>
+                      <td class="text-center bg-soft-blue">
+                        {{getTotalQuestionByKey(child,'public')?getTotalQuestionByKey(child,'public'):'-'}}
+                      </td>
+                      <td class="text-center bg-soft-orange col-private-group">
+                        {{getTotalQuestionByKey(child,'private')?getTotalQuestionByKey(child,'private'):'-'}}
+                      </td>
+                      <td class="text-center bg-soft-green">
+                        {{getTotalQuestionByKey(child,'approved')?getTotalQuestionByKey(child,'approved'):'-'}}
+                      </td>
+                      <td class="text-center bg-soft-red">
+                        {{getTotalQuestionByKey(child,'pending')?getTotalQuestionByKey(child,'pending'):'-'}}
+                      </td>
+                      <td class="text-center ">
+                        @if (getTotalCdrQuestionLimit(child) !== 0) {
+                          <span>
+                            {{child['question_inserted_total']?child['question_inserted_total']:'-'}}
+                            {{!unLimitQuestion?'/'+getTotalCdrQuestionLimit(child):''}}
+                          </span>
+                        }
+                        @if (getTotalCdrQuestionLimit(child) === 0) {
+                          <span>
+                            -
+                          </span>
+                        }
+                      </td>
+                    </tr>
+                    @for (cdr_item of chuan_dau_ra; track cdr_item) {
+                      @if (child['cdr_cauhoi'] && child['cdr_cauhoi'][cdr_item.id]) {
+                        <tr
+                          class="level-row">
+                          <td class="pl-5 level-label">{{ cdr_item.label }}</td>
+                          <td class="text-center bg-soft-blue">
+                            {{child['question_inserted']['public'][cdr_item.id]?child['question_inserted']['public'][cdr_item.id]:
+                            '-'}}
+                          </td>
+                          <td class="text-center bg-soft-orange col-private-level">
+                            {{child['question_inserted']['private'][cdr_item.id]?child['question_inserted']['private'][cdr_item.id]:
+                            '-'}}
+                          </td>
+                          <td class="text-center bg-soft-green text-success">
+                            {{child['question_inserted']['approved'][cdr_item.id]?child['question_inserted']['approved'][cdr_item.id]:
+                            '-'}}
+                          </td>
+                          <td class="text-center bg-soft-red text-danger">
+                            {{child['question_inserted']['pending'][cdr_item.id]?child['question_inserted']['pending'][cdr_item.id]:
+                            '-'}}
+                          </td>
+                          <td class="text-center ">
+                            <span>
+                              {{getTotalQuestionInsetedCdr(child,cdr_item.id)?getTotalQuestionInsetedCdr(child,cdr_item.id):'-'}}
+                              {{!unLimitQuestion?'/'+child['cdr_cauhoi'][cdr_item.id.toString()]:''}}
+                            </span>
+                          </td>
+                        </tr>
+                      }
+                    }
+                  }
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    } @else {
+      <div class="layout_component_container__error d-flex justify-content-center align-items-center w-100 h-100">
+        <p class="alert alert-secondary m-0 primary-font --fs-14">Vui lòng chọn môn học</p>
+      </div>
+    }
+  </div>
+</div>
+
+<ng-template #autoCdrQuestion let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">Bổ sung số lượng câu hỏi thi KTHP:</h3>
+      <button class="btn ovic-over-right-section__close-button" (click)="closeForm(d)"></button>
+    </div>
+    <div class="ovic-over-right-section__body users-layout-form"
+      style="height: auto; font-size: 13px; line-height: 1.25;">
+      <div class="ovic-vertical__inputs form-auto-cdr table-reBorder">
+        <div class="form-row"
+          style="padding: 10px; background-color: #faedc4; border-radius: 6px; margin-bottom: 10px;">
+          <div style="line-height: 1.5; color: red;">
+            <p>
+              - Thầy/Cô nhập số câu hỏi muốn thêm hoặc bổ sung.
+              <br>
+                - Số câu hỏi mức <strong>{{courseSelected.params.cdr | showlabel : chuan_dau_ra : "id" :
+              "label"}}</strong> > 50%
+              <br>
+                - Số câu hỏi mức <span [innerHTML]="returnOrtherLvlCdr('less')"></span>
+                < 40% <br>
+                - Số câu hỏi mức <span [innerHTML]="returnOrtherLvlCdr('greater')"></span>
+                < 10% <br>
+                - Thao tác này không thể hoàn tác số câu hỏi trước đó.
+              </p>
+            </div>
+          </div>
+          <div class="form-row">
+            <table class="table-add-cdr-last-exam">
+              <tr>
+                @for (cdr of chuan_dau_ra; track cdr) {
+                  <th style="text-align: center;"
+                    [ngClass]="cdr.disabled? 'disabled-label-table':'activity-label-table'"
+                    >
+                    {{cdr.label}}
+                  </th>
+                }
+                <th style="text-align: center; width: 100px;">
+                  Tổng
+                </th>
+              </tr>
+              <tr>
+                @for (cdr of chuan_dau_ra; track cdr) {
+                  <td>
+                    @if (!cdr.disabled) {
+                      <div [ngClass]="cdr_cauhoi_kthp_require[cdr.id]?'require-cdr-backgroud-color':''"
+                        class="p-inputgroup">
+                        <input (keyup)="changeCdrCauhoi()" #inputNumberQuestion
+                          class="ovic-input-field no-border-left-right"
+                          (keydown)="pointQuestionKeyDown($event,inputNumberQuestion)"
+                          style="text-align: center; flex:1; width: 100%; min-width: 50px;" type="number"
+                          [(ngModel)]="cdr_cauhoi_kthp[cdr.id]">
+                          <span style="min-width: 60px;" class="p-inputgroup-addon tag-cdr-cauhoi-percent">
+                            = {{returnPercentOnCdrItem(cdr_cauhoi_kthp[cdr.id])}} %
+                          </span>
+                        </div>
+                      }
+                    </td>
+                  }
+                  <td style="text-align: center;">
+                    {{returnTotalCdrLastExam()}} ({{returnPercent()}}%)
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <div class="row form-row form-row-flex-row">
+              <div class="col-12 flex-div ghi-de-dulieu">
+                <p-checkbox [(ngModel)]="checkboxCdrCauhoi" [binary]="true"
+                  label="Tôi chắc chắn với phân bổ số lượng câu hỏi như trên">
+                </p-checkbox>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ovic-over-right-section__foot-wrap-buttons flex-footer-right">
+          <button style="line-height: 1;" [disabled]="!checkboxCdrCauhoi" (click)="addBS20(d)" type="button"
+            class="btn btn-primary">
+            Lưu lại
+          </button>
+        </div>
+      </div>
+    </ng-template>

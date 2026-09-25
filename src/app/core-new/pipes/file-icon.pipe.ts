@@ -23,7 +23,7 @@ export function getFileIcon(file: File | string | { ext?: string }): FileIconTyp
     if (typeof File !== 'undefined' && file instanceof File) {
         return getFileTypeFromExtension(file.name.split('.').pop());
     }
-    const ext: string | undefined = typeof file === 'string' ? file : ('ext' in file ? file.ext : undefined);
+    const ext: string = typeof file === 'string' ? file : file.ext;
     return getFileTypeFromExtension(ext);
 }
 

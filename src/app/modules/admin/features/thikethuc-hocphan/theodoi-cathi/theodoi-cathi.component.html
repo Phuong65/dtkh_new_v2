@@ -1,1 +1,193 @@
-﻿<div class="p-3">theodoi-cathi.component works!</div>
+<div class="layout_component_container">
+    <div class="layout_component_container-header">
+        <div class="layout_component_container-header-filter" style="flex: 1;">
+            <input (keyup)="keyupForFilterByName($event['target']['value'])"
+                (keyup.enter)="startFilter($event['target']['value'],'name')"
+                placeholder="Nhập rồi nhấn enter để tìm kiếm" style="width: 250px;" type="text">
+        </div>
+        <div class="layout_component_container-header-action">
+            <p-overlayPanel #op appendTo="body">
+                <ng-template pTemplate>
+                    <ng-container [ngTemplateOutlet]="templateFilterShift">
+                    </ng-container>
+                </ng-template>
+            </p-overlayPanel>
+            <button (click)="op.toggle($event)" style="line-height: 1; margin-left: 5px;" class="btn btn-primary">
+                <i class="fa fa-filter"></i>Tìm kiếm
+            </button>
+        </div>
+    </div>
+    <div class="layout_component_container-bottom">
+        <div class="layout_component_container-bottom-table">
+            <p-table dataKey="id" [(selection)]="selectedShift" selectionMode="single" [value]="list_shifts"
+                styleClass="table-scroll-able table-able-dropdown-p-table table-none-header table-reBorder">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 3rem; text-align: center;">TT</th>
+                        <th style="width: 500px; min-width: 300px;">Tên ca thi</th>
+                        <th style="width: 120px; text-align: center;">Trạng thái</th>
+                        <th style="width: 130px; text-align: center;">Thời gian bắt đầu</th>
+                        <th style="width: 100px; text-align: center;">SL đề / Số SV</th>
+                        <!-- <th style="width: 120px; text-align: center;">Thời lượng (phút)</th> -->
+                        <!-- <th style="width: 100px; text-align: center;">Số lượng đề</th> -->
+                        <!-- <th style="width: 100px; text-align: center;">Số SV</th> -->
+                        <!-- <th style="width: 100px; text-align: center;">Loại</th> -->
+
+                        <th style="width: 300px;">Môn học</th>
+                        <th style="width:120px; text-align: center;">Hình thức thi</th>
+                        <th style="width: 250px;">Người tạo</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-shift>
+                    <tr [pSelectableRow]="shift">
+                        <td style="text-align: center;">{{shift['index_']}}</td>
+                        <td>
+                            <div class="shift-name">
+                                <div style="flex: 1; display: flex; flex-direction: column;">
+                                    <span style="font-weight: 600; margin-bottom: 5px;">{{shift.name}}</span>
+                                    <div *ngIf="shift['type_of_test'] === 'TRACNGHIEM'" class="row"
+                                        style="font-style: italic;">
+                                        <span class="col-4">- Thời lượng: {{shift['time_of_test']}} phút</span>
+                                    </div>
+                                </div>
+                                <button [matMenuTriggerFor]="menuActionShift" style="margin-left: 10px;"
+                                    class="btn btn-primary btn-icon btn-transparent">
+                                    <i class="fa fa-ellipsis-v"></i>
+                                </button>
+                                <mat-menu #menuActionShift="matMenu">
+                                    <a *ngIf="(shift.status === 1 || shift.status === 2) && shift.type_of_test === 'TRACNGHIEM'"
+                                        target="_blank" style="text-decoration: none; color: #333;" mat-menu-item
+                                        [routerLink]="['phongthi']" [queryParams]="{code:shift.id}">
+                                        <span style="margin-right: 10px;">
+                                            <i class="fa fa-list-ul" ></i>
+                                        </span>
+                                        <span>Danh sách phòng thi</span>
+                                    </a>
+                                    <a *ngIf="(shift.status === 1 || shift.status === 2) && shift.type_of_test === 'DUAN'"
+                                        target="_blank" style="text-decoration: none; color: #333;" mat-menu-item
+                                        [routerLink]="['phongthi-duan']" [queryParams]="{code:shift.id}">
+                                        <span style="margin-right: 10px;">
+                                            <i class="fa fa-list-ul" ></i>
+                                        </span>
+                                        <span>Danh sách phòng thi</span>
+                                    </a>
+                                    <button *ngIf="shift.status === 0" mat-menu-item [disabled]="true">
+                                        <i style="margin-right: 10px;" class="fa fa-list-ul" ></i>
+                                        <span>Ca thi chưa được kích hoạt</span>
+                                    </button>
+                                    <!-- <button *ngIf="shift.status === 1" (click)="changeStatusCathi(shift, 2)"
+                                        mat-menu-item>
+                                        <i class="fa fa-circle margin-right-10px width-16px"></i>
+                                        <span>Đã hoàn thành</span>
+                                    </button> -->
+                                </mat-menu>
+                            </div>
+                        </td>
+                        <td style="text-align: center;">
+                            <span class="status-shift status-deactive" *ngIf="shift.status === 0">Chưa kích hoạt</span>
+                            <span class="status-shift status-activite" *ngIf="shift.status === 1">Đã kích hoạt</span>
+                            <span class="status-shift status-done" *ngIf="shift.status === 2">Đã hoàn thành</span>
+                        </td>
+                        <td style="text-align: center;">{{shift['time_start'] | date : 'dd/MM/yyyy HH:mm ' :'UTC+7'}}
+                        </td>
+                        <td style="text-align: center;">{{shift['count_test']}} / {{shift['count_student']}} </td>
+                        <td>
+                            {{shift['course_id'] | showlabel:list_course:'id':'label_name'}}
+                        </td>
+                        <td style="text-align: center;">
+                            {{shift['type_of_test'] | showlabel:type_test:'key':'label'}}
+                        </td>
+                        <td>
+                            <div *ngIf="shift['user_created']"
+                                style="display:flex; flex-direction: column; line-height: 1.25;">
+                                <span style="font-weight: 600;">{{shift['user_created'].display_name}}</span>
+                                <span style="font-style: italic;">{{shift['user_created'].email}}</span>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+        <div class="page-layout-set">
+            <p-paginator #paginator_shift (onPageChange)="changePage_shift($event)" [rows]="limit_shifts"
+                [totalRecords]="total_shifts"></p-paginator>
+        </div>
+    </div>
+</div>
+
+<ng-template #templateFilterShift>
+    <div class="layout-filter-shift" style="width: 500px;">
+        <div class="ovic-vertical__inputs" style="line-height: 1.5;">
+            <div class="row form-row form-row-flex-row">
+                <div class="col-12">
+                    <p-checkbox (onChange)="initLoad()" *ngIf="hdthi_thuky || hdthi_qlct" [(ngModel)]="shiftcoithi_show"
+                        [binary]="true" label="Hiển thị theo ca thi thầy/cô được phân công coi thi"></p-checkbox>
+                </div>
+            </div>
+            <div class="row form-row form-row-flex-row">
+                <div class="col-12">
+                    <label>Môn học:</label>
+                    <ovic-dropdown [defaultValue]="objectFillter['course_id']"
+                        (onChangeGetValue)="startFilter($event,'course_id')" placeholder="- - - - -"
+                        scrollHeight="400px" styleClass="shift-dropdown-filter width-250px" [options]="list_course"
+                        optionLabel="label_name" optionId="id" [filter]="true" filterBy="label_name">
+                    </ovic-dropdown>
+                </div>
+
+            </div>
+            <div class="row form-row form-row-flex-row">
+                <div class="col-4">
+                    <label>Năm học:</label>
+                    <ovic-dropdown [defaultValue]="objectFillter['namhoc']"
+                        (onChangeGetValue)="startFilter($event,'namhoc')" placeholder="- - - - -"
+                        [options]="list_namhoc" optionLabel="label" optionId="value">
+                    </ovic-dropdown>
+                </div>
+                <div class="col-4">
+                    <label>Học kỳ:</label>
+                    <ovic-dropdown [defaultValue]="objectFillter['hocky']"
+                        (onChangeGetValue)="startFilter($event,'hocky')" placeholder="- - - - -" [options]="list_hocky"
+                        optionLabel="label" optionId="value">
+                    </ovic-dropdown>
+                </div>
+                <div class="col-4">
+                    <label>Đợt thi:</label>
+                    <ovic-dropdown [defaultValue]="objectFillter['dotthi']"
+                        (onChangeGetValue)="startFilter($event,'dotthi')" placeholder="- - - - -"
+                        [options]="list_dotthi" optionLabel="label" optionId="value">
+                    </ovic-dropdown>
+                </div>
+            </div>
+            <div class="row form-row form-row-flex-row">
+                <div class="col-12">
+                    <label>Trạng thái:</label>
+                    <ovic-groups-radio-v2 [defaultValue]="objectFillter['status']"
+                        (onChange)="startFilter( $event, 'status' )" [unSelect]="false" [columns]="3"
+                        group_name="option_status_filter" [options]="option_status_filter" optionId="id"
+                        optionLabel="label">
+                    </ovic-groups-radio-v2>
+                </div>
+            </div>
+            <div class="row form-row form-row-flex-row">
+                <div class="col-12" style="text-align: right;">
+                    <button style="line-height: 1;" (click)="cancelFilter()" class="btn btn-secondary"><i
+                            class="fa fa-refresh"></i>Hủy tìm kiếm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #templateRoom>
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">{{selectedShift ? selectedShift.name : ''}} - Danh sách phòng
+                thi
+            </h3>
+            <button class="btn ovic-over-right-section__close-button" (click)="closeSideMenu()"></button>
+        </div>
+        <div class="ovic-over-right-section__body" style="height:calc(100vh - 57px); padding: 0px;">
+            <!-- <app-phongthi [thishift]="selectedShift"></app-phongthi> -->
+        </div>
+    </div>
+</ng-template>
