@@ -1,16 +1,1 @@
-<div class="survey-plan-preview-quetsion">
-    <app-survey-detail-question *ngIf="state == 'SUCCESS' && surveyValue" [isLock]="true"
-        [survey_id]="surveyValue.survey_id" [planId]="idPlanSurvey"></app-survey-detail-question>
-    <div *ngIf="state == 'ERROR'" class="data-load-error-retry-banner">
-        <span class="error-text">
-            Tải dữ liệu thất bại, vui lòng
-            <span class="retry-link" (click)="reloadData()">nhấn vào đây</span>
-            để tải lại
-        </span>
-    </div>
-    <div *ngIf="state == 'NOT_SET'" style="width: 100%; height: calc(100vh - 60px); display: flex; justify-content: center; align-items: center;">
-    <div class="data-load-error-retry-banner" style="width: 406px">
-        <span class="error-text">Đợt khảo sát chưa được chọn phiếu, vui lòng chọn phiếu !</span>
-    </div>
-    </div>
-</div>
+﻿<div class="p-3">survey-plan-preview-quetsion.component works!</div>

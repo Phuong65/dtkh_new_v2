@@ -1,4 +1,4 @@
-﻿import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BankAudioViewerComponent } from './bank-audio-viewer.component';
 
@@ -6,7 +6,7 @@ describe('BankAudioViewerComponent', () => {
   let component: BankAudioViewerComponent;
   let fixture: ComponentFixture<BankAudioViewerComponent>;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ BankAudioViewerComponent ]
     })
@@ -23,5 +23,3 @@ describe('BankAudioViewerComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-
-

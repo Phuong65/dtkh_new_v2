@@ -65,7 +65,7 @@ import { GroupRadioQuestionV2Component } from './group-radio-question-v2/group-r
 		InputQuestionDirectionComponent,
 		SharedModule,
 		DragDropModule,
-		KatexImgDirective,
+		KatexImgDirective
 	]
 })
 export class QuestionTypesModule { }

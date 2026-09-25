@@ -1,4 +1,4 @@
-﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ImportCanbothiComponent } from './import-canbothi.component';
 
@@ -8,7 +8,7 @@ describe('ImportCanbothiComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ ImportCanbothiComponent ]
+      declarations: [ ImportCanbothiComponent ]
     })
     .compileComponents();
 
@@ -21,4 +21,3 @@ describe('ImportCanbothiComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-

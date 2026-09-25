@@ -1,4 +1,4 @@
-﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { QuanlyTailieuComponent } from './quanly-tailieu.component';
 
@@ -8,7 +8,7 @@ describe('QuanlyTailieuComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ QuanlyTailieuComponent ]
+      declarations: [ QuanlyTailieuComponent ]
     })
     .compileComponents();
 
@@ -21,4 +21,3 @@ describe('QuanlyTailieuComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-

@@ -1,4 +1,4 @@
-﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SinhvienCathiComponent } from './sinhvien-cathi.component';
 
@@ -8,7 +8,7 @@ describe('SinhvienCathiComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ SinhvienCathiComponent ]
+      declarations: [ SinhvienCathiComponent ]
     })
     .compileComponents();
 
@@ -21,4 +21,3 @@ describe('SinhvienCathiComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-

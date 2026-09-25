@@ -1,14 +1,22 @@
 import { Component, OnInit, ViewChild, Input, Output, EventEmitter, TemplateRef, ViewContainerRef, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
-import { Table } from 'primeng/table';
+import { CommonModule } from '@angular/common';
+import { Table, TableModule } from 'primeng/table';
+import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
+import { ButtonModule } from 'primeng/button';
+import { RippleModule } from 'primeng/ripple';
+import { TooltipModule } from 'primeng/tooltip';
+import { OvicSafeHtmlPipe } from '../../pipes/ovic-safe-html.pipe';
 import { OvicTableStructure, InsideAction, OvicTableStructureButton } from '@shared/models/ovic-models';
 import { debounceTime, Subject, Subscription } from 'rxjs';
 import { NotificationService } from '@core/services/notification.service';
 import { OvicButton } from '@core/models/buttons';
 
-@Component({standalone: true, 
+@Component({standalone: true,
     selector: 'ovic-table',
     templateUrl: './ovic-table.component.html',
     styleUrls: ['./ovic-table.component.css'],
+    imports: [CommonModule, TableModule, InputTextModule, SelectModule, ButtonModule, RippleModule, TooltipModule, OvicSafeHtmlPipe],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OvicTableComponent implements OnInit, OnDestroy {

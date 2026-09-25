@@ -1,4 +1,4 @@
-﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BaiHocV2Component } from './bai-hoc-v2.component';
 
@@ -21,5 +21,3 @@ describe('BaiHocV2Component', () => {
     expect(component).toBeTruthy();
   });
 });
-
-

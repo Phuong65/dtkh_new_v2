@@ -1,9 +1,11 @@
 @if (!freeze) {
-  <p-dropdown [options]="options" optionLabel="{{optionLabel}}" (onChange)="onChangeHandle($event)"
+  <p-select [options]="options" optionLabel="{{optionLabel}}" (onChange)="onChangeHandle($event)"
     placeholder="{{placeholder}}" [showClear]="showClear" [filter]="filter" [filterBy]="filterBy"
-    [filterPlaceholder]="filterPlaceholder" [filterMatchMode]="filterMatchMode" styleClass="{{wrapClass}}"
+    [filterPlaceholder]="filterPlaceholder" styleClass="{{wrapClass}}"
     emptyFilterMessage="{{emptyFilterMessage}}" panelStyleClass="ovic-input-line-dropdown-panel" [(ngModel)]="value"
-  [disabled]="disabled" appendTo="body" [scrollHeight]="scrollHeight"></p-dropdown>
+  [disabled]="disabled" appendTo="body" [scrollHeight]="scrollHeight"></p-select>
+
+  
 }
 
 @if (freeze) {

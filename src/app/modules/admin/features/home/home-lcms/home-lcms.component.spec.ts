@@ -1,4 +1,4 @@
-﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HomeLcmsComponent } from './home-lcms.component';
 
@@ -8,7 +8,7 @@ describe('HomeLcmsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ HomeLcmsComponent ]
+      declarations: [ HomeLcmsComponent ]
     })
     .compileComponents();
 
@@ -21,4 +21,3 @@ describe('HomeLcmsComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-

@@ -129,21 +129,21 @@
   },
   "hotPaths": [
     {
-      "path": "plans\\update-core21.md",
-      "accessCount": 39,
-      "lastAccessed": 1790301977056,
-      "type": "file"
-    },
-    {
       "path": "src/app",
-      "accessCount": 35,
-      "lastAccessed": 1790261411292,
+      "accessCount": 42,
+      "lastAccessed": 1790304212198,
       "type": "directory"
     },
     {
+      "path": "plans\\update-core21.md",
+      "accessCount": 42,
+      "lastAccessed": 1790306199246,
+      "type": "file"
+    },
+    {
       "path": "src",
-      "accessCount": 23,
-      "lastAccessed": 1790301592578,
+      "accessCount": 28,
+      "lastAccessed": 1790307163601,
       "type": "directory"
     },
     {
@@ -207,6 +207,12 @@
       "type": "file"
     },
     {
+      "path": "angular.json",
+      "accessCount": 5,
+      "lastAccessed": 1790304192553,
+      "type": "file"
+    },
+    {
       "path": "src\\app\\modules\\shared\\components\\ovic-media-player\\ovic-media-player.component.ts",
       "accessCount": 4,
       "lastAccessed": 1790180802594,
@@ -216,12 +222,6 @@
       "path": "src\\app\\modules\\shared\\components\\ovic-preview\\ovic-preview.component.ts",
       "accessCount": 4,
       "lastAccessed": 1790180896925,
-      "type": "file"
-    },
-    {
-      "path": "angular.json",
-      "accessCount": 4,
-      "lastAccessed": 1790259377624,
       "type": "file"
     },
     {
@@ -267,6 +267,12 @@
       "type": "directory"
     },
     {
+      "path": "src\\app\\modules\\public\\public.module.ts",
+      "accessCount": 3,
+      "lastAccessed": 1790304192741,
+      "type": "file"
+    },
+    {
       "path": "src\\app\\modules\\shared\\directives\\ngx-viewer.directive.ts",
       "accessCount": 2,
       "lastAccessed": 1790177954893,
@@ -294,12 +300,6 @@
       "path": "src\\app\\modules\\shared\\pipes\\ovic-safe-html.pipe.ts",
       "accessCount": 2,
       "lastAccessed": 1790215323306,
-      "type": "file"
-    },
-    {
-      "path": "src\\app\\modules\\public\\public.module.ts",
-      "accessCount": 2,
-      "lastAccessed": 1790255352454,
       "type": "file"
     },
     {

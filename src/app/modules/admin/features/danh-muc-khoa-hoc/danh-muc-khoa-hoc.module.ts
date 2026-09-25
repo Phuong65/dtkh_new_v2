@@ -17,6 +17,7 @@ import { BankAudioViewerComponent } from './bank-audio-viewer/bank-audio-viewer.
 import { PanelComponent } from './panel/panel.component';
 // import { NgxResizableModule } from '@3dgenomes/ngx-resizable';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { PlyrModule } from 'ngx-plyr';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -88,6 +89,7 @@ import { MatStepperModule } from '@angular/material/stepper';
         InputMaskModule,
         // NgxResizableModule,
         MatProgressBarModule,
+        PlyrModule,
         PdfViewerModule
     ]
 })

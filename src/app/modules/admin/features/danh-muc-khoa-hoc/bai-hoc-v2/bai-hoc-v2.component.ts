@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import {RouterModule} from '@angular/router';
 
-@Component({standalone: false, 
+@Component({
     selector: 'app-bai-hoc-v2',
     templateUrl: './bai-hoc-v2.component.html',
     styleUrls: ['./bai-hoc-v2.component.css'],

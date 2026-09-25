@@ -1,4 +1,4 @@
-﻿import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BaiHocComponent } from './bai-hoc.component';
 
@@ -6,7 +6,7 @@ describe('BaiHocComponent', () => {
   let component: BaiHocComponent;
   let fixture: ComponentFixture<BaiHocComponent>;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ BaiHocComponent ]
     })
@@ -23,5 +23,3 @@ describe('BaiHocComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-
-

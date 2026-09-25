@@ -1,18 +1,18 @@
-import { Component, Input } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { StatOverview } from '@modules/shared/models/survey-statistics.model';
+import {RouterModule} from '@angular/router';
 
 @Component({
     selector: 'app-stat-overview',
-    standalone: true,
-    imports: [CommonModule],
     templateUrl: './stat-overview.component.html',
-    styleUrls: ['./stat-overview.component.css']
+    styleUrls: ['./stat-overview.component.css'],
+    standalone: true,
+    imports: [CommonModule,RouterModule]
 })
-export class StatOverviewComponent {
-    @Input() overview: StatOverview | null = null;
-
-    formatNumber(value: number): string {
-        return Number(value || 0).toLocaleString('vi-VN');
-    }
+export class StatOverviewComponent implements OnInit {
+    constructor() {}
+    ngOnInit(): void {}
 }
+
+
+
