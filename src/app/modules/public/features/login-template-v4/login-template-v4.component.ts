@@ -1,5 +1,6 @@
 import { Component, NgZone, OnDestroy, OnInit, TemplateRef } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
@@ -32,10 +33,11 @@ interface LoginButton {
 
 declare var google: any;
 
-@Component({standalone: false, 
+@Component({standalone: true, 
     selector: 'app-login-template-v4',
     templateUrl: './login-template-v4.component.html',
-    styleUrls: ['./login-template-v4.component.css']
+    styleUrls: ['./login-template-v4.component.css'],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule]
 })
 export class LoginTemplateV4Component implements OnInit, OnDestroy {
 

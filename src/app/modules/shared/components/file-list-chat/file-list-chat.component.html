@@ -1,78 +1,114 @@
-<div style="width: auto;" [ngSwitch]="fileView['type']">
-    <div class="flex-view-file" *ngSwitchCase="'image'" style="overflow: auto;">
-        <p-image *ngIf="src" [src]="src" alt="Image" width="300" [preview]="true"></p-image>
-    </div>
-    <div class="flex-view-file file-default" *ngSwitchCase="'video'" style="overflow: auto;">
-        <div *ngIf="!fileView['open']" (click)="fileView['open'] = !fileView['open']"
+<div style="width: auto;">
+  @switch (fileView['type']) {
+    @case ('image') {
+      <div class="flex-view-file" style="overflow: auto;">
+        @if (src) {
+          <p-image [src]="src" alt="Image" width="300" [preview]="true"></p-image>
+        }
+      </div>
+    }
+    @case ('video') {
+      <div class="flex-view-file file-default" style="overflow: auto;">
+        @if (!fileView['open']) {
+          <div (click)="fileView['open'] = !fileView['open']"
             style="display: flex; flex-direction: row; cursor: pointer;" class="view-default-file">
             <i style="font-size: 20px; padding: 5px;" class="icon-in-open-download-file"
-                [ngClass]="fileView | ovicFileIcon" ></i>
+            [ngClass]="fileView | ovicFileIcon" ></i>
             <div class="info" style="padding: 5px; flex: 1;">
-                <h4 class="name">{{fileView['title']}}</h4>
-                <span style="font-size: 11px!important;">{{fileView["file_size"]}}</span>
+              <h4 class="name">{{fileView['title']}}</h4>
+              <span style="font-size: 11px!important;">{{fileView["file_size"]}}</span>
             </div>
             <button class="play-button"></button>
-        </div>
-        <video *ngIf="src && fileView['open']" width="100%" height="auto" controls>
+          </div>
+        }
+        @if (src && fileView['open']) {
+          <video width="100%" height="auto" controls>
             <source [src]="src">
-        </video>
-    </div>
-    <div class="flex-view-file file-default" *ngSwitchCase="'audio'">
-        <div *ngIf="!fileView['open']" (click)="fileView['open'] = !fileView['open']"
+          </video>
+        }
+      </div>
+    }
+    @case ('audio') {
+      <div class="flex-view-file file-default">
+        @if (!fileView['open']) {
+          <div (click)="fileView['open'] = !fileView['open']"
             style="display: flex; flex-direction: row; cursor: pointer;" class="view-default-file">
             <i style="font-size: 20px; padding: 5px;" class="icon-in-open-download-file"
-                [ngClass]="fileView | ovicFileIcon" ></i>
+            [ngClass]="fileView | ovicFileIcon" ></i>
             <div class="info" style="padding: 5px; flex: 1;">
-                <h4 class="name">{{fileView['title']}}</h4>
-                <span style="font-size: 11px!important;">{{fileView["file_size"]}}</span>
+              <h4 class="name">{{fileView['title']}}</h4>
+              <span style="font-size: 11px!important;">{{fileView["file_size"]}}</span>
             </div>
             <button class="play-button"></button>
-        </div>
-        <audio *ngIf="src && fileView['open']" style="width:300px; height: 30px;" controls>
+          </div>
+        }
+        @if (src && fileView['open']) {
+          <audio style="width:300px; height: 30px;" controls>
             <source [src]="src">
-        </audio>
-    </div>
-    <div class="flex-view-file file-default" *ngSwitchDefault>
+          </audio>
+        }
+      </div>
+    }
+    @default {
+      <div class="flex-view-file file-default">
         <div style="display: flex; flex-direction: row;" class="view-default-file">
-            <i style="font-size: 20px; padding: 5px;" class="icon-in-open-download-file"
-                [ngClass]="fileView | ovicFileIcon" ></i>
-            <div class="info" style="padding: 5px; flex: 1;">
-                <h4 class="name">{{fileView['title']}}</h4>
-                <span style="font-size: 11px!important;">{{fileView["file_size"]}}</span>
-            </div>
-            <button (click)="selectFile()" style="padding: 0 5px;"
-                class="btn btn-success btn-icon btn-download btn-transparent"><i class="fa fa-external-link"
-                    style="font-size: 13px;"></i></button>
-            <a [href]="src" download="true" style="padding: 0 5px; margin-left: 5px;"
-                class="btn btn-success btn-icon btn-download btn-transparent"><i class="fa fa-download"
-                    style="font-size: 13px;"></i></a>
+          <i style="font-size: 20px; padding: 5px;" class="icon-in-open-download-file"
+          [ngClass]="fileView | ovicFileIcon" ></i>
+          <div class="info" style="padding: 5px; flex: 1;">
+            <h4 class="name">{{fileView['title']}}</h4>
+            <span style="font-size: 11px!important;">{{fileView["file_size"]}}</span>
+          </div>
+          <button (click)="selectFile()" style="padding: 0 5px;"
+            class="btn btn-success btn-icon btn-download btn-transparent"><i class="fa fa-external-link"
+          style="font-size: 13px;"></i></button>
+          <a [href]="src" download="true" style="padding: 0 5px; margin-left: 5px;"
+            class="btn btn-success btn-icon btn-download btn-transparent"><i class="fa fa-download"
+          style="font-size: 13px;"></i></a>
         </div>
         <p-dialog (onHide)="display = false" styleClass="p-dialog-view-file" appendTo="body" [dismissableMask]="true"
-            [modal]="true" [(visible)]="display" [draggable]="false" [resizable]="false">
-            <div class="popup-waiting-loading" *ngIf="startProgress"
-                style="height: 100%; width: 100%; display: flex; flex-direction: column; justify-content: center; align-self: center;">
-                <label>Vui lòng chờ...</label>
-                <div class="tn-import-student-progressbar">
-                    <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
-                </div>
+          [modal]="true" [(visible)]="display" [draggable]="false" [resizable]="false">
+          @if (startProgress) {
+            <div class="popup-waiting-loading"
+              style="height: 100%; width: 100%; display: flex; flex-direction: column; justify-content: center; align-self: center;">
+              <label>Vui lòng chờ...</label>
+              <div class="tn-import-student-progressbar">
+                <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+              </div>
             </div>
-            <div *ngIf="src_view && fileView" style="width: 100%; height: 100%;">
-                <div style="height: 100%;" *ngIf="fileView['source'] &&  fileView['type']">
-                    <div style="height: 100%;" [ngSwitch]="fileView['type']">
-                        <div style="height: 100%;" class="flex-view-file" *ngSwitchCase="'pdf'">
-                            <iframe width="100%" height="100%" [src]="src_view" frameborder="0"></iframe>
+          }
+          @if (src_view && fileView) {
+            <div style="width: 100%; height: 100%;">
+              @if (fileView['source'] &&  fileView['type']) {
+                <div style="height: 100%;">
+                  <div style="height: 100%;">
+                    @switch (fileView['type']) {
+                      @case ('pdf') {
+                        <div style="height: 100%;" class="flex-view-file">
+                          <iframe width="100%" height="100%" [src]="src_view" frameborder="0"></iframe>
                         </div>
-                        <div style="height: 100%;" class="flex-view-file" *ngSwitchDefault>
-                            <ngx-doc-viewer *ngIf="!download" [url]="src_view" viewer="office"
-                                style="width:100%;height:100%;"></ngx-doc-viewer>
-                            <!-- <iframe width="100%" height="100%" [src]="fileUrlView" frameborder="0"></iframe> -->
-                            <div style="color: #495057; font-size: 18px;" *ngIf="download">File này không được hỗ trợ
-                                xem trước, vui lòng <a download="true" [href]="src_view">tải
-                                    về</a></div>
+                      }
+                      @default {
+                        <div style="height: 100%;" class="flex-view-file">
+                          @if (!download) {
+                            <ngx-doc-viewer [url]="src_view" viewer="office"
+                            style="width:100%;height:100%;"></ngx-doc-viewer>
+                          }
+                          <!-- <iframe width="100%" height="100%" [src]="fileUrlView" frameborder="0"></iframe> -->
+                          @if (download) {
+                            <div style="color: #495057; font-size: 18px;">File này không được hỗ trợ
+                              xem trước, vui lòng <a download="true" [href]="src_view">tải
+                            về</a></div>
+                          }
                         </div>
-                    </div>
+                      }
+                    }
+                  </div>
                 </div>
+              }
             </div>
+          }
         </p-dialog>
-    </div>
+      </div>
+    }
+  }
 </div>

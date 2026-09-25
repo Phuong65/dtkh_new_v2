@@ -1,14 +1,21 @@
 <div class="ovic-checklist {{cssClass}}">
-    <ul class="ocl-list">
-        <li class="ocl-list__item" *ngFor="let question of questions; let i=index">
-            <div class="ocl-question">
-                <b class="ocl-question__lable" *ngIf="question.question">{{question.question}}</b>
-                <ul class="ocl-question__amswers">
-                    <li class="ocl-question__amswers__item question-type-{{question.type}}" *ngFor="let answer of question.answers" (click)="buttonClick(question.name,answer.key )" [ngClass]="{'checked' : answer.check}">
-                        <span class="ocl-question__check">{{answer.name}}</span>
-                    </li>
-                </ul>
-            </div>
-        </li>
-    </ul>
+  <ul class="ocl-list">
+    @for (question of questions; track question; let i = $index) {
+    <li class="ocl-list__item">
+      <div class="ocl-question">
+        @if (question.question) {
+        <b class="ocl-question__lable">{{question.question}}</b>
+        }
+        <ul class="ocl-question__amswers">
+          @for (answer of question.answers; track answer) {
+          <li class="ocl-question__amswers__item question-type-{{question.type}}"
+            (click)="buttonClick(question.name,answer.key )" [ngClass]="{'checked' : answer.check}">
+            <span class="ocl-question__check">{{answer.name}}</span>
+          </li>
+          }
+        </ul>
+      </div>
+    </li>
+    }
+  </ul>
 </div>

@@ -4,13 +4,16 @@ import { FileService } from '@core/services/file.service';
 import { MediaService } from '@shared/services/media.service';
 import { AuthService } from '@core/services/auth.service';
 import { NotificationService } from '@core/services/notification.service';
-import { MatMenuTrigger } from '@angular/material/menu';
+import { MatMenuTrigger, MatMenu } from '@angular/material/menu';
 import { DownloadProcess } from '@shared/components/ovic-download-progress/ovic-download-progress.component';
+import { CommonModule } from '@angular/common';
+import { OvicFileIconPipe } from '../../pipes/ovic-file-icon.pipe';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'app-file-list-local-on-table' ,
 	templateUrl : './file-list-local-on-table.component.html' ,
-	styleUrls   : [ './file-list-local-on-table.component.css' ]
+	styleUrls   : [ './file-list-local-on-table.component.css' ],
+ imports: [MatMenu, MatMenuTrigger, CommonModule, OvicFileIconPipe]
 } )
 export class FileListLocalOnTableComponent implements OnInit , OnChanges {
 

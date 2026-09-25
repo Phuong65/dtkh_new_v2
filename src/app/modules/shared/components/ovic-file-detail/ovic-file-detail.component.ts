@@ -1,12 +1,15 @@
 import { Component , Input , OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FileTypePipe } from '../../pipes/file-type.pipe';
 import { OvicDriveFile , OvicFile } from '@core/models/file';
 import { FileService } from '@core/services/file.service';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-@Component( {standalone: false, 
+@Component( {standalone: true,
 	selector    : 'ovic-file-detail' ,
 	templateUrl : './ovic-file-detail.component.html' ,
-	styleUrls   : [ './ovic-file-detail.component.css' ]
+	styleUrls   : [ './ovic-file-detail.component.css' ],
+	imports     : [CommonModule, FileTypePipe]
 } )
 export class OvicFileDetailComponent implements OnInit {
 

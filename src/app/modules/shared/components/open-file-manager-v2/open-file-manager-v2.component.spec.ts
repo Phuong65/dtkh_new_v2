@@ -1,4 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NotificationService } from '@core/services/notification.service';
+import { FileService } from '@core/services/file.service';
+import { AuthService } from '@core/services/auth.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { OpenFileManagerService } from '@modules/shared/services/open-file-manager.service';
 
 import { OpenFileManagerV2Component } from './open-file-manager-v2.component';
 
@@ -8,7 +13,14 @@ describe('OpenFileManagerV2Component', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ OpenFileManagerV2Component ]
+      imports: [OpenFileManagerV2Component],
+      providers: [
+        { provide: NotificationService, useValue: {} },
+        { provide: FileService, useValue: {} },
+        { provide: AuthService, useValue: { accessToken: '' } },
+        { provide: NgbModal, useValue: {} },
+        { provide: OpenFileManagerService, useValue: {} }
+      ]
     })
     .compileComponents();
 

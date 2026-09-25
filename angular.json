@@ -31,8 +31,6 @@
                             "src/assets/css/uil-icon.css",
                             "src/assets/css/font-awesome.min.css",
                             "src/assets/css/fontawesomev6.min.css",
-                            "node_modules/primeng/resources/themes/lara-light-blue/theme.css",
-                            "node_modules/primeng/resources/primeng.min.css",
                             "node_modules/primeicons/primeicons.css",
                             "src/assets/css/admin-dashboard.css",
                             "src/assets/css/base.css",

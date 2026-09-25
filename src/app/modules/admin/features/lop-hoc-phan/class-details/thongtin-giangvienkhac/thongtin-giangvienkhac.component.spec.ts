@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ThongtinGiangvienkhacComponent } from './thongtin-giangvienkhac.component';
 
@@ -8,7 +8,7 @@ describe('ThongtinGiangvienkhacComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ThongtinGiangvienkhacComponent ]
+      imports: [ ThongtinGiangvienkhacComponent ]
     })
     .compileComponents();
 
@@ -21,3 +21,4 @@ describe('ThongtinGiangvienkhacComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+

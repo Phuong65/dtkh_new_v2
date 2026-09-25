@@ -81,96 +81,62 @@
         </div>
     </div>
     <div class="dashboard-v2-layout-right">
-        <div class="ovic-student-layout__header" [ngSwitch]="key_menu_top">
-            <!-- <div class="ovic-student-layout__header__left">
-                <h2 class="ovic-student-layout__app-name" style="padding: 5px 0px; font-size: 18px;"
-                    [ngSwitch]="key_server">
-                    <h2 class="ovic-student-layout__app-name" style="padding: 5px 0px; font-size: 18px;"
-                        *ngSwitchCase="'ictu'">
-                        <ng-container [ngTemplateOutlet]="logoTnu"></ng-container>
-                        ICTU - ONLINE
-                    </h2>
-                    <h2 class="ovic-student-layout__app-name" style="padding: 5px 0px; font-size: 18px;"
-                        *ngSwitchCase="'dev'">
-                        <ng-container [ngTemplateOutlet]="logoTnu"></ng-container>
-                        LCMS - ICTU
-                    </h2>
-                    <h2 class="ovic-student-layout__app-name" style="padding: 5px 0px; font-size: 18px;"
-                        *ngSwitchCase="'dttx'">
-                        <ng-container [ngTemplateOutlet]="logoTnu"></ng-container>
-                        LCMS - DTTX
-                    </h2>
-                    <h2 class="ovic-student-layout__app-name" style="padding: 5px 0px; font-size: 18px;"
-                        *ngSwitchCase="'tueba_dttx'">
-                        <img style="height: 100%; margin: 0 10px;" src="../../../../assets/images/logo-tueba.png">
-                        TUEBA.EDU.VN
-                    </h2>
-                    <h2 class="ovic-student-layout__app-name" style="padding: 5px 0px; font-size: 18px;"
-                        *ngSwitchCase="'nvhcm'">
-                        <img style="height: 100%; margin: 0 10px;" src="../../../../assets/images/logo_nvhcm.png">
-                        HCMCONS.VN
-                    </h2>
-                    <h2 class="ovic-student-layout__app-name" style="padding: 5px 0px; font-size: 18px;"
-                        *ngSwitchCase="'vhhcm'">
-                        <img style="height: 100%; margin: 0 10px;" src="../../../../assets/images/logo-vhhcm.png">
-                        HCMUC.EDU.VN
-                    </h2>
-                </h2>
-                <div class="ovic-student-layout__header__icon">
-                    <button class="btn ovic-student-layout__header-btn-collapse-menu" type="button"
-                        (click)="toggleMenu()">
-                        <i class="fi-rr-menu-burger"></i>
-                    </button>
-                </div>
-            </div> -->
-            <div *ngSwitchDefault class="ovic-student-layout__header__right">
-                <div class="ovic-student-layout__right-header-label">
-                    <!-- <i [class]="menuActive ? menuActive.icon : 'fi-rr-bug'"></i> -->
-                    <!-- <button *ngIf="showBackButton" class="btn ovic-student-layout__header-btn-collapse-menu"
-                        type="button" (click)="backToClass()"> -->
-                    <!-- <a routerLink="{{back_url}}" style="color:#666; margin: 0 10px 0 15px; cursor: pointer; text-decoration: none; line-height: 1;">
-                        <i style="margin: 0px; line-height: 1;" *ngIf="showBackButton" (click)="backToClass()" class="pi pi-arrow-left"></i>
-                    </a> -->
-                    <i style="color:#666; margin: 0 10px 0 15px; cursor: pointer; text-decoration: none; line-height: 0;"
-                        *ngIf="showBackButton" (click)="backToClass()" class="pi pi-arrow-left"></i>
-                    <!-- </button> -->
-                    <h2 *ngIf="!secondary_feature" style="margin-left: 15px;"> {{menuActive ? menuActive.title : ''}}
-                    </h2>
-
-                    <h2 *ngIf="secondary_feature" style="margin-left: 15px;"> {{secondary_feature}}</h2>
-                </div>
-                <span *ngIf="showHuongdan" style="text-decoration: none; cursor: pointer;" (click)="moveToHelp()">
-                    <span
-                        style="display: block; color: #666; border-radius: 30px; border: 1px solid #666; padding: 5px 10px; font-size: 14px;">
-                        <i style="margin-right: 5px; font-size: 14px;" class="fa fa-question"></i>
-                        Hướng dẫn
-                    </span>
-                </span>
-                <ul class="ovic-student-layout__right-header-menu">
-                    <!--                    <li class="ovic-student-layout__right-header-menu-item">-->
-                    <!--                        <button class="btn-help" label="Hướng dẫn"  ></button>-->
-                    <!--                    </li>-->
-                    <li class="ovic-student-layout__right-header-menu-item">
-                        <app-user-info-v2></app-user-info-v2>
-                    </li>
-                    <!-- <li class="ovic-student-layout__right-header-menu-item btn--for-mobile">
-                        <button class="btn ovic-student-layout__button-right-header" type="button"
-                            (click)="toggleMenuForMobile(null)" style="line-height: 0;">
-                            <i class="fa fa-bars" ></i>
-                        </button>
-                    </li> -->
-                </ul>
-            </div>
-            <div *ngSwitchCase="'menuTopV2'" class="ovic-student-layout__header__right">
-                <div style="border-right: 1px solid #c8c8c8; height: 60px; width: 60px;"
-                    class="ovic-student-layout__right-header-label">
-                    <i style="color:#666; margin: 0 auto; cursor: pointer; text-decoration: none; line-height: 0;"
-                        *ngIf="showBackButton" (click)="backToClass()" class="pi pi-arrow-left"></i>
-                </div>
-                <div class="menu-ctdt" style="display: flex; width: 100%; justify-content: center;">
-                    <p-tabMenu [model]="menuTopV2"></p-tabMenu>
-                </div>
-            </div>
+        <div class="ovic-student-layout__header">
+            @switch (key_menu_top) {
+                @case ('menuTopV2') {
+                    <div class="ovic-student-layout__header__right">
+                        <div style="border-right: 1px solid #c8c8c8; height: 60px; width: 60px;"
+                            class="ovic-student-layout__right-header-label">
+                            @if (showBackButton) {
+                                <i style="color:#666; margin: 0 auto; cursor: pointer; text-decoration: none; line-height: 0;"
+                                    (click)="backToClass()" class="pi pi-arrow-left"></i>
+                            }
+                        </div>
+                        <div class="menu-ctdt" style="display: flex; width: 100%; justify-content: center;">
+                            <nav class="p-tabmenu p-component" role="tablist">
+                                <ul class="p-tabmenu-nav p-reset" role="menubar">
+                                    @for (item of menuTopV2; track item.label) {
+                                        <li class="p-tabmenuitem" role="none" routerLinkActive="p-highlight" [routerLinkActiveOptions]="{ exact: false }">
+                                            <a role="menuitem" class="p-menuitem-link" [routerLink]="item.routerLink" [queryParams]="item.queryParams">
+                                                <span class="p-menuitem-text">{{ item.label }}</span>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                }
+                @default {
+                    <div class="ovic-student-layout__header__right">
+                        <div class="ovic-student-layout__right-header-label">
+                            @if (showBackButton) {
+                                <i style="color:#666; margin: 0 10px 0 15px; cursor: pointer; text-decoration: none; line-height: 0;"
+                                    (click)="backToClass()" class="pi pi-arrow-left"></i>
+                            }
+                            @if (!secondary_feature) {
+                                <h2 style="margin-left: 15px;"> {{menuActive ? menuActive.title : ''}}</h2>
+                            } @else {
+                                <h2 style="margin-left: 15px;"> {{secondary_feature}}</h2>
+                            }
+                        </div>
+                        @if (showHuongdan) {
+                            <span style="text-decoration: none; cursor: pointer;" (click)="moveToHelp()">
+                                <span
+                                    style="display: block; color: #666; border-radius: 30px; border: 1px solid #666; padding: 5px 10px; font-size: 14px;">
+                                    <i style="margin-right: 5px; font-size: 14px;" class="fa fa-question"></i>
+                                    Hướng dẫn
+                                </span>
+                            </span>
+                        }
+                        <ul class="ovic-student-layout__right-header-menu">
+                            <li class="ovic-student-layout__right-header-menu-item">
+                                <app-user-info-v2></app-user-info-v2>
+                            </li>
+                        </ul>
+                    </div>
+                }
+            }
         </div>
 
 

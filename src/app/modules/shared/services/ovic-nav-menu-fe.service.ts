@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { OvicMobilePanel , OvicNavFe , OvicSimpleNav } from '../models/ovic-nav-fe';
-import { FEMainMenu } from '../utils/syscat';
+
+const FEMainMenu: OvicNavFe[] = [];
 
 @Injectable( {
 	providedIn : 'root'

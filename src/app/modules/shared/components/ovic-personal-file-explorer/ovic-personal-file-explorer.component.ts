@@ -1,6 +1,10 @@
 import { Component , ElementRef , Input , OnDestroy , OnInit , TemplateRef , ViewChild , ViewContainerRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder , FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { OvicFileIconPipe } from '../../pipes/ovic-file-icon.pipe';
+import { OvicFileShareStatePipe } from '../../pipes/ovic-file-share-state.pipe';
+import { OvicDropAndDragDirective } from '../../directives/ovic-drop-and-drag.directive';
 import { OvicDriveFile , OvicFile , OvicFileStore , OvicFileUpload , OvicTree } from '@core/models/file';
-import { FormBuilder , FormGroup } from '@angular/forms';
 import { AuthService } from '@core/services/auth.service';
 import { Overlay , OverlayRef } from '@angular/cdk/overlay';
 import { fromEvent , Observable , Subscription } from 'rxjs';
@@ -47,10 +51,11 @@ interface SearchInfo {
 	limit : number;
 }
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-personal-file-explorer' ,
 	templateUrl : './ovic-personal-file-explorer.component.html' ,
 	styleUrls   : [ './ovic-personal-file-explorer.component.css' ] ,
+	imports     : [CommonModule, ReactiveFormsModule, OvicFileIconPipe, OvicFileShareStatePipe, OvicDropAndDragDirective] ,
 	animations  : [
 		trigger( 'openSubmenu' , [
 			state( 'opened' , style( { 'transform' : 'scaleY(1)' , 'visibility' : 'visible' , 'opacity' : '1' } ) ) ,

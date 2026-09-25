@@ -4,7 +4,7 @@ import { NotificationService } from '@core/services/notification.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-percentages-table' ,
 	templateUrl : './ovic-percentages-table.component.html' ,
 	styleUrls   : [ './ovic-percentages-table.component.css' ]

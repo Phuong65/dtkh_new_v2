@@ -2,16 +2,17 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormGroup } from '@angular/forms';
-import { ImageCroppedEvent } from 'ngx-image-cropper';
+import { ImageCroppedEvent, ImageCropperModule } from 'ngx-image-cropper';
 import { FileService } from '@core/services/file.service';
 import { HelperService } from '@core/services/helper.service';
 import { AuthService } from '@core/services/auth.service';
 import { OvicFileStore, OvicFileSever } from '../../models/file-store';
 
-@Component({standalone: false, 
+@Component({standalone: true, 
     selector: 'avata-maker',
     templateUrl: './avata-maker.component.html',
-    styleUrls: ['./avata-maker.component.css']
+    styleUrls: ['./avata-maker.component.css'],
+    imports: [ImageCropperModule]
 })
 
 export class AvataMakerComponent implements OnInit {

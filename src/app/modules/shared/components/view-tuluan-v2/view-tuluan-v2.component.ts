@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-view-tuluan-v2',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './view-tuluan-v2.component.html',
   styleUrls: ['./view-tuluan-v2.component.css']
 })

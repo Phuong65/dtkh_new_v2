@@ -1,4 +1,8 @@
 import { Component , EventEmitter , Input , OnInit , Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { OvicPlyrDirective } from '../../directives/ovic-plyr.directive';
+import { OvicSafeResourceUrlPipe } from '../../pipes/ovic-safe-resource-url.pipe';
 import { Download , OvicDriveFile , OvicFile , OvicPreviewFileContent , OvicTinyDriveFile , SimpleFileLocal } from '@core/models/file';
 import { NgbActiveModal , NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { tap } from 'rxjs/operators';
@@ -9,10 +13,11 @@ import { FileType } from '../../utils/syscat';
 import { OvicFileDetailComponent } from '../ovic-file-detail/ovic-file-detail.component';
 import * as Plyr from 'plyr';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-preview' ,
 	templateUrl : './ovic-preview.component.html' ,
-	styleUrls   : [ './ovic-preview.component.css' ]
+	styleUrls   : [ './ovic-preview.component.css' ],
+	imports     : [CommonModule, MatProgressBarModule, OvicPlyrDirective, OvicSafeResourceUrlPipe]
 } )
 export class OvicPreviewComponent implements OnInit {
 

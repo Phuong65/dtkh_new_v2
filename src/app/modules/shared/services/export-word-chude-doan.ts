@@ -17,7 +17,7 @@ import { Classes } from '../models/classes';
 import { DonVi } from '../models/don-vi';
 import { ElnChuyenMuc } from '../models/Elng';
 import { ElnKhoaHoc } from '../models/elng-khoa-hoc';
-import { FileChild } from 'docx/build/file/file-child';
+type ParagraphAlignment = (typeof AlignmentType)[keyof typeof AlignmentType];
 
 @Injectable({
     providedIn: 'root'
@@ -191,7 +191,7 @@ export class ExportWordChudeDuanService {
     cell(
         text: string,
         bold = false,
-        align = AlignmentType.CENTER,
+        align: ParagraphAlignment = AlignmentType.CENTER,
         widthPercent?: number
     ): TableCell {
         return new TableCell({
@@ -223,7 +223,7 @@ export class ExportWordChudeDuanService {
     }
 
     // ================= PARAGRAPH =================
-    p(text: string, bold = false, align = AlignmentType.LEFT, underline = false): Paragraph {
+    p(text: string, bold = false, align: ParagraphAlignment = AlignmentType.LEFT, underline = false): Paragraph {
         return new Paragraph({
             alignment: align,
             children: [
@@ -269,7 +269,7 @@ export class ExportWordChudeDuanService {
         };
     }
 
-    buildFooter(data: any[]): FileChild[] {
+    buildFooter(data: any[]): Array<Paragraph | Table> {
         const total = data?.length || 0;
 
         return [

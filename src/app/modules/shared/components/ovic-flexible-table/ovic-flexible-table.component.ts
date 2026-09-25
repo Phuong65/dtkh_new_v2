@@ -5,7 +5,7 @@ import { state , style , trigger } from '@angular/animations';
 import { debounceTime , Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-flexible-table' ,
 	templateUrl : './ovic-flexible-table.component.html' ,
 	styleUrls   : [ './ovic-flexible-table.component.css' ] ,

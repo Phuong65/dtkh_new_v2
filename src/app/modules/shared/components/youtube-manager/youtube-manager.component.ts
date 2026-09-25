@@ -8,7 +8,7 @@ import { OvicFileStore } from '../../models/file-store';
 import { AbstractControl } from '@angular/forms';
 import { NotificationService } from '@core/services/notification.service';
 
-@Component({standalone: false, 
+@Component({standalone: true, 
     selector: 'youtube-manager',
     templateUrl: './youtube-manager.component.html',
     styleUrls: ['./youtube-manager.component.css']

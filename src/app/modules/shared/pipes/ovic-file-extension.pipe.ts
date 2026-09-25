@@ -1,7 +1,7 @@
 import { Pipe , PipeTransform } from '@angular/core';
 import { OvicDriveFile } from '@core/models/file';
 
-@Pipe( {standalone: false, 
+@Pipe( {standalone: true, 
 	name : 'ovicFileExtension'
 } )
 export class OvicFileExtensionPipe implements PipeTransform {

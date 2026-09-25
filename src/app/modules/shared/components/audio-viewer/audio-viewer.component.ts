@@ -1,4 +1,5 @@
 import { Component, OnInit, Output, Input, ViewChild, ElementRef, EventEmitter, SimpleChanges, OnChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FileService } from '@core/services/file.service';
 import { HelperService } from '@core/services/helper.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -14,10 +15,11 @@ import {
 import { getLinkDownload_aws, getLinkMedia_aws } from '@env';
 import { AuthService } from '@core/services/auth.service';
 
-@Component({standalone: false, 
+@Component({standalone: true, 
     selector: 'audio-viewer',
     templateUrl: './audio-viewer.component.html',
-    styleUrls: ['./audio-viewer.component.css']
+    styleUrls: ['./audio-viewer.component.css'],
+    imports: [CommonModule]
 })
 export class AudioViewerComponent implements OnInit, OnChanges {
     hasMedia = false;

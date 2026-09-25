@@ -56,7 +56,6 @@ import {
     rotateSides,
     slide
 } from '@shared/animations/router-animations';
-import { OverlayPanel } from 'primeng/overlaypanel';
 import { BUTTON_NO, BUTTON_YES } from '@core/models/buttons';
 import { ScrollPanel } from 'primeng/scrollpanel';
 import { Title } from '@angular/platform-browser';

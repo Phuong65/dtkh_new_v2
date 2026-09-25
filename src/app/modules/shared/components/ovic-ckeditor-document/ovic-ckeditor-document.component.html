@@ -7,21 +7,25 @@
 </ng-container>
 
 <ng-template #templateEditor>
-    <div *ngIf="!isReadyToLoad" class="editor-skeleton">
-        <div class="skeleton-toolbar"></div>
-        <div class="skeleton-content">Đang tải trình soạn thảo...</div>
+  @if (!isReadyToLoad) {
+    <div class="editor-skeleton">
+      <div class="skeleton-toolbar"></div>
+      <div class="skeleton-content">Đang tải trình soạn thảo...</div>
     </div>
-    <div *ngIf="isReadyToLoad" [appKatexImg]="countChange" [appLoadMediaOnText]="countChange"
-        class="document-editor_basic" [ngClass]="isMaximize?'maximize-editor-mode':''">
-        <div #editorContent id="editor" class="document-editor__editable {{styleClass}}">
-        </div>
+  }
+  @if (isReadyToLoad) {
+    <div [appKatexImg]="countChange" [appLoadMediaOnText]="countChange"
+      class="document-editor_basic" [ngClass]="isMaximize?'maximize-editor-mode':''">
+      <div #editorContent id="editor" class="document-editor__editable {{styleClass}}">
+      </div>
     </div>
+  }
 </ng-template>
 
 <!-- <ng-template #templateEditorPopup let-c="close" let-d="dismiss">
-    <div class="maximize-layout-popup">
-        <ng-container *ngTemplateOutlet="templateEditor">
+<div class="maximize-layout-popup">
+  <ng-container *ngTemplateOutlet="templateEditor">
 
-        </ng-container>
-    </div>
+  </ng-container>
+</div>
 </ng-template> -->

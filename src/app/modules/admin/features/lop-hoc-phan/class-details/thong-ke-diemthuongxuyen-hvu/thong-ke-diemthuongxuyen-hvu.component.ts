@@ -69,6 +69,12 @@ interface FileImportCC {
 
 const validatePoint: (point: number | undefined | null, _default: number) => number = (point: number, _default: number): number => (point !== undefined && point !== null ? point : _default);
 
+export interface PercentScore {
+    cc: number;
+    daugio: number;
+    kynang: number;
+}
+
 @Component({
     selector: 'app-thong-ke-diemthuongxuyen-hvu',
     standalone: true,

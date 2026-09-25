@@ -10,7 +10,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import renderMathInElement from 'katex/contrib/auto-render';
 // declare var EqEditor;
 
-@Component({standalone: false, 
+@Component({standalone: true, 
     selector: 'latex-handle',
     templateUrl: './latex-handle.component.html',
     styleUrls: ['./latex-handle.component.css'],

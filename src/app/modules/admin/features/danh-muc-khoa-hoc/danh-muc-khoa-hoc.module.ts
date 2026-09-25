@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DanhMucKhoaHocRoutingModule } from './danh-muc-khoa-hoc-routing.module';
 import { SharedModule } from '@shared/shared.module';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { KhoaHocComponent } from './khoa-hoc/khoa-hoc.component';
 import { InputTextModule } from 'primeng/inputtext';
 import { BaiHocComponent } from './bai-hoc/bai-hoc.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { TabViewModule } from 'primeng/tabview';
-import { InputSwitchModule } from 'primeng/inputswitch';
+import { TabsModule } from 'primeng/tabs';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { AngularResizeElementModule } from 'angular-resize-element';
 import { InputMaskModule } from 'primeng/inputmask';
@@ -69,7 +69,7 @@ import { MatStepperModule } from '@angular/material/stepper';
         DragDropModule,
         ProgressBarModule,
         RadioButtonModule,
-        InputSwitchModule,
+        ToggleSwitchModule,
         TooltipModule,
         ButtonModule,
         CheckboxModule,
@@ -78,11 +78,11 @@ import { MatStepperModule } from '@angular/material/stepper';
         SharedModule,
         DanhMucKhoaHocRoutingModule,
         FormsModule,
-        DropdownModule,
+        SelectModule,
         ReactiveFormsModule,
         InputTextModule,
         NgbModule,
-        TabViewModule,
+        TabsModule,
         SelectButtonModule,
         AngularResizeElementModule,
         InputMaskModule,

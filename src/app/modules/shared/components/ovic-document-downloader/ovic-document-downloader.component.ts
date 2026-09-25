@@ -5,6 +5,11 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FileService } from '@core/services/file.service';
 import { tap } from 'rxjs/operators';
 import { DownloadProcess } from '@shared/components/ovic-download-progress/ovic-download-progress.component';
+import { GeneralModule } from '@modules/kiem-thu-ngan-hang-cau-hoi/general/general.module';
+import { CommonModule } from '@angular/common';
+import { OvicFileIconPipe } from '../../pipes/ovic-file-icon.pipe';
+import { OvicFileSizePipe } from '../../pipes/ovic-file-size.pipe';
+import { FileTypePipe } from '../../pipes/file-type.pipe';
 
 const STATE_REJECTED : OvicDocumentDownloadResult = {
 	state    : 'REJECTED' ,
@@ -26,10 +31,11 @@ const STATE_CANCEL : OvicDocumentDownloadResult = {
 	download : null
 };
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'app-ovic-document-downloader' ,
 	templateUrl : './ovic-document-downloader.component.html' ,
-	styleUrls   : [ './ovic-document-downloader.component.css' ]
+	styleUrls   : [ './ovic-document-downloader.component.css' ],
+ imports: [GeneralModule, CommonModule, OvicFileIconPipe, OvicFileSizePipe, FileTypePipe]
 } )
 export class OvicDocumentDownloaderComponent implements OnInit {
 

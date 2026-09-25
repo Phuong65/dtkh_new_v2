@@ -2,7 +2,7 @@ import { Component , EventEmitter , Input , OnDestroy , OnInit , Output } from '
 import * as Plyr from 'plyr';
 import { OvicDocumentTypes } from '@core/models/file';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-preview-file-fullsize' ,
 	templateUrl : './ovic-preview-file-fullsize.component.html' ,
 	styleUrls   : [ './ovic-preview-file-fullsize.component.css' ]

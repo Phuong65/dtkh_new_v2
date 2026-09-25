@@ -13,7 +13,7 @@ export interface OvicNavigator {
 	lastsPage : number;
 }
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-navigation' ,
 	templateUrl : './ovic-navigation.component.html' ,
 	styleUrls   : [ './ovic-navigation.component.css' ]

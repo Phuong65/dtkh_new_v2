@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
-import {  environment, getRoute } from 'src/environments/environment';
+import { getRoute } from 'src/environments/environment';
 import { HttpClient , HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { Dto } from '@core/models/dto';
 import { OvicZoom } from '../../shared/models/ovic-zoom';
 import { map } from 'rxjs/operators';
-import { DEFAULT_ZOOM } from '../../shared/utils/syscat';
-import createHmac from 'create-hmac';
-import * as CryptoJS from 'crypto-js';
-import base64url from 'base64url';
+
+const DEFAULT_ZOOM = { api: '' , apiSecret: '' , host_id: '' , user_id: '' };
+
+const ZOOM_NOT_CONFIGURED = 'Zoom client integration requires backend configuration.';
 
 @Injectable ( {
 	providedIn : 'root'
@@ -18,9 +18,11 @@ export class OvicZoomService {
 
 	api = getRoute( 'class-zoom/' );
 
-	apiZoomUser = ''.concat ( environment.server.apiZoom , 'users' );
+	/** Configure via backend — not from environment */
+	apiZoomUser = '';
 
-	apiZoomMeeting = ''.concat ( environment.server.apiZoom , 'mettings' );
+	/** Configure via backend — not from environment */
+	apiZoomMeeting = '';
 
 	constructor (
 		private http : HttpClient
@@ -60,31 +62,8 @@ export class OvicZoomService {
 		);
 	}
 
-	getZoomToken ( api , apisecret ) {
-		let newApi = null;
-		let newApisecret = null;
-		if ( ! api ) {
-			newApi = this.defaultZoom.api;
-		} else {
-			newApi = api;
-		}
-		if ( ! apisecret ) {
-			newApisecret = this.defaultZoom.apiSecret;
-		} else {
-			newApisecret = apisecret;
-        }
-		const d = new Date ();
-		const tmpd = d.setMinutes ( d.getMinutes () + 90 );
-		const exp = new Date ( tmpd );
-		const apiSecret = newApisecret.trim ();
-		const payload = { 'iss' : newApi.trim () , 'exp' : exp.getTime () };
-		const header = { 'alg' : 'HS256' , 'typ' : 'JWT' };
-		const headerBase64 = base64url ( JSON.stringify ( header ) );
-		const payloadBase64 = base64url ( JSON.stringify ( payload ) );
-		const sig = CryptoJS.HmacSHA256 ( headerBase64 + '.' + payloadBase64 , apiSecret );
-		const signature = CryptoJS.enc.Base64.stringify ( sig );
-        const token = headerBase64 + '.' + payloadBase64 + '.' + signature;
-		return token;
+	getZoomToken ( _api?: string , _apisecret?: string ): string {
+		throw new Error( ZOOM_NOT_CONFIGURED );
 	}
 
 	getBody ( hostId : string , startTime : any , time : number , title : string ) {
@@ -146,20 +125,11 @@ export class OvicZoomService {
 		return body;
 	}
 
-	getUserByZoom ( api : string , apisecret : string ) : Observable<any> {
-		const token = this.getZoomToken ( api , apisecret );
-        const headers = { 'token_zoom' : 'Bearer ' + token , 'Content-Type' : 'application/json' };
-		return this.http.get<Dto> ( this.apiZoomUser , { headers } ).pipe (
-			map ( res => res )
-		);
+	getUserByZoom ( _api : string , _apisecret : string ) : Observable<any> {
+		return throwError( () => new Error( ZOOM_NOT_CONFIGURED ) );
 	}
 
-	createMeeting ( api : string , apisecret : string , hostId : string , startTime : any , time : number , title : string , userId : string ) : Observable<any> {
-        const token = this.getZoomToken(api, apisecret);
-		const body = this.getBody ( hostId , startTime , time , title );
-        const headers = { 'token_zoom': 'Bearer '+ token, 'Content-Type': 'application/json', 'user_id': userId ? userId : this.defaultZoom.user_id };
-		return this.http.post<Dto> ( this.apiZoomMeeting , body , { headers } ).pipe (
-			map ( res => res )
-		);
+	createMeeting ( _api : string , _apisecret : string , _hostId : string , _startTime : any , _time : number , _title : string , _userId : string ) : Observable<any> {
+		return throwError( () => new Error( ZOOM_NOT_CONFIGURED ) );
 	}
 }

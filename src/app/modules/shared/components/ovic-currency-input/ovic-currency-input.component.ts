@@ -1,7 +1,7 @@
 import { Component , Input , OnInit , SimpleChanges , OnChanges , Output , EventEmitter } from '@angular/core';
 import { AbstractControl , FormGroup } from '@angular/forms';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-currency-input' ,
 	templateUrl : './ovic-currency-input.component.html' ,
 	styleUrls   : [ './ovic-currency-input.component.css' ]

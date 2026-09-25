@@ -4,6 +4,7 @@ import { HelperService } from '@core/services/helper.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DomSanitizer } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 // import { TnBankQuestionService } from '../../../shared/services/tn-bank-question.service';
 import {
     NORMAL_MODAL_OPTIONS,
@@ -15,11 +16,17 @@ import {
 import { getLinkDownload_aws, getLinkMedia_aws } from '@env';
 import { AuthService } from '@core/services/auth.service';
 import { OvicDocument } from '@core/models/file';
+import { NgxDocViewerComponent } from 'ngx-doc-viewer';
+import { GeneralModule } from '@modules/kiem-thu-ngan-hang-cau-hoi/general/general.module';
+import { Dialog } from 'primeng/dialog';
+import { Image } from 'primeng/image';
+import { OvicFileIconPipe } from '../../pipes/ovic-file-icon.pipe';
 
-@Component({standalone: false, 
+@Component({standalone: true, 
     selector: 'file-list-chat',
     templateUrl: './file-list-chat.component.html',
-    styleUrls: ['./file-list-chat.component.css']
+    styleUrls: ['./file-list-chat.component.css'],
+    imports: [NgxDocViewerComponent, GeneralModule, Dialog, CommonModule, Image, OvicFileIconPipe]
 })
 export class FileListChatComponent implements OnInit, OnChanges {
 

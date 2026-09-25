@@ -56,7 +56,6 @@ import {
     rotateSides,
     slide
 } from '@shared/animations/router-animations';
-import { OverlayPanel } from 'primeng/overlaypanel';
 import { BUTTON_NO, BUTTON_YES } from '@core/models/buttons';
 import { ScrollPanel } from 'primeng/scrollpanel';
 import { Title } from '@angular/platform-browser';
@@ -69,12 +68,11 @@ import { SharedModule } from '@modules/shared/shared.module';
 import { UserInfoV2Component } from './user-info-v2/user-info-v2.component';
 import { MENU_TEST_V2 } from '@modules/shared/models/menu-test';
 import { MenuModule } from 'primeng/menu';
-import { TabMenuModule } from 'primeng/tabmenu';
 
 @Component({
     selector: 'app-dashboard-v2',
     standalone: true,
-    imports: [CommonModule, SharedModule, RouterModule, UserInfoV2Component, MenuModule, TabMenuModule],
+    imports: [CommonModule, SharedModule, RouterModule, UserInfoV2Component, MenuModule],
     templateUrl: './dashboard-v2.component.html',
     styleUrls: ['./dashboard-v2.component.css'],
     animations: [

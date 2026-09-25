@@ -1,6 +1,6 @@
 import { Component , OnInit , Input , ViewChild , ElementRef , Output , EventEmitter , SimpleChanges , OnChanges } from '@angular/core';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
     selector : 'su-input-switch' ,
     templateUrl : './su-input-switch.component.html' ,
     styleUrls : [ './su-input-switch.component.css' ]

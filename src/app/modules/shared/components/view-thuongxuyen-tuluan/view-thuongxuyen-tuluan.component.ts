@@ -11,11 +11,16 @@ import { firstValueFrom, forkJoin, mergeMap, of } from 'rxjs';
 import { APP_CONFIGS } from '@env';
 import { CoursePlanActivityTuluanTieuchicham } from '@modules/shared/models/course-plan-activity-tuluan-tieuchicham';
 import { CHUAN_DAU_RA } from '@modules/shared/utils/syscat';
+import { SafeHtmlPipe } from '../../../kiem-thu-ngan-hang-cau-hoi/pipes/safe-html.pipe';
+import { LoadMediaOnTextDirective } from '@modules/shared/directives/load-media-on-text.directive';
+import { Divider } from 'primeng/divider';
+import { KatexImgDirective } from '@modules/shared/directives/katex-img.directive';
 
-@Component({standalone: false, 
+@Component({standalone: true, 
     selector: 'app-view-thuongxuyen-tuluan',
     templateUrl: './view-thuongxuyen-tuluan.component.html',
-    styleUrls: ['./view-thuongxuyen-tuluan.component.css']
+    styleUrls: ['./view-thuongxuyen-tuluan.component.css'],
+    imports: [SafeHtmlPipe, LoadMediaOnTextDirective, Divider, KatexImgDirective]
 })
 export class ViewThuongxuyenTuluanComponent implements OnInit, OnChanges {
 

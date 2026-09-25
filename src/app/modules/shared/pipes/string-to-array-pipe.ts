@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
-@Pipe( {standalone: false, 
+@Pipe( {standalone: true, 
     name: 'stringToArrayPipe'
 } )
 export class StringToArrayPipe implements PipeTransform {

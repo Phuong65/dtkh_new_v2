@@ -9,39 +9,39 @@ import {
 	Output,
 	Renderer2
 } from '@angular/core';
-import * as Plyr from 'plyr';
+import Plyr, * as PlyrTypes from 'plyr';
 
-@Directive({ selector: 'plyr' })
+@Directive({ standalone: true, selector: 'plyr' })
 export class OvicPlyrDirective implements AfterViewInit, OnDestroy {
 	@Input() plyrTitle = '';
 	@Input() plyrPlaysInline = false;
 	@Input() plyrCrossOrigin = false;
-	@Input() plyrOptions: Plyr.Options = {};
-	@Input() plyrSources: Plyr.Source[] = [];
-	@Input() plyrTracks: Plyr.Track[] = [];
+	@Input() plyrOptions: PlyrTypes.Options = {};
+	@Input() plyrSources: PlyrTypes.Source[] = [];
+	@Input() plyrTracks: PlyrTypes.Track[] = [];
 	@Input() plyrPoster = '';
-	@Input() plyrType: Plyr.MediaType = 'video';
+	@Input() plyrType: PlyrTypes.MediaType = 'video';
 
 	@Output() plyrInit = new EventEmitter<Plyr>();
-	@Output() plyrReady = new EventEmitter<Plyr.PlyrEvent>();
-	@Output() plyrPlay = new EventEmitter<Plyr.PlyrEvent>();
-	@Output() plyrPause = new EventEmitter<Plyr.PlyrEvent>();
-	@Output() plyrPlaying = new EventEmitter<Plyr.PlyrEvent>();
-	@Output() plyrWaiting = new EventEmitter<Plyr.PlyrEvent>();
-	@Output() plyrSeeking = new EventEmitter<Plyr.PlyrEvent>();
-	@Output() plyrSeeked = new EventEmitter<Plyr.PlyrEvent>();
-	@Output() plyrEnded = new EventEmitter<Plyr.PlyrEvent>();
-	@Output() plyrTimeUpdate = new EventEmitter<Plyr.PlyrEvent>();
-	@Output() plyrProgress = new EventEmitter<Plyr.PlyrEvent>();
-	@Output() plyrVolumeChange = new EventEmitter<Plyr.PlyrEvent>();
-	@Output() plyrRateChange = new EventEmitter<Plyr.PlyrEvent>();
-	@Output() plyrLoadStart = new EventEmitter<Plyr.PlyrEvent>();
-	@Output() plyrLoadedData = new EventEmitter<Plyr.PlyrEvent>();
-	@Output() plyrLoadedMetadata = new EventEmitter<Plyr.PlyrEvent>();
-	@Output() plyrCanPlay = new EventEmitter<Plyr.PlyrEvent>();
-	@Output() plyrCanPlayThrough = new EventEmitter<Plyr.PlyrEvent>();
-	@Output() plyrStalled = new EventEmitter<Plyr.PlyrEvent>();
-	@Output() plyrError = new EventEmitter<Plyr.PlyrEvent>();
+	@Output() plyrReady = new EventEmitter<PlyrTypes.PlyrEvent>();
+	@Output() plyrPlay = new EventEmitter<PlyrTypes.PlyrEvent>();
+	@Output() plyrPause = new EventEmitter<PlyrTypes.PlyrEvent>();
+	@Output() plyrPlaying = new EventEmitter<PlyrTypes.PlyrEvent>();
+	@Output() plyrWaiting = new EventEmitter<PlyrTypes.PlyrEvent>();
+	@Output() plyrSeeking = new EventEmitter<PlyrTypes.PlyrEvent>();
+	@Output() plyrSeeked = new EventEmitter<PlyrTypes.PlyrEvent>();
+	@Output() plyrEnded = new EventEmitter<PlyrTypes.PlyrEvent>();
+	@Output() plyrTimeUpdate = new EventEmitter<PlyrTypes.PlyrEvent>();
+	@Output() plyrProgress = new EventEmitter<PlyrTypes.PlyrEvent>();
+	@Output() plyrVolumeChange = new EventEmitter<PlyrTypes.PlyrEvent>();
+	@Output() plyrRateChange = new EventEmitter<PlyrTypes.PlyrEvent>();
+	@Output() plyrLoadStart = new EventEmitter<PlyrTypes.PlyrEvent>();
+	@Output() plyrLoadedData = new EventEmitter<PlyrTypes.PlyrEvent>();
+	@Output() plyrLoadedMetadata = new EventEmitter<PlyrTypes.PlyrEvent>();
+	@Output() plyrCanPlay = new EventEmitter<PlyrTypes.PlyrEvent>();
+	@Output() plyrCanPlayThrough = new EventEmitter<PlyrTypes.PlyrEvent>();
+	@Output() plyrStalled = new EventEmitter<PlyrTypes.PlyrEvent>();
+	@Output() plyrError = new EventEmitter<PlyrTypes.PlyrEvent>();
 
 	private player: Plyr | null = null;
 	private readonly handlers = new Map<string, (event: any) => void>();
@@ -70,7 +70,7 @@ export class OvicPlyrDirective implements AfterViewInit, OnDestroy {
 		};
 		this.plyrInit.emit(this.player);
 
-		const outputs: Record<string, EventEmitter<any>> = {
+		const outputs: Record<string, EventEmitter<Event>> = {
 			ready: this.plyrReady,
 			play: this.plyrPlay,
 			pause: this.plyrPause,
@@ -93,15 +93,15 @@ export class OvicPlyrDirective implements AfterViewInit, OnDestroy {
 		};
 
 		Object.entries(outputs).forEach(([name, output]) => {
-			const handler = (event: any): void => this.ngZone.run(() => output.emit(event));
+			const handler = (event: Event): void => this.ngZone.run(() => output.emit(event));
 			this.handlers.set(name, handler);
-			this.player?.on(name as any, handler);
+			this.player?.on(name as keyof PlyrTypes.PlyrEventMap, handler as any);
 		});
 	}
 
 	ngOnDestroy(): void {
 		if (!this.player) return;
-		this.handlers.forEach((handler, name) => this.player?.off(name as any, handler));
+		this.handlers.forEach((handler, name) => this.player?.off(name as keyof PlyrTypes.PlyrEventMap, handler));
 		this.player.destroy();
 		this.player = null;
 	}

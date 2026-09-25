@@ -1,7 +1,7 @@
 import { OnDestroy, Pipe, PipeTransform } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
-@Pipe({standalone: false, 
+@Pipe({standalone: true, 
     name: 'showlabel'
 })
 export class ShowLabelData implements PipeTransform, OnDestroy {

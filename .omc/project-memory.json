@@ -1,0 +1,433 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1790252960196,
+  "projectRoot": "d:\\data\\project\\angular\\v21\\dtkh_new_v2",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "@angular/core",
+        "version": "21.1.1",
+        "category": "frontend"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "npm run build && npx ng test --watch=false --browsers=ChromeHeadless",
+    "testCommand": "npm test",
+    "lintCommand": null,
+    "devCommand": "npm run start",
+    "scripts": {
+      "ng": "ng",
+      "start": "node --max_old_space_size=3072 ./node_modules/@angular/cli/bin/ng serve -o --port=8008",
+      "start:lowram": "node --max_old_space_size=3072 ./node_modules/@angular/cli/bin/ng serve --configuration development-lowram --port=8008",
+      "build": "node --max_old_space_size=3072 ./node_modules/@angular/cli/bin/ng build --aot",
+      "watch": "ng build --watch --configuration development",
+      "test": "ng test"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "docs",
+      "src"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "dist": {
+      "path": "dist",
+      "purpose": "Distribution/build output",
+      "fileCount": 0,
+      "lastAccessed": 1790252960158,
+      "keyFiles": []
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 2,
+      "lastAccessed": 1790252960159,
+      "keyFiles": [
+        "FRONTEND_API_GUIDE.md",
+        "_rules.md"
+      ]
+    },
+    "plans": {
+      "path": "plans",
+      "purpose": null,
+      "fileCount": 75,
+      "lastAccessed": 1790252960160,
+      "keyFiles": [
+        "arrange-paragraphs-editor.md",
+        "cauhoi-tracnghiem-chitiet.md",
+        "cauhoi-tracnghiem-create-form.md",
+        "cauhoi-tuluan-15p.md",
+        "cham-diem-kiem-tra-dau-gio.md"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 7,
+      "lastAccessed": 1790252960160,
+      "keyFiles": [
+        "custom-theme.scss",
+        "favicon.ico",
+        "index.html",
+        "main.ts",
+        "polyfills.ts"
+      ]
+    },
+    "src\\app": {
+      "path": "src\\app",
+      "purpose": "Application code",
+      "fileCount": 5,
+      "lastAccessed": 1790252960173,
+      "keyFiles": [
+        "app-routing.module.ts",
+        "app.component.css",
+        "app.component.html"
+      ]
+    },
+    "src\\assets": {
+      "path": "src\\assets",
+      "purpose": "Static assets",
+      "fileCount": 1,
+      "lastAccessed": 1790252960173,
+      "keyFiles": []
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "plans\\update-core21.md",
+      "accessCount": 39,
+      "lastAccessed": 1790301977056,
+      "type": "file"
+    },
+    {
+      "path": "src/app",
+      "accessCount": 35,
+      "lastAccessed": 1790261411292,
+      "type": "directory"
+    },
+    {
+      "path": "src",
+      "accessCount": 23,
+      "lastAccessed": 1790301592578,
+      "type": "directory"
+    },
+    {
+      "path": "src\\app\\modules\\shared\\components\\test-question-review-v2\\test-question-review-v2.component.html",
+      "accessCount": 14,
+      "lastAccessed": 1790212988047,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\shared\\directives\\ovic-plyr.directive.ts",
+      "accessCount": 9,
+      "lastAccessed": 1790181433018,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\shared\\components\\test-question-review-v2\\test-question-review-v2.component.spec.ts",
+      "accessCount": 8,
+      "lastAccessed": 1790213071533,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\shared\\components\\test-question-import-v2\\test-question-import-v2.component.html",
+      "accessCount": 8,
+      "lastAccessed": 1790213423297,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\admin\\dashboard\\dashboard-v2\\dashboard-v2.component.html",
+      "accessCount": 8,
+      "lastAccessed": 1790301657520,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\shared\\components\\ovic-file-explorer\\ovic-file-explorer.component.ts",
+      "accessCount": 6,
+      "lastAccessed": 1790180545441,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\shared\\components\\ovic-file-detail\\ovic-file-detail.component.ts",
+      "accessCount": 5,
+      "lastAccessed": 1790178088672,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\shared\\components\\ovic-personal-file-explorer\\ovic-personal-file-explorer.component.ts",
+      "accessCount": 5,
+      "lastAccessed": 1790180680097,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\public\\features\\index\\index.component.ts",
+      "accessCount": 5,
+      "lastAccessed": 1790181031537,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\shared\\components\\test-question-review-v2\\test-question-review-v2.component.ts",
+      "accessCount": 5,
+      "lastAccessed": 1790183831198,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\shared\\components\\ovic-media-player\\ovic-media-player.component.ts",
+      "accessCount": 4,
+      "lastAccessed": 1790180802594,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\shared\\components\\ovic-preview\\ovic-preview.component.ts",
+      "accessCount": 4,
+      "lastAccessed": 1790180896925,
+      "type": "file"
+    },
+    {
+      "path": "angular.json",
+      "accessCount": 4,
+      "lastAccessed": 1790259377624,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\public\\features\\login-template-v4\\login-template-v4.component.ts",
+      "accessCount": 3,
+      "lastAccessed": 1790177512252,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\shared\\directives\\ovic-drop-and-drag.directive.ts",
+      "accessCount": 3,
+      "lastAccessed": 1790177975274,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\shared\\components\\ovic-preview-single-google-drive-file\\ovic-preview-single-google-drive-file.component.ts",
+      "accessCount": 3,
+      "lastAccessed": 1790180846341,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\public\\features\\login-template-v4\\login-template-v4.component.spec.ts",
+      "accessCount": 3,
+      "lastAccessed": 1790181699893,
+      "type": "file"
+    },
+    {
+      "path": "src/app/modules/shared",
+      "accessCount": 3,
+      "lastAccessed": 1790215306612,
+      "type": "directory"
+    },
+    {
+      "path": "src/app/modules",
+      "accessCount": 3,
+      "lastAccessed": 1790253254115,
+      "type": "directory"
+    },
+    {
+      "path": "src/app/modules/shared/components",
+      "accessCount": 3,
+      "lastAccessed": 1790254581228,
+      "type": "directory"
+    },
+    {
+      "path": "src\\app\\modules\\shared\\directives\\ngx-viewer.directive.ts",
+      "accessCount": 2,
+      "lastAccessed": 1790177954893,
+      "type": "file"
+    },
+    {
+      "path": "C:\\Users\\2311\\AppData\\Local\\Temp\\claude\\d--data-project-angular-v21-dtkh-new-v2\\ed4ce972-c89d-48a6-b2dd-f4e456e1e4b4\\tasks\\bz0vha2gp.output",
+      "accessCount": 2,
+      "lastAccessed": 1790181244930,
+      "type": "file"
+    },
+    {
+      "path": "C:\\Users\\2311\\AppData\\Local\\Temp\\claude\\d--data-project-angular-v21-dtkh-new-v2\\ed4ce972-c89d-48a6-b2dd-f4e456e1e4b4\\tasks\\b28foi395.output",
+      "accessCount": 2,
+      "lastAccessed": 1790181582229,
+      "type": "file"
+    },
+    {
+      "path": "C:\\Users\\2311\\AppData\\Local\\Temp\\claude\\d--data-project-angular-v21-dtkh-new-v2\\ed4ce972-c89d-48a6-b2dd-f4e456e1e4b4\\tasks\\b64i2o74e.output",
+      "accessCount": 2,
+      "lastAccessed": 1790181893345,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\shared\\pipes\\ovic-safe-html.pipe.ts",
+      "accessCount": 2,
+      "lastAccessed": 1790215323306,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\public\\public.module.ts",
+      "accessCount": 2,
+      "lastAccessed": 1790255352454,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\public\\features\\login-template-v4\\login-template-v4.component.html",
+      "accessCount": 1,
+      "lastAccessed": 1790177405577,
+      "type": "file"
+    },
+    {
+      "path": "C:\\Users\\2311\\AppData\\Local\\Temp\\claude\\d--data-project-angular-v21-dtkh-new-v2\\ed4ce972-c89d-48a6-b2dd-f4e456e1e4b4\\tasks\\b7nnkjm30.output",
+      "accessCount": 1,
+      "lastAccessed": 1790177575064,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\shared\\components\\ovic-personal-file-explorer\\ovic-personal-file-explorer.component.html",
+      "accessCount": 1,
+      "lastAccessed": 1790177804935,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\shared\\components\\ovic-file-explorer\\ovic-file-explorer.component.html",
+      "accessCount": 1,
+      "lastAccessed": 1790177805215,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\shared\\components\\ovic-preview-single-google-drive-file\\ovic-preview-single-google-drive-file.component.html",
+      "accessCount": 1,
+      "lastAccessed": 1790177861359,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\shared\\pipes\\ovic-file-share-state.pipe.ts",
+      "accessCount": 1,
+      "lastAccessed": 1790177889645,
+      "type": "file"
+    },
+    {
+      "path": "src/app/modules/shared/directives",
+      "accessCount": 1,
+      "lastAccessed": 1790177890578,
+      "type": "directory"
+    },
+    {
+      "path": "src\\app\\modules\\admin\\dashboard\\dashboard-v2\\user-info-v2\\user-info-v2.component.ts",
+      "accessCount": 1,
+      "lastAccessed": 1790177914969,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\shared\\pipes\\ovic-safe-resource-url.pipe.ts",
+      "accessCount": 1,
+      "lastAccessed": 1790177997853,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\modules\\shared\\pipes\\ovic-safe-url.pipe.ts",
+      "accessCount": 1,
+      "lastAccessed": 1790177998481,
+      "type": "file"
+    },
+    {
+      "path": "src/app/modules/shared/components/ovic-media-player/ovic-media-player.component.ts",
+      "accessCount": 1,
+      "lastAccessed": 1790180709827,
+      "type": "directory"
+    },
+    {
+      "path": "C:\\Users\\2311\\AppData\\Local\\Temp\\claude\\d--data-project-angular-v21-dtkh-new-v2\\ed4ce972-c89d-48a6-b2dd-f4e456e1e4b4\\tasks\\bmm1v4fdl.output",
+      "accessCount": 1,
+      "lastAccessed": 1790181318296,
+      "type": "directory"
+    },
+    {
+      "path": "C:\\Users\\2311\\AppData\\Local\\Temp\\claude\\d--data-project-angular-v21-dtkh-new-v2\\ed4ce972-c89d-48a6-b2dd-f4e456e1e4b4\\tasks\\b90d4ou2o.output",
+      "accessCount": 1,
+      "lastAccessed": 1790181488909,
+      "type": "directory"
+    },
+    {
+      "path": "src\\app\\core\\services\\auth.service.ts",
+      "accessCount": 1,
+      "lastAccessed": 1790181603430,
+      "type": "file"
+    },
+    {
+      "path": "src\\app\\core\\services\\helper.service.ts",
+      "accessCount": 1,
+      "lastAccessed": 1790181603653,
+      "type": "file"
+    },
+    {
+      "path": "C:\\Users\\2311\\AppData\\Local\\Temp\\claude\\d--data-project-angular-v21-dtkh-new-v2\\ed4ce972-c89d-48a6-b2dd-f4e456e1e4b4\\tasks\\bk1gw68pj.output",
+      "accessCount": 1,
+      "lastAccessed": 1790181762976,
+      "type": "file"
+    },
+    {
+      "path": "C:\\Users\\2311\\AppData\\Local\\Temp\\claude\\d--data-project-angular-v21-dtkh-new-v2\\ed4ce972-c89d-48a6-b2dd-f4e456e1e4b4\\tasks\\a11c7dfb8737b4be6.output",
+      "accessCount": 1,
+      "lastAccessed": 1790181783475,
+      "type": "file"
+    },
+    {
+      "path": "src/app/modules/shared/components/test-question-review-v2",
+      "accessCount": 1,
+      "lastAccessed": 1790182029687,
+      "type": "directory"
+    },
+    {
+      "path": "src/app/modules/shared/components/test-question-import-v2",
+      "accessCount": 1,
+      "lastAccessed": 1790183545431,
+      "type": "directory"
+    },
+    {
+      "path": "C:\\Users\\2311\\AppData\\Local\\Temp\\claude\\d--data-project-angular-v21-dtkh-new-v2\\ed4ce972-c89d-48a6-b2dd-f4e456e1e4b4\\tasks\\bffscwpas.output",
+      "accessCount": 1,
+      "lastAccessed": 1790183723435,
+      "type": "file"
+    },
+    {
+      "path": "C:\\Users\\2311\\AppData\\Local\\Temp\\claude\\d--data-project-angular-v21-dtkh-new-v2\\ed4ce972-c89d-48a6-b2dd-f4e456e1e4b4\\tasks\\bwfff87nt.output",
+      "accessCount": 1,
+      "lastAccessed": 1790183861358,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

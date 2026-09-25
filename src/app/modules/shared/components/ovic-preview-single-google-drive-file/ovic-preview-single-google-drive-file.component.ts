@@ -1,4 +1,10 @@
 import { Component , EventEmitter , Input , OnInit , Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { OvicSafeResourceUrlPipe } from '../../pipes/ovic-safe-resource-url.pipe';
+import { OvicSafeUrlPipe } from '../../pipes/ovic-safe-url.pipe';
+import { OvicSafeHtmlPipe } from '../../pipes/ovic-safe-html.pipe';
+import { NgxViewerDirective } from '../../directives/ngx-viewer.directive';
 import { Download , OvicPreviewFileContent , OvicTinyDriveFile } from '@core/models/file';
 import { FileService } from '@core/services/file.service';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -10,10 +16,11 @@ interface SingleFileDriverPreview {
 	url : string;
 }
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-preview-single-google-drive-file' ,
 	templateUrl : './ovic-preview-single-google-drive-file.component.html' ,
-	styleUrls   : [ './ovic-preview-single-google-drive-file.component.css' ]
+	styleUrls   : [ './ovic-preview-single-google-drive-file.component.css' ],
+	imports     : [CommonModule, MatProgressBarModule, OvicSafeResourceUrlPipe, OvicSafeUrlPipe, OvicSafeHtmlPipe, NgxViewerDirective]
 } )
 export class OvicPreviewSingleGoogleDriveFileComponent implements OnInit {
 

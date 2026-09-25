@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ChangeDetectorRef, ElementRef, HostListener, 
 import { NotificationService, StateLoadingV2 } from '@core/services/notification.service';
 import { debounceTime, distinctUntilChanged, map, of, Subscription, switchMap, timer } from 'rxjs';
 import { MessageService } from 'primeng/api';
-import { PrimeNGConfig } from 'primeng/api';
+import { PrimeNG } from 'primeng/config';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '@core/services/auth.service';
@@ -53,9 +53,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 		private translate: TranslateService,
 		private http: HttpClient,
 		private authService: AuthService,
-		private primengConfig: PrimeNGConfig,
-		private cdr: ChangeDetectorRef,
-		private ngZone: NgZone
+		private primeng: PrimeNG
 	) {
 		(window as any).katex = katex;
 		const observerOnLoading = this.notification.onAppLoading.pipe(
@@ -133,7 +131,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	ngOnInit(): void {
-		this.primengConfig.ripple = true;
+		this.primeng.ripple.set(true);
 		document.documentElement.style.fontSize = '14px';
 	}
 

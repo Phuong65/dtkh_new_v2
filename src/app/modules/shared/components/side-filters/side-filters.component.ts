@@ -1,7 +1,7 @@
 import { Component , Input , OnInit } from '@angular/core';
 import { SideFilterSettings } from '@shared/models/side-filters';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'app-side-filters' ,
 	templateUrl : './side-filters.component.html' ,
 	styleUrls   : [ './side-filters.component.css' ]

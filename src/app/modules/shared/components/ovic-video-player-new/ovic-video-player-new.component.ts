@@ -10,6 +10,8 @@ import { LessonVideoLogEvent, VideoBaiHoc } from '../../../shared/models/elng-ba
 import { PlaylistYoutubeService } from '../../services/playlist-youtube.service';
 import { FileService } from '@core/services/file.service';
 import { waitForAsync as async } from '@angular/core/testing';
+import { OvicPlyrDirective } from '@modules/shared/directives/ovic-plyr.directive';
+import { ProgressBar } from 'primeng/progressbar';
 
 // export interface OvicVideosEventLog {
 //     tracking? : ClassStudentsTracking;
@@ -24,10 +26,11 @@ export interface OvicVideosEventLog {
     log: LessonVideoLogEvent;
 }
 
-@Component({standalone: false, 
+@Component({standalone: true, 
     selector: 'ovic-video-player-new',
     templateUrl: './ovic-video-player-new.component.html',
-    styleUrls: ['./ovic-video-player-new.component.css']
+    styleUrls: ['./ovic-video-player-new.component.css'],
+    imports: [OvicPlyrDirective, ProgressBar]
 })
 export class OvicVideoPlayerNewComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
 

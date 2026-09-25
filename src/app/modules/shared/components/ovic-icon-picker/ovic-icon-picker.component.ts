@@ -3,7 +3,7 @@ import { NgbModal , NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { HelperService } from '@core/services/helper.service';
 import { DEFAULT_MODAL_OPTIONS_NO_BACKDROP } from '@shared/utils/syscat';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-icon-picker' ,
 	templateUrl : './ovic-icon-picker.component.html' ,
 	styleUrls   : [ './ovic-icon-picker.component.css' ]

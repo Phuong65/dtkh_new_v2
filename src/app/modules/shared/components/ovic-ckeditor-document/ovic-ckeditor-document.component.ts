@@ -19,7 +19,7 @@ import { NotificationService } from '@core/services/notification.service';
 import { LatexHandleComponent } from '../latex-handle/latex-handle.component';
 import { MatDialog } from '@angular/material/dialog';
 
-@Component({standalone: false, 
+@Component({standalone: true, 
     selector: 'ovic-ckeditor-document',
     templateUrl: './ovic-ckeditor-document.component.html',
     styleUrls: ['./ovic-ckeditor-document.component.css']

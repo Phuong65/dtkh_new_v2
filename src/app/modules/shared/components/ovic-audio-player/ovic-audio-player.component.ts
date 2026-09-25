@@ -4,7 +4,7 @@ import { OvicMedia , OvicMediaSources } from '@core/models/file';
 import { NotificationService } from '@core/services/notification.service';
 import { AuthService } from '@core/services/auth.service';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-audio-player' ,
 	templateUrl : './ovic-audio-player.component.html' ,
 	styleUrls   : [ './ovic-audio-player.component.css' ]

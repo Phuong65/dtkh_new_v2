@@ -1,176 +1,240 @@
-<div *ngIf="hasContent" class="question-file-preview">
-    <div *ngFor="let part of questionImport" class="question-file-preview-content">
+@if (hasContent) {
+  <div class="question-file-preview">
+    @for (part of questionImport; track part) {
+      <div class="question-file-preview-content">
         <div #part_direction class="import-question-direction-part">
-            {{part['question_direction'] | rawHtmlPipe : part_direction}}
+          {{part['question_direction'] | rawHtmlPipe : part_direction}}
         </div>
-        <div *ngIf="part.media && part.media.path" class="mediaPreview">
+        @if (part.media && part.media.path) {
+          <div class="mediaPreview">
             <label class="lable-preview-media" (click)="selectPreviewAudio(part)">[Click to
-                view
-                {{part.media.type==='audio'?'Audio':'Video'}}]</label>
+              view
+            {{part.media.type==='audio'?'Audio':'Video'}}]</label>
             <div class="mediaPreview-content {{part.media.type === 'video' && part['media_open']?'video-preview-active':null}}"
-                [ngClass]="part['media_open']?'audio-preview-active':null">
-                <audio-viewer [width]="442" [height]="250" [type]="part.media.type" *ngIf="part['media_open']"
-                    [path]="part.media.path" [source]="part.media.source">
+              [ngClass]="part['media_open']?'audio-preview-active':null">
+              @if (part['media_open']) {
+                <audio-viewer [width]="442" [height]="250" [type]="part.media.type"
+                  [path]="part.media.path" [source]="part.media.source">
                 </audio-viewer>
+              }
             </div>
-        </div>
+          </div>
+        }
         <ng-container [ngTemplateOutlet]="templateQuestion"
-            [ngTemplateOutletContext]="{ part: part, noQuestionNumber:false}"></ng-container>
-    </div>
+        [ngTemplateOutletContext]="{ part: part, noQuestionNumber:false}"></ng-container>
+      </div>
+    }
     <ng-template #templateQuestion let-part="part" let-noQuestionNumber="noQuestionNumber" let-keyNumber="keyNumber">
-        <container-element [ngSwitch]="part.question_type">
-            <ng-container *ngSwitchCase="'drag_drop'">
-                <div *ngIf="part.answer_option" class="list-reorder_words-ans">
-                    <div class="box-reorder_words-ans" *ngFor="let word of part.answer_option" style="cursor:default;">
-                        {{word['value']}}</div>
-                </div>
+      <ng-container>
+        @switch (part.question_type) {
+          @case ('drag_drop') {
+            @if (part.answer_option) {
+              <div class="list-reorder_words-ans">
+                @for (word of part.answer_option; track word) {
+                  <div class="box-reorder_words-ans" style="cursor:default;">
+                  {{word['value']}}</div>
+                }
+              </div>
+            }
+          }
+          @case ('grouping') {
+            @if (part.answer_option) {
+              <div class="list-reorder_words-ans">
+                @for (word of part.answer_option; track word) {
+                  <div class="box-reorder_words-ans" style="cursor:default;">
+                  {{word['value']}}</div>
+                }
+              </div>
+            }
+          }
+        }
+      </ng-container>
+      <div [ngClass]="noQuestionNumber?'row':''"
+        class="{{noQuestionNumber && part.question_type === 'drag_drop'?'drag-drop-child-other':''}}">
+        @for (quest of part["children"]; track quest; let i = $index) {
+          <div class="import-questTion-option {{noQuestionNumber?'col-6':''}}"
+            [ngClass]="noQuestionNumber?'no-question-number':''"
+            >
+            <!-- <container-element [ngSwitch]="quest['group_id']">
+            <ng-container *ngSwitchCase="quest['group_id']">
             </ng-container>
-            <ng-container *ngSwitchCase="'grouping'">
-                <div *ngIf="part.answer_option" class="list-reorder_words-ans">
-                    <div class="box-reorder_words-ans" *ngFor="let word of part.answer_option" style="cursor:default;">
-                        {{word['value']}}</div>
-                </div>
-            </ng-container>
-        </container-element>
-        <div [ngClass]="noQuestionNumber?'row':''"
-            class="{{noQuestionNumber && part.question_type === 'drag_drop'?'drag-drop-child-other':''}}">
-            <div class="import-questTion-option {{noQuestionNumber?'col-6':''}}"
-                [ngClass]="noQuestionNumber?'no-question-number':''"
-                *ngFor='let quest of part["children"]; let i = index'>
-                <!-- <container-element [ngSwitch]="quest['group_id']">
-                <ng-container *ngSwitchCase="quest['group_id']">
-                </ng-container>
-            </container-element> -->
-                <div class="import-question-direction-child">
-                    <strong *ngIf="!noQuestionNumber">{{quest.question_number}}.</strong>
-                    <span *ngIf="noQuestionNumber" style="margin-right: 10px;">+</span>
-                    <div #questionDirection class="import-question-direction-content">
-                        {{quest.question_direction | rawHtmlPipe : questionDirection : true}}
-                    </div>
-                </div>
-
-
-                <div *ngIf="quest.answer_option && quest.answer_option.length !== 2 && (quest.question_type === 'radio' || quest.question_type === 'checkbox')"
-                    class="question_answer_setting">
-                    <label class="title-setting-question">Cài đặt</label>
-                    <div class="row form-row form-row-flex-row">
-                        <div class="col-6 flex-div" style="border-right: 1px dashed #c8c8c8; padding-right: 15px;">
-                            <label>Hiển thị số lượng đáp án trên 1 dòng:</label>
-                            <div class="group_select_cols">
-                                <div class="col_select_item" *ngFor="let col of option_show_anwser_col, index as k">
-                                    <input [(ngModel)]="quest['config']['cols']" type="radio" [value]="col['value']"
-                                        [name]="'config'+part['keyParent'].toString()+'_'+i.toString()">
-                                    <span>{{col['value']}}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="padding-left: 15px;" class="col-4 flex-div">
-                            <label>Đảo đáp án:</label>
-                            <div class="group_select_cols">
-                                <div class="col_select_item" *ngFor="let col of option_invertedAnswer, index as k">
-                                    <input [(ngModel)]="quest['config']['invertedAnswer']" type="radio"
-                                        [value]="col['value']"
-                                        [name]="'invertedAnswer'+part['keyParent'].toString()+'_'+i.toString()">
-                                    <span>{{col['label']}}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-
-                <container-element class="ans-option-class" [ngSwitch]="quest.question_type">
-                    <ng-container *ngSwitchCase="'radio'">
-                        <div class="lesson-answer-content">
-                            <ovic-groups-radio-v2 [columns]="quest['config']['cols']"
-                                [group_name]="!keyNumber?'group_'+part['keyParent'].toString()+'_'+i.toString():'group_' + keyNumber.toString() + part['question_number'].toString()+'_'+i.toString()"
-                                styleClass="radio-answer-lesson"
-                                *ngIf="quest.answer_option && quest.answer_option.length !== 0" [verticalMode]="false"
-                                [rawHtml]="true" [options]="quest.answer_option" optionLabel="value" optionId="id"
-                                [defaultValue]="quest.answer_correct[0]"
-                                [show_image]="quest.answer_option[0].value | pipeCheckImg"
-                                (onChange)="onChangeRadioAnswer(quest,$event)">
-                            </ovic-groups-radio-v2>
-                        </div>
-                    </ng-container>
-                    <ng-container *ngSwitchCase="'checkbox'">
-                        <div class="lesson-answer-content">
-                            <ovic-groups-checkbox [show_image]="quest.answer_option[0].value | pipeCheckImg"
-                                [columns]="quest['config']['cols']" classes="radio-answer-lesson"
-                                *ngIf="quest.answer_option && quest.answer_option.length !== 0" [verticalMode]="false"
-                                [rawHtml]="true" [options]="quest.answer_option" optionLabel="value" optionId="id"
-                                [default]="quest.answer_correct[0]" (onChange)="onChangeCheckboxAnswer(quest,$event)">
-                            </ovic-groups-checkbox>
-                        </div>
-                    </ng-container>
-                    <ng-container *ngSwitchCase="'inputbox'">
-                        <div class="lesson-answer-input">
-                            <p-chips [allowDuplicate]="false" (onAdd)="onAddChips($event,quest.answer_correct)"
-                                (onRemove)="onRemoveChips($event,quest.answer_correct)" styleClass="input-answers-chips"
-                                [ngModel]="quest.answer_correct[0] | stringToArrayPipe:'|'"></p-chips>
-                        </div>
-                    </ng-container>
-                    <ng-container *ngSwitchCase="'reorder_words'">
-                        <div style="width: 100%; margin-top: 10px;" class="lesson-answer-reorder_words"
-                            *ngIf="quest.reorder_words_ans && quest.reorder_words_ans.length">
-                            <div cdkDropListOrientation="horizontal" cdkDropList class="list-reorder_words-ans"
-                                (cdkDropListDropped)="dropReorder($event,quest.reorder_words_ans, quest)">
-                                <div class="box-reorder_words-ans" *ngFor="let word of quest.reorder_words_ans" cdkDrag>
-                                    {{word}}</div>
-                            </div>
-                        </div>
-                    </ng-container>
-                    <ng-container *ngSwitchCase="'group-radio'">
-                        <div *ngIf="quest['children']">
-                            <ng-container [ngTemplateOutlet]="templateQuestion"
-                                [ngTemplateOutletContext]="{ part: quest, noQuestionNumber:true, keyNumber: part['keyParent']}"></ng-container>
-                        </div>
-                    </ng-container>
-                    <ng-container *ngSwitchCase="'group-input'">
-                        <div *ngIf="quest['children']">
-                            <ng-container [ngTemplateOutlet]="templateQuestion"
-                                [ngTemplateOutletContext]="{ part: quest, noQuestionNumber:true, keyNumber: part['keyParent']}"></ng-container>
-                        </div>
-                    </ng-container>
-                    <ng-container *ngSwitchCase="'drag_drop'">
-                        <div class="border-drop-end"
-                            *ngIf="quest.answer_correct && quest.answer_correct[0] && (!quest.children || !quest.children.length)">
-                            <div class="box-ans-correct"
-                                *ngFor="let item of (quest.answer_correct[0] | getAnsDragDropPipe : part.answer_option)">
-                                {{item}}
-                            </div>
-                        </div>
-                        <div *ngIf="quest['children'] && quest.children.length">
-                            <ng-container [ngTemplateOutlet]="templateQuestion"
-                                [ngTemplateOutletContext]="{ part: quest, noQuestionNumber:true, keyNumber: part['keyParent']}">
-                            </ng-container>
-                        </div>
-                    </ng-container>
-                    <ng-container *ngSwitchCase="'grouping'">
-                        <div>
-                            <div [ngClass]="quest.question_type === 'grouping'?'border-drop-end-grouping':''"
-                                class="border-drop-end"
-                                *ngIf="quest.answer_correct && quest.answer_correct[0] && (!quest.children || !quest.children.length)">
-                                <div class="box-ans-correct"
-                                    *ngFor="let item of (quest.answer_correct[0] | getAnsDragDropPipe : part.answer_option)">
-                                    {{item}}
-                                </div>
-                            </div>
-                            <ng-container *ngIf="quest['children'] && quest.children.length"
-                                [ngTemplateOutlet]="templateQuestion"
-                                [ngTemplateOutletContext]="{ part: quest, noQuestionNumber:true, keyNumber: part['keyParent']}">
-                            </ng-container>
-                        </div>
-                    </ng-container>
-                </container-element>
-                <p class="question-hint-exp" *ngIf="quest.hint"><strong>Hint</strong>:
-                    {{quest.hint}}</p>
-                <p class="question-hint-exp question-exp" *ngIf="quest.explain">
-                    <strong>Explain</strong>:
-                    {{quest.explain}}
-                </p>
+          </container-element> -->
+          <div class="import-question-direction-child">
+            @if (!noQuestionNumber) {
+              <strong>{{quest.question_number}}.</strong>
+            }
+            @if (noQuestionNumber) {
+              <span style="margin-right: 10px;">+</span>
+            }
+            <div #questionDirection class="import-question-direction-content">
+              {{quest.question_direction | rawHtmlPipe : questionDirection : true}}
             </div>
-        </div>
+          </div>
+          @if (quest.answer_option && quest.answer_option.length !== 2 && (quest.question_type === 'radio' || quest.question_type === 'checkbox')) {
+            <div
+              class="question_answer_setting">
+              <label class="title-setting-question">Cài đặt</label>
+              <div class="row form-row form-row-flex-row">
+                <div class="col-6 flex-div" style="border-right: 1px dashed #c8c8c8; padding-right: 15px;">
+                  <label>Hiển thị số lượng đáp án trên 1 dòng:</label>
+                  <div class="group_select_cols">
+                    @for (col of option_show_anwser_col; track col; let k = $index) {
+                      <div class="col_select_item">
+                        <input [(ngModel)]="quest['config']['cols']" type="radio" [value]="col['value']"
+                          [name]="'config'+part['keyParent'].toString()+'_'+i.toString()">
+                          <span>{{col['value']}}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                  <div style="padding-left: 15px;" class="col-4 flex-div">
+                    <label>Đảo đáp án:</label>
+                    <div class="group_select_cols">
+                      @for (col of option_invertedAnswer; track col; let k = $index) {
+                        <div class="col_select_item">
+                          <input [(ngModel)]="quest['config']['invertedAnswer']" type="radio"
+                            [value]="col['value']"
+                            [name]="'invertedAnswer'+part['keyParent'].toString()+'_'+i.toString()">
+                            <span>{{col['label']}}</span>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+              <div class="ans-option-class">
+                @switch (quest.question_type) {
+                  @case ('radio') {
+                    <div class="lesson-answer-content">
+                      @if (quest.answer_option && quest.answer_option.length !== 0) {
+                        <ovic-groups-radio-v2 [columns]="quest['config']['cols']"
+                          [group_name]="!keyNumber?'group_'+part['keyParent'].toString()+'_'+i.toString():'group_' + keyNumber.toString() + part['question_number'].toString()+'_'+i.toString()"
+                          styleClass="radio-answer-lesson"
+                          [verticalMode]="false"
+                          [rawHtml]="true" [options]="quest.answer_option" optionLabel="value" optionId="id"
+                          [defaultValue]="quest.answer_correct[0]"
+                          [show_image]="quest.answer_option[0].value | pipeCheckImg"
+                          (onChange)="onChangeRadioAnswer(quest,$event)">
+                        </ovic-groups-radio-v2>
+                      }
+                    </div>
+                  }
+                  @case ('checkbox') {
+                    <div class="lesson-answer-content">
+                      @if (quest.answer_option && quest.answer_option.length !== 0) {
+                        <ovic-groups-checkbox [show_image]="quest.answer_option[0].value | pipeCheckImg"
+                          [columns]="quest['config']['cols']" classes="radio-answer-lesson"
+                          [verticalMode]="false"
+                          [rawHtml]="true" [options]="quest.answer_option" optionLabel="value" optionId="id"
+                          [default]="quest.answer_correct[0]" (onChange)="onChangeCheckboxAnswer(quest,$event)">
+                        </ovic-groups-checkbox>
+                      }
+                    </div>
+                  }
+                  @case ('inputbox') {
+                    <div class="lesson-answer-input">
+                      <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+                        @for (chip of ((quest.answer_correct?.[0] || '') | stringToArrayPipe: '|'); track chip) {
+                          <p-chip [label]="chip" [removable]="true"
+                            (onRemove)="quest.answer_correct = onRemoveChips({ value: chip }, quest.answer_correct)"></p-chip>
+                        }
+                      </div>
+                      <div class="input-group input-group-sm" style="max-width: 320px;">
+                        <input #chipInput type="text" class="form-control" aria-label="Thêm đáp án" placeholder="Thêm đáp án..."
+                          (keydown.enter)="$event.preventDefault(); quest.answer_correct = onAddChips({ value: chipInput.value }, quest.answer_correct); chipInput.value = ''">
+                        <button class="btn btn-outline-primary" type="button"
+                          (click)="quest.answer_correct = onAddChips({ value: chipInput.value }, quest.answer_correct); chipInput.value = ''">Thêm</button>
+                      </div>
+                    </div>
+                  }
+                  @case ('reorder_words') {
+                    @if (quest.reorder_words_ans && quest.reorder_words_ans.length) {
+                      <div style="width: 100%; margin-top: 10px;" class="lesson-answer-reorder_words"
+                        >
+                        <div cdkDropListOrientation="horizontal" cdkDropList class="list-reorder_words-ans"
+                          (cdkDropListDropped)="dropReorder($event,quest.reorder_words_ans, quest)">
+                          @for (word of quest.reorder_words_ans; track word) {
+                            <div class="box-reorder_words-ans" cdkDrag>
+                            {{word}}</div>
+                          }
+                        </div>
+                      </div>
+                    }
+                  }
+                  @case ('group-radio') {
+                    @if (quest['children']) {
+                      <div>
+                        <ng-container [ngTemplateOutlet]="templateQuestion"
+                        [ngTemplateOutletContext]="{ part: quest, noQuestionNumber:true, keyNumber: part['keyParent']}"></ng-container>
+                      </div>
+                    }
+                  }
+                  @case ('group-input') {
+                    @if (quest['children']) {
+                      <div>
+                        <ng-container [ngTemplateOutlet]="templateQuestion"
+                        [ngTemplateOutletContext]="{ part: quest, noQuestionNumber:true, keyNumber: part['keyParent']}"></ng-container>
+                      </div>
+                    }
+                  }
+                  @case ('drag_drop') {
+                    @if (quest.answer_correct && quest.answer_correct[0] && (!quest.children || !quest.children.length)) {
+                      <div class="border-drop-end"
+                        >
+                        @for (item of (quest.answer_correct[0] | getAnsDragDropPipe : part.answer_option); track item) {
+                          <div class="box-ans-correct"
+                            >
+                            {{item}}
+                          </div>
+                        }
+                      </div>
+                    }
+                    @if (quest['children'] && quest.children.length) {
+                      <div>
+                        <ng-container [ngTemplateOutlet]="templateQuestion"
+                          [ngTemplateOutletContext]="{ part: quest, noQuestionNumber:true, keyNumber: part['keyParent']}">
+                        </ng-container>
+                      </div>
+                    }
+                  }
+                  @case ('grouping') {
+                    <div>
+                      @if (quest.answer_correct && quest.answer_correct[0] && (!quest.children || !quest.children.length)) {
+                        <div [ngClass]="quest.question_type === 'grouping'?'border-drop-end-grouping':''"
+                          class="border-drop-end"
+                          >
+                          @for (item of (quest.answer_correct[0] | getAnsDragDropPipe : part.answer_option); track item) {
+                            <div class="box-ans-correct"
+                              >
+                              {{item}}
+                            </div>
+                          }
+                        </div>
+                      }
+                      @if (quest['children'] && quest.children.length) {
+                        <ng-container
+                          [ngTemplateOutlet]="templateQuestion"
+                          [ngTemplateOutletContext]="{ part: quest, noQuestionNumber:true, keyNumber: part['keyParent']}">
+                        </ng-container>
+                      }
+                    </div>
+                  }
+                }
+              </div>
+              @if (quest.hint) {
+                <p class="question-hint-exp"><strong>Hint</strong>:
+              {{quest.hint}}</p>
+            }
+            @if (quest.explain) {
+              <p class="question-hint-exp question-exp">
+                <strong>Explain</strong>:
+                {{quest.explain}}
+              </p>
+            }
+          </div>
+        }
+      </div>
     </ng-template>
-</div>
+  </div>
+}

@@ -1,11 +1,15 @@
 import { Component , Input , OnInit , TemplateRef , ViewChild , ViewContainerRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { OvicFileIconPipe } from '../../pipes/ovic-file-icon.pipe';
+import { OvicFileShareStatePipe } from '../../pipes/ovic-file-share-state.pipe';
+import { OvicDropAndDragDirective } from '../../directives/ovic-drop-and-drag.directive';
 import { OvicFile , OvicFileStore , OvicTree , OvicDriveFile , OvicFileUpload } from '@core/models/file';
 import { FileService } from '@core/services/file.service';
 import { NotificationService } from '@core/services/notification.service';
 import { MediaService } from '@shared/services/media.service';
 import { AuthService } from '@core/services/auth.service';
 import { NgbActiveModal , NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FormBuilder , FormGroup } from '@angular/forms';
+import { FormBuilder , FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { animate , state , style , transition , trigger } from '@angular/animations';
 import { filter , finalize , map , switchMap , take , throttleTime } from 'rxjs/operators';
 import { fromEvent , Observable , Subscription } from 'rxjs';
@@ -40,10 +44,11 @@ interface SearchInfo {
 	limit : number;
 }
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-file-explorer' ,
 	templateUrl : './ovic-file-explorer.component.html' ,
 	styleUrls   : [ './ovic-file-explorer.component.css' ] ,
+	imports     : [CommonModule, ReactiveFormsModule, OvicFileIconPipe, OvicFileShareStatePipe, OvicDropAndDragDirective] ,
 	animations  : [
 		trigger( 'openSubmenu' , [
 			state( 'opened' , style( { 'transform' : 'scaleY(1)' , 'visibility' : 'visible' , 'opacity' : '1' } ) ) ,

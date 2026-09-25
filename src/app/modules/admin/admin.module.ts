@@ -4,7 +4,6 @@ import { AdminRoutingModule } from './admin-routing.module';
 
 import { MenuModule } from 'primeng/menu';
 import { PanelMenuModule } from 'primeng/panelmenu';
-import { MessagesModule } from 'primeng/messages';
 import { MessageModule } from 'primeng/message';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { ButtonModule } from 'primeng/button';
@@ -16,11 +15,11 @@ import { NgApexchartsModule } from 'ng-apexcharts';
 import { SharedModule } from '@shared/shared.module';
 import { DashboardComponent } from '@modules/admin/dashboard/dashboard.component';
 import { UserInfoComponent } from '@modules/admin/dashboard/user-info/user-info.component';
-import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { PopoverModule } from 'primeng/popover';
 import { MenuLanguageComponent } from '@modules/admin/dashboard/menu-language/menu-language.component';
 import { TranslateModule } from '@ngx-translate/core';
 // import { OvicMessageModule } from '@modules/admin/features/ovic-message/ovic-message.module';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 // import { HomeComponent } from './features/home/home.component';
 // import { HomeAgencyComponent } from './features/home/home-agency/home-agency.component';
@@ -54,7 +53,6 @@ import { ContentNoneComponent } from './features/content-none/content-none.compo
         AdminRoutingModule,
         MenuModule,
         PanelMenuModule,
-        MessagesModule,
         MessageModule,
         ScrollPanelModule,
         ButtonModule,
@@ -62,10 +60,10 @@ import { ContentNoneComponent } from './features/content-none/content-none.compo
         InputTextModule,
         NgApexchartsModule,
         // SharedModule,
-        OverlayPanelModule,
+        PopoverModule,
         TranslateModule,
         // OvicMessageModule,
-        DropdownModule,
+        SelectModule,
         FormsModule,
         ChartModule,
         // GoogleChartsModule,

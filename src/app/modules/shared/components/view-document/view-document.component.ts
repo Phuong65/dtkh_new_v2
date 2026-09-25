@@ -12,11 +12,15 @@ import { map, mergeMap } from 'rxjs';
 import { getLinkMedia_aws } from 'src/environments/environment.prod';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { OFFICE_SUPORT_FILE, OvicVideoSourceObject, TYPE_FILE_LIST } from '@modules/shared/utils/syscat';
+import { MatProgressBar } from '@angular/material/progress-bar';
+import { NgxDocViewerComponent } from 'ngx-doc-viewer';
+import { Image } from 'primeng/image';
 
-@Component({standalone: false, 
+@Component({standalone: true, 
     selector: 'view-document',
     templateUrl: './view-document.component.html',
-    styleUrls: ['./view-document.component.css']
+    styleUrls: ['./view-document.component.css'],
+    imports: [MatProgressBar, NgxDocViewerComponent, Image]
 })
 export class ViewDocumentComponent implements OnInit, OnChanges {
 

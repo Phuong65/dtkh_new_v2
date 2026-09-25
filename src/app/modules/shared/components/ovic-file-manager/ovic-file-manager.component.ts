@@ -15,7 +15,7 @@ interface OvicFolderTreeObject {
 	children? : OvicFolderTreeObject[];
 }
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-file-manager' ,
 	templateUrl : './ovic-file-manager.component.html' ,
 	styleUrls   : [ './ovic-file-manager.component.css' ]

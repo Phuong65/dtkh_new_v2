@@ -117,6 +117,10 @@ export class LoginComponent implements OnInit {
 	}
 
 	ngAfterViewInit() : void {
+		const googleButton = document.getElementById( 'sign-up-form__btn--google-sign-in' );
+		if ( typeof google === 'undefined' || !google?.accounts?.id || !googleButton ) {
+			return;
+		}
 		google.accounts.id.initialize( {
 			client_id : '973389896263-82pnr0ieien6ud03fkvqfckdoc9673f5.apps.googleusercontent.com' ,
 			callback  : ( response : any ) => this.handleGoogleSignIn( response )
@@ -124,7 +128,7 @@ export class LoginComponent implements OnInit {
 
 
 		google.accounts.id.renderButton(
-			document.getElementById( 'sign-up-form__btn--google-sign-in' ) ,
+			googleButton ,
 			{ width : '100%' , size : 'large' , type : 'standard' , shape : 'circle' , text : 'signin_with' , theme : 'filled_blue' }  // customization attributes
 		);
 	}

@@ -5,10 +5,10 @@ import { GroupingQuestionComponent } from '@modules/admin/features/cauhoi-tracng
 import { DragAndDropQuestionComponent } from '@modules/admin/features/cauhoi-tracnghiem/question-types/drag-and-drop-question/drag-and-drop-question.component';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
-import { InputTextareaModule } from 'primeng/inputtextarea';
+import { TextareaModule } from 'primeng/textarea';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TooltipModule } from 'primeng/tooltip';
 import { GroupRadioQuestionComponent } from './group-radio-question/group-radio-question.component';
@@ -54,10 +54,10 @@ import { GroupRadioQuestionV2Component } from './group-radio-question-v2/group-r
 		CommonModule,
 		InputTextModule,
 		FormsModule,
-		InputTextareaModule,
+		TextareaModule,
 		ButtonModule,
 		RippleModule,
-		DropdownModule,
+		SelectModule,
 		CheckboxModule,
 		TooltipModule,
 		LoadMediaOnTextDirective,

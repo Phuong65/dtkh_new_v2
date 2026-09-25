@@ -20,6 +20,8 @@ import { TranslateLoader , TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { getSaver , SAVER } from '@core/providers/saver.provider';
 import { AlertComponent } from '@core/components/alert/alert.component';
+import { providePrimeNG } from 'primeng/config';
+import Lara from '@primeuix/themes/lara';
 
 import { OverlayModule } from '@angular/cdk/overlay';
 import { FormBuilder } from '@angular/forms';
@@ -66,7 +68,14 @@ export function HttpLoaderFactory( httpClient : HttpClient ) {
 		NgbActiveOffcanvas ,
 		MessageService ,
 		{ provide : SAVER , useFactory : getSaver } ,
-		{ provide : HTTP_INTERCEPTORS , useClass : InterceptorsService , multi : true }
+		{ provide : HTTP_INTERCEPTORS , useClass : InterceptorsService , multi : true },
+		providePrimeNG({
+			theme: {
+				preset: Lara,
+				options: { darkModeSelector: false }
+			},
+			ripple: true
+		})
 	] ,
 	exports      : [] ,
 	bootstrap    : [ AppComponent ]

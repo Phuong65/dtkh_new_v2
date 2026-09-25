@@ -1,11 +1,14 @@
 import { Component, OnInit, Input, SimpleChanges, OnChanges, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { RawHtmlPipe } from '../../pipes/innerhtml-raw-pipe';
 
-@Component({standalone: false, 
+@Component({standalone: true,
     selector: 'ovic-groups-checkbox',
     templateUrl: './ovic-groups-checkbox.component.html',
-    styleUrls: ['./ovic-groups-checkbox.component.css']
+    styleUrls: ['./ovic-groups-checkbox.component.css'],
+    imports: [CommonModule, RawHtmlPipe]
 })
 export class OvicGroupsCheckboxComponent implements OnInit {
 

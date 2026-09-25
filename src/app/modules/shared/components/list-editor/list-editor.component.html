@@ -1,23 +1,31 @@
 <div class="layout-list-editor-value">
-    <ul cdkDropList class="custom-dash-list" (cdkDropListDropped)="drop($event)">
-        <li cdkDrag class="item-list-value" *ngFor="let item of listValue;let i = index">
-            <div (keyup)="onKeyUpEditor(editor,i)" (keydown)="onKeyDown($event,i)" contenteditableModel
-                [(ngModel)]="item['value']" contenteditable="true" (paste)="onPaste($event)" #editor
-                class="content-editor-list">
-            </div>
-            <div class="example-custom-placeholder" *cdkDragPlaceholder></div>
-            <button *ngIf="listValue.length !== 1" class="btn btn-secondary btn-icon btn-transparent" cdkDragHandle>
-                <i class="fa fa-arrows"></i>
-            </button>
-            <button *ngIf="listValue.length !== 1" (click)="deleteList(i)"
-                class="btn btn-danger btn-icon btn-transparent">
-                <i class="fa fa-trash grey"></i>
-            </button>
-        </li>
-    </ul>
-    <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
-        <span class="red">Nhấn <strong>Tab</strong> để xuống hoặc thêm dòng (nếu con trỏ chuột ở dòng cuối)</span>
-        <button *ngIf="listValue && listValue.length" (click)="deleteAllList()" pButton pRipple icon="pi pi-trash"
-            type="button" label="Xóa tất cả" class="p-button-danger p-button-text"></button>
-    </div>
+  <ul cdkDropList class="custom-dash-list" (cdkDropListDropped)="drop($event)">
+    @for (item of listValue; track item; let i = $index) {
+      <li cdkDrag class="item-list-value">
+        <div (keyup)="onKeyUpEditor(editor,i)" (keydown)="onKeyDown($event,i)" contenteditableModel
+          [(ngModel)]="item['value']" contenteditable="true" (paste)="onPaste($event)" #editor
+          class="content-editor-list">
+        </div>
+        <div class="example-custom-placeholder" *cdkDragPlaceholder></div>
+        @if (listValue.length !== 1) {
+          <button class="btn btn-secondary btn-icon btn-transparent" cdkDragHandle>
+            <i class="fa fa-arrows"></i>
+          </button>
+        }
+        @if (listValue.length !== 1) {
+          <button (click)="deleteList(i)"
+            class="btn btn-danger btn-icon btn-transparent">
+            <i class="fa fa-trash grey"></i>
+          </button>
+        }
+      </li>
+    }
+  </ul>
+  <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+    <span class="red">Nhấn <strong>Tab</strong> để xuống hoặc thêm dòng (nếu con trỏ chuột ở dòng cuối)</span>
+    @if (listValue && listValue.length) {
+      <button (click)="deleteAllList()" pButton pRipple icon="pi pi-trash"
+      type="button" label="Xóa tất cả" class="p-button-danger p-button-text"></button>
+    }
+  </div>
 </div>

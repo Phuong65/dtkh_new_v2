@@ -5,9 +5,13 @@ import { OvicFile } from '@core/models/file';
 import { APP_CONFIGS } from '@env';
 import { OpenFileManagerService } from '@modules/shared/services/open-file-manager.service';
 import { LARGE_MODAL_OPTIONS } from '@modules/shared/utils/syscat';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { AbstractControl } from '@angular/forms';
-
+import { CommonModule } from '@angular/common';
+import { OvicFileIconPipe } from '../../pipes/ovic-file-icon.pipe';
+import { FormsModule } from '@angular/forms';
+import { Popover, PopoverModule } from 'primeng/popover';
+import { ViewDocumentComponent } from '../view-document/view-document.component';
 
 export interface DocumentFileAndLink {
     ordering: number;
@@ -17,12 +21,14 @@ export interface DocumentFileAndLink {
     file?: OvicFile;
 }
 
-@Component({standalone: false, 
+@Component({standalone: true,
     selector: 'form-document-file-and-link',
     templateUrl: './form-document-file-and-link.component.html',
-    styleUrls: ['./form-document-file-and-link.component.css']
+    styleUrls: ['./form-document-file-and-link.component.css'],
+    imports: [CommonModule, OvicFileIconPipe, NgbTooltip, FormsModule, PopoverModule, ViewDocumentComponent]
 })
 export class FormDocumentFileAndLinkComponent implements OnInit, OnChanges {
+    @ViewChild('opTemplateAddLink') opTemplateAddLink!: Popover;
 
     @Input() docDefault: DocumentFileAndLink[];
 
