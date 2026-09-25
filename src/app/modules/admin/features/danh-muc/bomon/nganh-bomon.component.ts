@@ -17,10 +17,13 @@ import { Router } from '@angular/router';
 import { SharedModule } from '@modules/shared/shared.module';
 import { CommonModule } from '@angular/common';
 import { APP_CONFIGS } from '@env';
+import { OvicTableComponent } from '@modules/shared/components/ovic-table/ovic-table.component';
+import { OvicDropdownComponent } from '@modules/shared/components/ovic-dropdown/ovic-dropdown.component';
+import { ShowLabelData } from '../../../../shared/pipes/show-label-data.pipe';
 
 @Component({
     standalone: true,
-    imports: [CommonModule, SharedModule, ReactiveFormsModule, FormsModule],
+    imports: [CommonModule, SharedModule, ReactiveFormsModule, FormsModule, OvicTableComponent, OvicDropdownComponent, ShowLabelData],
     selector: 'app-nganh-bomon',
     templateUrl: './nganh-bomon.component.html',
     styleUrls: ['./nganh-bomon.component.css']

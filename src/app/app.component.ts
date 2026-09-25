@@ -1,6 +1,6 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, signal, ViewChild, WritableSignal } from '@angular/core';
 import { NotificationService, StateLoadingV2 } from '@core/services/notification.service';
-import { debounceTime, distinctUntilChanged, map, of, Subscription, switchMap, timer } from 'rxjs';
+import { debounceTime, map, of, Subscription, switchMap, timer } from 'rxjs';
 import { MessageService } from 'primeng/api';
 import { PrimeNG } from 'primeng/config';
 import { TranslateService } from '@ngx-translate/core';
@@ -11,6 +11,7 @@ import katex from 'katex';
 import { Toast } from 'primeng/toast';
 import { AdminRoutingModule } from '@modules/admin/admin-routing.module';
 import { AppSafeHtmlPipe } from './core/pipes/app-safe-html.pipe';
+import { AppState } from '@core-new/models/app-state';
 @Component({standalone: true, 
 	selector: 'app-root',
 	templateUrl: './app.component.html',
@@ -24,7 +25,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
 	version = APP_CONFIGS.appVersion;
 
-	isLoading = false;
+	readonly state : WritableSignal<AppState> = signal<AppState>( 'loading' );
 
 	stateLoadingV2: StateLoadingV2 = {
 		loading: false,
@@ -61,9 +62,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 	) {
 		(window as any).katex = katex;
 		const observerOnLoading = this.notification.onAppLoading.pipe(
-			distinctUntilChanged(),
 			switchMap(isLoading => isLoading ? of(true) : timer(50).pipe(map(() => false)))
-		).subscribe(isLoading => this.isLoading = isLoading);
+		).subscribe(isLoading => this.state.set(isLoading ? 'loading' : 'success'));
 		this.subscription.add(observerOnLoading);
 
 		const observerOnLoadingV2 = this.notification.onLoadingAnimationV2.pipe(debounceTime(10)).subscribe(state => {

@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, signal, TemplateRef, ViewChild, WritableSignal } from '@angular/core';
 import { OvicTableStructure } from '../../../../shared/models/ovic-models';
 import { ElnChuyenMucService } from '../../../../shared/services/elearning-chuyen-muc.service';
 import { ElnChuyenMuc } from '../../../../shared/models/Elng';
@@ -21,15 +21,19 @@ import { APP_CONFIGS } from '@env';
 import { OvicTableComponent } from '@modules/shared/components/ovic-table/ovic-table.component';
 import { OvicDropdownComponent } from '@modules/shared/components/ovic-dropdown/ovic-dropdown.component';
 import { ShowLabelData } from '../../../../shared/pipes/show-label-data.pipe';
+import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
+import { AppState } from '@core-new/models/app-state';
 
 @Component({
     standalone: true,
-    imports: [CommonModule, SharedModule, ReactiveFormsModule, FormsModule, OvicTableComponent, OvicDropdownComponent, ShowLabelData],
+    imports: [CommonModule, SharedModule, ReactiveFormsModule, FormsModule, OvicTableComponent, OvicDropdownComponent, ShowLabelData, LoadingProgressComponent],
     selector: 'app-nganh-bomon',
     templateUrl: './nganh-bomon.component.html',
     styleUrls: ['./nganh-bomon.component.css']
 })
 export class NganhBomonComponent implements OnInit {
+    readonly state: WritableSignal<AppState> = signal<AppState>('loading');
+    isSaving = false;
     dmParent: ElnChuyenMuc[];
     @ViewChild('formInfo') formInfo: TemplateRef<any>;
     chuyenmucId: number;
@@ -160,7 +164,7 @@ export class NganhBomonComponent implements OnInit {
     }
 
     loadData(donvi_chuyenmon_id?: number) {
-        this.noitifi.isProcessing(true);
+        this.state.set('loading');
         const arr_condition = [
             { conditionName: 'status', condition: OvicQueryCondition.notEqual, value: '-1', orWhere: 'and' },
             { conditionName: 'donvi_id', condition: OvicQueryCondition.equal, value: this.donviId.toString(), orWhere: 'and' },
@@ -184,9 +188,7 @@ export class NganhBomonComponent implements OnInit {
         forkJoin([
             this.elnChuyenMucService.getElnChuyenMucByCols(condition_nganh),
             this.donViService.getDonViByCols(condition_donvi)
-        ]).pipe(
-            finalize(() => this.noitifi.isProcessing(false))
-        ).subscribe({
+        ]).subscribe({
             next: ([_nganh, _donvi]) => {
                 _nganh.forEach(f => {
                     const index = _donvi.findIndex(m => m.id === f.donvi_chuyenmon_id);
@@ -196,6 +198,7 @@ export class NganhBomonComponent implements OnInit {
                 })
                 this.dmChuyenmuc = this.helperService.sort(_nganh, 'ordering');
                 this.dmDonvi_chuyenmon = _donvi;
+                this.state.set( 'success' );
             },
             error: () => {
                 this.noitifi.toastError('Không tải được danh mục Ngành');
@@ -291,15 +294,12 @@ export class NganhBomonComponent implements OnInit {
         this.noitifi.confirmDelete().then(
             (a) => {
                 if (a) {
-                    this.noitifi.isProcessing(true);
-                    this.elnChuyenMucService.deleteElnChuyenMuc(chuyenmucId).subscribe({
+                    this.elnChuyenMucService.deleteElnChuyenMuc(chuyenmucId).pipe(finalize(() => this.loadData())).subscribe({
                         next: () => {
                             this.noitifi.toastSuccess('Xoá thành công');
-                            this.loadData();
                         },
                         error: () => {
                             this.noitifi.toastError('Xóa thất bại');
-                            this.noitifi.isProcessing(false);
                         }
                     });
                 }
@@ -313,7 +313,7 @@ export class NganhBomonComponent implements OnInit {
             const data = { ... this.formData.getRawValue() };
             let first_code = '';
             const index_code = this.dmDonvi_chuyenmon.findIndex(m => m.id === data['donvi_chuyenmon_id']);
-            
+
             if (this.app_config.codeByLvl) {
                 if (index_code !== -1) {
                     first_code = this.dmDonvi_chuyenmon[index_code].code;
@@ -325,9 +325,9 @@ export class NganhBomonComponent implements OnInit {
             }
 
             delete data['sup_code'];
-            this.noitifi.isProcessing(true);
+            this.isSaving = true;
             if (this.isUpdated) {
-                this.elnChuyenMucService.updateElnChuyenMuc(this.selectedChuyenmuc.id, data).subscribe({
+                this.elnChuyenMucService.updateElnChuyenMuc(this.selectedChuyenmuc.id, data).pipe(finalize(() => this.isSaving = false)).subscribe({
                     next: () => {
                         this.noitifi.toastSuccess('Sửa thông tin thành công');
                         this.resetForm();
@@ -335,19 +335,17 @@ export class NganhBomonComponent implements OnInit {
                         this.loadData();
                     },
                     error: () => {
-                        this.noitifi.isProcessing(false);
                         this.noitifi.toastError('Sửa thông tin thất bại');
                     }
                 });
             } else {
-                this.elnChuyenMucService.addElnChuyenMuc(data).subscribe({
+                this.elnChuyenMucService.addElnChuyenMuc(data).pipe(finalize(() => this.isSaving = false)).subscribe({
                     next: () => {
                         this.noitifi.toastSuccess('Thêm mới thành công');
                         this.resetForm();
                         this.loadData();
                     },
                     error: () => {
-                        this.noitifi.isProcessing(false);
                         this.noitifi.toastError('Thêm thất bại');
                     }
                 });

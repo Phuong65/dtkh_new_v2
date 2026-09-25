@@ -43,7 +43,7 @@ export interface StateLoadingV2Input {
 })
 export class NotificationService {
 
-	private OBSERVE_LOADING_ANIMATION = new Subject<boolean>();
+	private OBSERVE_LOADING_ANIMATION = new BehaviorSubject<boolean>(false);
 
 	private OBSERVE_LOADING_ANIMATION_V2 = new Subject<StateLoadingV2>();
 

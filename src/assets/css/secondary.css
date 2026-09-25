@@ -101,3 +101,34 @@
 .notifi-pani .p-paginator.p-component button{
     height:40px;
 }
+
+.p-select {
+    height: 30px;
+    min-width: 100px;
+    font-size: 14px;
+    align-items: center;
+    border-radius: 0;
+}
+
+.p-select .p-select-label {
+    font-size: 14px;
+    line-height: 1.2;
+    padding-block: 5px;
+}
+
+.p-select-overlay {
+    border-radius: 0;
+}
+
+.p-select-overlay .p-select-list-container,
+.p-select-overlay .p-select-option {
+    border-radius: 0;
+}
+
+.p-select-overlay .p-select-option {
+    align-items: center;
+    font-size: 14px;
+    line-height: 1.2;
+    min-height: 30px;
+    padding-block: 5px;
+}

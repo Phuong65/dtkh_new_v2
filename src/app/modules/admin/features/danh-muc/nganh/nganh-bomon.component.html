@@ -1,11 +1,18 @@
-<div class="layout_component_container" style="padding: 5px;">
-    <ovic-table [data]="dmChuyenmuc" styleClass="tbl-danhSachkhoa table-able-dropdown" dataKey="id" rowHover="false"
-        tableName="Danh sách" [tblStructure]="tblCols" [enableSearch]="true" [globalFilterFields]="['title','desc']"
-        (editData)="editChuyenmuc($event)" (deleteData)="deleteChuyenmuc($event)" [options_dropdown]="dmDonvi_chuyenmon"
-        label_dropdown="title" [addDropdown]="true" (addNewRow)="createChuyenmuc()" [addRow]="canAdded"
-        (onChangeDropdownEvent)="onChangeDropdownEvent($event)" placeholder_dropdown="--Tất cả đơn vị chuyên môn--"
-        addRowLabel="Thêm mới">
-    </ovic-table>
+<div class="layout_component_container position-relative" style="padding: 5px; min-height: 200px;">
+    @if (state()=='loading') {
+        <app-loading-progress heading="Đang tải danh sách ngành..." />
+    } @else {
+        <ovic-table [data]="dmChuyenmuc" styleClass="tbl-danhSachkhoa table-able-dropdown" dataKey="id" rowHover="false"
+            tableName="Danh sách" [tblStructure]="tblCols" [enableSearch]="true" [globalFilterFields]="['title','desc']"
+            (editData)="editChuyenmuc($event)" (deleteData)="deleteChuyenmuc($event)" [options_dropdown]="dmDonvi_chuyenmon"
+            label_dropdown="title" [addDropdown]="true" (addNewRow)="createChuyenmuc()" [addRow]="canAdded"
+            (onChangeDropdownEvent)="onChangeDropdownEvent($event)" placeholder_dropdown="--Tất cả đơn vị chuyên môn--"
+            addRowLabel="Thêm mới">
+        </ovic-table>
+    }
+    @if (isSaving) {
+        <app-loading-progress heading="Đang lưu dữ liệu..." />
+    }
 </div>
 
 <ng-template #formInfo let-c="close" let-d="dismiss">
