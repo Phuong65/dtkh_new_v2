@@ -506,7 +506,7 @@ export class NotificationService {
 			centered: true,
 			windowClass: 'ovic-modal-class'
 		};
-		const popup = this.openModal(OvicMediaPlayerComponent, options);
+		const popup = this.openModal(OvicMediaPlayerComponent, options); 
 		popup.componentInstance.data = data;
 		return popup.result;
 	}

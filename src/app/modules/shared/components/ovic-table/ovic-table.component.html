@@ -14,9 +14,9 @@
               (keyup)="search($event.target['value'], $event)" [placeholder]="searchPlaceholder" />
           }
           @if (addDropdown) {
-            <p-dropdown appendTo="body" [showClear]="true" [placeholder]="placeholder_dropdown"
+            <p-select appendTo="body" [showClear]="true" [placeholder]="placeholder_dropdown"
               (onChange)="onChangeDropdown($event)" [options]="options_dropdown"
-            [optionLabel]="label_dropdown"></p-dropdown>
+            [optionLabel]="label_dropdown"></p-select>
           }
           @if (addRow) {
             <button class="btn btn-success" (click)="addNewRowClick($event)">

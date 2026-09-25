@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HTTP_INTERCEPTORS , HttpClient  } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ToastModule } from 'primeng/toast';
@@ -67,6 +67,7 @@ export function HttpLoaderFactory( httpClient : HttpClient ) {
 		NgbActiveOffcanvas ,
 		MessageService ,
 		{ provide : SAVER , useFactory : getSaver } ,
+		provideHttpClient(withInterceptorsFromDi()),
 		{ provide : HTTP_INTERCEPTORS , useClass : InterceptorsService , multi : true },
 		providePrimeNG({
 			theme: {
