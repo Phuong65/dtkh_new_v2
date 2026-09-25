@@ -1,1 +1,637 @@
-<div class="p-3">quanly-duyetnoidung-hoctap-v2.component works!</div>
+<div class="layout_component_container" [ngClass]="closeLeft?'close-left-body':''">
+  <div class="layout_component_container-course" style="position: relative;">
+    <button style="margin-left: 5px; padding: 0px; min-width: 0px; z-index: 50;" (click)="closeLeftBody()"
+      class="btn btn-success button-close-left-body">
+      <i style="margin: 0px;vertical-align: middle; font-size: 13px;"
+      [ngClass]="closeLeft?'pi pi-angle-double-right':'pi pi-angle-double-left'"></i>
+    </button>
+    <div class="search-layout">
+      <div class="search-layout-top" style="display: flex; align-items: center;">
+        <input (keyup.enter)="onSearchByTitle()" [(ngModel)]="searchCourse" type="text" class="ovic-input-field"
+          placeholder="Nhập tên rồi nhấn enter" type="text" style="width: 100%;">
+          <button style="margin-left: 5px;" [matMenuTriggerFor]="menuTop" class="btn btn-primary">
+            <i style="margin: 0px;" class="fa fa-ellipsis-h" ></i>
+          </button>
+          <mat-menu #menuTop="matMenu">
+            <button (click)="changeToMyCourse('my_council')" mat-menu-item
+              [disabled]="my_course === 'my_council'?true:false">
+              <span>Hiển thị môn học theo hội đồng của bạn</span>
+            </button>
+            <button (click)="changeToMyCourse('my_course')" mat-menu-item
+              [disabled]="my_course === 'my_course'?true:false">
+              <span>Hiển thị môn học bạn phụ trách</span>
+            </button>
+            <button (click)="changeToMyCourse('show_all')" mat-menu-item
+              [disabled]="my_course === 'show_all'?true:false">
+              <span>Hiển thị tất cả</span>
+            </button>
+          </mat-menu>
+        </div>
+        @if (isManager) {
+          <div style="margin-top: 5px;">
+            <ovic-dropdown (onChange)="onChangeFilterChuyenmon($event)" placeholder="--- chọn khoa ---"
+              [options]="list_donvi_chuyenmon" optionId="id" optionLabel="title" [filter]="true"
+            [defaultValue]="categoryFilter" filterBy="title"></ovic-dropdown>
+          </div>
+        }
+      </div>
+      <div class="list-course-layout ">
+        <mat-selection-list (selectionChange)="onSelectCourse($event)" [multiple]="false" class="selection-list-mat"
+          #courses>
+          @for (course of dmKhoahoc ; track course) {
+            <mat-list-option [selected]="courseSelected && courseSelected.id === course.id ? true: false"
+              [value]="course">
+              <div mat-line style="font-weight: 600;">{{course.title + ' (' + course.maso + ')'}}</div>
+              <div mat-line>{{course['creator_name'] + course['info_']}}</div>
+            </mat-list-option>
+          }
+        </mat-selection-list>
+      </div>
+      <div class="page-layout-set">
+        <p-paginator #paginator (onPageChange)="changePage($event)" [rows]="limitCourse"
+        [totalRecords]="totalCourse"></p-paginator>
+      </div>
+    </div>
+    <div class="layout_component_container-plan">
+      <div class="list-plan-layout">
+        <mat-selection-list (selectionChange)="onSelecPlan($event)" [multiple]="false" class="selection-list-mat"
+          #plans>
+          @for (plan of list_plan ; track plan) {
+            <mat-list-option [selected]="selectedPlan && selectedPlan.id === plan.id ? true: false"
+              [value]="plan">
+              @if (plan.week !== 1000) {
+                <div mat-line
+                  style="font-weight: 600; text-align: center; white-space:pre-wrap ;">{{plan.id !== 0
+                  && plan.week !== 0 && plan.week !== 100 ? label_parent_kehoach
+                  +' '+ plan.week :
+                plan.title}}</div>
+              }
+              @if (plan.week === 1000 && plan.id > 0) {
+                <div mat-line
+                  style="font-weight: 600; text-align: center; white-space:pre-wrap ;">
+                  KTTX Thực hành
+                </div>
+              }
+              @if (plan.week === 1000 && plan.id < 0) {
+                <div mat-line
+                  style="font-weight: 600; text-align: center; white-space:pre-wrap ;">
+                  KTTX Dự án
+                </div>
+              }
+              <!-- <div *ngIf="plan.id == -2" mat-line
+              style="font-weight: 600; text-align: center; white-space:pre-wrap ;">
+              <i [ngClass]="plan.title"></i>
+            </div> -->
+          </mat-list-option>
+        }
+      </mat-selection-list>
+    </div>
+  </div>
+  <div class="layout_component_container-noidung" style="font-size: 14px;">
+    @if (selectedPlan) {
+      <container-element>
+        @switch (selectedPlan.id) {
+          @case (0) {
+            <app-ketqua-duyet-all [courseSelected]="courseSelected"
+            [listThamDInh]="list_thanhvien"></app-ketqua-duyet-all>
+          }
+          @default {
+            @if (selectedPlan) {
+              <container-element>
+                @switch (selectedPlan.week) {
+                  @case (1000) {
+                    <container-element>
+                      @switch (selectedPlan.id) {
+                        @default {
+                          <app-duyet-thuongxuyen-tuluan [listThamDInh]="list_thanhvien"
+                            [selectedCourse]="courseSelected"
+                          [planTuluan]="selectedPlan"></app-duyet-thuongxuyen-tuluan>
+                        }
+                        @case (-2) {
+                          <app-duyet-thuongxuyen-duan [listThamDInh]="list_thanhvien"
+                            [selectedCourse]="courseSelected"
+                          [planTuluan]="selectedPlan"></app-duyet-thuongxuyen-duan>
+                        }
+                      }
+                    </container-element>
+                  }
+                  @case (100) {
+                    <p-tabView styleClass="tab-lesson-view">
+                      <p-tabPanel #tabPanel_1 header="Câu hỏi thi KTHP">
+                        @if (tabPanel_1['selected'] && selectedPlan['tnKTHP']) {
+                          <div
+                            class="lesson-content-right-layout">
+                            <app-duyet-cauhoi [hoidong]="list_thanhvien" [courseSelected]="courseSelected"
+                            [activity]="selectedPlan['tnKTHP']"></app-duyet-cauhoi>
+                          </div>
+                        }
+                      </p-tabPanel>
+                      <p-tabPanel #tabPanel_2 header="Câu hỏi thực hành thi KTHP">
+                        @if (tabPanel_2['selected']) {
+                          <div class="lesson-content-right-layout">
+                            <app-duyet-cauhoi-thuchanh-kthp [listThamDInh]="list_thanhvien"
+                              [selectedCourse]="courseSelected" [planTuluan]="selectedPlan">
+                            </app-duyet-cauhoi-thuchanh-kthp>
+                          </div>
+                        }
+                      </p-tabPanel>
+                    </p-tabView>
+                  }
+                  @default {
+                    <p-tabView (onChange)="onChangeTapView()" [(activeIndex)]="activeIndex"
+                      styleClass="tab-lesson-view">
+                      <p-tabPanel header="KẾT QUẢ THẨM ĐỊNH">
+                        <ket-qua-tham-dinh [courseSelected]="courseSelected" [coursePlan]="selectedPlan"
+                        [listThamDInh]="list_thanhvien"></ket-qua-tham-dinh>
+                      </p-tabPanel>
+                      <p-tabPanel header="NHẬN XÉT CÂY CELO">
+                        <div class="lesson-content-right-layout">
+                          @for (activity of list_activity_cdr; track activity) {
+                            <p-panel [showHeader]="false" [header]="activity.title"
+                              styleClass="panel-plan-activity">
+                              <ng-container [ngTemplateOutlet]="templateCdr"
+                                [ngTemplateOutletContext]="{ activity: activity}">
+                              </ng-container>
+                              <ng-container [ngTemplateOutlet]="templateDuyet"
+                                [ngTemplateOutletContext]="{ activity: activity}">
+                              </ng-container>
+                            </p-panel>
+                          }
+                        </div>
+                      </p-tabPanel>
+                      <p-tabPanel header="NHẬN XÉT NỘI DUNG KHÁC">
+                        <div class="lesson-content-right-layout">
+                          @for (activity of list_activity_other; track activity) {
+                            <p-panel [header]="activity.title" styleClass="panel-plan-activity no-border-top"
+                              >
+                              <container-element>
+                                @switch (activity.type) {
+                                  @case ('MUCTIEU') {
+                                    <div>
+                                      <div class="ovic-vertical__inputs back-ground-info"
+                                        style="line-height: 1.5;">
+                                        <div class="row form-row ">
+                                          <div class="col-12">
+                                            <div id="editor" class="document-editor__editable">
+                                              <div class="ck ck-editor__main" role="presentation">
+                                                <div style="border:none"
+                                                  class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                                                  [innerHtml]="activity['desc'] | safeHtml">
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  }
+                                  @case ('ACTIVITY') {
+                                    <div>
+                                      <ng-container [ngTemplateOutlet]="templateTailieuGiangday"
+                                        [ngTemplateOutletContext]="{ activity: activity}">
+                                      </ng-container>
+                                    </div>
+                                  }
+                                  @case ('OFFLINE_TEST') {
+                                    <div>
+                                      <ng-container [ngTemplateOutlet]="templateBaitap"
+                                        [ngTemplateOutletContext]="{ activity: activity}">
+                                      </ng-container>
+                                    </div>
+                                  }
+                                  @case ('ACTIVITY_TEST') {
+                                    <div>
+                                      <div style="text-align: center; padding: 15px;">
+                                        Không có nội dung
+                                      </div>
+                                    </div>
+                                  }
+                                  @case ('MEET') {
+                                    <div>
+                                      <div class="ovic-vertical__inputs back-ground-info"
+                                        style="line-height: 1.5;">
+                                        <div class="row form-row">
+                                          <div class="col-12">
+                                            {{activity.title}}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  }
+                                }
+                              </container-element>
+                              <ng-container [ngTemplateOutlet]="templateDuyet"
+                                [ngTemplateOutletContext]="{ activity: activity}">
+                              </ng-container>
+                            </p-panel>
+                          }
+                        </div>
+                      </p-tabPanel>
+                      <p-tabPanel header="NHẬN XÉT CÂU HỎI">
+                        @if (activeIndex === 3) {
+                          <div class="lesson-content-right-layout">
+                            <app-duyet-cauhoi [hoidong]="list_thanhvien" [courseSelected]="courseSelected"
+                            [activity]="selectedPlan"></app-duyet-cauhoi>
+                          </div>
+                        }
+                      </p-tabPanel>
+                    </p-tabView>
+                  }
+                }
+              </container-element>
+            }
+          }
+        }
+      </container-element>
+    }
+  </div>
+</div>
+
+<ng-template #templateKiemtraKynang>
+
+</ng-template>
+
+<ng-template #templateCdr let-activity="activity">
+  <div class="cdr-content back-ground-info">
+    <div class="cdr-content-title">
+      <strong>{{activity['kyhieu']+'. '+activity['title']}}</strong>
+    </div>
+    <div class="cdr-content-cdr-info">
+      @for (info of activity.params.cdr.cdr_info; track info) {
+        <div>
+          <label class="label-info">- {{info['label']}}:</label>
+          <span class="value-info">{{info['value']}}</span>
+        </div>
+      }
+    </div>
+    <div class="cdr-content-cdr-info">
+      <label style="text-decoration: underline; margin-bottom: 1em;">
+        <strong>Nội dung giảng dạy:</strong>
+      </label>
+      <div style="margin-bottom: 1em;"><strong>{{activity['desc_title']}}</strong></div>
+      <div class="info-desc ql-editor" [innerHtml]="activity['desc'] | safeHtmlDecode">
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #templateBaitap let-activity="activity">
+  <div class="ovic-vertical__inputs back-ground-info" style="line-height: 1.5;">
+    <div class="row form-row ">
+      <div class="col-12">
+        <div id="editor" class="document-editor__editable">
+          <div class="ck ck-editor__main" role="presentation">
+            <div style="border:none"
+              class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+              [innerHtml]="activity['desc'] | safeHtml">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    @if (activity['files']) {
+      <div class="row form-row form-row-flex-row">
+        <div class="col-12 flex-div">
+          <label>Tài liệu đính kèm:</label>
+          <div class="files-list-view">
+            @for (file of activity['files']; track file; let i = $index) {
+              <div class="single-file" (click)="onSelectFileReview(file)"
+                >
+                <i class="icon-in-open-download-file" [ngClass]="file | ovicFileIcon" ></i>
+                <div class="info">
+                  <h4 class="name">{{file.title}}</h4>
+                  <p class="size">{{file['file_size']}}</p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</ng-template>
+
+<ng-template #templateTailieuGiangday let-activity="activity">
+  <div class="ovic-vertical__inputs back-ground-info" style="line-height: 1.5;">
+    @if (activity['files']) {
+      <div class="row form-row form-row-flex-row">
+        <div class="col-12 flex-div">
+          <div class="files-list-view">
+            @for (file of activity['files']; track file; let i = $index) {
+              <div class="single-file" (click)="onSelectFileReview(file)"
+                >
+                <i class="icon-in-open-download-file" [ngClass]="file | ovicFileIcon" ></i>
+                <div class="info">
+                  <h4 class="name">{{file.title}}</h4>
+                  <p class="size">{{file['file_size']}}</p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (activity['slides']) {
+      <div class="row form-row form-row-flex-row">
+        <div class="col-12 flex-div">
+          <div class="files-list-view">
+            @for (slide of activity['slides']; track slide; let i = $index) {
+              <div class="single-file" (click)="onSelectFileReview(slide)"
+                >
+                <i class="icon-in-open-download-file" [ngClass]="slide | ovicFileIcon" ></i>
+                <div class="info">
+                  <h4 class="name">{{slide.title}}</h4>
+                  <p class="size">{{slide['file_size']}}</p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (activity['desc']) {
+      <div class="row form-row">
+        <div class="col-12">
+          <div id="editor" class="document-editor__editable">
+            <div class="ck ck-editor__main" role="presentation">
+              <div style="border:none"
+                class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                [innerHtml]="activity['desc'] | safeHtml">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (activity['video']) {
+      <div class="row form-row">
+        <div class="col-12">
+          <audio-viewer [type]="activity['video'].type" [path]="activity['video'].path"
+            [source]="activity['video'].source">
+          </audio-viewer>
+        </div>
+      </div>
+    }
+  </div>
+</ng-template>
+
+<ng-template #filesLessonReview let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section" style="height: 100vh;">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">View</h3>
+      <button class="btn ovic-over-right-section__close-button" (click)="d(true)"></button>
+    </div>
+    <div class="ovic-over-right-section__body footer-no-hint no-footer" style="padding: 0px;">
+      <div class="ovic-vertical__inputs back-ground-info" style="height: 100%;">
+        <view-document [file]="selectedFileReview?selectedFileReview:null">
+        </view-document>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #templateDuyet let-activity="activity">
+  <div class="class-duyet-layout"
+    [ngClass]="(!activity['comments'] || !activity['comments'].length) && !kd_hoidong && !kd_hoidong?'no-border-top':''">
+    <div style="width: 100%; padding: 15px;" class="list-comment-layout">
+      <!-- <label style="font-weight: 600; margin-bottom: 10px;">Ý KIẾN NHẬN XÉT CỦA THÀNH VIÊN HỘI ĐỒNG: </label>
+
+      <div style="padding-bottom: 10px; border-bottom: 1px solid #c8c8c8; margin-bottom: 10px;"
+        *ngIf="activity['status'] === 1 || activity['status'] === -1">
+        <div>
+          <label style="width: 150px;">- Duyệt lúc:</label> {{activity['approved_at'] | ovicDateTime}}
+        </div>
+        <div>
+          <label style="width: 150px;">- Trạng thái duyệt:</label>
+          {{activity['status'] === 1?'Đạt':'Yêu cầu sửa'}}
+        </div>
+      </div> -->
+      <div class="ketqua-duyet-hoidong row">
+        <div class="ketqua-duyet-hoidong-left col-6"
+          style="border-right: 1px solid #c8c8c8; margin-bottom: 10px;">
+          <label style="font-weight: 600; margin-bottom: 10px;">
+            KẾT QUẢ DUYỆT CỦA HỘI ĐỒNG KHOA:
+          </label>
+
+          @if (activity['status'] === 1 || activity['status'] === -1) {
+            <div class="ketquaduyet-hoidong row"
+              style="padding-bottom: 10px; ">
+              <div class="ketquaduyet-hoidong-left col-6">
+                <div class="ketquaduyet-hoidong-left-status" style="text-align: center;"
+                  >
+                @switch (activity['status']) {
+                  @case (1) {
+                    <span class="true-blue status-duyet-hoidong">Đạt</span>
+                  }
+                  @case (-1) {
+                    <span class="red status-duyet-hoidong">Yêu cầu sửa</span>
+                  }
+                }
+              </div>
+            </div>
+            <div class="ketquaduyet-hoidong-right col-6">
+              <div>Duyệt lúc:</div>
+              <div>{{activity['approved_at'] | ovicDateTime}}</div>
+            </div>
+          </div>
+        } @else {
+          <div class="ketquaduyet-hoidong" style="padding-bottom: 10px; ">
+            <div style="text-align: center;">
+              @switch (activity['status']) {
+                @case (0) {
+                  <span class="gray status-duyet-hoidong">Chờ duyệt</span>
+                }
+                @case (-2) {
+                  <span class="blue status-duyet-hoidong">Đã sửa, chờ duyệt</span>
+                }
+              }
+            </div>
+          </div>
+        }
+
+      </div>
+      @if (key_server === 'ictu') {
+        <div class="ketqua-duyet-hoidong-right col-6">
+          <label style="font-weight: 600; margin-bottom: 10px;">
+            KẾT QUẢ DUYỆT CỦA HỘI ĐỒNG TRƯỜNG:
+          </label>
+          @if (activity['status_captruong'] === 1 || activity['status_captruong'] === -1) {
+            <div class="ketquaduyet-hoidong row"
+              style="padding-bottom: 10px; ">
+              <div class="ketquaduyet-hoidong-left col-6">
+                <div class="ketquaduyet-hoidong-left-status" style="text-align: center;"
+                  >
+                  @switch (activity['status_captruong']) {
+                    @case (1) {
+                      <span class="true-blue status-duyet-hoidong">Đạt</span>
+                    }
+                    @case (-1) {
+                      <span class="red status-duyet-hoidong">Yêu cầu sửa</span>
+                    }
+                  }
+                </div>
+              </div>
+              <div class="ketquaduyet-hoidong-right col-6">
+                <div>Duyệt lúc:</div>
+                <div>{{activity['approved_captruong_at'] | ovicDateTime}}</div>
+              </div>
+            </div>
+          } @else {
+            <div class="ketquaduyet-hoidong" style="padding-bottom: 10px; ">
+              <div style="text-align: center;">
+                @switch (activity['status_captruong']) {
+                  @case (0) {
+                    <span class="gray status-duyet-hoidong">Chờ duyệt</span>
+                  }
+                  @case (-2) {
+                    <span class="blue status-duyet-hoidong">Đã sửa, chờ duyệt</span>
+                  }
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+    <div style="border-bottom: 1px solid #c8c8c8; margin-bottom: 10px;"></div>
+    @if ((kd_uyvien || kd_hoidong) && activity['status'] !== 1) {
+      <div [ngClass]="(!activity['comments'] || !activity['comments'].length) ? 'padding-top-15px':''"
+        class="comment-edit-layout">
+        <textarea placeholder="Nhập nội dung nhận xét trước khi duyệt hoặc yêu cầu sửa... "
+        [(ngModel)]="activity['textarea_comment']"></textarea>
+        <div class="action-edit-layout">
+          <button (click)="saveComment(1,activity)" style="line-height: 1; margin-bottom: 10px;"
+            class="btn-primary">Đồng ý duyệt
+          </button>
+          <button (click)="saveComment(-1,activity)" style="line-height: 1;" class="btn-danger">Yêu cầu
+          sửa</button>
+        </div>
+      </div>
+    }
+    @if (kd_hoidong && activity['status'] !== -1 && activity['status'] !== 1 && activity['comments'] && activity['comments'].length) {
+      <div
+        style="padding: 15px 0px">
+        <div class="hozion-lay" style="position: relative;">
+          <label
+            style="font-weight: 600; z-index: 1; position: relative; background: whitesmoke; padding-right: 5px;">KẾT
+          LUẬN CỦA CHỦ TỊCH HỘI ĐỒNG: </label>
+        </div>
+        <div style="display: flex; justify-content: space-evenly;">
+          @if (kd_hoidong) {
+            <button style="margin-right: 5px; width: 150px; line-height: 1;" (click)="duyetNoidung(activity, 1)"
+            class="btn btn-primary">Đồng ý duyệt</button>
+          }
+          @if (kd_hoidong) {
+            <button style="margin-left: 5px; width: 150px;line-height: 1;" (click)="duyetNoidung(activity, -1)"
+            class="btn btn-danger">Yêu cầu sửa</button>
+          }
+        </div>
+      </div>
+    }
+    @if (activity.status === 1) {
+      <div class="view-comment-action">
+        <span (click)="actionViewComment(activity)">
+          {{activity['expandView']?'Ẩn nhận xét':'Hiển thị nhận xét'}}
+        </span>
+      </div>
+    }
+    <div class="view-comment-layout" [ngClass]="activity['expandView']?'':'close-view-comment'">
+      @for (comment of activity['comments']; track comment; let index = $index) {
+        <div class="comment-box">
+          <div class="inner-comment">
+            <div class="inner-comment-header">
+              <div style="flex: 1;">
+                <span style="font-weight: 600; margin-right: 10px; text-decoration: underline;">
+                  {{comment['display_name'] +':'}}
+                </span>
+              </div>
+            </div>
+            @if (comment['children'] && comment['children'].length) {
+              <div>
+                @for (children of comment['children']; track children) {
+                  <div style="margin-bottom: 15px; ">
+                    <div [ngClass]="children['status'] === 1?'duyet-comment':'yeucausua-comment'"
+                      class="conten-comment-box">
+                      <div class="conten-comment-inner-box" [innerHTML]="children.comment">
+                      </div>
+                    </div>
+                    <div style="margin-left: 20px; margin-top: 5px;">
+                      <span
+                        style="font-size: 12px; color: #898989; margin-right: 20px; font-style: italic;">{{children.created_at
+                      | ovicDateTime}}</span>
+                      <span style="color: #898989; cursor: pointer;"
+                        (click)="openReply(children,index)">Phản
+                      hồi ({{children['count_reply']}})</span>
+                    </div>
+                    @if (children['reply_open'] === true) {
+                      <div class="reply-layout">
+                        <div class="list_reply_comments">
+                          @for (reply_comment of children['reply_comments']; track reply_comment) {
+                            <div style="margin-bottom: 15px;"
+                              >
+                              <div style="text-align: right; margin-bottom: 5px;">
+                                <span>{{reply_comment['display_name']}}</span>
+                              </div>
+                              <div class="conten-comment-box-left"
+                                [ngClass]="reply_comment['my_reply_comment']?'my-reply-comment':''">
+                                <div class="conten-comment-inner-box-left"
+                                  [innerHTML]="reply_comment.comment">
+                                </div>
+                              </div>
+                              <div style="margin-right: 20px; margin-top: 5px; text-align: right;">
+                                <span
+                                  style="font-size: 12px; color: #898989; font-style: italic;">{{reply_comment.created_at
+                                | ovicDateTime}}</span>
+                              </div>
+                            </div>
+                          }
+                        </div>
+                        @if (kd_hoidong || kd_uyvien || (courseSelected && userId === courseSelected.creator_plan_id)) {
+                          <div style="display: flex; position: relative;"
+                            >
+                            <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
+                              <img style="width: 100%;" src="../../../assets/images/a_none.jpg">
+                            </div>
+                            <textarea
+                              style="height: 40px; margin-left: 10px; flex: 1; padding-right: 130px;"
+                              placeholder="Nhập phản hồi... "
+                            [(ngModel)]="children['textarea_comment']"></textarea>
+                            <button (click)="saveCommentReply(children , activity, index)"
+                              style="position: absolute; bottom: 5px; right:5px"
+                              class="btn btn-primary"><i class="fa fa-paper-plane"
+                            ></i>Gửi
+                          phản hồi</button>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+
+<!-- <div *ngIf="rejectRole && (activity['status'] === -1 || activity['status'] === 1)"
+style="padding: 0px 15px 15px 15px">
+<div class="hozion-lay" style="position: relative;">
+  <label
+    style="font-weight: 600; z-index: 1; position: relative; background: whitesmoke; padding-right: 5px;">
+    KẾT LUẬN CỦA CHỦ TỊCH HỘI ĐỒNG:
+  </label>
+</div>
+<div style="display: flex; justify-content: space-evenly;">
+  <button style="margin: 0px 5px; width: 200px; line-height: 1;" (click)="huyTrangThai(activity)"
+    *ngIf="rejectRole" class="btn btn-secondary">
+  {{activity['status'] === -1?'Huỷ trạng thái yêu cầu sửa': 'Huỷ trạng thái đã duyệt'}}</button>
+</div>
+</div> -->
+</div>
+</ng-template>
