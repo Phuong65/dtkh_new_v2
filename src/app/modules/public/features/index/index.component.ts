@@ -1,10 +1,18 @@
 import { Component , OnInit , TemplateRef , ViewChild } from '@angular/core';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
+import { RippleModule } from 'primeng/ripple';
+import { InputTextModule } from 'primeng/inputtext';
+import { TableModule } from 'primeng/table';
+import { SelectModule } from 'primeng/select';
+import { PaginatorModule } from 'primeng/paginator';
 import { CHUC_VU , QuyetDinh , QuyetDinhHocVien } from '@shared/models/quyet-dinh';
 import { QueryQuyetDinhHocVien , QuyetDinhHocVienService , SearchQuyetDinhHocVienOptions } from '@shared/services/quyet-dinh-hoc-vien.service';
 import { debounceTime , Observable , of , Subject , Subscription , switchMap } from 'rxjs';
 import { AGENCIES , ENABLE_SELECT_AGENCY } from '@env';
 import { AbstractControl , FormBuilder , ValidationErrors , ValidatorFn , Validators } from '@angular/forms';
-import { Paginator } from 'primeng/paginator';
+import { Paginator, PaginatorState } from 'primeng/paginator';
 import { HelperService } from '@core/services/helper.service';
 import { NotificationService } from '@core/services/notification.service';
 import { DanhMucService } from '@shared/services/danh-muc.service';
@@ -12,8 +20,7 @@ import { QuyetDinhService } from '@shared/services/quyet-dinh.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { filter , map } from 'rxjs/operators';
 import { NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
-import { DropdownFilterOptions } from 'primeng/dropdown';
-import { NgPaginateEvent } from '@shared/models/ovic-models';
+import { SelectFilterOptions } from 'primeng/select';
 import { FormGroup } from '@angular/forms';
 
 interface AgencyOption {
@@ -22,10 +29,11 @@ interface AgencyOption {
 	logo : string
 }
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'app-index' ,
 	templateUrl : './index.component.html' ,
-	styleUrls   : [ './index.component.css' ]
+	styleUrls   : [ './index.component.css' ],
+	imports: [CommonModule, NgOptimizedImage, FormsModule, ReactiveFormsModule, ButtonModule, RippleModule, InputTextModule, TableModule, SelectModule, PaginatorModule]
 } )
 export class IndexComponent implements OnInit {
 
@@ -205,12 +213,12 @@ export class IndexComponent implements OnInit {
 		this.modalService.dismissAll( '' );
 	}
 
-	myResetFunction( options : DropdownFilterOptions ) {
+	myResetFunction( options : SelectFilterOptions ) {
 		options.reset();
 		this.filterValue = '';
 	}
 
-	paginate( { page } : NgPaginateEvent ) {
+	paginate( { page = 0 } : PaginatorState ): void {
 		this.f[ 'paged' ].setValue( page + 1 );
 		this.__queryData( this.formGroup.value );
 	}

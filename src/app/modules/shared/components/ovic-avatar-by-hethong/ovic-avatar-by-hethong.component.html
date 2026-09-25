@@ -1,17 +1,18 @@
 <!--<input type="file" #fileChooser hidden="true" [accept]="_accept"  (change)="onInputAvatar($event , fileChooser,0)">-->
 <div class="w-100 h-100 ">
-    <div class="row m-0 h-100">
-        <div class="col">
-            <div class="h-100 d-flex justify-content-center">
-                <button pRipple [disabled]="disabled" class="btn w-100 btn-avata"
-                        style="margin-top: 30px;height: 262px;" (click)="btnClickinput()">
-                    <img *ngIf="characterAvatar; else showIcon" loading="lazy" class="imgchecksize" [ngClass]="footage == 'vertical' ? 'vertical' :'horizontal'"  [src]="characterAvatar " alt="">
-                    <ng-template #showIcon>
-                        <i class="pi pi-upload"></i>
-                        <div [innerHTML]="textView |safeHtml"></div>
-                    </ng-template>
-                </button>
-            </div>
-        </div>
+  <div class="row m-0 h-100">
+    <div class="col">
+      <div class="h-100 d-flex justify-content-center">
+        <button pRipple [disabled]="disabled" class="btn w-100 btn-avata"
+          style="margin-top: 30px;height: 262px;" (click)="btnClickinput()">
+          @if (characterAvatar) {
+            <img loading="lazy" class="imgchecksize" [ngClass]="footage == 'vertical' ? 'vertical' :'horizontal'"  [src]="characterAvatar " alt="">
+          } @else {
+            <i class="pi pi-upload"></i>
+            <div [innerHTML]="textView |safeHtml"></div>
+          }
+        </button>
+      </div>
     </div>
+  </div>
 </div>

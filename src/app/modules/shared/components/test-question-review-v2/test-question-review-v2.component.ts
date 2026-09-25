@@ -2,11 +2,24 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { AuthService } from '@core/services/auth.service';
 import { HelperService } from '@core/services/helper.service';
 import { getLinkDownload_aws } from '@env';
-
-@Component({standalone: false, 
+import { OvicGroupsCheckboxComponent } from '../ovic-groups-checkbox/ovic-groups-checkbox.component';
+import { OvicGroupsRadioV2Component } from '../ovic-groups-radio-v2/ovic-groups-radio-v2.component';
+import { PipeCheckImg } from '../../pipes/pipe-check-img';
+import { CommonModule } from '@angular/common';
+import { GeneralModule } from '@modules/kiem-thu-ngan-hang-cau-hoi/general/general.module';
+import { AudioViewerComponent } from '../audio-viewer/audio-viewer.component';
+import { OvicSafeHtmlPipe } from '../../pipes/ovic-safe-html.pipe';
+import { StringToArrayPipe } from '../../pipes/string-to-array-pipe';
+import { GetAnsDragDropPipe } from '../../pipes/get-ans-drag-drop.pipe';
+import { RawHtmlPipe } from '../../pipes/innerhtml-raw-pipe';
+import { ChipModule } from 'primeng/chip';
+@Component({standalone: true, 
   selector: 'test-question-review-v2',
   templateUrl: './test-question-review-v2.component.html',
-  styleUrls: ['./test-question-review-v2.component.css']
+  styleUrls: ['./test-question-review-v2.component.css'],
+  imports: [OvicGroupsCheckboxComponent, OvicGroupsRadioV2Component, 
+    PipeCheckImg, CommonModule, GeneralModule, AudioViewerComponent, 
+    ChipModule, OvicSafeHtmlPipe, StringToArrayPipe, GetAnsDragDropPipe, RawHtmlPipe]
 })
 export class TestQuestionReviewV2Component implements OnInit {
 

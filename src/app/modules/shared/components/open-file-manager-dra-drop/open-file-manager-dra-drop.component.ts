@@ -8,7 +8,7 @@ import {FileService} from "@core/services/file.service";
 import {AuthService} from "@core/services/auth.service";
 import {NgbModal, NgbTooltipModule} from "@ng-bootstrap/ng-bootstrap";
 import {OpenFileManagerService} from "@shared/services/open-file-manager.service";
-import {SharedModule} from "@shared/shared.module";
+import {OvicFileIconPipe} from '../../pipes/ovic-file-icon.pipe';
 import {DragDropModule, moveItemInArray, transferArrayItem} from "@angular/cdk/drag-drop";
 
 export interface FileDraDrop {
@@ -19,7 +19,7 @@ export interface FileDraDrop {
 @Component({
   selector: 'open-file-manager-dra-drop',
   standalone: true,
-    imports: [CommonModule, SharedModule, NgbTooltipModule, FormsModule, DragDropModule],
+    imports: [CommonModule, OvicFileIconPipe, NgbTooltipModule, FormsModule, DragDropModule],
   templateUrl: './open-file-manager-dra-drop.component.html',
   styleUrls: ['./open-file-manager-dra-drop.component.css']
 })

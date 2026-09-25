@@ -1,12 +1,28 @@
+import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from '@core/services/auth.service';
+import { AudioViewerComponent } from '../audio-viewer/audio-viewer.component';
+import { OvicGroupsCheckboxComponent } from '../ovic-groups-checkbox/ovic-groups-checkbox.component';
+import { OvicGroupsRadioV2Component } from '../ovic-groups-radio-v2/ovic-groups-radio-v2.component';
+import { OvicSafeHtmlPipe } from '../../pipes/ovic-safe-html.pipe';
+import { PipeCheckImg } from '../../pipes/pipe-check-img';
 import { HelperService } from '@core/services/helper.service';
 import { getLinkDownload_aws } from '@env';
 
-@Component({standalone: false, 
+@Component({standalone: true,
     selector: 'test-question-review',
     templateUrl: './test-question-review.component.html',
-    styleUrls: ['./test-question-review.component.css']
+    styleUrls: ['./test-question-review.component.css'],
+    imports: [
+        CommonModule,
+        MatTooltipModule,
+        AudioViewerComponent,
+        OvicGroupsRadioV2Component,
+        OvicGroupsCheckboxComponent,
+        PipeCheckImg,
+        OvicSafeHtmlPipe
+    ]
 })
 export class TestQuestionReviewComponent implements OnInit, OnChanges {
 

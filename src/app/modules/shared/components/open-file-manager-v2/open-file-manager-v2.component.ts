@@ -12,7 +12,7 @@ import { MenuItem } from 'primeng/api';
 import { OpenFileManagerService } from '@modules/shared/services/open-file-manager.service';
 
 
-@Component({standalone: false, 
+@Component({standalone: true, 
     selector: 'open-file-manager-v2',
     templateUrl: './open-file-manager-v2.component.html',
     styleUrls: ['./open-file-manager-v2.component.css'],

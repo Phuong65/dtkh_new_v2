@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { QuanlyKehoachHoctapComponent } from './quanly-kehoach-hoctap.component';
 
@@ -8,7 +8,7 @@ describe('QuanlyKehoachHoctapComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ QuanlyKehoachHoctapComponent ]
+      imports: [ QuanlyKehoachHoctapComponent ]
     })
     .compileComponents();
 
@@ -21,3 +21,4 @@ describe('QuanlyKehoachHoctapComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+

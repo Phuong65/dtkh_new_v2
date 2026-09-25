@@ -4,7 +4,6 @@ import { LoginV2Component } from './features/login-v2/login-v2.component';
 import { ContentNoneComponent } from './features/content-none/content-none.component';
 import { UnauthorizedComponent } from './features/unauthorized/unauthorized.component';
 import { ClearComponent } from './features/clear/clear.component';
-import { TraCuuComponent } from '@modules/public/features/tra-cuu/tra-cuu.component';
 import { LoginTemplateV3Component } from '@modules/public/features/login-template-v3/login-template-v3.component';
 import { LoginTemplateV4Component } from '@modules/public/features/login-template-v4/login-template-v4.component';
 import { IndexComponent } from '@modules/public/features/index/index.component';

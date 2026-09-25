@@ -1,6 +1,6 @@
 import { Component , Input , OnInit } from '@angular/core';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-progress' ,
 	templateUrl : './ovic-progress.component.html' ,
 	styleUrls   : [ './ovic-progress.component.css' ]

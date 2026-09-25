@@ -1,7 +1,7 @@
 import { Directive, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import Viewer from 'viewerjs';
 
-@Directive({ selector: '[ngxViewer]' })
+@Directive({ selector: '[ngxViewer]', standalone: true })
 export class NgxViewerDirective implements OnInit, OnDestroy {
 	@Input() viewerOptions: Viewer.Options = {};
 

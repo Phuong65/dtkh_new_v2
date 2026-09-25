@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { AbstractControl, FormsModule, ReactiveFormsModule, } from '@angular/forms';
 import { OvicChooser } from '@modules/shared/models/ovic-models';
@@ -10,11 +10,10 @@ import { MultiSelectModule } from 'primeng/multiselect';
     styleUrls: ['./multi-group-select.component.css'],
     standalone: true,
     imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        MultiSelectModule
-    ]
+    FormsModule,
+    ReactiveFormsModule,
+    MultiSelectModule
+]
 })
 export class MultiGroupSelectComponent implements OnInit, OnChanges {
 

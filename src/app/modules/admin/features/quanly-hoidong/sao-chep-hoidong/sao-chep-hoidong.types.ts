@@ -10,7 +10,7 @@ export type CopySelectedHoidongState =
     | 'partialSuccess'
     | 'error';
 
-export {
+export type {
     CopyHoidongCandidate,
     CopySelectedHoidongJobStatus,
     CopySelectedHoidongPreview,

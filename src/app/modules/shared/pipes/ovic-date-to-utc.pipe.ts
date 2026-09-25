@@ -1,6 +1,6 @@
 import { Input , Pipe , PipeTransform } from '@angular/core';
 
-@Pipe( {standalone: false, 
+@Pipe( {standalone: true, 
 	name : 'ovicDateToUtc'
 } )
 

@@ -1,11 +1,11 @@
-<ng-container *ngIf="ready">
-    <plyr #PlyrComponent style="display: block; width: 100%;" plyrTitle="Video lesson" [plyrPlaysInline]="true"
-        [plyrOptions]="options" [plyrSources]="videoSources" (plyrInit)="player = $event"
-        (plyrPause)="videoPaused($event)" (plyrPlaying)="videoPlying($event)" (plyrWaiting)="videoWaiting($event)">
-    </plyr>
-</ng-container>
-<ng-container *ngIf="!ready">
-    <div class="tn-import-student-progressbar" style="width: 100%;">
-        <p-progressBar [value]="progressValue" mode="dynamic"></p-progressBar>
-    </div>
-</ng-container>
+@if (ready) {
+  <plyr #PlyrComponent style="display: block; width: 100%;" plyrTitle="Video lesson" [plyrPlaysInline]="true"
+    [plyrOptions]="options" [plyrSources]="videoSources" (plyrInit)="player = $event"
+    (plyrPause)="videoPaused($event)" (plyrPlaying)="videoPlying($event)" (plyrWaiting)="videoWaiting($event)">
+  </plyr>
+}
+@if (!ready) {
+  <div class="tn-import-student-progressbar" style="width: 100%;">
+    <p-progressBar [value]="progressValue" mode="determinate"></p-progressBar>
+  </div>
+}

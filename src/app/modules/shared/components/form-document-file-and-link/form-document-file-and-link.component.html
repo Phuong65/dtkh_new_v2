@@ -1,99 +1,176 @@
 <div class="form-document-file-and-link">
-    <div class="content-form-document-file-and-link">
-        <div class="list-file-or-text">
-            <div class="item-file-or-text" *ngFor="let item of list_document, index as i">
-                <div class="single-file" *ngIf="item.type === 'file'">
-                    <i class="icon-in-open-download-file" [ngClass]="item.file | ovicFileIcon" ></i>
-                    <div class="info" (click)="openViewFile(item.file)">
-                        <h4 class="name">{{item.title}}</h4>
-                        <p class="size">{{item.file['file_size']}}</p>
-                    </div>
-                    <button (click)="actionDownload(i)" style="padding: 0 5px;" type="button"
-                        class="btn btn-success btn-download"
-                        [ngbTooltip]="item.file['download']?'Cho phép tải tài liệu học tập':'Không cho phép tải tài liệu học tâp'"
-                        container="body" placement="left">
-                        <i aria-hidden=" true" class="fa fa-download"
-                            [ngClass]="item.file['download']? 'download-true':'download-false'"></i>
-                    </button>
-                    <button (click)="deleteFileChoosed(i)" style="padding: 0 5px;" type="button" class="btn btn-delete">
-                        <i  class="fa fa-trash-o"></i></button>
+  <div class="content-form-document-file-and-link">
+    <div class="list-file-or-text">
+      @for (item of list_document; track item; let i = $index) {
+        <div class="item-file-or-text">
+          @if (item.type === 'file') {
+            <div class="single-file">
+              <i class="icon-in-open-download-file" [ngClass]="item.file | ovicFileIcon" ></i>
+              <div class="info" (click)="openViewFile(item.file)">
+                <h4 class="name">{{item.title}}</h4>
+                <p class="size">{{item.file['file_size']}}</p>
+              </div>
+              <button (click)="actionDownload(i)" style="padding: 0 5px;" type="button"
+                class="btn btn-success btn-download"
+                [ngbTooltip]="item.file['download']?'Cho phép tải tài liệu học tập':'Không cho phép tải tài liệu học tâp'"
+                container="body" placement="left">
+                <i aria-hidden=" true" class="fa fa-download"
+                [ngClass]="item.file['download']? 'download-true':'download-false'"></i>
+              </button>
+              <button (click)="deleteFileChoosed(i)" style="padding: 0 5px;" type="button" class="btn btn-delete">
+                <i  class="fa fa-trash-o"></i></button>
+              </div>
+            }
+            @if (item.type === 'link') {
+              <div class="single-file">
+                <i class="icon-in-open-download-file" [ngClass]="item.link?'fa fa-globe':'fa fa-book'"
+                ></i>
+                <div class="info">
+                  @if (item.link) {
+                    <h4 class="name">
+                      <a [href]="item.link" target="_blank">{{item.title}}</a>
+                    </h4>
+                  }
+                  @if (!item.link) {
+                    <h4 class="name">{{item.title}}</h4>
+                  }
                 </div>
-                <div class="single-file" *ngIf="item.type === 'link'">
-                    <i class="icon-in-open-download-file" [ngClass]="item.link?'fa fa-globe':'fa fa-book'"
-                        ></i>
-                    <div class="info">
-                        <h4 *ngIf="item.link" class="name">
-                            <a [href]="item.link" target="_blank">{{item.title}}</a>
-                        </h4>
-                        <h4 *ngIf="!item.link" class="name">{{item.title}}</h4>
-                    </div>
-                    <!-- <button (click)="openEditForm(opTemplateAddLink,$event,item)" style="padding: 0 5px; background-color: #fff!important;"
-                        class="btn btn-primary btn-icon btn-transparent">
-                        <i  class="fa fa-pencil"></i>
-                    </button> -->
-                    <button (click)="deleteFileChoosed(i)" style="padding: 0 5px;" type="button" class="btn btn-delete">
-                        <i  class="fa fa-trash-o"></i>
-                    </button>
-                </div>
+                <!-- <button (click)="openEditForm(opTemplateAddLink,$event,item)" style="padding: 0 5px; background-color: #fff!important;"
+                class="btn btn-primary btn-icon btn-transparent">
+                <i  class="fa fa-pencil"></i>
+              </button> -->
+              <button (click)="deleteFileChoosed(i)" style="padding: 0 5px;" type="button" class="btn btn-delete">
+                <i  class="fa fa-trash-o"></i>
+              </button>
             </div>
+          }
         </div>
-        <div class="row">
-            <div (click)="openFileManager()" class="col-6" style="padding-right: 5px;">
-                <button mat-raised-button class="btn btn-success">
-                    Chọn tệp tin
-                </button>
-            </div>
-            <div (click)="openFormAdd(opTemplateAddLink,$event)" class="col-6" style="padding-left: 5px; ">
-                <button mat-raised-button class="btn btn-primary">
-                    Thêm link
-                </button>
-            </div>
-        </div>
+      }
     </div>
+    <div class="row">
+      <div (click)="openFileManager()" class="col-6" style="padding-right: 5px;">
+        <button mat-raised-button class="btn btn-success">
+          Chọn tệp tin
+        </button>
+      </div>
+      <div (click)="openFormAdd(opTemplateAddLink,$event)" class="col-6" style="padding-left: 5px; ">
+        <button mat-raised-button class="btn btn-primary">
+          Thêm link
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
-<p-overlayPanel #opTemplateAddLink>
-    <ng-template pTemplate>
-        <div class="ovic-vertical__inputs" style="line-height: 1.5; width:500px">
-            <div class="row form-row form-row-flex-row">
-                <div class="col-12 flex-div">
-                    <label>Tên tài liệu<span class="red">*</span>:</label>
-                    <input [(ngModel)]="documentTypeLink.title" type="text" class="ovic-input-field" autocomplete="off">
-                </div>
-            </div>
-            <div class="row form-row form-row-flex-row">
-                <div class="col-12 flex-div">
-                    <label>Link:</label>
-                    <input [(ngModel)]="documentTypeLink.link" type="text" class="ovic-input-field" autocomplete="off">
-                </div>
-            </div>
-            <div class="row form-row form-row-flex-row">
-                <div class="col-12" style="text-align: right;">
-                    <button *ngIf="!documentTypeLink.ordering" (click)="addLinkToList()" style="width:auto"
-                        class="btn btn-primary">
-                        Thêm
-                    </button>
-                    <button *ngIf="documentTypeLink.ordering" (click)="opTemplateAddLink.hide()" style="width:auto"
-                        class="btn btn-primary">
-                        Đóng
-                    </button>
-                </div>
-            </div>
+<!-- <p-overlayPanel #opTemplateAddLink>
+  <ng-template pTemplate>
+    <div class="ovic-vertical__inputs" style="line-height: 1.5; width:500px">
+      <div class="row form-row form-row-flex-row">
+        <div class="col-12 flex-div">
+          <label>Tên tài liệu<span class="red">*</span>:</label>
+          <input [(ngModel)]="documentTypeLink.title" type="text" class="ovic-input-field" autocomplete="off">
         </div>
-    </ng-template>
-</p-overlayPanel>
+      </div>
+      <div class="row form-row form-row-flex-row">
+        <div class="col-12 flex-div">
+          <label>Link:</label>
+          <input [(ngModel)]="documentTypeLink.link" type="text" class="ovic-input-field" autocomplete="off">
+        </div>
+      </div>
+      <div class="row form-row form-row-flex-row">
+        <div class="col-12" style="text-align: right;">
+          @if (!documentTypeLink.ordering) {
+            <button (click)="addLinkToList()" style="width:auto"
+              class="btn btn-primary">
+              Thêm
+            </button>
+          }
+          @if (documentTypeLink.ordering) {
+            <button (click)="opTemplateAddLink.hide()" style="width:auto"
+              class="btn btn-primary">
+              Đóng
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-overlayPanel> -->
+
+<p-popover #opTemplateAddLink>
+  <ng-template #content>
+    <div
+      class="ovic-vertical__inputs"
+      style="line-height: 1.5; width: 500px"
+    >
+      <div class="row form-row form-row-flex-row">
+        <div class="col-12 flex-div">
+          <label>
+            Tên tài liệu<span class="red">*</span>:
+          </label>
+
+          <input
+            [(ngModel)]="documentTypeLink.title"
+            type="text"
+            class="ovic-input-field"
+            autocomplete="off"
+          >
+        </div>
+      </div>
+
+      <div class="row form-row form-row-flex-row">
+        <div class="col-12 flex-div">
+          <label>Link:</label>
+
+          <input
+            [(ngModel)]="documentTypeLink.link"
+            type="text"
+            class="ovic-input-field"
+            autocomplete="off"
+          >
+        </div>
+      </div>
+
+      <div class="row form-row form-row-flex-row">
+        <div class="col-12" style="text-align: right;">
+
+          @if (!documentTypeLink.ordering) {
+            <button
+              (click)="addLinkToList()"
+              style="width: auto"
+              class="btn btn-primary">
+              Thêm
+            </button>
+          }
+
+          @if (documentTypeLink.ordering) {
+            <button
+              (click)="opTemplateAddLink.hide()"
+              style="width: auto"
+              class="btn btn-primary">
+              Đóng
+            </button>
+          }
+
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-popover>
+
+
 
 <ng-template #viewDocumentTempalte let-c="close" let-d="dismiss">
-    <div class="ovic-over-right-section" style="height: 100vh;">
-        <div class="ovic-over-right-section__head">
-            <h3 class="ovic-over-right-section__header">View</h3>
-            <button class="btn ovic-over-right-section__close-button" (click)="d(true)"></button>
-        </div>
-        <div class="ovic-over-right-section__body footer-no-hint no-footer" style="padding: 0px;">
-            <div class="ovic-vertical__inputs" style="height: 100%;">
-                <view-document [file]="fileView?fileView:null">
-                </view-document>
-            </div>
-        </div>
+  <div class="ovic-over-right-section" style="height: 100vh;">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">View</h3>
+      <button class="btn ovic-over-right-section__close-button" (click)="d(true)"></button>
     </div>
+    <div class="ovic-over-right-section__body footer-no-hint no-footer" style="padding: 0px;">
+      <div class="ovic-vertical__inputs" style="height: 100%;">
+        <view-document [file]="fileView?fileView:null">
+        </view-document>
+      </div>
+    </div>
+  </div>
 </ng-template>

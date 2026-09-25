@@ -4,7 +4,7 @@ import { OvicFileSever, OvicFileStore, OvicTree, OvicDriveFile, OvicFileUpload }
 import { AbstractControl } from '@angular/forms';
 import { APP_CONFIGS, environment } from 'src/environments/environment';
 import { FileService } from '@core/services/file.service';
-@Component({standalone: false, 
+@Component({standalone: true, 
     selector: 'open-file-manager',
     templateUrl: './open-file-manager.component.html',
     styleUrls: ['./open-file-manager.component.css']

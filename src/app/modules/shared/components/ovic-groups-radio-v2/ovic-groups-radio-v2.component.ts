@@ -1,12 +1,16 @@
 import { Component, OnInit, Input, SimpleChanges, OnChanges, Output, EventEmitter, OnDestroy, inject, AfterViewInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { KEY_ANSWER } from '@modules/shared/utils/syscat';
+import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
+import { LoadMediaOnTextDirective } from '../../directives/load-media-on-text.directive';
 
-@Component({standalone: false, 
+@Component({standalone: true,
     selector: 'ovic-groups-radio-v2',
     templateUrl: './ovic-groups-radio-v2.component.html',
     styleUrls: ['./ovic-groups-radio-v2.component.css'],
+    imports: [CommonModule, SafeHtmlPipe, LoadMediaOnTextDirective]
 })
 
 export class OvicGroupsRadioV2Component implements OnInit, OnChanges, OnDestroy, AfterViewInit {

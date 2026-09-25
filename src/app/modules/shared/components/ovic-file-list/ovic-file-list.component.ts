@@ -6,7 +6,7 @@ import { Subject } from 'rxjs';
 import { MediaService } from '@shared/services/media.service';
 import { APP_CONFIGS } from '@env';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-file-list' ,
 	templateUrl : './ovic-file-list.component.html' ,
 	styleUrls   : [ './ovic-file-list.component.css' ]

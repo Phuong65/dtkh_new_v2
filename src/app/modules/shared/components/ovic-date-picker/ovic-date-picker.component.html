@@ -1,4 +1,6 @@
-<label *ngIf="label">{{label}}</label>
+@if (label) {
+  <label>{{label}}</label>
+}
 <p-calendar
   [dateFormat]="dateFormat"
   [locale]="locale"
@@ -10,7 +12,7 @@
   [monthNavigator]="monthNavigator"
   [yearNavigator]="yearNavigator"
   [yearRange]="yearRange"
-  [showTransitionOptions]="'0ms'" 
+  [showTransitionOptions]="'0ms'"
   [hideTransitionOptions]="'0ms'"
   [disabled]="disabled"
   appendTo="body"

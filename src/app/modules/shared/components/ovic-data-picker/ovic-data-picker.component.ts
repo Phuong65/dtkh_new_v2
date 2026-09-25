@@ -2,7 +2,7 @@ import { Component , EventEmitter , Input , OnInit , Output , OnChanges , Simple
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DataPickerColumn , DataPickerGroup } from '@shared/models/ovic-models';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-data-picker' ,
 	templateUrl : './ovic-data-picker.component.html' ,
 	styleUrls   : [ './ovic-data-picker.component.css' ]

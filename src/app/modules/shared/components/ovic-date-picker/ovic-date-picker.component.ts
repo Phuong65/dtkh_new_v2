@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, Input, Output, EventEmitter, SimpleChanges, OnChanges } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
-@Component( {standalone: false, 
+@Component( {standalone: true, 
     selector: 'ovic-date-picker',
     templateUrl: './ovic-date-picker.component.html',
     styleUrls: [ './ovic-date-picker.component.css' ]

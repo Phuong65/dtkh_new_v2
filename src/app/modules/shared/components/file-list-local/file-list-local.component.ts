@@ -9,11 +9,14 @@ import { NotificationService } from '@core/services/notification.service';
 import { DownloadProcess } from '@shared/components/ovic-download-progress/ovic-download-progress.component';
 import { Observable , of , Subject } from 'rxjs';
 import { CLOUD_STORAGE_KEY } from '../../../../../environments/environment.prod';
+import { CommonModule } from '@angular/common';
+import { OvicFileIconPipe } from '../../pipes/ovic-file-icon.pipe';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'app-file-list-local' ,
 	templateUrl : './file-list-local.component.html' ,
-	styleUrls   : [ './file-list-local.component.css' ]
+	styleUrls   : [ './file-list-local.component.css' ],
+ imports: [CommonModule, OvicFileIconPipe]
 } )
 export class FileListLocalComponent implements OnInit , OnChanges {
 

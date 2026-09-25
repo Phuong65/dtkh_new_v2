@@ -2,7 +2,7 @@ import { Component , EventEmitter , Input , OnChanges , OnInit , Output , Simple
 import { OvicRightContextMenu } from '@shared/models/ovic-right-context-menu';
 import { NotificationService } from '@core/services/notification.service';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-right-content-menu' ,
 	templateUrl : './ovic-right-content-menu.component.html' ,
 	styleUrls   : [ './ovic-right-content-menu.component.css' ]

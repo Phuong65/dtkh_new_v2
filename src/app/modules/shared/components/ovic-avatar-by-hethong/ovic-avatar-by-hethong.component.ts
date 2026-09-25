@@ -8,12 +8,12 @@ import {AvatarMakerSetting, MediaService} from "@shared/services/media.service";
 import {map} from "rxjs/operators";
 import {RippleModule} from "primeng/ripple";
 import {getLinkDownload_aws} from "@env";
-import {SharedModule} from "@shared/shared.module";
+import {SafeHtmlPipe} from "@shared/pipes/safe-html.pipe";
 export const TYPE_FILE_IMAGE:string[] = ['image/png', 'image/gif','image/jpeg', 'image/bmp',' image/x-icon'];
 @Component({
   selector: 'app-ovic-avatar-by-hethong',
   standalone: true,
-    imports: [CommonModule, RippleModule, SharedModule],
+    imports: [CommonModule, RippleModule, SafeHtmlPipe],
   templateUrl: './ovic-avatar-by-hethong.component.html',
   styleUrls: ['./ovic-avatar-by-hethong.component.css']
 })

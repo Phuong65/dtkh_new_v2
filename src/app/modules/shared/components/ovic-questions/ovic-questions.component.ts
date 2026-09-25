@@ -1,10 +1,12 @@
 import { Component , OnInit , Input , Output , EventEmitter , OnChanges , SimpleChanges } from '@angular/core';
 import { OvicQuestion } from '@shared/models/ovic-models';
+import { CommonModule } from '@angular/common';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-questions' ,
 	templateUrl : './ovic-questions.component.html' ,
-	styleUrls   : [ './ovic-questions.component.css' ]
+	styleUrls   : [ './ovic-questions.component.css' ],
+ imports: [CommonModule]
 } )
 export class OvicQuestionsComponent implements OnInit , OnChanges {
 

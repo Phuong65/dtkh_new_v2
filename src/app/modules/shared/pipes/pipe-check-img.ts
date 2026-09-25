@@ -1,6 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({standalone: false, 
+@Pipe({
+    standalone: true,
     name: 'pipeCheckImg'
 })
 export class PipeCheckImg implements PipeTransform {

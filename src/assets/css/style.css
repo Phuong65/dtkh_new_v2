@@ -2865,32 +2865,70 @@ p-calendar {
 
 /* end */
 
-/* menu-v2*/
+/* menu-v2 — PrimeNG 21 DOM */
 .menu-layout-right-bottom .submenu-v2 {
-    border: 0px;
     width: 100%;
+    border: 0;
 }
 
-.child-submenu-item-v2 a {
-    margin: 0 10px;
-    color: #4b4c4c;
+.menu-layout-right-bottom .submenu-v2 .p-menu-list {
+    padding: 0;
+}
+
+.menu-layout-right-bottom .submenu-v2 .p-menu-item-content {
+    background: transparent;
+    border-radius: 4px;
+}
+
+.menu-layout-right-bottom .submenu-v2 .p-menu-item-link,
+.menu-layout-right-bottom .submenu-v2 .child-submenu-item-v2 a {
+    display: flex;
+    align-items: center;
+    min-height: 34px;
+    margin: 2px 10px;
+    padding:0.75rem 10px;
+    color: #4b4c4c !important;
     font-size: 14px;
+    line-height: 1.25;
     box-shadow: none !important;
     border-radius: 4px !important;
 }
 
-.menu-layout-right-bottom .submenu-v2 .p-submenu-header span {
+.menu-layout-right-bottom .submenu-v2 .p-menu-submenu-label,
+.menu-layout-right-bottom .submenu-v2 .p-submenu-header {
+    padding: 0.75rem 20px;
     color: #0084ff;
     text-transform: uppercase;
     font-size: 14px;
 }
 
-.submenu-v2 .p-menuitem-link:not(.p-disabled):hover,
-.submenu-v2 .p-menuitem-link:not(.p-menuitem-link-active):hover,
-.submenu-v2 .p-menuitem-link:not(.p-disabled):focus,
-.submenu-v2 .p-menuitem-link:not(.p-menuitem-link-active):focus,
-.submenu-v2 .p-menuitem-link.p-menuitem-link-active {
+/* PrimeNG 21 applies visual state to .p-menu-item-content. */
+.menu-layout-right-bottom .submenu-v2 .p-menu-item:not(.p-disabled) .p-menu-item-content:hover,
+.menu-layout-right-bottom .submenu-v2 .p-menu-item.p-focus .p-menu-item-content,
+.menu-layout-right-bottom .submenu-v2 .p-menu-item-content:has(.p-menu-item-link.p-menu-item-link-active),
+.menu-layout-right-bottom .submenu-v2 .p-menu-item-content:has(.p-menuitem-link.p-menuitem-link-active),
+.menu-layout-right-bottom .submenu-v2 .p-menuitem-link:not(.p-disabled):hover,
+.menu-layout-right-bottom .submenu-v2 .p-menuitem-link:not(.p-menuitem-link-active):focus,
+.menu-layout-right-bottom .submenu-v2 .p-menu-item-link:not(.p-disabled):hover,
+.menu-layout-right-bottom .submenu-v2 .p-menu-item-link:not(.p-menu-item-link-active):focus,
+.menu-layout-right-bottom .submenu-v2 .p-menu-item-link.p-menu-item-link-active {
     background-color: #c2e7ff !important;
+    color: #4b4c4c !important;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.menu-layout-right-bottom .submenu-v2 .p-menu-item.p-disabled .p-menu-item-link,
+.menu-layout-right-bottom .submenu-v2 .p-menu-item[data-p-disabled="true"] .p-menu-item-link {
+    cursor: default;
+}
+
+.fa-solid.fa-chalkboard-user {
+    background-image: url('/assets/images/svg/chalkboard-user.svg');
+}
+
+.child-submenu-item-v2 span {
+    line-height: 1.25 !important;
 }
 
 .fa-solid.fa-chalkboard-user {

@@ -1,10 +1,20 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { HelperService } from '@core/services/helper.service';
 import mammothPlus from 'mammoth-plus';
 import { MathMLToLaTeX } from 'mathml-to-latex';
 import * as latex_js from 'latex.js';
 import { NotificationService } from '@core/services/notification.service';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { AudioViewerComponent } from '../audio-viewer/audio-viewer.component';
+import { OvicGroupsRadioV2Component } from '../ovic-groups-radio-v2/ovic-groups-radio-v2.component';
+import { OvicGroupsCheckboxComponent } from '../ovic-groups-checkbox/ovic-groups-checkbox.component';
+import { RawHtmlPipe } from '../../pipes/innerhtml-raw-pipe';
+import { PipeCheckImg } from '../../pipes/pipe-check-img';
+import { StringToArrayPipe } from '../../pipes/string-to-array-pipe';
+import { GetAnsDragDropPipe } from '../../pipes/get-ans-drag-drop.pipe';
+import { ChipModule } from 'primeng/chip';
 
 export interface Question {
     question_direction: string; // nội dung câu hỏi
@@ -66,10 +76,23 @@ export interface INFORES {
     noAnswerCorrectArray: string[]
 }
 
-@Component({standalone: false, 
+@Component({standalone: true,
     selector: 'test-question-import-v2',
     templateUrl: './test-question-import-v2.component.html',
-    styleUrls: ['./test-question-import-v2.component.css']
+    styleUrls: ['./test-question-import-v2.component.css'],
+    imports: [
+        CommonModule,
+        FormsModule,
+        DragDropModule,
+        AudioViewerComponent,
+        OvicGroupsRadioV2Component,
+        OvicGroupsCheckboxComponent,
+        RawHtmlPipe,
+        PipeCheckImg,
+        StringToArrayPipe,
+        GetAnsDragDropPipe,
+        ChipModule
+    ]
 })
 export class TestQuestionImportV2Component implements OnInit {
 
@@ -702,21 +725,29 @@ export class TestQuestionImportV2Component implements OnInit {
         return s.substr(i, j);
     }
 
-    onAddChips(event, ans) {
-        if (ans[0] && ans[0].length !== 0) {
-            ans[0] = ans[0].concat('|', event['value']);
+    onAddChips(event: any, ans: string[]): string[] {
+        const value = event && event['value'] ? event['value'].toString().trim() : '';
+        if (!value) {
+            return Array.isArray(ans) ? [...ans] : [];
         }
+        const currentJoined = Array.isArray(ans) && ans[0] ? ans[0] : '';
+        if (currentJoined) {
+            const answers = currentJoined.split('|').filter(Boolean);
+            if (!answers.includes(value)) {
+                return [answers.concat(value).join('|')];
+            }
+            return [currentJoined];
+        }
+        return [value];
     }
 
-    onRemoveChips(event, ans) {
-        if (ans[0] && ans[0].length !== 0) {
-            const arr = ans[0].split('|');
-            const index = arr.findIndex(m => m === event['value']);
-            if (index !== -1) {
-                arr.splice(index, 1);
-                ans[0] = arr.join('|')
-            }
+    onRemoveChips(event: any, ans: string[]): string[] {
+        if (!Array.isArray(ans) || !ans[0]) {
+            return [];
         }
+        const value = event && event['value'] ? event['value'].toString() : '';
+        const answers = ans[0].split('|').filter(m => m !== value);
+        return [answers.join('|')];
     }
 
     dropReorder(event: CdkDragDrop<string[]>, data: String[], quest: Question) {

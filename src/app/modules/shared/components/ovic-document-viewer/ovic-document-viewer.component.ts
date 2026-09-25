@@ -4,7 +4,7 @@ import { FileService } from '@core/services/file.service';
 // import { viewerType } from 'ngx-doc-viewer/ngx-doc-viewer';
 import { environment , getLinkDownload } from '@env';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-document-viewer' ,
 	templateUrl : './ovic-document-viewer.component.html' ,
 	styleUrls   : [ './ovic-document-viewer.component.css' ]

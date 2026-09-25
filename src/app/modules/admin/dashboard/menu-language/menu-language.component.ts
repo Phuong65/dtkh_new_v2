@@ -4,7 +4,7 @@ import { UnsubscribeAndCompleteObserversOnDestroy } from '@core/utils/decorator'
 import { APP_CONFIGS } from '@env';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { OverlayPanel } from 'primeng/overlaypanel';
+import { Popover } from 'primeng/popover';
 
 interface MenuLanguage {
 	name : string;
@@ -44,7 +44,7 @@ export class MenuLanguageComponent implements OnInit {
 	ngOnInit() : void {
 	}
 
-	changeLang( panel : OverlayPanel , lang : MenuLanguage ) {
+	changeLang( panel : Popover , lang : MenuLanguage ) {
 		panel.hide();
 		this.auth.changeUserLanguage( lang.name );
 	}

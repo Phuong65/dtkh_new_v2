@@ -12,7 +12,7 @@ import { RippleModule } from 'primeng/ripple';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ConfirmationService } from 'primeng/api';
 import { DialogModule } from 'primeng/dialog';
-import { SidebarModule } from 'primeng/sidebar';
+import { DrawerModule } from 'primeng/drawer';
 import { TooltipModule } from 'primeng/tooltip';
 import { LoaderComponent } from './features/loader/loader.component';
 import { SharedModule } from '@shared/shared.module';
@@ -34,7 +34,7 @@ import { ColorPanelComponent } from './features/color-panel/color-panel.componen
 		RippleModule ,
 		ConfirmPopupModule ,
 		DialogModule ,
-		SidebarModule ,
+		DrawerModule ,
 		TooltipModule ,
 		SharedModule ,
 		BasicRoutingModule

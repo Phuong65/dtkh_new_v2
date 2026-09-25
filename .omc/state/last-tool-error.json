@@ -1,0 +1,7 @@
+{
+  "tool_name": "Agent",
+  "tool_input_preview": "{\"description\":\"Review Angular header migration\",\"prompt\":\"Read-only review current working directory. Review ONLY diff in src/app/modules/admin/dashboard/dashboard-v2/dashboard-v2.component.html arou...",
+  "error": "Refusing to use d:\\data\\project\\angular\\v21\\dtkh_new_v2\\.claude\\worktrees\\agent-a8f71dfd463fb2657 as an isolation worktree: git resolves its working tree to D:/data/project/angular/v21/dtkh_new_v2/.claude/worktrees/agent-a8f71dfd463fb2657 (a core.worktree redirect, or a checkout discovered above it), so commands run there would write outside the worktree. Remove the redirect, restore the worktree's own .git, or recreate the worktree, then retry.",
+  "timestamp": "2026-09-25T02:00:59.083Z",
+  "retry_count": 3
+}

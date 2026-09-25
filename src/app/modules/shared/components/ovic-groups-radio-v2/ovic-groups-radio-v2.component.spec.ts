@@ -8,8 +8,8 @@ describe('OvicGroupsRadioV2Component', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ OvicGroupsRadioV2Component ]
-    })
+    imports: [OvicGroupsRadioV2Component]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(OvicGroupsRadioV2Component);

@@ -52,16 +52,16 @@ describe('LoginTemplateIctuDttxComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should have universityName as QUẢN LÝ ĐÀO TẠO TỪ XA', () => {
-        expect(component.universityName).toBe('QUẢN LÝ ĐÀO TẠO TỪ XA');
+    it('should have universityName as TRƯỜNG ĐẠI HỌC CÔNG NGHỆ THÔNG TIN VÀ TRUYỀN THÔNG', () => {
+        expect(component.universityName).toBe('TRƯỜNG ĐẠI HỌC CÔNG NGHỆ THÔNG TIN VÀ TRUYỀN THÔNG');
     });
 
     it('should have universitySub as TRƯỜNG ĐẠI HỌC CÔNG NGHỆ THÔNG TIN VÀ TRUYỀN THÔNG', () => {
         expect(component.universitySub).toBe('TRƯỜNG ĐẠI HỌC CÔNG NGHỆ THÔNG TIN VÀ TRUYỀN THÔNG');
     });
 
-    it('should have pageTitle as Đăng nhập — Đào tạo từ xa ICTU', () => {
-        expect(component.pageTitle).toBe('Đăng nhập — Đào tạo từ xa ICTU');
+    it('should use the configured application page title', () => {
+        expect(component.pageTitle).toBe('[LCMS] - Hệ thống quản lý học tập trực tuyến, Trường Đại học CNTT & TT');
     });
 
     it('should initialize loginForm with username and password controls', () => {

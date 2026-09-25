@@ -2,7 +2,7 @@ import { Component, OnInit, Input, SimpleChanges, OnChanges, EventEmitter, Outpu
 import { AbstractControl } from '@angular/forms';
 import { HelperService } from '@core/services/helper.service';
 
-@Component({standalone: false, 
+@Component({standalone: true, 
     selector: 'ovic-editor',
     templateUrl: './ovic-editor.component.html',
     styleUrls: ['./ovic-editor.component.css']

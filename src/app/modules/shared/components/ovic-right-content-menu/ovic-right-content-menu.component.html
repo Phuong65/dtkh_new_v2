@@ -1,28 +1,40 @@
 <div class="ovic-right-context-menu" [class.submenu-open-left]="_item['subMenuOpenLeft']" (contextmenu)="disableContextMenu($event)">
-    <ul class="ovic-right-context-menu__nav">
-        <li class="ovic-right-context-menu__nav-elm" [class.border-top--bold]="_menu['boldBorderTop']" *ngFor="let _menu of _data" [class.elm-has-child]="_menu.child && _menu.child.length">
-            <ng-container *ngIf="_menu.child && _menu.child.length">
-                <span class="btn ovic-right-context-menu__btn-nav" [ngClass]="_menu.class"><i  [ngClass]="_menu.icon ? _menu.icon :'fa fa-dot-circle-o'"></i><span>{{_menu.label}}</span></span>
-                <ul class="ovic-right-context-menu__nav-child">
-                    <li class="ovic-right-context-menu__nav-elm" *ngFor="let _childMenu of _menu.child">
-                        <a class="btn ovic-right-context-menu__btn-nav" href="#" [ngClass]="_childMenu.class" (click)="menuItemClick($event,_childMenu.slug,_item.attached)" *ngIf="!_childMenu.invisible">
-                            <i  [ngClass]="_childMenu.icon ? _childMenu.icon :'fa fa-dot-circle-o'"></i><span>{{_childMenu.label}}</span>
-                        </a>
-                        <span class="btn ovic-right-context-menu__btn-nav disabled" [ngClass]="_childMenu.class" *ngIf="_childMenu.invisible">
-                            <i  [ngClass]="_childMenu.icon ? _childMenu.icon :'fa fa-dot-circle-o'"></i><span>{{_childMenu.label}}</span>
-                        </span>
-                    </li>
-                </ul>
-            </ng-container>
-            <ng-container *ngIf="!_menu.child || _menu.child.length === 0">
-                <a class="btn ovic-right-context-menu__btn-nav" href="#" [ngClass]="_menu.class" (click)="menuItemClick($event,_menu.slug,_item.attached)" *ngIf="!_menu.invisible">
-                    <i  [ngClass]="_menu.icon ? _menu.icon :'fa fa-dot-circle-o'"></i><span>{{_menu.label}}</span>
-                </a>
-                <span class="btn ovic-right-context-menu__btn-nav disabled" [ngClass]="_menu.class" *ngIf="_menu.invisible">
-                    <i  [ngClass]="_menu.icon ? _menu.icon :'fa fa-dot-circle-o'"></i><span>{{_menu.label}}</span>
-                </span>
-            </ng-container>
-        </li>
-    </ul>
+  <ul class="ovic-right-context-menu__nav">
+    @for (_menu of _data; track _menu) {
+      <li class="ovic-right-context-menu__nav-elm" [class.border-top--bold]="_menu['boldBorderTop']" [class.elm-has-child]="_menu.child && _menu.child.length">
+        @if (_menu.child && _menu.child.length) {
+          <span class="btn ovic-right-context-menu__btn-nav" [ngClass]="_menu.class"><i  [ngClass]="_menu.icon ? _menu.icon :'fa fa-dot-circle-o'"></i><span>{{_menu.label}}</span></span>
+          <ul class="ovic-right-context-menu__nav-child">
+            @for (_childMenu of _menu.child; track _childMenu) {
+              <li class="ovic-right-context-menu__nav-elm">
+                @if (!_childMenu.invisible) {
+                  <a class="btn ovic-right-context-menu__btn-nav" href="#" [ngClass]="_childMenu.class" (click)="menuItemClick($event,_childMenu.slug,_item.attached)">
+                    <i  [ngClass]="_childMenu.icon ? _childMenu.icon :'fa fa-dot-circle-o'"></i><span>{{_childMenu.label}}</span>
+                  </a>
+                }
+                @if (_childMenu.invisible) {
+                  <span class="btn ovic-right-context-menu__btn-nav disabled" [ngClass]="_childMenu.class">
+                    <i  [ngClass]="_childMenu.icon ? _childMenu.icon :'fa fa-dot-circle-o'"></i><span>{{_childMenu.label}}</span>
+                  </span>
+                }
+              </li>
+            }
+          </ul>
+        }
+        @if (!_menu.child || _menu.child.length === 0) {
+          @if (!_menu.invisible) {
+            <a class="btn ovic-right-context-menu__btn-nav" href="#" [ngClass]="_menu.class" (click)="menuItemClick($event,_menu.slug,_item.attached)">
+              <i  [ngClass]="_menu.icon ? _menu.icon :'fa fa-dot-circle-o'"></i><span>{{_menu.label}}</span>
+            </a>
+          }
+          @if (_menu.invisible) {
+            <span class="btn ovic-right-context-menu__btn-nav disabled" [ngClass]="_menu.class">
+              <i  [ngClass]="_menu.icon ? _menu.icon :'fa fa-dot-circle-o'"></i><span>{{_menu.label}}</span>
+            </span>
+          }
+        }
+      </li>
+    }
+  </ul>
 </div>
 

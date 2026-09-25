@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, OnChanges, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
     selector: 'ovic-dropdown',
     templateUrl: './ovic-dropdown.component.html',
     styleUrls: [ './ovic-dropdown.component.css' ]

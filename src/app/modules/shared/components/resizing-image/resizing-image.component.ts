@@ -12,7 +12,7 @@ import { AuthService } from '@core/services/auth.service';
 import { OpenFileManagerService } from '@modules/shared/services/open-file-manager.service';
 import { APP_CONFIGS } from '@env';
 
-@Component({standalone: false, 
+@Component({standalone: true, 
     selector: 'resizing-image',
     templateUrl: './resizing-image.component.html',
     styleUrls: ['./resizing-image.component.css']

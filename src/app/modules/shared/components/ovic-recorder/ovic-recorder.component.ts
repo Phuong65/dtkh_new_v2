@@ -2,7 +2,7 @@ import { Component , EventEmitter , Input , OnChanges , OnInit , Output , Simple
 import { NotificationService } from '@core/services/notification.service';
 import MicRecorder from 'mic-recorder-to-mp3';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-recorder' ,
 	templateUrl : './ovic-recorder.component.html' ,
 	styleUrls   : [ './ovic-recorder.component.css' ]

@@ -8,8 +8,8 @@ describe('OvicGroupsCheckboxComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ OvicGroupsCheckboxComponent ]
-    })
+    imports: [OvicGroupsCheckboxComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(OvicGroupsCheckboxComponent);

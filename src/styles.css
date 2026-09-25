@@ -199,7 +199,7 @@ body {
 a,
 a:visited,
 a:hover {
-    text-decoration: none;
+    text-decoration: none !important;
 }
 
 @media (max-width: 600px) {

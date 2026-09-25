@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DongboDulieuMainComponent } from './dongbo-dulieu-main.component';
 
@@ -8,7 +8,7 @@ describe('DongboDulieuMainComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DongboDulieuMainComponent ]
+      imports: [ DongboDulieuMainComponent ]
     })
     .compileComponents();
 
@@ -21,3 +21,4 @@ describe('DongboDulieuMainComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+

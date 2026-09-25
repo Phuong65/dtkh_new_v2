@@ -110,15 +110,20 @@ export class LoginTemplateV3Component implements OnInit, OnDestroy {
     }
 
     ngAfterViewInit(): void {
-        google.accounts.id.initialize({
-            client_id: google_client_id,
-            callback: (response: any) => this.handleGoogleSignIn(response)
-        });
+        const googleButton = document.getElementById('sign-up-form__btn--google-sign-in');
+        if (typeof google !== 'undefined' && google?.accounts?.id) {
+            google.accounts.id.initialize({
+                client_id: google_client_id,
+                callback: (response: any) => this.handleGoogleSignIn(response)
+            });
 
-        google.accounts.id.renderButton(
-            document.getElementById('sign-up-form__btn--google-sign-in'),
-            { width: '100%', size: 'large', type: 'standard', shape: 'circle', text: 'signin_with', theme: 'filled_blue' }  // customization attributes
-        );
+            if (googleButton) {
+                google.accounts.id.renderButton(
+                    googleButton,
+                    { width: '100%', size: 'large', type: 'standard', shape: 'circle', text: 'signin_with', theme: 'filled_blue' }
+                );
+            }
+        }
     }
 
     checkUserLoginStatus() {

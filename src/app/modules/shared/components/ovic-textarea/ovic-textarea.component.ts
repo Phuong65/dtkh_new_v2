@@ -1,6 +1,6 @@
 import { Component , EventEmitter , Input , OnChanges , OnInit , Output , SimpleChanges } from '@angular/core';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-textarea' ,
 	templateUrl : './ovic-textarea.component.html' ,
 	styleUrls   : [ './ovic-textarea.component.css' ]

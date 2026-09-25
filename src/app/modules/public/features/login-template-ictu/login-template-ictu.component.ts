@@ -135,17 +135,19 @@ export class LoginTemplateIctuComponent implements OnInit, OnDestroy {
     }
 
     ngAfterViewInit(): void {
-        google.accounts.id.initialize({
-            client_id: google_client_id,
-            callback: (response: any) => this.handleGoogleSignIn(response)
-        });
-
         const googleButton = document.getElementById('sign-up-form__btn--google-sign-in');
-        if (googleButton && typeof google !== 'undefined' && google.accounts?.id) {
-            google.accounts.id.renderButton(
-                googleButton,
-                { text: 'Đăng nhập', locale: 'vi', size: 'large', type: 'standard', width: '300px', shape: 'rectangular', theme: 'filled_blue', scope: 'profile email', longtitle: true, height: 50 }  // customization attributes
-            );
+        if (typeof google !== 'undefined' && google?.accounts?.id) {
+            google.accounts.id.initialize({
+                client_id: google_client_id,
+                callback: (response: any) => this.handleGoogleSignIn(response)
+            });
+
+            if (googleButton) {
+                google.accounts.id.renderButton(
+                    googleButton,
+                    { text: 'Đăng nhập', locale: 'vi', size: 'large', type: 'standard', width: '300px', shape: 'rectangular', theme: 'filled_blue', scope: 'profile email', longtitle: true, height: 50 }
+                );
+            }
         }
     }
 

@@ -2,6 +2,12 @@
 import { CommonModule } from '@angular/common';
 import {RouterModule} from '@angular/router';
 
+export interface PercentScore {
+    cc: number;
+    daugio: number;
+    kynang: number;
+}
+
 @Component({
     selector: 'app-thong-ke-diemthuongxuyen-hvu',
     templateUrl: './thong-ke-diemthuongxuyen-hvu.component.html',

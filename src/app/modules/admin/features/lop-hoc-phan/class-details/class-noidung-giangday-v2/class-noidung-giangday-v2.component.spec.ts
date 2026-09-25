@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ClassNoidungGiangdayV2Component } from './class-noidung-giangday-v2.component';
 
@@ -8,7 +8,7 @@ describe('ClassNoidungGiangdayV2Component', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ClassNoidungGiangdayV2Component ]
+      imports: [ ClassNoidungGiangdayV2Component ]
     })
     .compileComponents();
 
@@ -21,3 +21,4 @@ describe('ClassNoidungGiangdayV2Component', () => {
     expect(component).toBeTruthy();
   });
 });
+

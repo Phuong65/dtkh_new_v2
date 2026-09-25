@@ -1,4 +1,8 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { HelperService } from '@core/services/helper.service';
+import { NotificationService } from '@core/services/notification.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { PlaylistYoutubeService } from '@modules/shared/services/playlist-youtube.service';
 
 import { YoutubeManagerComponent } from './youtube-manager.component';
 
@@ -6,9 +10,15 @@ describe('YoutubeManagerComponent', () => {
   let component: YoutubeManagerComponent;
   let fixture: ComponentFixture<YoutubeManagerComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ YoutubeManagerComponent ]
+      imports: [YoutubeManagerComponent],
+      providers: [
+        { provide: HelperService, useValue: {} },
+        { provide: NotificationService, useValue: {} },
+        { provide: NgbModal, useValue: {} },
+        { provide: PlaylistYoutubeService, useValue: {} }
+      ]
     })
     .compileComponents();
   }));

@@ -3,11 +3,20 @@ import { HelperService } from '@core/services/helper.service';
 import mammothPlus from 'mammoth-plus';
 import { MathMLToLaTeX } from 'mathml-to-latex';
 import * as latex_js from 'latex.js';
+import { OvicGroupsRadioV2Component } from '../ovic-groups-radio-v2/ovic-groups-radio-v2.component';
+import { PipeCheckImg } from '../../pipes/pipe-check-img';
+import { OvicGroupsCheckboxComponent } from '../ovic-groups-checkbox/ovic-groups-checkbox.component';
+import { CommonModule } from '@angular/common';
+import { AudioViewerComponent } from '../audio-viewer/audio-viewer.component';
+import { RawHtmlPipe } from '../../pipes/innerhtml-raw-pipe';
+import { FormsModule } from '@angular/forms';
 
-@Component({standalone: false, 
+@Component({standalone: true, 
     selector: 'test-question-import',
     templateUrl: './test-question-import.component.html',
-    styleUrls: ['./test-question-import.component.css']
+    styleUrls: ['./test-question-import.component.css'],
+    imports: [OvicGroupsRadioV2Component, PipeCheckImg, OvicGroupsCheckboxComponent, CommonModule, 
+        AudioViewerComponent, RawHtmlPipe,FormsModule]
 })
 export class TestQuestionImportComponent implements OnInit, OnChanges {
     @Input() fileInput: File;

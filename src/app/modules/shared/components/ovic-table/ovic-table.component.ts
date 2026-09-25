@@ -5,7 +5,7 @@ import { debounceTime, Subject, Subscription } from 'rxjs';
 import { NotificationService } from '@core/services/notification.service';
 import { OvicButton } from '@core/models/buttons';
 
-@Component({standalone: false, 
+@Component({standalone: true, 
     selector: 'ovic-table',
     templateUrl: './ovic-table.component.html',
     styleUrls: ['./ovic-table.component.css'],

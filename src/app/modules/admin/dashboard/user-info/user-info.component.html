@@ -8,7 +8,7 @@
         </div>
     </button>
 </div>
-<p-overlayPanel #panel styleClass="top-bar__overlay-panel --append-to-overlay-anchor" [appendTo]="overlayAnchor">
+<p-popover #panel styleClass="top-bar__overlay-panel --append-to-overlay-anchor" [appendTo]="overlayAnchor">
     <div class="top-bar__vertical-menu__head">
         <b class="top-bar__vertical-menu__user-name">{{ currentUser.name }}</b>
         <b class="top-bar__vertical-menu__user-email">{{ currentUser.email }}</b>
@@ -41,4 +41,4 @@
             </button>
         </li>
     </ul>
-</p-overlayPanel>
+</p-popover>

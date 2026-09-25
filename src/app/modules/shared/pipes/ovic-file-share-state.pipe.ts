@@ -1,7 +1,7 @@
 import { Pipe , PipeTransform } from '@angular/core';
 import { OvicDriveFile , OvicFile , OvicFileStore } from '@core/models/file';
 
-@Pipe( {standalone: false,  name : 'ovicFileShareState' } )
+@Pipe( {standalone: true,  name : 'ovicFileShareState' } )
 export class OvicFileShareStatePipe implements PipeTransform {
 
 	stateIcons = new Map( [

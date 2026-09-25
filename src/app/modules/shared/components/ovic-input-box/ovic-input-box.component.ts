@@ -2,7 +2,7 @@ import { Component , Input , OnInit , SimpleChanges , OnChanges , Output , Event
 import { FormBuilder , FormGroup , Validators } from '@angular/forms';
 import { HelperService } from '@core/services/helper.service';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
     selector    : 'ovic-input-box' ,
     templateUrl : './ovic-input-box.component.html' ,
     styleUrls   : [ './ovic-input-box.component.css' ]

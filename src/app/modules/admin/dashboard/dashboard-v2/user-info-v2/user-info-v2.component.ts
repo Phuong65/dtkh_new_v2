@@ -7,14 +7,14 @@ import { BUTTON_NO, BUTTON_YES } from '@core/models/buttons';
 import { NotificationService } from '@core/services/notification.service';
 import { filter } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
-import { SharedModule } from '@modules/shared/shared.module';
-import { OverlayPanel, OverlayPanelModule } from 'primeng/overlaypanel';
+import { Popover, PopoverModule } from 'primeng/popover';
+import { OvicSafeUrlPipe } from '@modules/shared/pipes/ovic-safe-url.pipe';
 
 
 @Component({
     selector: 'app-user-info-v2',
     standalone: true,
-    imports: [CommonModule, SharedModule, OverlayPanelModule],
+    imports: [CommonModule, PopoverModule, OvicSafeUrlPipe],
     templateUrl: './user-info-v2.component.html',
     styleUrls: ['./user-info-v2.component.css']
 })
@@ -40,7 +40,7 @@ export class UserInfoV2Component implements OnInit {
 
     // trackWindowScroll = new Subscription();
 
-    @ViewChild('panel') panel: OverlayPanel;
+    @ViewChild('panel') panel: Popover;
 
     constructor(
         private auth: AuthService,
@@ -97,7 +97,7 @@ export class UserInfoV2Component implements OnInit {
         this.router.navigate(['login']).then(() => this.notificationService.isProcessing(false), () => this.notificationService.isProcessing(false));
     }
 
-    async confirmSignOut(panel: OverlayPanel) {
+    async confirmSignOut(panel: Popover) {
         this.notificationService.isProcessing(true);
         this.auth.removeSession();
         await this.auth.logout();
@@ -111,7 +111,7 @@ export class UserInfoV2Component implements OnInit {
         // }
     }
 
-    routeLink(panel: OverlayPanel, router: string) {
+    routeLink(panel: Popover, router: string) {
         panel.hide();
         this.router.navigateByUrl(router).then(() => null);
     }

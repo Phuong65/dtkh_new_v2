@@ -4,7 +4,7 @@ import { FileService } from '@core/services/file.service';
 import { NotificationService } from '@core/services/notification.service';
 import { VideoBaiHoc } from '@modules/shared/models/elng-bai-hoc';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-video-player' ,
 	templateUrl : './ovic-video-player.component.html' ,
 	styleUrls   : [ './ovic-video-player.component.css' ]

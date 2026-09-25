@@ -19,17 +19,30 @@ import { MediaFolderService } from '../../services/media-folder.service';
 import { NORMAL_MODAL_OPTIONS } from '@core/utils/syscat';
 import { MediaFolder } from '@modules/shared/models/media-folder';
 import { HelperService } from '@core/services/helper.service';
-import { TREE } from '../tree-custom/tree-custom.component';
-import { OverlayPanel } from 'primeng/overlaypanel';
-import { MatSelectionListChange } from '@angular/material/list';
-import { BUTTON_CANCEL, BUTTON_CLOSED, BUTTON_NO, BUTTON_YES } from '@core/models/buttons';
+import { TREE, TreeCustomComponent } from '../tree-custom/tree-custom.component';
+
+import { MatSelectionListChange, MatSelectionList, MatListOption } from '@angular/material/list';
+import {BUTTON_CLOSED, BUTTON_NO, BUTTON_YES } from '@core/models/buttons';
 import { ConfirmationService } from 'primeng/api';
-import * as FileSaver from 'file-saver';
-@Component({standalone: false, 
+
+import { CommonModule } from '@angular/common';
+import { ContextMenu } from 'primeng/contextmenu';
+import { TableModule } from 'primeng/table';
+import { Checkbox } from 'primeng/checkbox';
+import { OvicFileIconPipe } from '../../pipes/ovic-file-icon.pipe';
+import { Dialog } from 'primeng/dialog';
+import { MatProgressBar } from '@angular/material/progress-bar';
+import { ViewDocumentComponent } from '../view-document/view-document.component';
+import { GeneralModule } from '@modules/kiem-thu-ngan-hang-cau-hoi/general/general.module';
+import { FilterPipe } from '../../directives/filter.pipe';
+import { DrawerModule } from 'primeng/drawer';
+import { ConfirmPopupModule } from 'primeng/confirmpopup';
+@Component({standalone: true, 
     selector: 'files-management-new',
     templateUrl: './files-management-new.component.html',
     styleUrls: ['./files-management-new.component.css'],
-    providers: [ContextMenuService, ConfirmationService]
+    providers: [ContextMenuService, ConfirmationService],
+    imports: [CommonModule, TreeCustomComponent,ConfirmPopupModule,DrawerModule, ContextMenu, TableModule, Checkbox, OvicFileIconPipe, Paginator, Dialog, MatProgressBar, ViewDocumentComponent, MatSelectionList, MatListOption, GeneralModule, FilterPipe]
 
 })
 export class FilesManagementNewComponent implements OnInit, OnChanges, AfterViewInit {

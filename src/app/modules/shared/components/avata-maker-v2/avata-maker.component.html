@@ -19,16 +19,23 @@
             (imageLoaded)="imageLoaded()"
             (cropperReady)="cropperReady()"
             (loadImageFailed)="loadImageFailed()"></image-cropper>
-          <small *ngIf="isError" class="text-danger errorMessage" (click)="hideError()">
-            Lỗi kiểu dữ liệu
-          </small>
+
+            @if(isError){
+               <small class="text-danger errorMessage" (click)="hideError()">
+              Lỗi kiểu dữ liệu
+              </small>
+            }
+       
         </div>
       </div>
-      <div class="text-center ui-lg-6 ui-g-12" *ngIf="croppedImage">
+      @if(croppedImage){
+        <div class="text-center ui-lg-6 ui-g-12" >
         <div class="result-zone" >
           <img class="img-preview" [src]="croppedImage"/>
         </div>
       </div>
+      }
+      
     </div>
     <div class="panel-footer vt-area-button">
       <button type="submit" (click)="sendBackData()" class="btn btn-info btn ovic-over-right-section__foot-btn btn-primary ng-star-inserted">Lưu lại</button>

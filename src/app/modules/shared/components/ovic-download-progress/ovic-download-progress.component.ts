@@ -1,4 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { OvicFileIconPipe } from '../../pipes/ovic-file-icon.pipe';
+import { OvicFileSizePipe } from '../../pipes/ovic-file-size.pipe';
+import { FileTypePipe } from '../../pipes/file-type.pipe';
 import { FileService } from '@core/services/file.service';
 import { Download, OvicDriveFile, OvicFile, OvicDocument, OvicMediaSources } from '@core/models/file';
 import { Observable } from 'rxjs';
@@ -13,10 +18,11 @@ export enum DownloadProcess {
     completed = 'completed'
 }
 
-@Component({standalone: false, 
+@Component({standalone: true, 
     selector: 'ovic-download-progress',
     templateUrl: './ovic-download-progress.component.html',
-    styleUrls: ['./ovic-download-progress.component.css']
+    styleUrls: ['./ovic-download-progress.component.css'],
+    imports: [CommonModule, MatProgressBarModule, OvicFileIconPipe, OvicFileSizePipe, FileTypePipe]
 })
 export class OvicDownloadProgressComponent implements OnInit {
 

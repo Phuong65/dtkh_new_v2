@@ -12,9 +12,8 @@ import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { ClearComponent } from './features/clear/clear.component';
 import { InputMaskModule } from 'primeng/inputmask';
-import { TraCuuComponent } from './features/tra-cuu/tra-cuu.component';
 import { TableModule } from 'primeng/table';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { PaginatorModule } from 'primeng/paginator';
 import { LoginTemplateV3Component } from './features/login-template-v3/login-template-v3.component';
@@ -35,10 +34,7 @@ import { LoginTemplateIctuDttxComponent } from './features/login-template-ictu-d
         LoginV2Component,
         UnauthorizedComponent,
         ClearComponent,
-        TraCuuComponent,
         LoginTemplateV3Component,
-        LoginTemplateV4Component,
-        IndexComponent,
         LoginTemplateIctuComponent,
         LoginMainTemplateComponent,
         LoginTemplateNvhcmComponent,
@@ -56,7 +52,9 @@ import { LoginTemplateIctuDttxComponent } from './features/login-template-ictu-d
         InputMaskModule,
         FormsModule,
         TableModule,
-        DropdownModule,
+        SelectModule,
+        LoginTemplateV4Component,
+        IndexComponent,
         InputTextModule,
         PaginatorModule,
         NgOptimizedImage

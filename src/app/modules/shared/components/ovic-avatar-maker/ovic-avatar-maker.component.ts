@@ -1,5 +1,5 @@
 import { AfterViewInit , Component , ElementRef , Input , OnInit , Output , ViewChild } from '@angular/core';
-import { ImageCroppedEvent } from 'ngx-image-cropper';
+import { ImageCroppedEvent, ImageCropperModule } from 'ngx-image-cropper';
 import { OutputFormat } from 'ngx-image-cropper';
 import { state , style , trigger } from '@angular/animations';
 import { NotificationService } from '@core/services/notification.service';
@@ -11,8 +11,9 @@ import { AuthService } from '@core/services/auth.service';
 import { filter , map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { UnsubscribeAndCompleteObserversOnDestroy } from '@core/utils/decorator';
+import { OvicSafeUrlPipe } from '../../pipes/ovic-safe-url.pipe';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-avatar-maker' ,
 	templateUrl : './ovic-avatar-maker.component.html' ,
 	styleUrls   : [ './ovic-avatar-maker.component.css' ] ,
@@ -29,7 +30,8 @@ import { UnsubscribeAndCompleteObserversOnDestroy } from '@core/utils/decorator'
 				'visibility' : 'hidden'
 			} ) )
 		] )
-	]
+	],
+ imports: [ImageCropperModule, OvicSafeUrlPipe]
 } )
 
 // @UnsubscribeAndCompleteObserversOnDestroy()

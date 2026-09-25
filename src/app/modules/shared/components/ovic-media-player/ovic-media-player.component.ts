@@ -1,19 +1,20 @@
-import { Component , Input , OnChanges , OnInit , SimpleChanges , ViewChild } from '@angular/core';
-import { PlyrComponent } from 'ngx-plyr';
+import { Component , Input , OnChanges , OnInit , SimpleChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import * as Plyr from 'plyr';
+import { OvicPlyrDirective } from '../../directives/ovic-plyr.directive';
+import { OvicSafeHtmlPipe } from '../../pipes/ovic-safe-html.pipe';
 import { OvicMedia , OvicMediaSources } from '@core/models/file';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'app-ovic-media-player' ,
 	templateUrl : './ovic-media-player.component.html' ,
-	styleUrls   : [ './ovic-media-player.component.css' ]
+	styleUrls   : [ './ovic-media-player.component.css' ],
+	imports     : [CommonModule, OvicPlyrDirective, OvicSafeHtmlPipe]
 } )
 export class OvicMediaPlayerComponent implements OnInit , OnChanges {
 
 	@Input() data : OvicMedia; /* local | serverFile | googleDrive */
-
-	@ViewChild( PlyrComponent ) plyr : PlyrComponent;
 
 	options : Plyr.Options = {
 		autoplay           : true ,

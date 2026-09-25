@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { ContextMenuService, MenuItem } from 'primeng/api';
 import { ContextMenu } from 'primeng/contextmenu';
+import { CommonModule } from '@angular/common';
 
 export interface TREE {
     collapsedIcon: string;
@@ -29,11 +30,12 @@ export interface TREE {
     deleteNode?: boolean;
 }
 
-@Component({standalone: false, 
+@Component({standalone: true, 
     selector: 'tree-custom',
     templateUrl: './tree-custom.component.html',
     styleUrls: ['./tree-custom.component.css'],
-    providers: [ContextMenuService]
+    providers: [ContextMenuService],
+    imports: [CommonModule, ContextMenu]
 })
 
 export class TreeCustomComponent implements OnInit, OnChanges {

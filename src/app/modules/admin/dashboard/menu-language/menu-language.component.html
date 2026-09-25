@@ -3,7 +3,7 @@
         <span class="admin-menu-language-box__lbl --lang-{{activeLang.name}}"></span>
     </button>
 </div>
-<p-overlayPanel #panel styleClass="top-bar__overlay-panel --append-to-overlay-anchor" [appendTo]="overlayAnchor">
+<p-popover #panel styleClass="top-bar__overlay-panel --append-to-overlay-anchor" [appendTo]="overlayAnchor">
     <ul class="admin-menu-language-box__list-languages">
         <li *ngFor="let lang of languages">
             <button class="btn admin-menu-language-box__list-languages__button" [class.--lang-active]="activeLang.name === lang.name" (click)="changeLang(panel,lang)">
@@ -12,4 +12,4 @@
             </button>
         </li>
     </ul>
-</p-overlayPanel>
+</p-popover>

@@ -5,7 +5,7 @@ import { RoleService } from '@core/services/role.service';
 import { Router } from '@angular/router';
 import { BUTTON_NO, BUTTON_YES } from '@core/models/buttons';
 import { NotificationService } from '@core/services/notification.service';
-import { OverlayPanel } from 'primeng/overlaypanel';
+import { Popover } from 'primeng/popover';
 import { filter } from 'rxjs/operators';
 
 @Component({standalone: false, 
@@ -35,7 +35,7 @@ export class UserInfoComponent implements OnInit, OnDestroy {
 
     // trackWindowScroll = new Subscription();
 
-    @ViewChild('panel') panel: OverlayPanel;
+    @ViewChild('panel') panel: Popover;
 
     constructor(
         private auth: AuthService,
@@ -92,7 +92,7 @@ export class UserInfoComponent implements OnInit, OnDestroy {
         this.router.navigate(['login']).then(() => this.notificationService.isProcessing(false), () => this.notificationService.isProcessing(false));
     }
 
-    async confirmSignOut(panel: OverlayPanel) {
+    async confirmSignOut(panel: Popover) {
         this.notificationService.isProcessing(true);
         this.auth.removeSession();
         await this.auth.logout();
@@ -106,7 +106,7 @@ export class UserInfoComponent implements OnInit, OnDestroy {
         // }
     }
 
-    routeLink(panel: OverlayPanel, router: string) {
+    routeLink(panel: Popover, router: string) {
         panel.hide();
         this.router.navigateByUrl(router).then(() => null);
     }

@@ -1,14 +1,18 @@
 <div class="img-picker">
-    <div class="image-viewer " [ngClass]="!avatar?'':'border-img'">
-        <img *ngIf="avatar" [src]="avatar" (click)="openFileManager()" />
-        <!-- <open-file-manager
-                class="fileManager"
-                [isMultipleMode]="false"
-                [oneResult]="true"
-                (onResult)="resultHandle($event)"
-                [buttonLabel]="avatar?null:'Click vào đây để chọn ảnh đại diện'"
-        ></open-file-manager> -->
-        <button style="width: 100%;" *ngIf="!avatar" (click)="openFileManager()" type="button"
-            class="btn btn-outline-success call-file-picker">Click vào đây để chọn ảnh đại diện</button>
-    </div>
+  <div class="image-viewer " [ngClass]="!avatar?'':'border-img'">
+    @if (avatar) {
+      <img [src]="avatar" (click)="openFileManager()" />
+    }
+    <!-- <open-file-manager
+    class="fileManager"
+    [isMultipleMode]="false"
+    [oneResult]="true"
+    (onResult)="resultHandle($event)"
+    [buttonLabel]="avatar?null:'Click vào đây để chọn ảnh đại diện'"
+  ></open-file-manager> -->
+  @if (!avatar) {
+    <button style="width: 100%;" (click)="openFileManager()" type="button"
+    class="btn btn-outline-success call-file-picker">Click vào đây để chọn ảnh đại diện</button>
+  }
+</div>
 </div>

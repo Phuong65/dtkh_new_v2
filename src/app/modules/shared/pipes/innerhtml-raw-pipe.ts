@@ -1,7 +1,8 @@
 import { ElementRef, Pipe, PipeTransform } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 
-@Pipe({standalone: false, 
+@Pipe({
+    standalone: true,
     name: 'rawHtmlPipe'
 })
 export class RawHtmlPipe implements PipeTransform {
@@ -11,7 +12,7 @@ export class RawHtmlPipe implements PipeTransform {
     transform(value: string, elem: HTMLDivElement, showInput: boolean = false): string {
         let result = value;
         if (showInput) {
-            result = value.replace(/\{\_input\_\}/gi,'..............')
+            result = value.replace(/\{\_input\_\}/gi, '..............')
         }
         elem.innerHTML = result;
         return null;

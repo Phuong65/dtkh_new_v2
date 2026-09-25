@@ -2,7 +2,7 @@ import { Component , Input , OnInit , SimpleChanges , OnChanges } from '@angular
 import { OvicRateOption } from '@shared/models/ovic-models';
 import { AbstractControl } from '@angular/forms';
 
-@Component( {standalone: false, 
+@Component( {standalone: true, 
 	selector    : 'ovic-rating' ,
 	templateUrl : './ovic-rating.component.html' ,
 	styleUrls   : [ './ovic-rating.component.css' ]
