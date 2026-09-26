@@ -3,19 +3,21 @@
         <div class="form-de-layout-right form-tracnghiem"
             [ngClass]="openComment?'open-comment-hoidong':'no-open-comment'">
             @if (selectedCourse) {
-<p-tabs [value]="activeIndexTab" (valueChange)="onTabIndexChange($event)"
-                class="tab-lesson-view" [ngClass]="!isEmptyObject(course_form_duyet)? 'layout-tab-form-duyet-panel' :''">
-                <p-tablist>
+                <div class="form-de-tab-view" [ngClass]="!isEmptyObject(course_form_duyet)? 'layout-tab-form-duyet-panel' :''">
+                    <ul class="nav nav-tabs form-de-tab-list">
                     @for (panel of list_tab; track panel.key; let tabIndex = $index) {
-                        <p-tab [value]="tabIndex">
+                        <li class="nav-item">
+                            <a class="nav-link" [class.active]="activeIndexTab === tabIndex"
+                                (click)="onTabIndexChange(tabIndex)" href="javascript:void(0)">
                             <ng-container [ngTemplateOutlet]="panelHeader" [ngTemplateOutletContext]="{ type: panel.key}">
                             </ng-container>
-                        </p-tab>
+                            </a>
+                        </li>
                     }
-                </p-tablist>
-                <p-tabpanels>
-                @for (panel of list_tab; track panel) {
-<p-tabpanel [value]="$index">
+                    </ul>
+                    <div class="form-de-tab-panels">
+                    @for (panel of list_tab; track panel; let tabIndex = $index) {
+<div class="form-de-tab-panel" [hidden]="activeIndexTab !== tabIndex">
                     @if (panel.key !== 'TNTX' && selectTab && selectTab.key === panel.key) {
 <ng-container
                         [ngTemplateOutlet]="panel.component" [ngTemplateOutletContext]="{ typeTest: panel.key}">
@@ -33,7 +35,7 @@
                         <span style="color: #f97316; text-align: center;">Không tồn tại bài kiểm tra trắc nghiệm</span>
                     </div>
 }
-                </p-tabpanel>
+                </div>
 }
                 <!-- <ng-container *ngIf="keyServer =='hvu' else otherKey"></ng-container>
                 <ng-template #otherKey>
@@ -68,8 +70,8 @@
                     <ng-container [ngTemplateOutlet]="formdeTnKthp">
                     </ng-container>
                 </p-tabPanel> -->
-                </p-tabpanels>
-            </p-tabs>
+                    </div>
+                </div>
 }
         </div>
     </div>

@@ -24,7 +24,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { APP_CONFIGS, key_server } from '@env';
 import { BUTTON_YES, BUTTON_NO } from '@core/models/buttons';
-import { TabsModule } from 'primeng/tabs';
 import { ClassPlanActivities } from '@modules/shared/models/class-plan-activities';
 import { MatButtonModule } from '@angular/material/button';
 import { ThuongxuyenTuluanV2Component } from "../thuongxuyen-tuluan-v2/thuongxuyen-tuluan-v2.component";
@@ -40,7 +39,6 @@ import { CauhoiTuluan15pComponent } from "../cauhoi-tuluan-15p/cauhoi-tuluan-15p
     ReactiveFormsModule,
     FormsModule,
     TableModule,
-    TabsModule,
     MatButtonModule,
     ThuongxuyenTuluanV2Component,
     ThuongxuyenDuanComponent,

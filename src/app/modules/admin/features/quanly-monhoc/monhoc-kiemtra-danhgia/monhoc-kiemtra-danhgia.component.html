@@ -1,15 +1,24 @@
 <div class="layout_component_container">
     <div style="height: 100%;" class="form-de-layout-right form-tracnghiem">
-        <p-tabs styleClass="tab-lesson-view" [value]="tabIndex" (valueChange)="onTabIndexChange($event)">
-            <p-tablist>
-                <p-tab [value]="0">Luyện tập tại nhà{{!isDttx && key_server !== 'hvu'?'/15p':''}}</p-tab>
-                <p-tab [value]="1">{{isDttx && key_server !== 'hvu'?'Kiểm tra giữa kỳ':'Kiểm tra thường xuyên'}}</p-tab>
+        <div class="assessment-tabs">
+            <ul class="nav nav-tabs assessment-tab-list">
+                <li class="nav-item">
+                    <a class="nav-link" [class.active]="tabIndex === 0" (click)="onTabIndexChange(0)"
+                        href="javascript:void(0)">Luyện tập tại nhà{{!isDttx && key_server !== 'hvu'?'/15p':''}}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" [class.active]="tabIndex === 1" (click)="onTabIndexChange(1)"
+                        href="javascript:void(0)">{{isDttx && key_server !== 'hvu'?'Kiểm tra giữa kỳ':'Kiểm tra thường xuyên'}}</a>
+                </li>
                 @if (key_server === 'ictu') {
-                    <p-tab [value]="2">Nhập câu hỏi KT tự luận 15P</p-tab>
+                    <li class="nav-item">
+                        <a class="nav-link" [class.active]="tabIndex === 2" (click)="onTabIndexChange(2)"
+                            href="javascript:void(0)">Nhập câu hỏi KT tự luận 15P</a>
+                    </li>
                 }
-            </p-tablist>
-            <p-tabpanels>
-            <p-tabpanel [value]="0">
+            </ul>
+            <div class="assessment-tab-panels">
+            <div class="assessment-tab-panel" [hidden]="tabIndex !== 0">
                 <div class="document-type-a4-vertical" style="position: relative;">
                     <div class="layout-test-dg-cc" style="margin-bottom: 20px;">
                         <p-table [value]="list_week" styleClass="tbl-danhSachUser table-reBorder">
@@ -123,8 +132,8 @@
                         </p-table>
                     </div>
                 </div>
-            </p-tabpanel>
-            <p-tabpanel [value]="1">
+            </div>
+            <div class="assessment-tab-panel" [hidden]="tabIndex !== 1">
                 @if (list_plan && list_plan.length && showTests) {
 <div class="lesson-baihocv2"
                     [ngClass]="closeLeft?'close-left-body':''" style="transition: all 0.3s;">
@@ -259,15 +268,15 @@
                     </span>
                 </div>
 }
-            </p-tabpanel>
+            </div>
             @if (key_server === 'ictu') {
-<p-tabpanel [value]="2">
+<div class="assessment-tab-panel" [hidden]="tabIndex !== 2">
                 @if (tabIndex === 2) {
 <app-cauhoi-tuluan-15p [courseSelected]="selectedCourse"></app-cauhoi-tuluan-15p>
 }
-            </p-tabpanel>
+            </div>
 }
-            </p-tabpanels>
-        </p-tabs>
+            </div>
+        </div>
     </div>
 </div>

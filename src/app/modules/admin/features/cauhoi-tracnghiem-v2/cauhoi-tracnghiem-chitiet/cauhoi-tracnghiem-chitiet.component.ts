@@ -654,11 +654,8 @@ export class CauhoiTracnghiemChitietComponent implements OnInit {
         }
         this.isUpdated = false;
         this.resetCreateQuestionTabs();
-        this.openTemplateAdd = false;
+        this.openTemplateAdd = true;
         this.notificationService.openSideNavigationMenu({ template: this.templateCreateQuestion, size: window.innerWidth, offsetTop: '0px' });
-        setTimeout(() => {
-            this.openTemplateAdd = true;
-        }, 500);
     }
 
     closeAddQuestionForm() {
@@ -681,12 +678,9 @@ export class CauhoiTracnghiemChitietComponent implements OnInit {
 
     onCreateQuestionTabChange(value: string | number): void {
         const index = Number(value);
-        if (index !== 1) {
-            this.createQuestionTabIndex = index;
-            return;
-        }
-        if (!this.createQuestionForm?.openKiemThu()) {
-            this.createQuestionTabIndex = 0;
+        this.createQuestionTabIndex = index;
+        if (index === 1) {
+            this.createQuestionForm?.openKiemThu();
         }
     }
 
@@ -791,10 +785,7 @@ export class CauhoiTracnghiemChitietComponent implements OnInit {
         this.isUpdated = true;
         this.selectQuestion = question;
         this.resetCreateQuestionTabs();
-        this.openTemplateAdd = false;
+        this.openTemplateAdd = true;
         this.notificationService.openSideNavigationMenu({ template: this.templateCreateQuestion, size: window.innerWidth, offsetTop: '0px' });
-        setTimeout(() => {
-            this.openTemplateAdd = true;
-        }, 500);
     }
 }

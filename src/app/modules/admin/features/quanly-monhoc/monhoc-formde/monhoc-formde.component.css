@@ -423,39 +423,46 @@
     border-left: 0;
 }
 
-:host ::ng-deep .form-de-layout-right.form-tracnghiem .tab-lesson-view {
+.form-de-tab-view {
     display: flex;
     flex-direction: column;
     height: 100%;
     min-height: 0;
 }
 
-:host ::ng-deep .form-de-layout-right.form-tracnghiem .tab-lesson-view .p-tablist {
+.form-de-tab-list {
     flex: 0 0 51px;
     background-color: #f8f9fa;
-}
-
-:host ::ng-deep .form-de-layout-right.form-tracnghiem .tab-lesson-view .p-tablist-tab-list {
     justify-content: center;
-    height: 100%;
-    background-color: #f8f9fa;
 }
 
-:host ::ng-deep .form-de-layout-right.form-tracnghiem .tab-lesson-view .p-tab {
-    background-color: #f8f9fa;
+.form-de-tab-list .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-height: 48px;
+    height: 44px;
+    padding: 8px 16px;
+    border-bottom: 3px solid transparent !important;
+    color: #6c757d;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
 }
 
-:host ::ng-deep .form-de-layout-right.form-tracnghiem .tab-lesson-view .p-tab[data-p-active="true"] {
-    background-color: #fff;
-    color: #3b82f6;
-    font-weight: 600;
+.form-de-tab-list .nav-link.active {
+    background: transparent !important;
+    border: 0 !important;
+    border-bottom: 3px solid #007bff !important;
+    color: #007bff !important;
 }
 
-:host ::ng-deep .form-de-layout-right.form-tracnghiem .layout-tab-form-duyet-panel .p-tab {
+.layout-tab-form-duyet-panel .form-de-tab-list .nav-link {
     padding: 7.25px 23px !important;
 }
 
-:host ::ng-deep .form-de-layout-right.form-tracnghiem .tab-lesson-view .p-tabpanels {
+.form-de-tab-panels {
     flex: 1 1 auto;
     height: calc(100% - 51px);
     min-height: 0;
@@ -464,7 +471,7 @@
     background-color: #eee;
 }
 
-:host ::ng-deep .form-de-layout-right.form-tracnghiem .tab-lesson-view .p-tabpanel {
+.form-de-tab-panel {
     height: 100%;
 }
 

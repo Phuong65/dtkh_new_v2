@@ -14,7 +14,6 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { PanelModule } from 'primeng/panel';
 import { TableModule } from 'primeng/table';
-import { TabsModule } from 'primeng/tabs';
 import { OvicQueryCondition } from '@core/models/dto';
 import { ConditionOption } from '@modules/shared/models/condition-option';
 import { forkJoin, mergeMap, Observable, of } from 'rxjs';
@@ -59,7 +58,6 @@ interface Tuluan15pRow {
     standalone: true,
     imports: [
         CommonModule,
-        TabsModule,
         SharedModule,
         TableModule,
         FormsModule,

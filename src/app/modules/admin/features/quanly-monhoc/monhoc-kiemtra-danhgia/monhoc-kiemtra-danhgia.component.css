@@ -6,6 +6,55 @@
     font-size: 14px;
 }
 
+.assessment-tabs {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+.assessment-tab-list {
+    flex: 0 0 auto;
+    justify-content: center;
+    min-height: 48px;
+}
+
+.assessment-tab-list .nav-item,
+.assessment-tab-list .nav-link {
+    display: flex;
+    align-items: center;
+}
+
+.assessment-tab-list .nav-link {
+    box-sizing: border-box;
+    min-height: 48px;
+    height: 44px;
+    padding: 8px 16px;
+    border-bottom: 3px solid transparent !important;
+    color: #6c757d;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.assessment-tab-list .nav-link.active {
+    background: transparent !important;
+    border: 0 !important;
+    border-bottom: 3px solid #007bff !important;
+    color: #007bff !important;
+}
+
+.assessment-tab-panels {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    background-color: #eee;
+}
+
+.assessment-tab-panel {
+    min-height: 100%;
+}
+
 .lesson-baihocv2 {
     line-height: 1.25;
     width: 100%;

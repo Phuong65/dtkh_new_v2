@@ -378,14 +378,22 @@
     </div>
     <div class="ovic-over-right-section__body footer-no-hint create-drawer-body create-question-tab-body">
       <!-- <app-text-import-question></app-text-import-question> -->
-      <p-tabs styleClass="create-question-tabs" [value]="createQuestionTabIndex.toString()"
-        (valueChange)="onCreateQuestionTabChange($event)">
-        <p-tablist>
-          <p-tab value="0">{{!isUpdated ? 'Tạo câu hỏi' : 'Sửa câu hỏi'}}</p-tab>
-          <p-tab value="1">Kiểm thử</p-tab>
-        </p-tablist>
-        <p-tabpanels>
-        <p-tabpanel value="0">
+      <div class="create-question-tabs">
+        <ul class="nav nav-tabs border-0 create-question-tab-list">
+          <li class="nav-item">
+            <a class="nav-link py-2 border-0" [class.active]="createQuestionTabIndex === 0"
+              (click)="onCreateQuestionTabChange(0)" href="javascript:void(0)">
+              {{!isUpdated ? 'Tạo câu hỏi' : 'Sửa câu hỏi'}}
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link py-2 border-0" [class.active]="createQuestionTabIndex === 1"
+              (click)="onCreateQuestionTabChange(1)" href="javascript:void(0)">
+              Kiểm thử
+            </a>
+          </li>
+        </ul>
+        <div class="create-question-tab-panel" [hidden]="createQuestionTabIndex !== 0">
           @if (openTemplateAdd) {
             <app-cauhoi-tracnghiem-create-form #createQuestionForm
               [unLimitQuestion]="unLimitQuestion"
@@ -396,8 +404,8 @@
               (testPreview)="showCreateQuestionPreview($event)" (close)="closeAddQuestionForm()">
             </app-cauhoi-tracnghiem-create-form>
           }
-        </p-tabpanel>
-        <p-tabpanel value="1">
+        </div>
+        <div class="create-question-tab-panel" [hidden]="createQuestionTabIndex !== 1">
           <div class="create-question-test-tab">
             @if (createQuestionPreview) {
               <app-question-test-preview
@@ -407,14 +415,12 @@
               </app-question-test-preview>
             } @else {
               <div class="create-question-test-empty">
-                <p class="alert alert-secondary m-0 primary-font --fs-14">Chọn tab Kiểm thử để xem trước
-                câu hỏi.</p>
+                <p class="alert alert-secondary m-0 primary-font --fs-14">Hoàn thiện câu hỏi để xem trước.</p>
               </div>
             }
           </div>
-        </p-tabpanel>
-        </p-tabpanels>
-      </p-tabs>
+        </div>
+      </div>
     </div>
   </div>
 </ng-template>
