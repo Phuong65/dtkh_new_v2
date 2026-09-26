@@ -1,18 +1,35 @@
-﻿import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {RouterModule} from '@angular/router';
+import { SharedModule } from "@modules/shared/shared.module";
+import { TextFieldModule } from '@angular/cdk/text-field';
+import { SurveyQuestion } from '@modules/shared/models/survey-question';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { EditableTextComponent } from "../../editable-text/editable-text.component";
+import { NotificationService } from '@core/services/notification.service';
+import { SurveyQuestionService } from '@modules/shared/services/survey-question.service';
 
 @Component({
-    selector: 'app-survey-question-input',
-    templateUrl: './survey-question-input.component.html',
-    styleUrls: ['./survey-question-input.component.css'],
-    standalone: true,
-    imports: [CommonModule,RouterModule]
+  selector: 'app-survey-question-input',
+  standalone: true,
+  imports: [CommonModule, SharedModule, TextFieldModule, FormsModule, EditableTextComponent],
+  templateUrl: './survey-question-input.component.html',
+  styleUrls: ['./survey-question-input.component.css']
 })
 export class SurveyQuestionInputComponent implements OnInit {
-    constructor() {}
-    ngOnInit(): void {}
+  private noitifi = inject(NotificationService);
+
+  @Input() questionParams!: SurveyQuestion;
+  @Output() questionParamsChange = new EventEmitter<SurveyQuestion>();
+
+  question: SurveyQuestion;
+
+  ngOnInit(): void {
+    this.question = this.questionParams;
+  }
+  updateQuestion(data: SurveyQuestion) {
+    this.questionParams = data;
+    this.questionParamsChange.emit(this.questionParams);
+  }
+
+
 }
-
-
-

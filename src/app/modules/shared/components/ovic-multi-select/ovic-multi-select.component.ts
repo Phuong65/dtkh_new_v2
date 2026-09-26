@@ -1,11 +1,15 @@
 import { Component, EventEmitter, Input, OnChanges, SimpleChanges, OnInit, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { OvicChooser } from '@shared/models/ovic-models';
 import { AbstractControl } from '@angular/forms';
+import { MultiSelectModule } from 'primeng/multiselect';
 
 @Component({standalone: true, 
     selector: 'ovic-multi-select',
     templateUrl: './ovic-multi-select.component.html',
-    styleUrls: ['./ovic-multi-select.component.css']
+    styleUrls: ['./ovic-multi-select.component.css'],
+    imports: [CommonModule, FormsModule, MultiSelectModule]
 })
 export class OvicMultiSelectComponent implements OnInit, OnChanges {
 

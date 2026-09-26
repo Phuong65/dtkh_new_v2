@@ -1,18 +1,55 @@
-﻿import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {RouterModule} from '@angular/router';
+import { SharedModule } from "@modules/shared/shared.module";
+import { TextFieldModule } from '@angular/cdk/text-field';
+import { SurveyQuestionExtend } from '@modules/shared/models/survey-question';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { EditableTextComponent } from "../../editable-text/editable-text.component";
+import { NotificationService } from '@core/services/notification.service';
+import { SurveyQuestionService } from '@modules/shared/services/survey-question.service';
 
 @Component({
-    selector: 'app-survey-question-checkbox',
-    templateUrl: './survey-question-checkbox.component.html',
-    styleUrls: ['./survey-question-checkbox.component.css'],
-    standalone: true,
-    imports: [CommonModule,RouterModule]
+  selector: 'app-survey-question-checkbox',
+  standalone: true,
+  imports: [CommonModule, SharedModule, TextFieldModule, FormsModule, EditableTextComponent],
+  templateUrl: './survey-question-checkbox.component.html',
+  styleUrls: ['./survey-question-checkbox.component.css']
 })
 export class SurveyQuestionCheckboxComponent implements OnInit {
-    constructor() {}
-    ngOnInit(): void {}
+  private noitifi = inject(NotificationService);
+  private surveysQuestionService = inject(SurveyQuestionService);
+
+  @Input() questionParams!: SurveyQuestionExtend;
+  @Output() questionParamsChange = new EventEmitter<SurveyQuestionExtend>();
+
+  question: SurveyQuestionExtend;
+
+  ngOnInit(): void {
+    this.question = this.questionParams;
+  }
+
+  addAnswer(): void {
+    const id = (this.question.answer_options.length + 1).toString();
+    this.question.answer_options.push({ id: id, label: '' });
+  }
+
+
+  delAnswer(id: string): void {
+    this.noitifi.confirmDelete().then(
+      (a) => {
+        if (a) {
+          this.question.answer_options = this.question.answer_options.filter((item) => item.id != id);
+          this.question.answer_options = this.surveysQuestionService.sortIdAnswer(this.question.answer_options);
+        }
+      },
+      () => null
+    );
+  }
+
+  updateQuestion(data: SurveyQuestionExtend) {
+    this.questionParams = data;
+    this.questionParamsChange.emit(this.questionParams);
+  }
+
+
 }
-
-
-

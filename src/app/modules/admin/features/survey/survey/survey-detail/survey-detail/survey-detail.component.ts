@@ -1,18 +1,18 @@
-﻿import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {RouterModule} from '@angular/router';
-
+import { Router, ActivatedRoute, RouterOutlet } from '@angular/router';
 @Component({
-    selector: 'app-survey-detail',
-    templateUrl: './survey-detail.component.html',
-    styleUrls: ['./survey-detail.component.css'],
-    standalone: true,
-    imports: [CommonModule,RouterModule]
+  selector: 'app-survey-detail',
+  standalone: true,
+  imports: [CommonModule, RouterOutlet],
+  templateUrl: './survey-detail.component.html',
+  styleUrls: ['./survey-detail.component.css']
 })
 export class SurveyDetailComponent implements OnInit {
-    constructor() {}
-    ngOnInit(): void {}
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+
 }
-
-
-

@@ -1,18 +1,32 @@
-﻿import { Component, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {RouterModule} from '@angular/router';
+import { TableModule } from 'primeng/table';
+
+interface GroupedResponse {
+    value: string;
+    count: number;
+    percentage: number;
+}
+
+interface RawItem {
+    value: string;
+    createdAt: string;
+}
 
 @Component({
     selector: 'app-stat-text-responses',
-    templateUrl: './stat-text-responses.component.html',
-    styleUrls: ['./stat-text-responses.component.css'],
     standalone: true,
-    imports: [CommonModule,RouterModule]
+    imports: [CommonModule, TableModule],
+    templateUrl: './stat-text-responses.component.html',
+    styleUrls: ['./stat-text-responses.component.css']
 })
-export class StatTextResponsesComponent implements OnInit {
-    constructor() {}
-    ngOnInit(): void {}
+export class StatTextResponsesComponent {
+    @Input() responses: string[] = [];
+    @Input() grouped: GroupedResponse[] = [];
+    @Input() total: number = 0;
+    @Input() rawItems: RawItem[] = [];
+    @Input() questionTitle: string = '';
+
+    /** Toggle giữa view "gộp" và view "tất cả" */
+    viewMode: 'grouped' | 'all' = 'grouped';
 }
-
-
-

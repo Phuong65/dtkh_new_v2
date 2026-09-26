@@ -1,1 +1,92 @@
-﻿<div class="p-3">stat-question-chart.component works!</div>
+<div class="stat-question-chart">
+    <!-- Cột trái: chart + rate-average (nếu là RATE) -->
+    <div class="chart-column">
+        <div class="chart-container">
+            <p-chart [type]="chartType" [data]="chartData" [options]="chartOptions"></p-chart>
+        </div>
+
+        <!-- Box tổng quan RATE — nằm dưới biểu đồ -->
+        <div *ngIf="stat.data.type === 'rate'" class="rate-average">
+            <span class="rate-average__stars">
+                <i *ngFor="let s of [].constructor(maxStar); let i = index"
+                   class="pi"
+                   [ngClass]="i < averageScore ? 'pi-star-fill' : 'pi-star'"
+                   [style.color]="i < averageScore ? '#f59e0b' : '#ddd'">
+                </i>
+            </span>
+            <span class="rate-average__value">{{ averageScore }} / {{ maxStar }}</span>
+            <span class="rate-average__label">(Trung bình)</span>
+        </div>
+    </div>
+
+    <!-- Bảng chi tiết cho option type (làm luôn legend) -->
+    <div *ngIf="stat.data.type === 'option'" class="stat-table">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th style="width:60px"></th>
+                    <th>Lựa chọn</th>
+                    <th class="text-center">Số lượt</th>
+                    <th class="text-center">Tỷ lệ</th>
+                    <th class="text-center" style="width:110px">So sánh</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of stat.data['items']; let i = index"
+                    class="row-clickable"
+                    [class.row-clickable--active]="stat.selectedOption?.type === 'option' && stat.selectedOption?.key === 'id:' + stat.question.answer_options[i]?.id"
+                    (click)="selectOption({type: 'option', key: 'id:' + stat.question.answer_options[i]?.id, label: item.label})">
+                    <td><span class="legend-dot" [style.background]="legendColors[i]"></span></td>
+                    <td>{{ item.label }}</td>
+                    <td class="text-center">{{ item.count }}</td>
+                    <td class="text-center">{{ item.percentage }}%</td>
+                    <td class="text-center">
+                        <button type="button"
+                                class="btn-option-teacher"
+                                [class.btn-option-teacher--active]="stat.selectedOption?.type === 'option' && stat.selectedOption?.key === 'id:' + stat.question.answer_options[i]?.id"
+                                (click)="$event.stopPropagation(); selectOption({type: 'option', key: 'id:' + stat.question.answer_options[i]?.id, label: item.label})">
+                            <i class="pi pi-chart-bar"></i> Xem
+                        </button>
+                    </td>
+                </tr>
+                <tr *ngIf="stat.data['otherCount']"
+                    class="row-clickable"
+                    [class.row-clickable--active]="stat.selectedOption?.type === 'option' && stat.selectedOption?.key === 'other'"
+                    (click)="selectOption({type: 'option', key: 'other', label: 'Khác'})">
+                    <td><span class="legend-dot" [style.background]="legendColors[stat.data['items'].length]"></span></td>
+                    <td><em>Khác</em></td>
+                    <td class="text-center">{{ stat.data['otherCount'] }}</td>
+                    <td class="text-center">{{ stat.data['otherPercentage'] }}%</td>
+                    <td class="text-center">
+                        <button type="button"
+                                class="btn-option-teacher"
+                                [class.btn-option-teacher--active]="stat.selectedOption?.type === 'option' && stat.selectedOption?.key === 'other'"
+                                (click)="$event.stopPropagation(); selectOption({type: 'option', key: 'other', label: 'Khác'})">
+                            <i class="pi pi-chart-bar"></i> Xem
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bảng chi tiết cho RATE -->
+    <div *ngIf="stat.data.type === 'rate'" class="stat-table">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Mức đánh giá</th>
+                    <th class="text-center">Số lượt</th>
+                    <th class="text-center">Tỷ lệ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let d of stat.data['distribution']">
+                    <td>{{ d.star }} ★</td>
+                    <td class="text-center">{{ d.count }}</td>
+                    <td class="text-center">{{ stat.data['total'] > 0 ? (d.count / stat.data['total'] * 100 | number:'1.0-1') : 0 }}%</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

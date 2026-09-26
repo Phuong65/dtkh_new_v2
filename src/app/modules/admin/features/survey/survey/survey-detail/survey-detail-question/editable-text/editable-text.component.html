@@ -1,1 +1,9 @@
-﻿<div class="p-3">editable-text.component works!</div>
+<textarea
+  class="editable-text"
+  [(ngModel)]="text"
+  [ngClass]="{'editable-text-title': title}"
+  (input)="onInput($event)"
+  rows="1"
+  placeholder="Nhập nội dung..."
+  [disabled]="disable"
+></textarea>

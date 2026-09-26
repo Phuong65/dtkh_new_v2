@@ -1,1 +1,13 @@
-﻿<div class="p-3">survey-question-input.component works!</div>
+@if (questionParams; as question) {
+  <div class="layout_component_container_survey_question_radio">
+    <div class="survey_question_radio_title">
+      <app-editable-text [(text)]="question.title" [title]="true"></app-editable-text>
+    </div>
+
+    <div class="survey_question_radio_answer">
+      <div class="text-answer-input">
+        * Không cần nhập câu trả lời! Cách trả lời là nhập chuỗi
+      </div>
+    </div>
+  </div>
+}
