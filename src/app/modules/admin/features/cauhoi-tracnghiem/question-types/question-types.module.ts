@@ -26,46 +26,44 @@ import { KatexImgDirective } from "@modules/shared/directives/katex-img.directiv
 import { GroupRadioQuestionV2Component } from './group-radio-question-v2/group-radio-question-v2.component';
 
 @NgModule({
-	declarations: [
-		DragAndDropQuestionComponent,
-		GroupingQuestionComponent,
-		QuestionTypeRadioComponent,
-		GroupRadioQuestionComponent,
-		GroupInputQuestionComponent,
-		QuestionTypeInputBoxComponent,
-		QuestionTypeReorderWordsComponent,
-		QuestionTypeRadioEditorComponent,
-		QuestionTypeArrangeParagraphsComponent,
-		GroupRadioQuestionV2Component
-	],
-	exports: [
-		DragAndDropQuestionComponent,
-		GroupingQuestionComponent,
-		QuestionTypeRadioComponent,
-		GroupRadioQuestionComponent,
-		GroupInputQuestionComponent,
-		QuestionTypeInputBoxComponent,
-		QuestionTypeReorderWordsComponent,
-		QuestionTypeRadioEditorComponent,
-		QuestionTypeArrangeParagraphsComponent,
-		GroupRadioQuestionV2Component
-	],
-	imports: [
-		CommonModule,
-		InputTextModule,
-		FormsModule,
-		TextareaModule,
-		ButtonModule,
-		RippleModule,
-		SelectModule,
-		CheckboxModule,
-		TooltipModule,
-		LoadMediaOnTextDirective,
-		SafeHtmlSinglePipe,
-		InputQuestionDirectionComponent,
-		SharedModule,
-		DragDropModule,
-		KatexImgDirective
-	]
+    exports: [
+        DragAndDropQuestionComponent,
+        GroupingQuestionComponent,
+        QuestionTypeRadioComponent,
+        GroupRadioQuestionComponent,
+        GroupInputQuestionComponent,
+        QuestionTypeInputBoxComponent,
+        QuestionTypeReorderWordsComponent,
+        QuestionTypeRadioEditorComponent,
+        QuestionTypeArrangeParagraphsComponent,
+        GroupRadioQuestionV2Component
+    ],
+    imports: [
+        CommonModule,
+        InputTextModule,
+        FormsModule,
+        TextareaModule,
+        ButtonModule,
+        RippleModule,
+        SelectModule,
+        CheckboxModule,
+        TooltipModule,
+        LoadMediaOnTextDirective,
+        SafeHtmlSinglePipe,
+        InputQuestionDirectionComponent,
+        SharedModule,
+        DragDropModule,
+        KatexImgDirective,
+        DragAndDropQuestionComponent,
+        GroupingQuestionComponent,
+        QuestionTypeRadioComponent,
+        GroupRadioQuestionComponent,
+        GroupInputQuestionComponent,
+        QuestionTypeInputBoxComponent,
+        QuestionTypeReorderWordsComponent,
+        QuestionTypeRadioEditorComponent,
+        QuestionTypeArrangeParagraphsComponent,
+        GroupRadioQuestionV2Component
+    ]
 })
 export class QuestionTypesModule { }

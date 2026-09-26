@@ -1,1 +1,108 @@
-﻿<div class="p-3">question-type-group-input.component works!</div>
+<div class="quiz-viewport">
+  <!-- <div class="d-flex justify-content-end mb-5 p-3">
+  <div class="mode-switch border" (click)="isReadOnly = !isReadOnly" [class.readonly-on]="isReadOnly">
+    <div class="switch-knob">
+      <i class="pi" [ngClass]="isReadOnly ? 'pi-eye' : 'pi-pencil'"></i>
+    </div>
+    <span class="text-mode">{{ isReadOnly ? 'Đang xem đáp án' : 'Đang làm thử' }}</span>
+  </div>
+</div> -->
+
+<div>
+  @if (av === 1) {
+    <div class="part-container">
+      <div class="part-header p-3 mb-5">
+        <div class="d-flex align-items-center mb-1">
+          <span class="part-title-text">
+            {{ course_question['title_part'] }}
+          </span>
+        </div>
+        <div [appKatexImg]="course_question.id" [appLoadMediaOnText]="course_question.id"
+          class="part-desc-text mb-2 ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+          [innerHTML]="course_question['question_direction'] | safeHtml">
+        </div>
+        @if (course_question.media) {
+          <audio controls class="w-100 audio-custom">
+            <source  [src]="course_question.media.path | ictuMediaLink : course_question.media.source : token | ovicSafeUrl">
+          </audio>
+        }
+      </div>
+      <div class="questions-list">
+        <ng-container *ngTemplateOutlet="questionTmpl; context: { $implicit: course_question, idx: 1 }">
+        </ng-container>
+      </div>
+    </div>
+  }
+
+  @if (av !== 1) {
+    <div>
+      <ng-container *ngTemplateOutlet="questionTmpl; context: { $implicit: course_question, idx: 1 }">
+      </ng-container>
+    </div>
+  }
+</div>
+
+<ng-template #questionTmpl let-q let-idx="idx">
+  <div class="question-block">
+    @if (av !== 1) {
+      <div class="question-header-section mb-3">
+        <div class="d-flex align-items-start">
+          @if (q.question_number && q.question_number !== 0) {
+            <span class="q-index-tag">
+              {{av === 1?q.question_number:'Câu ' +q.question_number}}:
+            </span>
+          }
+          <div [innerHTML]="q.question_direction | safeHtml" [appKatexImg]="q.id" [appLoadMediaOnText]="q.id"
+            class="q-content-text flex-grow-1 ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred">
+          </div>
+        </div>
+      </div>
+    }
+
+
+    <div class="drag-area">
+      <div>
+        @for (child of q.children; track child; let i = $index) {
+          <div class="sentence-list">
+            <div class="justify-content-between align-items-center mb-3">
+              <div class="d-flex mb-2">
+                <span>
+                  {{i + 1}})&nbsp;
+                </span>
+                <div [innerHTML]="child.question_direction | safeHtml" [appKatexImg]="child.id"
+                  [appLoadMediaOnText]="child.id" class="q-content-text flex-grow-1">
+                </div>
+              </div>
+              @if (!isReadOnly) {
+                <input type="text" [(ngModel)]="child.answer"
+                  class="form-control ml-3" [class.is-answer-wrong]="child.isWrong" style="width: 200px;"
+                  placeholder="Nhập đáp án..." />
+              } @else {
+                @if (child['new_answer_correct'] && child['new_answer_correct'].length) {
+                  <div>
+                    <span class="answer-label-correct">Đáp án đúng:</span>
+                    @for (ans of child['new_answer_correct']; track ans) {
+                      <span
+                        class="ans-tag ans-tag-correct">
+                        {{ans}}
+                      </span>
+                    }
+                  </div>
+                }
+              }
+              @if (child.showCorrectAnswer && child['new_answer_correct'] && child['new_answer_correct'].length) {
+                <span class="answer-label-correct ml-3">Đáp án đúng:</span>
+                @for (ans of child['new_answer_correct']; track ans) {
+                  <span class="ans-tag ans-tag-correct">
+                    {{ans}}
+                  </span>
+                }
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</ng-template>
+</div>

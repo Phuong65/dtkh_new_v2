@@ -272,3 +272,36 @@ a:hover {
     z-index: 9999999;
 }
 
+/* Shared tab alignment and typography */
+.nav-tabs {
+    align-items: center !important;
+}
+
+.nav-tabs .nav-item,
+.nav-tabs .nav-link,
+.p-tablist,
+.p-tablist-tab-list,
+.p-tab,
+.p-tabview-nav,
+.p-tabview-nav li,
+.p-tabview-nav .p-tabview-nav-link {
+    align-items: center !important;
+}
+
+.nav-tabs .nav-link,
+.p-tab,
+.p-tabview-nav .p-tabview-nav-link {
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    justify-content: center !important;
+    min-height: 48px !important;
+    padding: 8px 16px !important;
+    font-size: 14px !important;
+    line-height: 1.2 !important;
+}
+
+.p-tabview-nav li {
+    display: flex !important;
+    align-self: stretch !important;
+}
+

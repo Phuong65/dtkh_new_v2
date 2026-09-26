@@ -1,1 +1,359 @@
-﻿<div class="p-3">cauhoi-tracnghiem-create-form.component works!</div>
+<div class="create-edit-question-section ovic-is-loading--size-normal d-flex flex-column h-100"
+  [class.ovic-is-loading]="loading">
+  <div class="question-content">
+    <div class="row config-row">
+      @if (formMode !== 'update') {
+        <div class="col-md-4">
+          <div>
+            <label class="font-weight-bold">Loại câu hỏi <span class="text-danger">*</span></label>
+            <p-select appendTo="body" scrollHeight="400px"
+              styleClass="w-100 custom-dropdown" [filter]="false" [options]="questionTypeSection.options"
+              [(ngModel)]="questionTypeSection.active" (ngModelChange)="changesQuestionType()"
+              optionLabel="label" optionValue="value" optionDisabled="disable"
+              [placeholder]="questionTypeSection.placeholder">
+            </p-select>
+          </div>
+        </div>
+      }
+
+      <div [ngClass]="formMode === 'update' ? 'col-md-12' : 'col-md-8'">
+        <form [formGroup]="form">
+          <div class="row">
+            @if (testFormat === 'tienganh') {
+              <div class="col-sm-6">
+                <div>
+                  <label class="font-weight-bold">Part <span class="text-danger">*</span></label>
+                  <p-select scrollHeight="400px" appendTo="body"
+                    styleClass="w-100 custom-dropdown" [filter]="false" [options]="list_part_code"
+                    formControlName="code" optionLabel="label" optionValue="value"
+                    placeholder="Chọn part">
+                  </p-select>
+                </div>
+              </div>
+            }
+
+            @if (selectedCdr && selectedCdr.week === 100) {
+              <div class="col-sm-6">
+                <div>
+                  <label class="font-weight-bold">Chọn CDR
+                    <span class="text-danger">*</span>
+                  </label>
+                  <p-select scrollHeight="400px" appendTo="body"
+                    styleClass="w-100 custom-dropdown" [filter]="true" [options]="listCdr"
+                    formControlName="cdr_id" optionLabel="label" optionValue="id"
+                    placeholder="Chọn chuẩn đầu ra">
+                  </p-select>
+                </div>
+              </div>
+            }
+
+            @if (selectedCdr && selectedCdr.week !== 100) {
+              <div class="col-sm-6">
+                <div>
+                  <label class="font-weight-bold">Quyền truy cập
+                    <span class="text-danger">*</span>
+                  </label>
+                  <p-selectButton [options]="select_private" formControlName="private" optionLabel="label"
+                    optionValue="id" styleClass="custom-selectbutton">
+                  </p-selectButton>
+                </div>
+              </div>
+            }
+          </div>
+        </form>
+      </div>
+    </div>
+    @if (f['question_type'].value) {
+      <div class="question-preview flex-fill">
+        <div class="question-preview__container">
+          <div class="question-preview__question"
+            [ngClass]="testFormat === 'tienganh' ? 'question-preview__question--layout-separator' : 'question-preview__question--layout-linear'">
+            <div class="question-preview__question__direction">
+              <div class="question-preview__question__size">
+                <b class="question-preview__question__direction__prefix">
+                  {{testFormat === 'tienganh'?'PART':'CÂU HỎI'}}:
+                </b>
+                <div class="question-preview__question__direction__content">
+                  <app-input-question-direction #editorItem [abstractControl]="f['question_direction']"
+                    (ckEditor)="ckEditorSetup($event)">
+                  </app-input-question-direction>
+                  @if (testFormat === 'tienganh' || ((f['question_type'].value === 'group-input' || f['question_type'].value === 'group-radio' || f['question_type'].value === 'grouping' || f['question_type'].value === 'drag-drop'))) {
+                    @if (question.media) {
+                      <div class="question-media-wrapper">
+                        <div class="media-actions">
+                          <button type="button" (click)="btnImportQuestionMedia()"
+                            class="btn-import-media p-button-outlined" pRipple pButton
+                            icon="fa fa-refresh" label="Chọn lại">
+                          </button>
+                        </div>
+                        <div class="row no-gutters align-items-center">
+                          <div class="col-md-7 pr-md-3 border-right-dashed">
+                            <div class="media-item">
+                              <span class="media-label"><i class="fa fa-volume-up mr-1"></i>
+                              File nghe:
+                            </span>
+                            <div class="media-audio-row">
+                              <audio controls class="media-audio-player"
+                                [src]="question.media.path | ictuMediaLink : question.media.source : token | ovicSafeUrl">
+                              </audio>
+                              <button type="button" (click)="removeQuestionMedia()"
+                                class="media-remove-button p-button-text p-button-danger p-button-rounded"
+                                pRipple pButton icon="pi pi-times" pTooltip="Xóa file nghe"
+                                tooltipPosition="top">
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-5 pl-md-3">
+                          <div class="media-item">
+                            <span class="media-label">Số lượt nghe:</span>
+                            <div class="input-group-sm mt-1">
+                              <input placeholder="Nhập số..." type="text"
+                                class="form-control flat-input"
+                                [(ngModel)]="question.media.replay"
+                                (keyup)="validateInputMediaReplay()">
+                              </div>
+                              <small class="text-muted mt-1 d-block" style="font-size: 11px;">
+                                (Vui lòng nhập số)
+                              </small>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    } @else {
+                      <button type="button" (click)="btnImportQuestionMedia()"
+                        class="btn-import-media" pRipple pButton icon="fa fa-headphones"
+                        label="Chọn file nghe">
+                      </button>
+                    }
+                  }
+                </div>
+                @if (question && ['drag_drop','grouping'].includes(question.question_type) && question.answer_option &&  question.answer_option.length) {
+                  <div class="question-preview__question__list-answer-options"
+                    >
+                    @for (option of question.answer_option; track option) {
+                      <span class="question-preview__question__list-answer-options__text"
+                      >{{ option.value }}</span>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+            <div class="question-preview__question__answer">
+              @if (testFormat !== 'tienganh') {
+                            <div [ngClass]="f['question_type'].value !=='group-radio'
+                                ?'question-preview__question__size':''">
+                  @switch (f['question_type'].value) {
+                    @case ('group-input') {
+                      <group-input-question [question]="question"
+                      [confirmOnDelete]="formMode==='update'"></group-input-question>
+                    }
+                    <!-- <group-radio-question-v2 *ngSwitchCase="'group-radio'"
+                  [question]="question"></group-radio-question-v2> -->
+                  @case ('group-radio') {
+                    @for (child of question.children; track child; let i = $index) {
+                      <div class="question-preview__question__size position-relative"
+                        >
+                        <button (click)="removeChildQuestion(i)" pButton pRipple icon="pi pi-trash"
+                        class="question-preview__question__size__btn-remove-child-question p-button-danger"></button>
+                        <group-radio-question-v2 [question]="child"></group-radio-question-v2>
+                      </div>
+                    }
+                  }
+                  @case ('drag_drop') {
+                    <drag-and-drop-question [question]="question"
+                    [confirmOnDelete]="formMode==='update'"></drag-and-drop-question>
+                  }
+                  @case ('checkbox') {
+                    <question-type-radio-editor [multiple]="true"
+                    [question]="question"></question-type-radio-editor>
+                  }
+                  @case ('radio') {
+                    <question-type-radio-editor [multiple]="false"
+                    [question]="question"></question-type-radio-editor>
+                  }
+                  @case ('grouping') {
+                    <grouping-question
+                    [question]="question"></grouping-question>
+                  }
+                  @case ('inputbox') {
+                    <question-type-input-box [testFormat]="testFormat"
+                      [question]="question">
+                    </question-type-input-box>
+                  }
+                  @case ('reorder_words') {
+                  }
+                  @case ('matching') {
+                  }
+                  @default {
+                    <div
+                      class="d-flex flex-fill w-100 h-100 justify-content-center align-items-center">
+                      <p class="alert alert-secondary m-0 primary-font --fs-14">Vui lòng chọn loại câu
+                        hỏi
+                      </p>
+                    </div>
+                  }
+                }
+              </div>
+              <div class="question-preview__question__size">
+                @if (question.question_type === 'group-radio' ) {
+                  <div class="question-type-radio__footer d-flex justify-content-between align-items-center"
+                    >
+                    <p-checkbox [(ngModel)]="question.config.invertedAnswer" [binary]="true"
+                    label="Đảo vị trí của các câu hỏi"></p-checkbox>
+                    <button (click)="addMoreChildQuestion()" class="typical-question__btn-add">
+                      <i class="pi pi-plus-circle"></i>Thêm câu hỏi
+                    </button>
+                  </div>
+                }
+                <div class="question-preview__question__size__foot"
+                  [class.p-0]="question.question_type === 'drag_drop'">
+                  <button [disabled]="!availableToSave" (click)="saveQuestion()" pButton pRipple
+                    icon="pi pi-save"
+                    class="question-preview__question__size__foot__button p-button--center p-button-success"
+                    label="Lưu lại">
+                  </button>
+                  @if (question && question['status'] === -1) {
+                    <button [disabled]="!availableToSave"
+                      (click)="saveQuestion(true)" pButton pRipple icon="pi pi-save"
+                      class="question-preview__question__size__foot__button p-button--center p-button-help"
+                      label="Lưu lại và yêu cầu duyệt">
+                    </button>
+                  }
+                </div>
+              </div>
+            } @else {
+              @if (question.question_type !== 'drag_drop' ) {
+                @for (child of question.children; track child; let i = $index) {
+                  <div class="question-preview__question__size position-relative"
+                    >
+                    <button (click)="removeChildQuestion(i)" pButton pRipple icon="pi pi-trash"
+                    class="question-preview__question__size__btn-remove-child-question p-button-danger"></button>
+                    @if (!['inputbox','reorder_words'].includes(child.question_type)) {
+                      <div class="row"
+                        >
+                        <div class="col-12">
+                          <div class="ovic-vertical__inputs ovic-vertical__inputs--layout-2">
+                            <p class="form-row mt-0">
+                              <label for="question_number">Câu hỏi số</label>
+                              <input id="question_number" class="ovic-input-field"
+                                [(ngModel)]="child.question_number">
+                              </p>
+                            </div>
+                          </div>
+                          <div class="col-12">
+                            <div class="ovic-vertical__inputs ovic-vertical__inputs--layout-2">
+                              <p class="form-row mb-5">
+                                <label for="question_number">Nội dung câu hỏi
+                                  <span class="ovic-mark">*</span></label>
+                                  <textarea rows="2" [autoResize]="true" pTextarea
+                                    class="ovic-input-field" [(ngModel)]="child.question_direction">
+                                  </textarea>
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        }
+                        @switch (child.question_type) {
+                          @case ('group-input') {
+                            <group-input-question
+                            [question]="child"></group-input-question>
+                          }
+                          @case ('group-radio') {
+                            <group-radio-question
+                            [question]="child"></group-radio-question>
+                          }
+                          @case ('checkbox') {
+                            <question-type-radio-editor [multiple]="true"
+                            [question]="child"></question-type-radio-editor>
+                          }
+                          @case ('radio') {
+                            <question-type-radio-editor [multiple]="false"
+                            [question]="child"></question-type-radio-editor>
+                          }
+                          @case ('drag_drop') {
+                            <drag-and-drop-question
+                            [question]="child"></drag-and-drop-question>
+                          }
+                          @case ('grouping') {
+                            <grouping-question
+                            [question]="child"></grouping-question>
+                          }
+                          @case ('inputbox') {
+                            <question-type-input-box
+                            [question]="child"></question-type-input-box>
+                          }
+                          @case ('reorder_words') {
+                            <question-type-reorder-words
+                            [question]="child"></question-type-reorder-words>
+                          }
+                          @case ('arrange_paragraphs') {
+                            <question-type-arrange-paragraphs
+                            [question]="child"></question-type-arrange-paragraphs>
+                          }
+                          @case ('matching') {
+                          }
+                          @default {
+                            <div
+                              class="d-flex flex-fill w-100 h-100 justify-content-center align-items-center">
+                              <p class="alert alert-secondary m-0 primary-font --fs-14">Vui lòng chọn loại
+                                câu
+                              hỏi</p>
+                            </div>
+                          }
+                        }
+                      </div>
+                    }
+                  } @else {
+                    <div class="question-preview__question__size">
+                      <drag-and-drop-question [question]="question"
+                      [enableQuestionNumber]="true"></drag-and-drop-question>
+                    </div>
+                  }
+                  <div class="question-preview__question__size">
+                    @if (question.question_type !== 'drag_drop' ) {
+                      <div class="question-type-radio__footer d-flex justify-content-between align-items-center"
+                        >
+                        <p-checkbox [(ngModel)]="question.config.invertedAnswer" [binary]="true"
+                        label="Đảo vị trí của các câu hỏi"></p-checkbox>
+                        <button (click)="addMoreChildQuestion()" class="typical-question__btn-add">
+                          <i class="pi pi-plus-circle"></i>Thêm câu hỏi
+                        </button>
+                      </div>
+                    }
+                    <div class="question-preview__question__size__foot"
+                      [class.p-0]="question.question_type === 'drag_drop'">
+                      <button [disabled]="!availableToSave" (click)="saveQuestion()" pButton pRipple
+                        icon="pi pi-save"
+                        class="question-preview__question__size__foot__button p-button--center p-button-success"
+                        label="Lưu lại">
+                      </button>
+                      @if (question && question['status'] === -1) {
+                        <button [disabled]="!availableToSave"
+                          (click)="saveQuestion(true)" pButton pRipple icon="pi pi-save"
+                          class="question-preview__question__size__foot__button p-button--center p-button-help"
+                          label="Lưu lại và yêu cầu duyệt">
+                        </button>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div class="create-edit-question-section__panel d-flex flex-fill flex-column">
+          <p class="alert alert-secondary m-0 primary-font --fs-14">{{ guideMessages }}</p>
+        </div>
+      }
+    </div>
+  </div>
+  <!-- <div class="col-1">
+  <div class="ovic-vertical__inputs ovic-vertical__inputs--layout-2">
+    <p class="form-row mt-2">
+      <label for="cdr">Cdr <span class="ovic-mark">*</span></label>
+      <input id="cdr" class="ovic-input-field" [value]="level" disabled="disabled">
+    </p>
+  </div>
+</div> -->

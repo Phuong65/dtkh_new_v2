@@ -1,1 +1,107 @@
-﻿<div class="p-3">question-type-arrange-paragraphs.component works!</div>
+<div class="quiz-viewport">
+  <!-- <div class="d-flex justify-content-end mb-5 p-3">
+  <div class="mode-switch border" (click)="isReadOnly = !isReadOnly" [class.readonly-on]="isReadOnly">
+    <div class="switch-knob">
+      <i class="pi" [ngClass]="isReadOnly ? 'pi-eye' : 'pi-pencil'"></i>
+    </div>
+    <span class="text-mode">{{ isReadOnly ? 'Đang xem đáp án' : 'Đang làm thử' }}</span>
+  </div>
+</div> -->
+
+<div>
+  @if (av === 1) {
+    <div class="part-container">
+      <div class="part-header p-3 mb-5">
+        <div class="d-flex align-items-center mb-1">
+          <span class="part-title-text">{{ course_question['title_part'] }}</span>
+        </div>
+        <div [appKatexImg]="course_question.id" [appLoadMediaOnText]="course_question.id"
+          class="part-desc-text mb-2 ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+          [innerHTML]="course_question.question_direction | safeHtml">
+        </div>
+        @if (course_question.media) {
+          <audio controls class="w-100 audio-custom">
+            <source  [src]="course_question.media.path | ictuMediaLink : course_question.media.source : token | ovicSafeUrl">
+          </audio>
+        }
+      </div>
+      <div class="questions-list">
+        @for (child_q of course_question.children; track child_q; let i = $index) {
+          <ng-container *ngTemplateOutlet="questionTmpl; context: { $implicit: child_q, idx: i + 1 }">
+          </ng-container>
+        }
+      </div>
+    </div>
+  }
+
+  @if (av !== 1) {
+    <div>
+      <ng-container *ngTemplateOutlet="questionTmpl; context: { $implicit: course_question, idx: 1 }">
+      </ng-container>
+    </div>
+  }
+</div>
+
+<ng-template #questionTmpl let-q let-idx="idx">
+  <div class="question-block">
+    <div class="question-header-section mb-3" [ngClass]="av === 1? 'font-weigth-700 p-2':''">
+      <div class="d-flex align-items-start">
+        @if (q.question_number && q.question_number !== 0) {
+          <span class="q-index-tag">
+            {{av === 1?q.question_number:'Câu ' +q.question_number}}:
+          </span>
+        }
+        <div [innerHTML]="q.question_direction | safeHtml" [appKatexImg]="q.id" [appLoadMediaOnText]="q.id"
+          class="q-content-text flex-grow-1 ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred">
+        </div>
+      </div>
+    </div>
+
+
+    <div class="drag-area">
+      <div class="sentence-list" cdkDropList [cdkDropListDisabled]="isReadOnly"
+        (cdkDropListDropped)="drop($event, q)">
+
+        @for (s of (isReadOnly ? q['new_answer_correct'] : q.answer_option); track s; let sIdx = $index) {
+          <div class="sentence-item border mb-2"
+            [class.is-answer-correct]="q.showCorrectAnswer && s.isCorrect"
+            [class.is-answer-wrong]="s.isWrong"
+            cdkDrag [cdkDragDisabled]="isReadOnly">
+            <div class="d-flex align-items-center w-100">
+              <div class="order-badge mr-3">{{ sIdx + 1 }}</div>
+              <!-- TEXT -->
+              <div class="sentence-txt flex-grow-1">
+                @if (!isReadOnly) {
+                  {{ s.value }}
+                } @else {
+                  {{ s | showlabel: q.answer_option:'id':'value' }}
+                }
+              </div>
+              <!-- DRAG ICON -->
+              @if (!isReadOnly) {
+                <div class="drag-handle ml-2">
+                  <i class="pi pi-bars"></i>
+                </div>
+              }
+            </div>
+            <div class="custom-placeholder" *cdkDragPlaceholder></div>
+          </div>
+        }
+      </div>
+
+      @if (q.showCorrectAnswer && q['new_answer_correct'] && q['new_answer_correct'].length) {
+        <div style="display: flex; flex-direction: column;"
+          class="mt-2">
+          <span style="margin-top: 5px;" class="answer-label-correct">Đáp án đúng:</span>
+          @for (ans of q['new_answer_correct']; track ans) {
+            <span style="margin-top: 5px;" class="sentence-item is-answer-correct mr-1"
+              >
+              {{ ans | showlabel: q.answer_option:'id':'value' }}
+            </span>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</ng-template>
+</div>

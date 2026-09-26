@@ -1,1 +1,32 @@
-﻿<div class="p-3">question-type-reorder-words.component works!</div>
+@if (question) {
+  <div class="question-type-reorder-words">
+    <div class="row">
+      <div class="col-2">
+        <div class="ovic-vertical__inputs ovic-vertical__inputs--layout-2">
+          <p class="form-row mt-0">
+            <label for="question_number">Câu hỏi số</label>
+            <input id="question_number" class="ovic-input-field" [(ngModel)]="question.question_number">
+          </p>
+        </div>
+      </div>
+      <div class="col-10">
+        <div class="ovic-vertical__inputs ovic-vertical__inputs--layout-2">
+          <p class="form-row mt-0">
+            <input class="ovic-input-field" [value]="question.question_direction" [disabled]="true">
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="ovic-vertical__inputs ovic-vertical__inputs--layout-2">
+          <p class="form-row">
+            <label for="answer">Đáp án</label>
+            <input id="answer" class="ovic-input-field" [(ngModel)]="question.raw_answer" (ngModelChange)="updateAnswer()">
+            <small class="question-type-reorder-words__guide text-secondary">Các từ cần sắp xếp phân cách nhau bằng dấu xược phải( /). Ví dụ She/ is/ a/ teacher</small>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+}

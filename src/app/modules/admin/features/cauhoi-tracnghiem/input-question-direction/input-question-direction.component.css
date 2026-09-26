@@ -1,4 +1,22 @@
 /* CSS cho Skeleton Load */
+:host {
+    display: block;
+    width: 100%;
+    min-height: 180px;
+}
+
+.input-question-direction,
+.document-editor_basic {
+    display: block;
+    width: 100%;
+    min-height: 180px;
+}
+
+.document-editor__editable {
+    display: block;
+    min-height: 150px;
+}
+
 .editor-skeleton {
     border: 1px solid #ccced1;
     background: #f8f9fa;
