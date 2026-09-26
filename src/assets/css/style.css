@@ -3533,7 +3533,7 @@ body .p-multiselect-overlay *:not(i):not(svg):not(path):not(mat-icon):not(.pi):n
 }
 
 .menu-ctdt .p-tabmenu .p-tabmenu-nav .p-menuitem-text {
-    color: #000;
+    color: #6C757D;
     font-weight: 600;
 }
 
@@ -3563,7 +3563,7 @@ body .p-multiselect-overlay *:not(i):not(svg):not(path):not(mat-icon):not(.pi):n
 
 .menu-ctdt .p-tabmenu .p-tabmenu-nav .p-tabmenuitem.p-highlight .p-menuitem-link,
 .menu-ctdt .p-tabmenu .p-tabmenu-nav .p-tabmenuitem.p-highlight .p-menuitem-text {
-    color: #2673e8;
+    color: #6C757D;
     font-weight: 600;
 }
 
