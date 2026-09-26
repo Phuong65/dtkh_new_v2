@@ -3471,11 +3471,26 @@ p-calendar {
 
 .parent-lesson-layout-container {}
 
-body:has(app-quanly-monhoc-router-outlet) :is(.p-dialog, .p-popover, .p-overlay, .p-select-overlay, .p-multiselect-overlay, .p-datepicker, .p-tooltip, .modal, .ngb-tooltip-window) *:not(i):not(svg):not(path):not(mat-icon):not(.pi):not([class*="pi-"]):not([class*="fa-"]):not(.material-icons) {
+body :is(.p-dialog, .p-popover, .p-overlay, .p-select-overlay, .p-multiselect-overlay, .p-datepicker, .p-tooltip, .modal, .ngb-tooltip-window) *:not(i):not(svg):not(path):not(mat-icon):not(.pi):not([class*="pi-"]):not([class*="fa-"]):not(.material-icons) {
     font-size: 14px !important;
 }
 
 body:has(app-quanly-monhoc-router-outlet) :is(.p-dialog, .p-popover, .p-overlay, .p-select-overlay, .p-multiselect-overlay, .p-datepicker, .p-tooltip, .modal, .ngb-tooltip-window) *::placeholder {
+    font-size: 14px !important;
+}
+
+/* 1. Áp dụng font-size 14px cho CHÍNH THẺ .p-multiselect và toàn bộ phần tử con bên trong */
+p-multiSelect,
+.p-multiselect,
+p-multiSelect *:not(i):not(svg):not(path):not(mat-icon):not(.pi):not([class*="pi-"]):not([class*="fa-"]):not(.material-icons),
+.p-multiselect *:not(i):not(svg):not(path):not(mat-icon):not(.pi):not([class*="pi-"]):not([class*="fa-"]):not(.material-icons) {
+    font-size: 14px !important;
+}
+
+/* 2. Áp dụng cho Menu thả xuống Overlay (được đưa ra ngoài body) */
+body .p-multiselect-overlay,
+body .p-multiselect-overlay,
+body .p-multiselect-overlay *:not(i):not(svg):not(path):not(mat-icon):not(.pi):not([class*="pi-"]):not([class*="fa-"]):not(.material-icons) {
     font-size: 14px !important;
 }
 

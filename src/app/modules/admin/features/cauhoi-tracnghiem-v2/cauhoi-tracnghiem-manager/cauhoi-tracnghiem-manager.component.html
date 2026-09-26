@@ -20,20 +20,20 @@
         }
       </div>
       <div class="list-course-layout">
-        <mat-selection-list (selectionChange)="onSelectCourse($event)" [multiple]="false" class="selection-list-mat"
-          #courses>
+        <div class="selection-list-mat" #courses>
           @for (course of dmKhoahoc ; track course) {
-            <mat-list-option [selected]="courseSelected && courseSelected.id === course.id ? true: false"
-              [value]="course">
-              <div mat-line style="font-weight: 600;">{{course.title + ' (' + course.maso + ')'}}</div>
-              <div mat-line>{{course['creator_name'] + course['info_']}}</div>
-              <!-- <div mat-line *ngIf="course['status_question']">
-              <span [innerHTML]="course['status_question']"></span>
-            </div> -->
-          </mat-list-option>
-        }
-      </mat-selection-list>
-    </div>
+            <button type="button"
+              class="course-item"
+              [class.active]="courseSelected && courseSelected.id === course.id"
+              (click)="selectCourse(course)">
+              <div class="course-item__content">
+                <div class="course-item__title">{{course.title + ' (' + course.maso + ')'}}</div>
+                <div class="course-item__meta">{{course['creator_name'] + course['info_']}}</div>
+              </div>
+            </button>
+          }
+        </div>
+      </div>
     <div class="page-layout-set">
       <p-paginator #paginator (onPageChange)="changePage($event)" [rows]="limitCourse"
       [totalRecords]="totalCourse"></p-paginator>

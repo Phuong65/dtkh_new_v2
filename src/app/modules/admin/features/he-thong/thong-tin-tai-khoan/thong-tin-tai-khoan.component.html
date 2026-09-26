@@ -1,1 +1,116 @@
-﻿<div class="p-3">thong-tin-tai-khoan.component works!</div>
+<div class="ovic-section-ui layout_component_container">
+    <div class="form-user-info">
+        <p-panel header="{{translations.title}}">
+            <div class="ovic-form-ui">
+                <div class="tttk-ui-block tttk-ui-block--avatar">
+                    <input type="file" #fileChooser (change)="onFileInput($event.target['files'],fileChooser)"
+                        class="d-none" />
+                    <!--<button type="button" class="btn" (click)="changeAvatar()">-->
+                    <button style="height: auto; width: auto;" type="button" class="btn" (click)="changeAvatar()">
+                        <!--<img [src]="avatar | ovicSafeUrl" alt="{{ user.display_name }}">-->
+                        <img [src]="avatar" width="96" height="96" alt="{{ user.display_name }}">
+                    </button>
+                </div>
+                <div class="tttk-ui-block">
+                    <div class="ovic-vertical__inputs">
+                        <form [formGroup]="form">
+                            <div class="row form-row form-row-flex-row">
+                                <div class="col-12 flex-div">
+                                    <label>Display name</label>
+                                    <input type="text" placeholder="Display name" formControlName="display_name">
+                                </div>
+                            </div>
+                            <div class="row form-row form-row-flex-row">
+                                <div class="col-6 flex-div">
+                                    <label>User name</label>
+                                    <input type="text" placeholder="User name" formControlName="username">
+                                </div>
+                                <div class="col-6 flex-div">
+                                    <label>Password</label>
+                                    <div class="p-inputgroup">
+                                        <input style="flex: 1; width: auto;" type="text"
+                                            placeholder="Nhập mật khẩu mới " formControlName="password" [disabled]>
+                                        <span class="p-inputgroup-addon" style="padding: 0px; height: 30px;">
+                                            <button style="height: 30px;"
+                                                [ngClass]="isUpdatePassword ? 'btn btn-cancel' : 'btn btn-primary'"
+                                                (click)="changeUpdatePasswordMode()">
+                                                {{isUpdatePassword ? 'Hủy' : 'Đổi MK'}}
+                                            </button>
+                                        </span>
+                                    </div>
+                                    @if (f['password'].touched && f['password'].invalid) {
+                                    <span
+                                        class="ovic-form-row__notices ovic-form-row__notices--bottom-right ovic-notices--error">Mật
+                                        khẩu phải có ít nhất 8 kí tự. Phải bao gồm ít nhất 1 ký tự in hoa, 1 ký tự in
+                                        thường, 1
+                                        ký tự đặc biệt và 1 ký tự số</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="row form-row form-row-flex-row">
+                                <div class="col-6 flex-div">
+                                    <label>Email</label>
+                                    <input type="text" placeholder="Email" formControlName="email">
+                                    @if (emailControl.alreadyExist) {
+                                    <span
+                                        class="ovic-form-row__notices ovic-form-row__notices--top-right ovic-notices--error">Email
+                                        đã tồn tại</span>
+                                    }
+                                    @if (emailControl.checking) {
+                                    <span class="ovic-form-row__icon"><i
+                                            class="pi pi-spin pi-spinner"></i></span>
+                                    }
+                                </div>
+                                <div class="col-6 flex-div">
+                                    <label>Phone</label>
+                                    <input type="text" placeholder="Phone" formControlName="phone">
+                                    @if (phoneControl.alreadyExist) {
+                                    <span
+                                        class="ovic-form-row__notices ovic-form-row__notices--top-right ovic-notices--error">Số
+                                        điện thoại đã tồn tại</span>
+                                    }
+                                    @if (phoneControl.checking) {
+                                    <span class="ovic-form-row__icon"><i
+                                            class="pi pi-spin pi-spinner"></i></span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="row form-row form-row-flex-row">
+                                <div class="col-6 flex-div">
+                                    <label>Khoa:</label>
+                                    <ovic-dropdown [defaultValue]="user_profile.donvi_chuyenmon_id"
+                                        (onChange)="onChangeDonviCM($event)" placeholder="---chọn khoa---"
+                                        [options]="list_donvi_chuyenmon" optionId="id" optionLabel="title"
+                                        [filter]="true" filterBy="title" [showClear]="false">
+                                    </ovic-dropdown>
+                                </div>
+                                <div class="col-6 flex-div">
+                                    <label>Bộ môn:</label>
+                                    <ovic-dropdown [defaultValue]="user_profile.bomon_id"
+                                        (onChange)="onChangeNganh($event)" [showClear]="false"
+                                        placeholder="---chọn bộ môn---" [options]="list_nganh_bomon" optionId="id"
+                                        optionLabel="title" [filter]="true" filterBy="title">
+                                    </ovic-dropdown>
+                                </div>
+                            </div>
+                            <div class="row form-row form-row-flex-row">
+                                <div class="col-12 flex-div">
+                                    <span class="red">Lưu ý: mật khẩu phải có ít nhất 1 chữ
+                                        thường, 1 chữ hoa, 1 số và 1 ký tự đặc biệt, dài tối thiểu 8 ký tự
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div
+                    class="tttk-ui-block ovic-form-ui__foot ovic-form-ui__foot--border ovic-form-ui__foot--align-right pb-0 mt-3 pt-4">
+                    <button pButton type="button" [label]="buttons.refresh.label" [icon]="buttons.refresh.icon"
+                        [class]="buttons.refresh.class" (click)="btnRefreshClick()"></button>
+                    <button pButton type="button" [label]="buttons.submit.label" [icon]="buttons.submit.icon"
+                        (click)="btnSubmitClick()"></button>
+                </div>
+            </div>
+        </p-panel>
+    </div>
+</div>

@@ -19,3 +19,48 @@
 .hover-td:hover {
     background-color: #abc9fb;
 }
+
+.selection-list-mat {
+    padding-top: 0 !important;
+}
+
+.selection-list-mat .mat-list-option {
+    border-bottom: 1px solid #dfe5ee !important;
+    padding: 10px 12px !important;
+    min-height: 40px !important;
+    background: #fff !important;
+    transition: background-color 0.2s ease;
+}
+
+.selection-list-mat .mat-list-option:last-child {
+    border-bottom: none !important;
+}
+
+.selection-list-mat .mat-list-option:hover {
+    background: #f5f9ff !important;
+}
+
+.selection-list-mat .mat-list-option[aria-selected="true"] {
+    background: #f3f9ff !important;
+}
+
+.selection-list-mat .mat-pseudo-checkbox,
+.selection-list-mat .mat-list-option .mat-pseudo-checkbox,
+.selection-list-mat .mat-list-option .mat-pseudo-checkbox::before,
+.selection-list-mat .mat-list-option .mat-pseudo-checkbox::after,
+.selection-list-mat .mat-list-option .mat-list-item-ripple,
+.selection-list-mat .mat-list-option .mat-ripple {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    margin: 0 !important;
+    pointer-events: none !important;
+}
+
+.selection-list-mat .mat-list-item-content,
+.selection-list-mat .mat-list-text {
+    padding: 0 !important;
+    width: 100%;
+}

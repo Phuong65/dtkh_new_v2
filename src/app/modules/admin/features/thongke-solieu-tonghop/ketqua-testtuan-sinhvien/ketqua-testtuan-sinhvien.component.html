@@ -1,1 +1,282 @@
-﻿<div class="p-3">ketqua-testtuan-sinhvien.component works!</div>
+<div class="layout_component_container topical-question-bank position-relative ovic-is-loading--size-normal"
+    [ngClass]="closeLeft?'close-left-body':''" [class.ovic-is-loading]="loading">
+    <ng-container>
+        <div class="left-container position-relative ovic-is-loading--size-normal">
+            <div class="left-container-bottom">
+
+                <button style="margin-left: 5px; padding: 0; min-width: 0; z-index: 50;" (click)="closeLeftBody()"
+                    class="btn btn-success button-close-left-body">
+                    <i style="margin: 0;vertical-align: middle; font-size: 13px;"
+                        [ngClass]="closeLeft?'pi pi-angle-double-right':'pi pi-angle-double-left'"></i>
+                </button>
+
+                <tree-custom dataKey="key" [merNodeAndIcon]="true" [data]="treeCoures" (selectNode)="nodeSelect($event)"
+                    [select]="selectedNodeTree" (closeAndOpenNode)="closeAndOpenNode($event)">
+                </tree-custom>
+
+            </div>
+        </div>
+        <div class="right-container" [class.ovic-is-loading]="loadingTable">
+            <div class="right-container-top">
+                <b>BÁO CÁO TÌNH HÌNH TEST TUẦN {{text_selected_tree}}</b>
+                <div class="right-container-top--button">
+                    <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?objectFilter['namhoc']: null"
+                        style="margin-left: 5px;" (onChange)="onChangeFilter($event, 'namhoc')"
+                        placeholder="- Năm học -" [options]="listNamhoc" optionId="value" optionLabel="label"
+                        [filter]="true">
+                    </ovic-dropdown>
+                    <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?objectFilter['hocky']: null"
+                        style="margin-left: 5px;" (onChange)="onChangeFilter($event, 'hocky' )" [options]="listHocky"
+                        placeholder="- Học kỳ -" optionId="value" optionLabel="label" [filter]="true">
+                    </ovic-dropdown>
+                </div>
+
+            </div>
+
+            @if (typeViewTable === 'data') {
+            <div class="right-container-bottom">
+                <p-table [value]="list_khoa"
+                         styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-none-header ovic-ui-table table-reBorder th-td-padding-5px">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th [rowSpan]="2" style="text-align: center; width: 50px;" pFrozenColumn>TT</th>
+                            <th [rowSpan]="2" style="text-align: center; width: 200px;" pFrozenColumn>
+                                Đơn vị
+                            </th>
+
+                            @if (!selectedMonHoc) {
+                            <th [rowSpan]="2" class="text-center ovic-w-100px">
+                                Tổng số lớp học phần
+                            </th>
+                            }
+
+                            @if (selectedMonHoc) {
+                            <th [rowSpan]="2" style="text-align: center; width: 200px;">
+                                Giảng viên
+                            </th>
+                            }
+
+
+                            <th [rowSpan]="2" class="text-center ovic-w-100px">Tổng số sinh viên</th>
+                            <th [colSpan]="2" class="text-center ovic-w-125px">Sinh viên đã test </th>
+                            <th [colSpan]="2" class="text-center ovic-w-125px">Sinh viên chưa test</th>
+                            <th [colSpan]="2" class="text-center">Tỷ lệ Đạt </th>
+                            <th [colSpan]="2" class="text-center">A (8,5-10)</th>
+                            <th [colSpan]="2" class="text-center">B (7,0-8,4)</th>
+                            <th [colSpan]="2" class="text-center">C(5,5-6,9)</th>
+                            <th [colSpan]="2" class="text-center">D(4,0-5,4)</th>
+                            <th [colSpan]="2" class="text-center">F(4,0)</th>
+                        </tr>
+                        <tr>
+                            <th class="text-center">Tổng số</th>
+                            <th class="text-center">Tỷ lệ</th>
+                            <th class="text-center">Tổng số</th>
+                            <th class="text-center">Tỷ lệ</th>
+                            <th class="text-center">Tổng số</th>
+                            <th class="text-center">Tỷ lệ</th>
+                            <th class="text-center">Tổng số</th>
+                            <th class="text-center">Tỷ lệ</th>
+                            <th class="text-center">Tổng số</th>
+                            <th class="text-center">Tỷ lệ</th>
+                            <th class="text-center">Tổng số</th>
+                            <th class="text-center">Tỷ lệ</th>
+                            <th class="text-center">Tổng số</th>
+                            <th class="text-center">Tỷ lệ</th>
+                            <th class="text-center">Tổng số</th>
+                            <th class="text-center">Tỷ lệ</th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-khoa let-rowIndex="rowIndex">
+                        <tr>
+                            <td style="text-align: center;">{{rowIndex + 1}}</td>
+
+                            <!-- Tên môn -->
+
+                            @if (!selectedMonHoc) {
+                            <td>{{ khoa.title }}</td>
+                            }
+
+                            <!-- Tên lớp -->
+                            @if (selectedMonHoc) {
+                            <td>{{ khoa.name }}</td>
+                            }
+
+                            <!-- Học phần -->
+                            @if (!selectedMonHoc) {
+                            <td class="text-center">{{khoa['__tong_so_lop_hoc']}}</td>
+                            }
+
+                            <!-- Tên giảng viên -->
+                            @if (selectedMonHoc) {
+                            <td class="text-center">{{khoa['manager_info']}}</td>
+                            }
+
+                            <td class="text-center">{{khoa['__tong_so_sinh_vien']}}</td>
+
+                            <!-- Số sinh viên đã test -->
+                            <td class="text-center">{{khoa['__tong_so_rpt_student_havetest']}}</td>
+                            <td class="text-center">{{khoa['__percent_rpt_student_havetest'] |number:'1.0-2'}}%</td>
+
+                            <!-- Số sinh viên Chưa test -->
+                            <td class="text-center">{{khoa['__tong_so_rpt_student_nottest']}}</td>
+                            <td class="text-center">{{khoa['__percent_rpt_student_nottest'] |number:'1.0-2'}}%</td>
+
+                            <!-- tỉ lệ đạt -->
+                            <td style="text-align: center;">{{khoa['__tong_so_sinhvien_dat']}}</td>
+                            <td style="text-align: center;">{{khoa['__percent_sinhvien_dat'] | number:'1.0-2'}}%</td>
+
+                            <!-- Sinh viên điểm  -->
+                            <td style="text-align: center;">{{khoa['__tong_so_rpt_A']}}</td>
+                            <td style="text-align: center;">{{khoa['__percent_rpt_A'] | number:'1.0-2'}}%</td>
+                            <td style="text-align: center;">{{khoa['__tong_so_rpt_B']}}</td>
+                            <td style="text-align: center;">{{khoa['__percent_rpt_B'] | number:'1.0-2'}}%</td>
+                            <td style="text-align: center;">{{khoa['__tong_so_rpt_C']}}</td>
+                            <td style="text-align: center;">{{khoa['__percent_rpt_C'] | number:'1.0-2'}}%</td>
+                            <td style="text-align: center;">{{khoa['__tong_so_rpt_D']}}</td>
+                            <td style="text-align: center;">{{khoa['__percent_rpt_D'] | number:'1.0-2'}}%</td>
+                            <td style="text-align: center;">{{khoa['__tong_so_rpt_E']}}</td>
+                            <td style="text-align: center;">{{khoa['__percent_rpt_E'] | number:'1.0-2'}}%</td>
+
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="footer">
+                        <tr>
+                            <td colspan="2" class="text-center"><b>Tổng hợp</b></td>
+
+                            <!-- Học phần -->
+                            <td class="text-center">{{getTotal('lophoc')}}</td>
+                            <td class="text-center">{{getTotal('sinhvien')}}</td>
+                            <!-- sv đã test  -->
+                            <td class="text-center">{{getTotal('sinhvien-have-test-cc')}}</td>
+                            <td class="text-center">{{(getTotal('sinhvien') ? getTotal('sinhvien-have-test-cc') *100 /
+                                getTotal('sinhvien'): 0) |number:'1.0-2'}}%</td>
+                            <!-- sv đã chua test  -->
+                            <td class="text-center">{{getTotal('sinhvien-not-test-cc')}}</td>
+                            <td class="text-center">{{(getTotal('sinhvien-not-test-cc') ?
+                                getTotal('sinhvien-not-test-cc') *100 / getTotal('sinhvien') : 0) |number:'1.0-2'}}%
+                            </td>
+                            <!-- sinh vien dat>-->
+                            <td class="text-center">{{getTotal('rpt_dat')}}</td>
+                            <td class="text-center">{{(getTotal('rpt_dat') ? getTotal('rpt_dat') *100 /
+                                getTotal('sinhvien') : 0) |number:'1.0-2'}}%</td>
+
+                            <!-- diem sinh viên -->
+
+                            <td class="text-center">{{getTotal('rpt_A')}}</td>
+                            <td class="text-center">{{(getTotal('rpt_A') ? getTotal('rpt_A') *100 /
+                                getTotal('tong_so_test_cc') : 0) |number:'1.0-2'}}%</td>
+
+                            <td class="text-center">{{getTotal('rpt_B')}}</td>
+                            <td class="text-center">{{(getTotal('rpt_B') ? getTotal('rpt_B') *100 /
+                                getTotal('tong_so_test_cc') : 0) |number:'1.0-2'}}%</td>
+
+                            <td class="text-center">{{getTotal('rpt_C')}}</td>
+                            <td class="text-center">{{(getTotal('rpt_C') ? getTotal('rpt_C') *100 /
+                                getTotal('tong_so_test_cc') : 0) |number:'1.0-2'}}%</td>
+
+                            <td class="text-center">{{getTotal('rpt_D')}}</td>
+                            <td class="text-center">{{(getTotal('rpt_D') ? getTotal('rpt_D') *100 /
+                                getTotal('tong_so_test_cc') : 0) |number:'1.0-2'}}%</td>
+                            <td class="text-center">{{getTotal('rpt_E')}}</td>
+                            <td class="text-center">{{(getTotal('rpt_E') ? getTotal('rpt_E') *100 /
+                                getTotal('tong_so_test_cc') : 0) |number:'1.0-2'}}%</td>
+
+
+                        </tr>
+                    </ng-template>
+                </p-table>
+
+
+
+                <div class="page-layout-set">
+                    <!-- <p-paginator #paginator (onPageChange)="changePage($event)" [rows]="limitCourse"
+          [totalRecords]="totalCourse">
+      </p-paginator> -->
+                </div>
+            </div>
+            } @else {
+                <div class="right-container-bottom">
+                    <p-table [value]="dataStudentsByMenu"
+                             styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-none-header ovic-ui-table table-reBorder th-td-padding-5px">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th [rowSpan]="2" class="text-center ovic-w-50px"  pFrozenColumn>TT</th>
+                                <th [rowSpan]="2" class="text-center ovic-w-200px"  pFrozenColumn>Họ và tê</th>
+                                <th [rowSpan]="2" class="text-center ovic-w-125px"  pFrozenColumn>Mã sinh viên</th>
+                                <th [rowSpan]="2" class="text-center ovic-w-100px" pFrozenColumn>Kết quả test </th>
+                                @for (item of objectWeek; track $index) {
+                                <th [colSpan]="2" class="text-center" pFrozenColumn>{{'Bài' + item}}</th>
+                                }
+
+
+                            </tr>
+                            <tr>
+                                @for (item of objectWeek; track $index) {
+                                    <th class="text-center"> Điểm </th>
+                                    <th class="text-center"> ĐK qua bài </th>
+                                }
+
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+                            <tr>
+                                <td class="text-center">{{rowIndex + 1}}</td>
+                                <td class="text-left" >{{ item['__displayName'] }}</td>
+                                <td class="text-center"> {{ item['__studentCode'] }}</td>
+                                <td class="text-center" [ngClass]="item['__total_rpt_dat'] < item['__total_rpt'] ?'chuadat':''"> {{ item['__total_rpt_dat'] +'/'+item['__total_rpt'] }}</td>
+
+                                @for (ow of objectWeek; track $index) {
+                                    <td class="text-center">{{item['__score_week_'+ow ]}}</td>
+                                    <td class="text-center" [ngClass]="item['__condition_week_'+ow ] ">
+                                        {{item['__condition_week_'+ow ] === 'dat' ? 'Đạt': item['__condition_week_'+ow ] === 'chuadat' ? 'KĐ': '-'}}
+                                    </td>
+                                }
+                            </tr>
+                        </ng-template>
+                    </p-table>
+
+                </div>
+            }
+
+            @if (!course) {
+                <!-- <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?objectFilter['namhoc']: null"
+            style="margin-left: 5px;" (onChange)="onChangeFilter($event, 'namhoc')" placeholder="- Năm học -"
+            [options]="listNamhoc" optionId="value" optionLabel="label" [filter]="true">
+        </ovic-dropdown>
+        <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?objectFilter['hocky']: null"
+            style="margin-left: 5px;" (onChange)="onChangeFilter($event, 'hocky' )" [options]="listHocky"
+            placeholder="- Học kỳ -" optionId="value" optionLabel="label" [filter]="true">
+        </ovic-dropdown> -->
+            } @else {
+                <div
+                    class="layout_component_container__error d-flex justify-content-center align-items-center w-100 h-100">
+                    <p class="alert alert-secondary m-0 primary-font --fs-14">Vui lòng chọn môn học</p>
+                </div>
+            }
+        </div>
+    </ng-container>
+</div>
+
+<ng-template #errorTemplate>
+    <div class="layout_component_container__error d-flex justify-content-center align-items-center w-100 h-100">
+        <p class="layout_component_container__error__message alert alert-danger m-0 primary-font --fs-14">
+            Mất kết nối với máy chủ.
+            <button class="btn layout_component_container__btn-reload text-primary">Tải lại</button>
+        </p>
+        <p class="layout_component_container__error__message alert alert-danger m-0 primary-font --fs-14">Bạn không có
+            quyền truy cập vào nội dung này. Vui lòng liên hệ với quản trị viên để được hỗ trợ</p>
+    </div>
+</ng-template>
+
+<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+    [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+    <div class="popup-waiting-loading">
+        <label style="width: 100%;">{{waitting_title}}</label>
+        <div class="tn-import-student-progressbar">
+            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+        </div>
+    </div>
+</p-dialog>

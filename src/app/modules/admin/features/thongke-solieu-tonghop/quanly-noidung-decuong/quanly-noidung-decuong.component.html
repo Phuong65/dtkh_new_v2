@@ -1,1 +1,71 @@
-﻿<div class="p-3">quanly-noidung-decuong.component works!</div>
+<div class="layout_component_container" [ngClass]="closeLeft?'close-left-body':''">
+    <div class="layout_component_container-course" style="position: relative;">
+        <button style="margin-left: 5px; padding: 0; min-width: 0; z-index: 50;" (click)="closeLeftBody()"
+                class="btn btn-success button-close-left-body">
+            <i style="margin: 0;vertical-align: middle; font-size: 13px;"
+               [ngClass]="closeLeft?'pi pi-angle-double-right':'pi pi-angle-double-left'"></i>
+        </button>
+        <div class="search-layout">
+            <div class="search-layout-top d-flex align-items-center" style="gap:6px;">
+                <input (keyup.enter)="searchClass($event)" class="ovic-input-field w-100"
+                       placeholder="Nhập tên rồi nhấn enter" type="text">
+<!--                <button class="btn btn-icon" *ngIf="isLanhDaoKhoa || isManager" (click)="filterMyClass()"-->
+<!--                        [disabled]="startProgress" container="body" placement="left" ngbTooltip="Lớp học được phân công"-->
+<!--                        [ngClass]="filterOwn?'btn btn-primary':'btn btn-secondary'">-->
+<!--                    <i style="margin-right: 0" class="pi pi-filter"></i>-->
+<!--                </button>-->
+            </div>
+<!--            <div class="d-flex"  style="margin-top: 5px;" *ngIf="isManager">-->
+<!--                                <ovic-dropdown (onChange)="onChangeFilterChuyenmon($event)" placeholder="-&#45;&#45; chọn khoa -&#45;&#45;"-->
+<!--                                               [options]="list_donvi_chuyenmon" optionId="id" optionLabel="title" [filter]="true"-->
+<!--                                               [defaultValue]="categoryFilter" filterBy="title"></ovic-dropdown>-->
+
+<!--                <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?objectFilter['namhoc']: null"-->
+<!--                               style="width:60%" (onChange)="onChangeFilter($event, 'namhoc')"-->
+<!--                               placeholder="- Năm học -"-->
+<!--                               [options]="listNamhoc" optionId="value" optionLabel="label" [filter]="true">-->
+<!--                </ovic-dropdown>-->
+<!--                <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?objectFilter['hocky']: null"-->
+<!--                               style="margin-left: 5px;width:40%" (onChange)="onChangeFilter($event, 'hocky' )"-->
+<!--                               [options]="listHocky"-->
+<!--                               placeholder="- Học kỳ -" optionId="value" optionLabel="label" [filter]="true">-->
+<!--                </ovic-dropdown>-->
+<!--            </div>-->
+        </div>
+        <div class="list-course-layout">
+            <div class="selection-list-mat" #courses>
+                @for (course of dmKhoahoc; track course.id) {
+                    <button type="button"
+                            class="course-item"
+                            [class.active]="courseSelect && courseSelect.id === course.id"
+                            (click)="selectCourse(course)">
+                        <span>{{course.title + ' (' + course.maso + ')'}}</span>
+                    </button>
+                }
+            </div>
+        </div>
+        <div class="page-layout-set">
+            <p-paginator #paginator (onPageChange)="changePage($event)" [rows]="limitList"
+                         [totalRecords]="totalCourse"></p-paginator>
+        </div>
+    </div>
+
+
+    <div class="layout_component_container-noidung" style="font-size: 14px;">
+        <div class="layout_component_container-noidung-top">
+            <div style="font-size: 14px;font-weight: 600;">
+                NỘI DUNG ĐỀ CƯƠNG @if (courseSelect) { <span class="text-uppercase">{{ ' > ' + courseSelect.title}}</span> }
+            </div>
+            <button pRipple pButton icon="pi pi-file-word" label="Xuất file" (click)="exportFileWord()" ></button>
+        </div>
+        <div class="layout_component_container-noidung-body">
+            @if (htmlBySelectClass) {
+                <div class="layout_component_container-noidung-body-ifarm" id="show_content_html">
+                </div>
+            } @else {
+                <div> vui lòng chọn lớp học </div>
+            }
+        </div>
+
+    </div>
+</div>

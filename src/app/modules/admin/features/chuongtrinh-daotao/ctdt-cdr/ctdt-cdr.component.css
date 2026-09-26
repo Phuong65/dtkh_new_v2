@@ -10,3 +10,33 @@
 .action-td-table {
     text-align: right!important;
 }
+
+
+.ctdt-cdr-ordering {
+    display: flex;
+    width: 100%;
+}
+
+.ctdt-cdr-ordering .p-inputgroup-addon {
+    display: flex;
+    flex: 0 0 60px;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    min-width: 60px;
+    padding: 0;
+    border: 1px solid #ced4da;
+    border-right: 0;
+    border-radius: 0;
+    background: #e9ecef;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.ctdt-cdr-ordering > .ovic-input-field {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    height: 30px;
+    border-radius: 0;
+}

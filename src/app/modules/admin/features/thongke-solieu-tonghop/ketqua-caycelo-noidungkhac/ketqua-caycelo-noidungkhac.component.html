@@ -1,1 +1,92 @@
-﻿<div class="p-3">ketqua-caycelo-noidungkhac.component works!</div>
+<div class="layout_component_container">
+    <div class="layout_component_container-top">
+        <div class="container-top-right">
+            <ovic-dropdown class="set-widh-dropdown" [showClear]="false"
+                [defaultValue]="objectFilter?objectFilter['category_id']: null" (onChange)="onChangeDonviCM($event)"
+                [filter]="true" [placeholder]="'---Chọn khoa quản lý---'" [options]="list_donvi_chuyenmon" optionId="id"
+                optionLabel="title" filterBy="title">
+            </ovic-dropdown>
+<!--            <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?objectFilter['namhoc']: null"-->
+<!--                style="margin-left: 5px;" (onChange)="onChangeFilter($event, 'namhoc')" placeholder="- Năm học -"-->
+<!--                [options]="listNamhoc" optionId="value" optionLabel="label" [filter]="true">-->
+<!--            </ovic-dropdown>-->
+<!--            <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?objectFilter['hocky']: null"-->
+<!--                style="margin-left: 5px;" (onChange)="onChangeFilter($event, 'hocky' )" [options]="listHocky"-->
+<!--                placeholder="- Học kỳ -" optionId="value" optionLabel="label" [filter]="true">-->
+<!--            </ovic-dropdown>-->
+            <ovic-dropdown  [showClear]="true" [defaultValue]="objectFilter?objectFilter['dot_capnhat']: null"
+                           style="margin-left: 5px;width:200px;" (onChange)="onChangeFilter($event, 'dot_capnhat')" placeholder="- Đợt cập nhật -"
+                           [options]="ds_dotCapnhat" optionId="dot_capnhat" optionLabel="dot_capnhat" [filter]="true">
+            </ovic-dropdown>
+        </div>
+    </div>
+    <div class="layout_component_container-bottom">
+        <div class="container-bottom-right">
+            <p-table [value]="list_cdr"
+                styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-none-header ovic-ui-table table-reBorder th-td-padding-5px">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th [rowSpan]="2" style="text-align: center; width: 50px;" pFrozenColumn>TT</th>
+                        <th [rowSpan]="2" style="text-align: center; width: 250px;" pFrozenColumn>Tên học phần</th>
+                        <th [rowSpan]="2" style="text-align: center; width: 140px;">Thông tin chung</th>
+                        @for (week of dataWeek; track week.week; let i = $index) {
+                            <th [colSpan]="2" style="text-align: center; width: 200px;">Bài {{ i + 1 }}</th>
+                        }
+                    </tr>
+                    <tr>
+                        @for (week of dataWeek; track week.week) {
+                            <th style="text-align: center; width: 140px;">Cây celo</th>
+                            <th style="text-align: center; width: 140px;">Nội dung khác</th>
+                        }
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-cdr let-rowIndex="rowIndex">
+                    <tr>
+                        <td style="text-align: center;">{{rowIndex + 1}}</td>
+                        <td>{{ cdr.title }}</td>
+                        <td style="text-align: center;">-</td>
+
+                        @for (week of dataWeek; track week.week) {
+                            <td style="text-align: center;" [ngClass]="cdr['__celoResult'][week.week - 1] ? {
+                                  'blue-text': cdr['__celoResult'][week.week - 1] === 'ĐẠT',
+                                  'red-bg': cdr['__celoResult'][week.week - 1] === 'Chưa đạt',
+                                  'yellow-text': cdr['__celoResult'][week.week - 1].includes('/')
+                                }:''">
+                                {{ cdr['__celoResult'][week.week - 1] }}
+                            </td>
+                            <td style="text-align: center;" [ngClass]="{
+                                  'blue-text': cdr['__otherResult'][week.week - 1] === 'ĐẠT',
+                                  'red-bg': cdr['__otherResult'][week.week - 1] === 'Chưa đạt'
+                                }">
+                                {{ cdr['__otherResult'][week.week - 1] }}
+                            </td>
+                        }
+                    </tr>
+
+                </ng-template>
+
+                <ng-template pTemplate="emptymessage" >
+                    <tr>
+                        <td colspan="27">
+                            Chưa tìm thấy kết quả.
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <div class="page-layout-set">
+                <p-paginator #paginator (onPageChange)="changePage($event)" [rows]="limitCourse"
+                    [totalRecords]="totalCourse"></p-paginator>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+    [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+    <div class="popup-waiting-loading">
+        <label style="width: 100%;">{{waitting_title}}</label>
+        <div class="tn-import-student-progressbar">
+            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+        </div>
+    </div>
+</p-dialog>

@@ -1,1 +1,84 @@
-﻿<div class="p-3">ketqua-nghiem-cauhoi-tuluan-kthp.component works!</div>
+<div class="layout_component_container">
+    <div class="layout_component_container-top">
+        <div class="container-top-right">
+
+<!--            <ovic-dropdown [showClear]="true"-->
+<!--                           style="margin-left: 5px;" [defaultValue]="type_have_question" (onChange)="changDrd($event)" placeholder="- Phân loại -"-->
+<!--                           [options]="check_number_questions" optionId="value" optionLabel="title" [filter]="true">-->
+<!--            </ovic-dropdown>-->
+
+            <ovic-dropdown class="set-widh-dropdown" [showClear]="false"
+                           style="margin-left: 5px;"
+                           [defaultValue]="objectFilter?objectFilter['category_id']: null" (onChange)="onChangeDonviCM($event)"
+                           [filter]="true" [placeholder]="'---Chọn khoa quản lý---'" [options]="list_donvi_chuyenmon" optionId="id"
+                           optionLabel="title" filterBy="title">
+            </ovic-dropdown>
+<!--            <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?objectFilter['namhoc']: null"-->
+<!--                           style="margin-left: 5px;" (onChange)="onChangeFilter($event, 'namhoc')" placeholder="- Năm học -"-->
+<!--                           [options]="listNamhoc" optionId="value" optionLabel="label" [filter]="true">-->
+<!--            </ovic-dropdown>-->
+<!--            <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?objectFilter['hocky']: null"-->
+<!--                           style="margin-left: 5px;" (onChange)="onChangeFilter($event, 'hocky' )" [options]="listHocky"-->
+<!--                           placeholder="- Học kỳ -" optionId="value" optionLabel="label" [filter]="true">-->
+<!--            </ovic-dropdown>-->
+            <ovic-dropdown  [showClear]="true" [defaultValue]="objectFilter?objectFilter['dot_capnhat']: null"
+                            style="margin-left: 5px;width:200px;" (onChange)="onChangeFilter($event, 'dot_capnhat')" placeholder="- Đợt cập nhật -"
+                            [options]="ds_dotCapnhat" optionId="dot_capnhat" optionLabel="dot_capnhat" [filter]="true">
+            </ovic-dropdown>
+        </div>
+    </div>
+    <div class="layout_component_container-bottom">
+        <div class="container-bottom-right">
+            <p-table [value]="list_cdr_clone"
+                     styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-none-header ovic-ui-table table-reBorder th-td-padding-5px">
+                <ng-template pTemplate="header">
+                    <tr class="text-uppercase">
+                        <th rowspan="2" class="text-center ovic-w-50px" >TT</th>
+                        <th rowspan="2" class="" >Tên học phần</th>
+                        <th rowspan="2" class="text-center ovic-w-200px" >Mã học phần </th>
+                        <th rowspan="2" class="text-center ovic-w-200px">Tổng số câu hỏi</th>
+                        <th rowspan="2" class="text-center ovic-w-200px">Tổng số đề </th>
+                        <th colspan="2" class="text-center ovic-w-300px"> Tổng số đã duyệt</th>
+
+                    </tr>
+                    <tr class="text-uppercase">
+                        <th class="text-center">Câu hỏi</th>
+                        <th class="text-center">Đề</th>
+                        <!--                        <th class="text-center ovic-w-150px">Chưa duyệt</th>-->
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-cdr let-rowIndex="rowIndex">
+                    <tr>
+                        <td class="text-center" >{{rowIndex + 1}}</td>
+                        <td >{{ cdr.title }}</td>
+                        <td class="text-center"> {{cdr.maso}}</td>
+<!--                        <td class="text-center">{{ cdr['_total_question'] }}</td>-->
+<!--                        <td class="text-center" >{{ cdr['_question_approved'] }}</td>-->
+<!--                        <td class="text-center" [ngClass]="cdr['_question_not_achieved'] > 0 ?'not-achieved':''" >{{ cdr['_question_not_achieved'] }}</td>-->
+                        <!--                        <td class="text-center" >{{ cdr['_question_await_approved'] }}</td>-->
+                        <td class="text-center"  [ngClass]="cdr['_total_question'] > 0 ?'':'not-achieved'" >{{cdr['_total_question']}}</td>
+                        <td class="text-center"  [ngClass]="cdr['_total_group_question'] > 0 ?'':'not-achieved'" >{{cdr['_total_group_question']}}</td>
+                        <td class="text-center"  [ngClass]="cdr['_total_question_accept'] > 0 ?'':'not-achieved'" >{{cdr['_total_question_accept']}}</td>
+                        <td class="text-center"  [ngClass]="cdr['_total_group_question_accept'] > 0 ?'':'not-achieved'" >{{cdr['_total_group_question_accept']}}</td>
+                    </tr>
+
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="7">Chưa tìm thấy kết quả.</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div>
+
+<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+          [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+    <div class="popup-waiting-loading">
+        <label style="width: 100%;">{{waitting_title}}</label>
+        <div class="tn-import-student-progressbar">
+            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+        </div>
+    </div>
+</p-dialog>

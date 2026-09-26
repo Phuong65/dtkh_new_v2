@@ -105,7 +105,7 @@
             <div class="search-layout">
                 <div class="search-layout-top" style="display: flex; align-items: center;">
                     <input [(ngModel)]="searchCourse_hp" type="text" class="ovic-input-field"
-                        placeholder="Nhập tên rồi nhấn enter" type="text" style="width: 100%;">
+                        placeholder="Nhập tên rồi nhấn enter" style="width: 100%;">
                 </div>
             </div>
             <div class="list-course-layout" style="line-height: 1.5;">
@@ -136,16 +136,16 @@
             </h3>
             <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
         </div>
-        <div class="ovic-over-right-section__body" style="height: calc(100vh - 51px - 57px);">
+        <div class="ovic-over-right-section__body" style="height: calc(100vh - 51px - 57px); line-height: 1.5;">
             <div class="search-layout">
                 <div class="search-layout-top" style="display: flex; align-items: center;">
                     <input [(ngModel)]="searchCourse" type="text" class="ovic-input-field"
-                        placeholder="Nhập tên rồi nhấn enter" type="text" style="width: 100%;">
+                        placeholder="Nhập tên rồi nhấn enter" style="width: 100%;">
                 </div>
             </div>
-            <div class="list-course-layout" style="line-height: 1.5;">
+            <div class="list-course-layout" style="line-height: 1.5; font-size: 14px;">
                 <mat-selection-list (selectionChange)="changeSelecCourse($event)" [multiple]="true"
-                    class="selection-list-mat" #courses>
+                    class="selection-list-mat" style="color:red" #courses>
                     @for (course of list_selected_course | filter : searchCourse : ['title','maso']; track course.id) {
                         <mat-list-option [selected]="course['checked']" [value]="course">
                             <div mat-line style="font-weight: 600;">

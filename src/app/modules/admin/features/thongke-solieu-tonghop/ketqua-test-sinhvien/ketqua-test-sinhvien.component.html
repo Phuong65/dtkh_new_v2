@@ -1,1 +1,97 @@
-﻿<div class="p-3">ketqua-test-sinhvien.component works!</div>
+<div class="layout_component_container">
+    <div class="layout_component_container-top">
+        <div class="container-top-right">
+            <ovic-dropdown class="set-widh-dropdown" [showClear]="false"
+                [defaultValue]="objectFilter?objectFilter['category_id']: null" (onChange)="onChangeDonviCM($event)"
+                [filter]="true" [placeholder]="'---Chọn khoa quản lý---'" [options]="list_donvi_chuyenmon" optionId="id"
+                optionLabel="title" filterBy="title">
+            </ovic-dropdown>
+            <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?objectFilter['namhoc']: null"
+                style="margin-left: 5px;" (onChange)="onChangeFilter($event, 'namhoc')" placeholder="- Năm học -"
+                [options]="listNamhoc" optionId="value" optionLabel="label" [filter]="true">
+            </ovic-dropdown>
+            <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?objectFilter['hocky']: null"
+                style="margin-left: 5px;" (onChange)="onChangeFilter($event, 'hocky' )" [options]="listHocky"
+                placeholder="- Học kỳ -" optionId="value" optionLabel="label" [filter]="true">
+            </ovic-dropdown>
+        </div>
+    </div>
+    <div class="layout_component_container-bottom">
+        <div class="container-bottom-right">
+            <p-table [value]="list_class"
+                styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-none-header ovic-ui-table table-reBorder th-td-padding-5px">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="text-align: center; width: 50px;">TT</th>
+                        <th rowspan="2" style="text-align: center; width: 350px;">Tên học phần</th>
+                        <th rowspan="2" style="text-align: center; width: 70px;">Số SV</th>
+                        <!-- <th rowspan="2" style="text-align: center;">Tổng số SV test chưa đạt</th> -->
+                        @for (week of dataWeekClass; track week.week; let i = $index) {
+                            <th colspan="1" style="text-align: center; width: 90px;">Bài {{ i + 1 }}</th>
+                        }
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-class let-rowIndex="rowIndex">
+                    <tr>
+                        <td style="text-align: center;">{{rowIndex + 1}}</td>
+                        <td>{{ class.name }}</td>
+                        <td style="text-align: center;">{{ class['total_student']}}</td>
+                        <!-- <td style="text-align: center;">Đang làm phần này</td> -->
+                        <!-- <ng-container *ngFor="let week of this.dataWeekClass">
+                            <td style="text-align: center;" [innerHTML]="getResultStudent(class, week)"></td>
+                        </ng-container> -->
+
+                                                @for (week of dataWeekClass; track week.week) {
+                            <td style="text-align: center;">
+                                                            @if (class['__textShow'][week.week - 1] !== '-') {
+                                <span>{{ class['__textShow'][week.week - 1].split(' - ')[0] }}</span> -
+                                <span [style.color]="'red'">{{ class['__textShow'][week.week - 1].split(' - ')[1].split(' | ')[0] }}</span> |
+                                <span>{{ class['__textShow'][week.week - 1].split(' | ')[1] }}</span>
+                                                            } @else {
+                                {{ class['__textShow'][week.week - 1] }}
+                                                            }
+                            </td>
+                                                }
+
+
+                    </tr>
+
+                </ng-template>
+                <ng-template pTemplate="emptymessage" >
+                    <tr>
+                        <td colspan="27">
+                            Chưa tìm thấy kết quả.
+                        </td>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="footer">
+                    <tr>
+                        <td></td>
+                        <td>
+                            <b> Ghi chú: A - <span style="color: red;"> B </span> | C <br></b>
+                            A: Số sinh viên test đã đạt <br>
+                            B: Số sinh viên test chưa đạt <br>
+                            C: Số sinh viên chưa test <br>
+                        </td>
+                    </tr>
+
+                </ng-template>
+            </p-table>
+            <div class="page-layout-set">
+                <p-paginator #paginator (onPageChange)="changePage($event)" [rows]="limitClass"
+                    [totalRecords]="totalClass"></p-paginator>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+    [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+    <div class="popup-waiting-loading">
+        <label style="width: 100%;">{{waitting_title}}</label>
+        <div class="tn-import-student-progressbar">
+            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+        </div>
+    </div>
+</p-dialog>

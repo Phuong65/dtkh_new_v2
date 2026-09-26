@@ -1,1 +1,264 @@
-﻿<div class="p-3">ketqua-nghiemthu-cauhoi-lms.component works!</div>
+<div class="layout_component_container">
+    <div class="layout_component_container-top">
+        <div class="container-top-right">
+            <ovic-dropdown class="set-widh-dropdown" [showClear]="false"
+                           [defaultValue]="objectFilter?objectFilter['category_id']: null" (onChange)="onChangeDonviCM($event)"
+                           [filter]="true" [placeholder]="'---Chọn khoa quản lý---'" [options]="list_donvi_chuyenmon" optionId="id"
+                           optionLabel="title" filterBy="title">
+            </ovic-dropdown>
+            <!--            <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?objectFilter['namhoc']: null"-->
+            <!--                style="margin-left: 5px;" (onChange)="onChangeFilter($event, 'namhoc')" placeholder="- Năm học -"-->
+            <!--                [options]="listNamhoc" optionId="value" optionLabel="label" [filter]="true">-->
+            <!--            </ovic-dropdown>-->
+            <!--            <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?objectFilter['hocky']: null"-->
+            <!--                style="margin-left: 5px;" (onChange)="onChangeFilter($event, 'hocky' )" [options]="listHocky"-->
+            <!--                placeholder="- Học kỳ -" optionId="value" optionLabel="label" [filter]="true">-->
+            <!--            </ovic-dropdown>-->
+
+            <ovic-dropdown  [showClear]="true" [defaultValue]="objectFilter?objectFilter['dot_capnhat']: null"
+                            style="margin-left: 5px;width:200px;" (onChange)="onChangeFilter($event, 'dot_capnhat')" placeholder="- Đợt cập nhật -"
+                            [options]="ds_dotCapnhat" optionId="dot_capnhat" optionLabel="dot_capnhat" [filter]="true">
+            </ovic-dropdown>
+
+<!--            <button pButton pRipple icon="pi pi-excel" label="Xuất dữ liệu" class="ml-2" (click)="btnExport()"></button>-->
+        </div>
+    </div>
+    <div class="layout_component_container-bottom">
+        <div class="container-bottom-right">
+            <p-table [value]="list_cdr"
+                     styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-none-header ovic-ui-table table-reBorder th-td-padding-5px">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th  style="text-align: center; width: 50px;">TT</th>
+                        <th  style="text-align: center; width: 250px;">Tên học phần</th>
+                        <th  style="text-align: center; width: 80px;">Tổng số câu hỏi</th>
+                        @for (week of dataWeek; track week.week) {
+                            @if (week.week !== 100) {
+                                <th colspan="1" style="text-align: center; width: 120px;">Bài {{ week.week }}</th>
+                            } @else {
+                                <th colspan="1" style="text-align: center; width: 120px;" >Câu hỏi kết thúc HP</th>
+                            }
+                        }
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-cdr let-rowIndex="rowIndex">
+                    <tr >
+                        <td style="text-align: center;" >{{rowIndex + 1}}</td>
+                        <td class="btn-hover"  (click)="btnselectRows(cdr)">{{ cdr.title }}</td>
+                        <td style="text-align: center;">{{ cdr['__total'] }}</td>
+
+                        @for (week of dataWeek; track week.week) {
+                            <td style="text-align: center;">
+
+                                @if (week.week !== 100) {
+                                    @if (cdr['__textShow'][week.week -1] !== '-') {
+                                        <span>{{ cdr['__textShow'][week.week -1].split(' - ')[0] }}</span> -
+                                        <span [style.color]="'red'">{{ cdr['__textShow'][week.week -1].split(' - ')[1].split(' | ')[0] }}</span> |
+                                        <span>{{ cdr['__textShow'][week.week -1].split(' | ')[1] }}</span>
+                                    } @else {
+                                        {{ cdr['__textShow'][week.week-1] }}
+                                    }
+                                } @else {
+                                    @if (cdr['__textShow'][12] !== '-') {
+                                        <span>{{ cdr['__textShow'][12].split(' - ')[0] }}</span> -
+                                        <span [style.color]="'red'">{{ cdr['__textShow'][12].split(' - ')[1].split(' | ')[0] }}</span> |
+                                        <span>{{ cdr['__textShow'][12].split(' | ')[1] }}</span>
+                                    } @else {
+                                        {{ cdr['__textShow'][12] }}
+                                    }
+                                }
+                            </td>
+                        }
+
+                    </tr>
+
+                </ng-template>
+
+                <ng-template pTemplate="emptymessage" >
+                    <tr>
+                        <td colspan="27">
+                            Chưa tìm thấy kết quả.
+                        </td>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="footer">
+                    <tr>
+                        <td></td>
+                        <td>
+                            <b> Ghi chú Tổng số câu hỏi  : A - B<br></b>
+                            A: là tổng số câu hỏi cha <br>
+                            B: Là tổng số câu hỏi cha và câu hỏi con.<br>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <b> Ghi chú số lượng thành phần : A - <span style="color: red;"> B </span> | C <br></b>
+                            A: là số câu đã nghiệm thu đạt <br>
+                            B: Số câu nghiệm thu không đạt <br>
+                            C: Số câu chưa nghiệm thu <br>
+                        </td>
+                    </tr>
+
+                </ng-template>
+            </p-table>
+
+            <div class="page-layout-set">
+                <p-paginator #paginator (onPageChange)="changePage($event)" [rows]="limitCourse"
+                             [totalRecords]="totalCourse"></p-paginator>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog  styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+          [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+    <div class="popup-waiting-loading">
+        <label style="width: 100%;">{{waitting_title}}</label>
+        <div class="tn-import-student-progressbar">
+            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+        </div>
+    </div>
+</p-dialog>
+
+
+<ng-template #formView let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">Chi tiết các câu hỏi đã duyệt > {{formTitle}}</h3>
+            <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
+        </div>
+        <div class="ovic-over-right-section__body" style="height: calc(100vh - 57px );">
+            <!--            <p-table-->
+            <!--                     styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-none-header ovic-ui-table table-reBorder th-td-padding-5px">-->
+            <!--                <ng-template pTemplate="body">-->
+            <!--                    <ng-container *ngFor="let item of CourseSelect['__dataWeek']">-->
+            <!--                        <tr >-->
+            <!--                            <th colspan="20"> {{'Bài:' + item['week'] }}</th>-->
+            <!--                        </tr>-->
+            <!--                        <tr >-->
+            <!--                            <th colspan="20"> 1. Các mức CDR</th>-->
+            <!--                        </tr>-->
+            <!--                        <tr>-->
+            <!--                            <th class="text-center " *ngFor="let itemCdr of item['__cdrList']">-->
+            <!--                                {{itemCdr['title']}}-->
+            <!--                            </th>-->
+            <!--                        </tr>-->
+            <!--                        <tr>-->
+            <!--                            <td class="text-center " *ngFor="let itemCdr of item['__cdrList']">-->
+            <!--                                {{itemCdr['soluong']}}-->
+            <!--                            </td>-->
+            <!--                        </tr>-->
+
+            <!--                    </ng-container>-->
+            <!--                </ng-template>-->
+            <!--            </p-table>-->
+            <table style="width:100%;border-collapse: collapse;" class="table tbl topical-question-tbl table-border">
+                <tr>
+                    <td>
+                        <b style="color:red"> Ghi chú: </b> <b> Tổng số câu hỏi  : A - B </b><br>
+                        A: là tổng số câu hỏi cha <br>
+                        B: Là tổng số câu hỏi cha và câu hỏi con.<br>
+                    </td>
+                </tr>
+            </table>
+
+            <p style="line-height: 1;font-size:14px;padding-top: 12px;"><strong>I.TỔNG SỐ </strong></p>
+            <table style="width:100%;border-collapse: collapse;" class="table tbl topical-question-tbl table-border">
+                <tr>
+                    <th colspan="20"> 1. Các mức CDR</th>
+                </tr>
+                <tr>
+                    @for (item of CourseSelect['__TotalCdrByChild']; track $index) {
+                    <th class="text-center">
+                        {{item['title']}}
+                    </th>
+                    }
+                    <!--                    <th class="text-center" >Tổng</th>-->
+                </tr>
+                <tr>
+                    @for (item of CourseSelect['__TotalCdrByChild']; track $index) {
+                    <td class="text-center">
+                        {{(item['soluong'])}}
+                    </td>
+                    }
+                    <!--                    <td class="text-center font-weight-bold">-->
+                    <!--                        {{ rplTotalAllByChild(CourseSelect['__TotalCdrByChild'], 'arr',true,CourseSelect.av ==1) + -->
+                    <!--                    (CourseSelect.av ==1 ?  ' - ' + this.getTotalQuestionByChild(CourseSelect['__courses']) : ' - ' +countRelatedItems(CourseSelect['__courses']))-->
+                    <!--                        }}-->
+                    <!--                    </td>-->
+                    <!--                    <td class="text-center font-weight-bold">-->
+                    <!--                        {{ rplTotalAllByChild(CourseSelect['__TotalCdrByChild'], 'arr',true,CourseSelect.av ==1) +-->
+                    <!--                    (CourseSelect.av ==1 ?  '' : ' - ' +countRelatedItems(CourseSelect['__courses']))-->
+                    <!--                        }}-->
+                    <!--                    </td>-->
+
+                </tr>
+                <tr>
+                    <th colspan="20"> 2. Loại câu hỏi</th>
+
+
+                </tr>
+                @for (item of CourseSelect['__TotalQuyestionTypeByChild']; track $index) {
+                <tr>
+                    <td colspan="3">{{item['title']}}</td>
+                    <td colspan="3" class="text-center">{{item['soluong']}}</td>
+                </tr>
+                } @empty {
+                    <tr>
+                        <td class="text-center" colspan="6"> Chưa có loại câu hỏi</td>
+                    </tr>
+                }
+
+
+
+            </table>
+            <p style="line-height: 1;font-size:14px;padding-top: 12px;"><strong>II.CHI TIẾT  </strong></p>
+
+            <table style="width:100%;border-collapse: collapse;" class="table tbl topical-question-tbl table-border">
+
+                @for (item of CourseSelect['__dataWeek']; track item['week']) {
+                    <tr >
+                        <th colspan="20"> {{item['week'] !== 100 ?  ('Bài: ' + item['week']): 'Câu hỏi kết thúc học phần' }}</th>
+                    </tr>
+                    <tr >
+                        <th colspan="20"> 1. Các mức CDR</th>
+                    </tr>
+                    <tr>
+                        @for (itemCdr of item['__cdrList']; track $index) {
+                        <th class="text-center ">
+                            {{itemCdr['title']}}
+                        </th>
+                        }
+                    </tr>
+                    <tr>
+                        @for (itemCdr of item['__cdrList']; track $index) {
+                        <td class="text-center ">
+                            <!--                            {{getTotalQuestionByChild(itemCdr['arr'])}}-->
+                            {{(itemCdr['soluong'])}}
+                        </td>
+                        }
+                    </tr>
+                    <tr >
+                        <th colspan="20"> 2. Loại câu hỏi</th>
+                    </tr>
+                    @for (itemCdr of item['__questionType']; track $index) {
+                        <tr>
+                            <td colspan="3" class="text-left" >
+                                {{itemCdr['title']}}
+                            </td>
+                            <td class="text-center" colspan="3"> {{itemCdr['soluong']}}</td>
+                        </tr>
+                    } @empty {
+                        <tr>
+                            <td class="text-center" colspan="6"> Chưa có câu hỏi </td>
+                        </tr>
+                    }
+
+                }
+
+            </table>
+        </div>
+    </div>
+</ng-template>

@@ -50,18 +50,61 @@
 }
 
 .layout_component_container-noidung-body-ifarm{
-    width: 1024px;
+    width: min(1024px, calc(100% - 30px));
     height: 100%;
-    padding: 10px;
+    padding: 24px 28px;
+    background: #ffffff;
+    border: 1px solid #e7ebf0;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+    box-sizing: border-box;
 }
 .layout_component_container-noidung-body-ifarm iframe{
     width:100%;
     height:100%;
     border:none;
+    background: #ffffff;
 }
 .list-course-layout {
     flex: 1;
     overflow: auto;
+    background: #f8fafc;
+}
+
+.selection-list-mat {
+    padding: 0;
+    background: #fff;
+}
+
+.course-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 55px;
+    font-size: 14px;
+    padding: 10px 12px;
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    background: #fff;
+    color: #2d3748;
+    cursor: pointer;
+    box-sizing: border-box;
+    line-height: 1.4;
+    text-align: left;
+    font-weight: 500;
+}
+
+.course-item:last-child {
+    border-bottom: none;
+}
+
+.course-item.active {
+    background: #f4f9ff;
+    color: #0b57c2;
+}
+
+.course-item:hover {
+    background: #f6fbff;
 }
 
 

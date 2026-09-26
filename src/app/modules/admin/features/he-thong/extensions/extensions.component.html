@@ -1,1 +1,135 @@
-﻿<div class="p-3">extensions.component works!</div>
+<div class="layout_component_container" style="padding: 5px;">
+    <ovic-table [data]="listData" styleClass="tbl-danhSachkhoa table-able-dropdown" dataKey="id" rowHover="true"
+                [rows]="rows" tableName="Danh sách " [tblStructure]="tblCols" [enableSearch]="true"
+                (editData)="edit($event)" (deleteData)="delete($event)"
+                (addNewRow)="create()" [addRow]="canAdded" addRowLabel="Thêm mới"></ovic-table>
+</div>
+
+
+<ng-template #formInfo let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+            <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
+        </div>
+        <div class="ovic-over-right-section__body users-layout-form" style="height:calc(100vh - 51px - 57px - 18px)">
+            <div class="ovic-vertical__inputs ">
+                <form [formGroup]="formData">
+                    <div class="row" >
+                        <div class="col-8">
+                            <div class="form-row">
+                                <label >Tiêu đề: <span class="ovic-mark">*</span></label>
+                                <input type="text" placeholder="Nội dung..." formControlName="title" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-row">
+                                <label >Trạng thái: <span class="ovic-mark">*</span></label>
+                                <p-select [options]="listStatus" placeholder="Chọn..." optionValue="value" optionLabel="label"
+                                            formControlName="enable"
+                                ></p-select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top:10px;">
+                        <div class="col">
+                            <div class="form-row">
+                                <label for="name">Key: <span class="ovic-mark">*</span></label>
+                                <input type="text" placeholder="Vd: NOIDUNG_KEY" formControlName="key" class="form-control">
+                                <!--                        <input (focusout)="onChangeSlug()" type="text" id="name" formControlName="code"-->
+                                <!--                               class="form-control">-->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top:10px;">
+                        <div class="col">
+                            <div class="form-row">
+                                <label for="desc-2">Cách hiển thi: <span class="ovic-mark">*</span></label>
+                                <!--                                <p-inputSwitch formControlName="grid" ></p-inputSwitch>-->
+                                <p-select placeholder="Chọn..." [options]="listGrid" optionLabel="label" optionValue="value" formControlName="grid"></p-select>
+                            </div>
+                        </div>
+                        @if (f['grid'].value) {
+                        <div class="col">
+                            <div class="form-row">
+                                <label for="desc-2">Số lượng cột: <span class="ovic-mark">*</span></label>
+                                <!--                                <p-inputSwitch formControlName="grid" ></p-inputSwitch>-->
+                                <input type="number" placeholder="Vd: 0,..." formControlName="grid_number" >
+                            </div>
+                        </div>
+                        }
+                    </div>
+
+
+                </form>
+                <div class="child-cpn" style="margin-top:15px;">
+                    @if (dataAllItem.length > 0) {
+                    <div class="child-top">
+                        <div class="child-top_head"> Data Child</div>
+                        @for (itemadd of dataAllItem; track $index) {
+                        <div class="child">
+                            <div class="child-left" >
+                                <div class="item">
+                                    <div class="label">Ordering <span class="ovic-mark">*</span></div>
+
+                                    <div class="input"><input class="w-100" placeholder="Vd: 0,1,..." type="number" [(ngModel)]="itemadd['ordering']" ></div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">Nội dung <span class="ovic-mark">*</span></div>
+
+                                    <div class="input"><input class="w-100" placeholder="Vd: Nội dung..." type="text" [(ngModel)]="itemadd['name']" ></div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">Hình ảnh <span class="ovic-mark">*</span></div>
+
+                                    <div class="input"><input class="w-100" placeholder="Vd: ..." type="text" [(ngModel)]="itemadd['image']" ></div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">Đường dẫn <span class="ovic-mark">*</span></div>
+
+                                    <div class="input"><input  class="w-100" placeholder="Vd:...." type="text" [(ngModel)]="itemadd['url']" ></div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">Trạng thái <span class="ovic-mark">*</span></div>
+
+                                    <div class="input"><p-select [style]="{'width':'100%'}" placeholder="Chọn..." [options]="listStatus"
+                                                                   optionLabel="label" optionValue="value" [(ngModel)]="itemadd['enable']"></p-select></div>
+                                </div>
+                            </div>
+                            <div class="child-right">
+                                <button pButton pRipple icon="pi pi-trash" class="p-button-danger border-radius-1" (click)="btnDeleteItem(itemadd)"></button>
+                            </div>
+
+
+                        </div>
+                        }
+                    </div>
+                    }
+                    <div class="child-footer">
+                        @if (dataAllItem.length > 0) {
+                        <button pRipple pButton icon="pi pi-sliders-h" class=" w-100 p-button--fade" label="Sắp xếp" (click)="btnAddItemSapxep()"></button>
+                        }
+                        <button pRipple pButton icon="pi pi-plus" class=" w-100 p-button-success" label="Thêm item" (click)="btnAddItem()"></button>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        <p class="ovic-form-notes ovic-over-right-section__foot-ovic-input-line">
+            <i class="pi pi-info-circle"></i>các trường có đánh dấu ( <span class="ovic-mark">*</span> ) là bắt
+            buộc phải nhập
+        </p>
+        <div class="ovic-dynamic-right-section__foot ovic-over-right-section__foot-wrap-buttons flex-footer-right">
+            <button type="button" class="btn btn-primary" (click)="saveFormData( isUpdated )">
+                <i class="fa fa-floppy-o" ></i>Lưu lại
+            </button>
+            <button type="button" class="btn btn-cancel" (click)="closeForm()">
+                <i class="fa fa-ban" ></i>Hủy thao tác
+            </button>
+        </div>
+    </div>
+</ng-template>

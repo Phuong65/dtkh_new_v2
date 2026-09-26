@@ -376,6 +376,11 @@ export class CauhoiTracnghiemManagerComponent implements OnInit {
         this.loadCdrAndQuestion();
     }
 
+    selectCourse(course: any) {
+        this.courseSelected = course;
+        this.loadCdrAndQuestion();
+    }
+
     loadCdrAndQuestion() {
         this.noitifi.isProcessing(true);
         const condition_cdr: ConditionOption = {

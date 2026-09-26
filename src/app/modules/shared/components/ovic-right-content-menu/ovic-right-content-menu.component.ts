@@ -1,11 +1,13 @@
 import { Component , EventEmitter , Input , OnChanges , OnInit , Output , SimpleChanges } from '@angular/core';
 import { OvicRightContextMenu } from '@shared/models/ovic-right-context-menu';
 import { NotificationService } from '@core/services/notification.service';
+import { CommonModule } from '@angular/common';
 
 @Component( {standalone: true, 
 	selector    : 'ovic-right-content-menu' ,
 	templateUrl : './ovic-right-content-menu.component.html' ,
-	styleUrls   : [ './ovic-right-content-menu.component.css' ]
+	styleUrls   : [ './ovic-right-content-menu.component.css' ] ,
+	imports     : [ CommonModule ]
 } )
 export class OvicRightContentMenuComponent implements OnInit , OnChanges {
 

@@ -1,4 +1,109 @@
-.ctdt-layout-bottom{
+:host {
+    display: block;
+    height: 100%;
+}
+
+.layout_component_container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #f7f8fa;
+    border: 1px solid #dfe3e8;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.ctdt-layout-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #dfe3e8;
+    background: #f4f6f9;
+}
+
+.ctdt-layout-top .ovic-input-field {
+    width: 320px;
+    height: 36px;
+    border: 1px solid #d7dce3;
+    border-radius: 6px;
+    background: #fff;
+    box-shadow: none;
+}
+
+.ctdt-layout-top .btn {
+    height: 36px;
+    line-height: 1;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.ctdt-layout-bottom {
+    flex: 1;
     height: calc(100% - 80px);
-    padding: 5px;
+    padding: 10px;
+    background: #f7f8fa;
+    overflow: auto;
+}
+
+:host ::ng-deep .p-datatable,
+:host ::ng-deep .p-datatable-wrapper,
+:host ::ng-deep .p-datatable-table {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #dfe3e8;
+    background: #fff;
+}
+
+:host ::ng-deep .p-datatable-thead > tr > th {
+    background: #f3f5f8;
+    color: #2f3746;
+    font-weight: 600;
+    border-color: #e3e7ec;
+    padding: 10px 12px;
+    font-size: 13px;
+}
+
+:host ::ng-deep .p-datatable-tbody > tr > td {
+    background: #fff;
+    border-color: #eef1f4;
+    color: #333;
+    padding: 10px 12px;
+    vertical-align: middle;
+}
+
+:host ::ng-deep .p-datatable-tbody > tr:hover > td {
+    background: #f9fbff;
+}
+
+:host ::ng-deep .p-datatable-tbody a {
+    color: #1f2d3d;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+:host ::ng-deep .p-datatable-tbody a:hover {
+    color: #0b5ed7;
+    text-decoration: underline;
+}
+
+:host ::ng-deep .p-paginator {
+    border-top: 1px solid #e5e7eb;
+    background: #fff;
+    padding: 10px 12px;
+}
+
+:host ::ng-deep .btn.btn-danger.btn-icon {
+    width: 32px;
+    height: 32px;
+    line-height: 1;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+:host ::ng-deep .table-none-header .p-datatable-thead {
+    display: table-header-group;
 }

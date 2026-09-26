@@ -1,1 +1,108 @@
-﻿<div class="p-3">quan-ly-chuyen-muc.component works!</div>
+<div class="layout_component_container" style="padding: 5px;">
+    <div class="scroll-table-layout-set">
+        <!-- <ovic-table [headerButtons]="headButtons" [menuTemplate]="userMenu" [data]="data" styleClass="tbl-danhSachUser" dataKey="id" rowHover="false" [rows]="15" tableName="Danh sách tài khoản" [tblStructure]="cols" [enableSearch]="false" [globalFilterFields]="['name','email']" (editData)="editUser($event)" (deleteData)="deleteUser($event)" (switch)="switchEvent($event)" (addNewRow)="creatUser(tplCreateAccount)" (onButtonClick)="userActions($event)"></ovic-table>-->
+        <ovic-table [headerButtons]="headButtons" [data]="listData"
+                    styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown table-reBorder" dataKey="id"
+                    rowHover="false" [rows]="rows" tableName="Danh sách chuyên mục" [tblStructure]="tblCols" [enableSearch]="true"
+                    (onButtonClick)="userActions($event)"
+                    searchPlaceholder="Nhập tên hiển thị rồi nhấn enter" searchType="server"
+                    (onSearch)="onSearch($event)"></ovic-table>
+    </div>
+    <div class="page-layout-set">
+        <p-paginator #paginator (onPageChange)="onPageChange($event)" [rows]="rows" [first]="0"
+                     [totalRecords]="recordsFiltered"></p-paginator>
+    </div>
+</div>
+
+
+
+<ng-template #formUpdate let-c="close" let-d="dismiss">
+<div class="ovic-over-right-section">
+    <div class="ovic-over-right-section__head">
+        <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+        <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
+    </div>
+    <div class="ovic-over-right-section__body users-layout-form" style="height: calc(100vh - 57px - 51px - 18px);">
+        <div class="ovic-vertical__inputs">
+            <form [formGroup]="formSave" autocomplete="off">
+                <div class="row">
+                    <div class="col">
+                        <div class="form-row" [class.err-input]="f['title'].invalid">
+                            <label >Tiêu đề <span class="ovic-mark">*</span></label>
+                            <input type="text" placeholder="Nhập tiêu đề..."  formControlName="title" autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="margin-top:15px;">
+                    <div class="col">
+                        <div class="form-row" [class.err-input]="f['desc'].invalid">
+                            <label >Mô tả </label>
+                            <input type="text" placeholder="Nhập mô tả..." formControlName="desc" autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="margin-top:15px;">
+                    <div class="col">
+                        <div class="form-row" [class.err-input]="f['status'].invalid">
+                            <label >Trạng thái <span class="ovic-mark">*</span></label>
+                            <p-select [options]="statusList" placeholder="Chọn..." optionValue="value" optionLabel="label"
+                                        formControlName="status"
+                            ></p-select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col p-0" >
+<!--                        <div class="form-row" [class.err-input]="f['status'].invalid">-->
+<!--                            <label >Trạng thái <span class="ovic-mark">*</span></label>-->
+<!--                            <p-dropdown [options]="statusList" placeholder="Chọn..." optionValue="value" optionLabel="label"-->
+<!--                                        formControlName="status"-->
+<!--                            ></p-dropdown>-->
+<!--                        </div>-->
+
+                        <app-ovic-avatar-by-hethong [formField]="f['image_url']" [public] = "1"
+                                              [aspectRatio]="16 / 9" [accept]="['.jpg', '.png', '.jpeg']" [site]="true"
+                                              [textView]="'<span>Tải ảnh nền</span>'"
+                                              [file_size]="100" [file_name]="file_name" [footage]="'horizontal'" [rotateShow] = true
+                        ></app-ovic-avatar-by-hethong>
+                    </div>
+                </div>
+
+
+
+            </form>
+        </div>
+    </div>
+    <p class="ovic-form-notes ovic-over-right-section__foot-ovic-input-line">
+        <i class="pi pi-info-circle"></i>Các trường có đánh dấu ( <span class="ovic-mark">*</span> ) là bắt
+        buộc phải nhập
+    </p>
+    @if (!isUpdated) {
+    <div class="ovic-over-right-section__foot-wrap-buttons flex-footer-right">
+
+        <div>
+            <button type="button" class="btn btn-primary" (click)="create()">
+                <i class="fa fa-floppy-o" ></i>Tạo mới
+            </button>
+            <button type="button" class="btn btn-cancel" (click)="resetForm()">
+                <i class="fa fa-ban" ></i>Reset Form
+            </button>
+        </div>
+    </div>
+    }
+
+    @if (isUpdated) {
+    <div class="ovic-over-right-section__foot-wrap-buttons flex-footer-right">
+
+        <div>
+            <button type="button" class="btn btn-primary" (click)="update()">
+                <i class="fa fa-floppy-o" ></i>Cập nhật
+            </button>
+            <button type="button" class="btn btn-cancel" (click)="resetForm()">
+                <i class="fa fa-ban" ></i>Hủy thao tác
+            </button>
+        </div>
+    </div>
+    }
+</div>
+</ng-template>

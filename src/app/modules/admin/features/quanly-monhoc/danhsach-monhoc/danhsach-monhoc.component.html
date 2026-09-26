@@ -5,49 +5,43 @@
             placeholder="Nhập tên rồi nhấn enter" style="width: 300px;" />
         <div style="display: flex;">
             @if (routerDaotao || routerAdmin) {
-<ovic-dropdown styleClass="dropdown-250"
-                (onChange)="onChangeFilterChuyenmon($event)" placeholder="---chọn khoa---"
-                [options]="list_donvi_chuyenmon" optionId="id" optionLabel="title" [filter]="true"
-                [defaultValue]="categoryFilter" filterBy="title">
+            <ovic-dropdown styleClass="dropdown-250" (onChange)="onChangeFilterChuyenmon($event)"
+                placeholder="---chọn khoa---" [options]="list_donvi_chuyenmon" optionId="id" optionLabel="title"
+                [filter]="true" [defaultValue]="categoryFilter" filterBy="title">
             </ovic-dropdown>
-}
+            }
 
-            @if ((routerDaotao || routerAdmin) && canAdd && (key_server === 'dttx-ictu' || key_server === 'ictu' || key_server === 'tueba_dttx')) {
-<button (click)="addCourse()"
-               
-                class="btn btn-success" style="margin-left: 5px;line-height: 1; ">
+            @if ((routerDaotao || routerAdmin) && canAdd && (key_server === 'dttx-ictu' || key_server === 'ictu' ||
+            key_server === 'tueba_dttx')) {
+            <button (click)="addCourse()" class="btn btn-success" style="margin-left: 5px;line-height: 1; ">
                 <i class="fa fa-plus"></i>Thêm mới
             </button>
-}
+            }
 
-            @if ((routerDaotao || routerAdmin || routerLanhdaobomon || routerLanhdaokhoa) && canAdd && key_server === 'hvu') {
-<button (click)="addCourse()"
-               
-                class="btn btn-success" style="margin-left: 5px;line-height: 1; ">
+            @if ((routerDaotao || routerAdmin || routerLanhdaobomon || routerLanhdaokhoa) && canAdd && key_server ===
+            'hvu') {
+            <button (click)="addCourse()" class="btn btn-success" style="margin-left: 5px;line-height: 1; ">
                 <i class="fa fa-plus"></i>Thêm mới
             </button>
-}
+            }
 
             @if ((routerDaotao || routerAdmin || routerLanhdaokhoa) && canAdd) {
-<button
-                [matMenuTriggerFor]="menuMonhoc" class="btn btn-primary btn-icon" style="margin-left: 5px;">
+            <button [matMenuTriggerFor]="menuMonhoc" class="btn btn-primary btn-icon" style="margin-left: 5px;">
                 <i class="fa fa-ellipsis-h"></i>
             </button>
-}
+            }
 
             <mat-menu #menuMonhoc="matMenu">
                 @if (routerDaotao || routerAdmin || routerLanhdaokhoa) {
-<button (click)="openTemplateImportCbthi()"
-                    mat-menu-item>
+                <button (click)="openTemplateImportCbthi()" mat-menu-item>
                     <span>Import GV test bộ câu hỏi TN</span>
                 </button>
-}
+                }
                 @if (routerDaotao || routerAdmin || routerLanhdaokhoa) {
-<button (click)="btnDowloadUpateData()" [disabled]="categoryFilter == null"
-                    mat-menu-item>
+                <button (click)="btnDowloadUpateData()" [disabled]="categoryFilter == null" mat-menu-item>
                     <span>Tải về báo cáo cập nhật dữ liệu</span>
                 </button>
-}
+                }
             </mat-menu>
         </div>
     </div>
@@ -57,26 +51,26 @@
             <ng-template pTemplate="header">
                 <tr>
                     @for (col of cols_course; track col) {
-<th [ngClass]="col['class']">{{col['label']}}</th>
-}
+                    <th [ngClass]="col['class']">{{col['label']}}</th>
+                    }
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-row>
                 <tr [ngClass]="selectedKhoahoc && selectedKhoahoc.id === row.id?'focus-row-table':''">
                     @for (col of cols_course; track col) {
-<td [ngClass]="col['class']">
+                    <td [ngClass]="col['class']">
                         @if (col['key'] !== 'title' && col['key'] !== 'editor_name') {
-<span>{{row[col['key']]}}</span>
-}
+                        <span>{{row[col['key']]}}</span>
+                        }
                         @if (col['key'] === 'title') {
-<div class="title-col-flex">
+                        <div class="title-col-flex">
                             <span class="title-col-flex-text">
                                 <a style="flex-direction: column;display: flex;" [routerLink]="['monhoc-thongtin']"
                                     [queryParams]="{code: row.id}">
-                                    <span style="color:#333; font-weight: 600;">
+                                    <span style="color:#333; font-weight: 600; text-align: left;">
                                         {{row[col['key']]}}
                                     </span>
-                                    <span style="font-size: 12px; font-style: italic; color: #757575;">
+                                    <span style="font-size: 12px; font-style: italic; color: #757575; text-align: left;">
                                         {{row['editor_name']}}
                                         {{row['sotinchi'] && row['hinhthucthi'] ? " - TC: "+
                                         row['sotinchi']+" - "+row['hinhthucthi']:""}}
@@ -85,44 +79,40 @@
                             </span>
 
                             @if (routerDaotao || routerAdmin || routerLanhdaokhoa) {
-<button (click)="onEditCourse(row)" ngbTooltip="Sửa" container="body" placement="top"
-                                class="btn btn-primary btn-icon btn-transparent"
-                               >
+                            <button (click)="onEditCourse(row)" ngbTooltip="Sửa" container="body" placement="top"
+                                class="btn btn-primary btn-icon btn-transparent">
                                 <i class="fa fa-pencil"></i>
                             </button>
-}
+                            }
 
                             @if (routerDaotao || routerAdmin || key_server==='hvu') {
-<button (click)="dowloadCoursePlanDocument(row)" ngbTooltip="Tải tài liệu giảng dạy"
-                                container="body" placement="top" class="btn btn-success btn-icon btn-transparent"
-                               >
+                            <button (click)="dowloadCoursePlanDocument(row)" ngbTooltip="Tải tài liệu giảng dạy"
+                                container="body" placement="top" class="btn btn-success btn-icon btn-transparent">
                                 <i class="fa fa-file-archive-o"></i>
                             </button>
-}
+                            }
 
                             @if ((routerDaotao || routerAdmin)) {
-<button (click)="cloneCourse(row)" class="btn btn-primary btn-icon btn-transparent"
-                                ngbTooltip="Sao chép nội dung từ môn học khác" container="body" placement="top"
-                               >
+                            <button (click)="cloneCourse(row)" class="btn btn-primary btn-icon btn-transparent"
+                                ngbTooltip="Sao chép nội dung từ môn học khác" container="body" placement="top">
                                 <i class="fa fa-clipboard"></i>
                             </button>
-}
+                            }
 
                             @if ((routerDaotao || routerAdmin) && canDelete) {
-<button (click)="deleteKhoahoc(row.id)" class="btn btn-danger btn-icon btn-transparent"
-                               >
+                            <button (click)="deleteKhoahoc(row.id)" class="btn btn-danger btn-icon btn-transparent">
                                 <i class="fa fa-trash"></i>
                             </button>
-}
+                            }
                         </div>
-}
+                        }
                         @if (col['key'] === 'editor_name') {
-<div [innerHTML]="row[col['key']]">
+                        <div [innerHTML]="row[col['key']]">
 
                         </div>
-}
+                        }
                     </td>
-}
+                    }
                 </tr>
             </ng-template>
         </p-table>

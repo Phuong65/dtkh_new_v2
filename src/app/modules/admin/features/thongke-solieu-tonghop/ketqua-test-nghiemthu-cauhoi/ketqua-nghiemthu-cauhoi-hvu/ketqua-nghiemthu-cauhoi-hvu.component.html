@@ -1,1 +1,106 @@
-﻿<div class="p-3">ketqua-nghiemthu-cauhoi-hvu.component works!</div>
+<div class="layout_component_container">
+    <div class="layout_component_container-top">
+        <div class="container-top-right">
+            <ovic-dropdown class="set-widh-dropdown" [showClear]="false"
+                           [defaultValue]="objectFilter?objectFilter['category_id']: null" (onChange)="onChangeDonviCM($event)"
+                           [filter]="true" [placeholder]="'---Chọn khoa quản lý---'" [options]="list_donvi_chuyenmon" optionId="id"
+                           optionLabel="title" filterBy="title">
+            </ovic-dropdown>
+
+
+            <ovic-dropdown  [showClear]="true" [defaultValue]="objectFilter?objectFilter['dot_capnhat']: null"
+                            style="margin-left: 5px;width:200px;" (onChange)="onChangeFilter($event, 'dot_capnhat')" placeholder="- Đợt cập nhật -"
+                            [options]="ds_dotCapnhat" optionId="dot_capnhat" optionLabel="dot_capnhat" [filter]="true">
+            </ovic-dropdown>
+            <button pButton pRipple icon="pi pi-file-excel" label="Xuất dữ liệu" class="ml-2" (click)="btnExport()"></button>
+        </div>
+    </div>
+    <div class="layout_component_container-bottom">
+        <div class="container-bottom-right">
+            <p-table [value]="listData"
+                     styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-none-header ovic-ui-table table-reBorder th-td-padding-5px">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th  style="text-align: center; width: 50px;">TT</th>
+                        <th  style="text-align: center; width: 100px;">Mã học phần</th>
+                        <th  style="text-align: center; width: 250px;">Tên học phần</th>
+                        <th  style="text-align: center; width: 250px;">Khoa quản lý</th>
+                        <th  style="text-align: center; width: 80px;">Tổng số câu hỏi</th>
+                        @for (week of dataWeek; track week.value) {
+                            @if (week.value !== 100) {
+                                <th colspan="1" style="text-align: center; width: 120px;">{{ week.label }}</th>
+                            } @else {
+                                <th colspan="1" style="text-align: center; width: 120px;" >Câu hỏi KTHP</th>
+                            }
+                        }
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-cdr let-rowIndex="rowIndex">
+                    <tr >
+                        <td style="text-align: center;" >{{rowIndex + 1}}</td>
+                        <td class="btn-hover"  >{{ cdr.maso }}</td>
+                        <td class="btn-hover"  >{{ cdr.title }}</td>
+                        <td class="btn-hover"  >{{ cdr['__categoris_name'] }}</td>
+                        <td style="text-align: center;">{{ cdr['__total'] }}</td>
+
+                        @for (week of dataWeek; track week.value) {
+                            <td style="text-align: center;">
+                                {{cdr['data_week'][week.value.toString()] ? cdr['data_week'][week.value.toString()] : ' - ' }}
+                            </td>
+<!--                            <td style="text-align: center;">-->
+
+<!--                                <ng-container *ngIf="week.week !== 100 else notWeek100" >-->
+<!--                                    <ng-container *ngIf="cdr['__textShow'][week.week -1] !== '-'">-->
+<!--                                        <span>{{ cdr['__textShow'][week.week -1].split(' - ')[0] }}</span> - -->
+<!--                                        <span [style.color]="'red'">{{ cdr['__textShow'][week.week -1].split(' - ')[1].split(' | ')[0] }}</span> |-->
+<!--                                        <span>{{ cdr['__textShow'][week.week -1].split(' | ')[1] }}</span>-->
+<!--                                    </ng-container>-->
+<!--                                    <ng-container *ngIf="cdr['__textShow'][week.week-1] === '-'">-->
+<!--                                        {{ cdr['__textShow'][week.week-1] }}-->
+<!--                                    </ng-container>-->
+
+<!--                                </ng-container>-->
+
+
+
+<!--                                <ng-template #notWeek100>-->
+<!--                                    <ng-container *ngIf="cdr['__textShow'][12] !== '-'">-->
+<!--                                        <span>{{ cdr['__textShow'][12].split(' - ')[0] }}</span> - -->
+<!--                                        <span [style.color]="'red'">{{ cdr['__textShow'][12].split(' - ')[1].split(' | ')[0] }}</span> |-->
+<!--                                        <span>{{ cdr['__textShow'][12].split(' | ')[1] }}</span>-->
+<!--                                    </ng-container>-->
+<!--                                    <ng-container *ngIf="cdr['__textShow'][12] === '-'">-->
+<!--                                        {{ cdr['__textShow'][12] }}-->
+<!--                                    </ng-container>-->
+
+<!--                                </ng-template>-->
+<!--                            </td>-->
+                        }
+
+                    </tr>
+
+                </ng-template>
+
+                <ng-template pTemplate="emptymessage" >
+                    <tr>
+                        <td colspan="27">
+                            Chưa tìm thấy kết quả.
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+
+
+        </div>
+    </div>
+</div>
+
+<p-dialog  styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+           [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+    <div class="popup-waiting-loading">
+        <label style="width: 100%;">{{waitting_title}}</label>
+        <div class="tn-import-student-progressbar">
+            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+        </div>
+    </div>
+</p-dialog>

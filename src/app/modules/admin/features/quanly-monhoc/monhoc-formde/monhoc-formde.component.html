@@ -145,7 +145,7 @@
                     <p-table [value]="list_cdr_cauhoi" styleClass="tbl-danhSachUser table-reBorder table-scroll-able">
                         <ng-template pTemplate="header">
                             <tr>
-                                <th style="width: 150px; text-align: center;"></th>
+                                <th style="width: 200px; text-align: center;"></th>
                                 <th style="width: 200px; text-align: center;">Tổng câu lấy / Tổng câu hỏi
                                 </th>
                                 @for (cdr of chuandaura; track cdr) {
@@ -163,7 +163,7 @@
                                     <div style="display: flex;">
                                         <span style="flex: 1;">{{label_week +' '+row['week']}}</span>
                                         @if (row['has_test']) {
-<span style="margin-left: 10px; font-weight: normal;" class="blue"
+<span style="margin-left: 10px; font-weight: 500;" class="blue"
                                            >
                                             Đã có đề
                                         </span>

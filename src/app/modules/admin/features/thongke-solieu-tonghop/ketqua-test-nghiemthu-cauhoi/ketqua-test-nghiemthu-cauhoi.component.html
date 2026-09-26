@@ -1,1 +1,5 @@
-﻿<div class="p-3">ketqua-test-nghiemthu-cauhoi.component works!</div>
+@if (keyServer == 'hvu') {
+    <app-ketqua-nghiemthu-cauhoi-hvu></app-ketqua-nghiemthu-cauhoi-hvu>
+} @else {
+    <app-ketqua-nghiemthu-cauhoi-lms></app-ketqua-nghiemthu-cauhoi-lms>
+}

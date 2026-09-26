@@ -16,12 +16,12 @@
         </div>
     </div>
     <div class="ctdt-layout-bottom">
-        <p-table [value]="list_ctdt"
+        <p-table [value]="list_ctdt" 
             styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-none-header table-reBorder">
             <ng-template pTemplate="header">
                 <tr>
-                    <th style="width: 80px;"></th>
-                    <th>Tên CTDT</th>
+                    <th style="width: 80px;">STT</th>
+                    <th style="text-align: left;">Tên CTDT</th> 
                     <th style="width: 120px; text-align: center;">Thao tác</th>
                 </tr>
             </ng-template>
@@ -30,7 +30,7 @@
                     <td style="width: 80px; text-align: center;">
                         {{row['index_']}}
                     </td>
-                    <td>
+                    <td style="text-align: left;">
                         <div>
                             <a [routerLink]="['ctdt-thongtin']" [queryParams]="{code: row.id}">
                                 {{row['ten']}}

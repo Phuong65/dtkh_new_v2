@@ -1,1 +1,220 @@
-﻿<div class="p-3">quan-ly-bai-viet.component works!</div>
+<div class="post-container">
+    <div class="post-top">
+      <div class="post-top_left">
+          <div class="head">Danh sách bài viết</div>
+      </div>
+
+        <div class="post-top_right">
+            <div>
+                <ovic-dropdown [options]="typeList" placeholder="--- Phân loại ---" optionId="value" optionLabel="label" [showClear]="true" (onChange)="drdSearchChage($event)"></ovic-dropdown>
+            </div>
+            <div>
+                <input type="text" style="width:240px;" placeholder="Nhập nội dung và ấn Enter" (keydown.enter)="btnSearch($event)">
+            </div>
+            <div>
+                <button pButton pRipple label="Thêm mới" icon="pi pi-plus" (click)="btnViewForm(false)"></button>
+            </div>
+        </div>
+    </div>
+    <div class="post-body">
+        @if (listData.length > 0) {
+        <div class="list-items">
+            @for (item of listData; track item.id) {
+            <div class="item intro-x">
+                <div class="item-btns intro-y">
+                    <button class="w-100" pRipple pButton icon="pi pi-pencil" (click)="btnViewForm(true, item.id)"></button>
+                    <button class="p-button-danger w-100" pRipple pButton icon="pi pi-trash" (click)="delete(item.id)"></button>
+                </div>
+                @if (item.ghim === 1) {
+                <div class="item-ghim">
+<!--                    <i class="pi pi-thumbtack"></i>-->
+                    <i class="fa fa-thumb-tack"></i>
+                    <div class="text">Bài viết nổi bật</div>
+                </div>
+                }
+
+                <div class="item-img">
+                    <img [src]="item['__link_img'] " alt="">
+                    <div class="overlay"></div>
+                </div>
+                <div class="item-head">
+                    {{item['title']}}
+                </div>
+                <div class="item-subhead">
+                   <strong >Mô tả: </strong> {{item['short_desc']}}
+                </div>
+                <div class="item-cate">
+                    <div><strong style="font-size: 14px;">Chuyên mục: </strong> {{item['__chuyenmuc']}}</div>
+                </div>
+                <div class="item-tags">
+                    <div><strong>Từ khoá: </strong> </div>
+                    <div class="d-flex flex-wrap" style=" gap:10px;">
+                        @for (tag of item.tags; track $index; let i = $index) {
+                        <div class="item-tags_child" [ngClass]="'bg_cl-' + i"> {{tag}}</div>
+                        }
+                    </div>
+                </div>
+
+            </div>
+            }
+        </div>
+        } @else {
+            <div class="d-flex justify-content-center align-items-center h-100" style="font-size:15px"> Chưa có dữ liệu</div>th
+        }
+    </div>
+    <div class="post-footer">
+        <p-paginator #paginator (onPageChange)="onPageChange($event)" [rows]="rows" [first]="0"
+                     [totalRecords]="recordsFiltered"></p-paginator>
+    </div>
+</div>
+
+
+<ng-template #formUpdate let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+            <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
+        </div>
+        <div class="ovic-over-right-section__body users-layout-form" style="height: calc(100vh - 57px - 51px - 18px);">
+            <div class="ovic-vertical__inputs">
+                <form [formGroup]="formSave" autocomplete="off">
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-row" [class.err-input]="f['title'].invalid">
+                                        <label >Tiêu đề <span class="ovic-mark">*</span></label>
+                                        <input type="text" placeholder="Nhập tiêu đề..."  formControlName="title" autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row" style="margin-top:15px;">
+                                <div class="col">
+                                    <div class="form-row" [class.err-input]="f['status'].invalid">
+                                        <label >Trạng thái <span class="ovic-mark">*</span></label>
+                                        <p-select [options]="statusList" placeholder="Chọn..." optionValue="value" optionLabel="label"
+                                                    formControlName="status"
+                                        ></p-select>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-row" [class.err-input]="f['cate_ids'].invalid">
+                                        <label >Chuyên mục</label>
+<!--                                        <p-dropdown [options]="statusList" placeholder="Chọn..." optionValue="value" optionLabel="label"-->
+<!--                                                    formControlName="status"-->
+<!--                                        ></p-dropdown>-->
+                                        <p-multiSelect placeholder="Chọn..." [style]="{'width':'100%', 'border-radius':'0'}" [options]="listChuyenmuc" optionValue="id" optionLabel="title" formControlName="cate_ids"></p-multiSelect>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col p-0" >
+                                    <app-ovic-avatar-by-hethong [formField]="f['image_url']" [public] = "1"
+                                                                        [aspectRatio]="16 / 9" [accept]="['.jpg', '.png', '.jpeg']" [site]="true"
+                                                                [textView]="textViewByOvic"
+                                                                [file_size]="100" [footage]="'horizontal'" [rotateShow] = true
+                                    ></app-ovic-avatar-by-hethong>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top:15px;">
+                                <div class="col">
+                                    <div class="form-row" [class.err-input]="f['tags'].invalid">
+                                        <label >Từ khóa <span class="ovic-mark">*</span></label>
+                                        <input type="text" placeholder="Vd: cntt;khmt;..."  formControlName="tags" autocomplete="off">
+                                        <div class="toar-tag"><p style="padding-top: 10px;">Lưu ý: Với mỗi <strong>từ khóa</strong> khác nhau thì cách nhau 1 dấu <strong>";"</strong>.</p></div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top:15px;">
+                                <div class="col">
+                                    <div class="form-row" [class.err-input]="f['ghim'].invalid">
+                                        <p-checkbox formControlName="ghim" [binary]="true"  label="Nổi bật lên đầu trang"></p-checkbox>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top:15px;">
+                                <div class="col">
+                                    <div class="form-row" [class.err-input]="f['type'].invalid">
+                                        <p-checkbox formControlName="type" [binary]="true"  label="Thông báo, văn bản chỉ đạo của nhà trường."></p-checkbox>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-row" [class.err-input]="f['short_desc'].invalid">
+                                        <label >Mô tả ngắn <span class="ovic-mark">*</span></label>
+                                        <textarea rows="4" type="text" placeholder="Nhập mô tả ngắn..." formControlName="short_desc" autocomplete="off"> </textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            @if (!f['type'].value) {
+                            <div class="row" style="margin-top:15px">
+                                <div class="col">
+                                    <div class="form-row ck-edit-height-350" [class.err-input]="f['content'].invalid">
+                                        <label>Nội dung</label>
+                                        <app-input-question-direction (ckEditor)="ckEditorSetup($event,'editor1')" [abstractControl]="f['content']" [public] = 1
+                                        ></app-input-question-direction>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                            } @else {
+                                <div class="row" style="margin-top:15px" >
+                                    <div class="col">
+                                        <div class="form-row ck-edit-height-350" [class.err-input]="f['content'].invalid">
+                                            <label>File(Chỉ nhận file PDF)</label>
+<!--                                            <app-input-question-direction (ckEditor)="ckEditorSetup($event,'editor1')" [abstractControl]="f['content']"-->
+<!--                                            ></app-input-question-direction>-->
+                                            <open-file-manager-v2 [formField]="f['files']" [filesDefault]="f['files'].value" [ext]="'pdf'"></open-file-manager-v2>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+
+
+
+                </form>
+            </div>
+        </div>
+        <p class="ovic-form-notes ovic-over-right-section__foot-ovic-input-line">
+            <i class="pi pi-info-circle"></i>Các trường có đánh dấu ( <span class="ovic-mark">*</span> ) là bắt
+            buộc phải nhập
+        </p>
+        @if (!isUpdated) {
+        <div class="ovic-over-right-section__foot-wrap-buttons flex-footer-right">
+
+            <div>
+                <button type="button" class="btn btn-primary" (click)="create()">
+                    <i class="fa fa-floppy-o" ></i>Tạo mới
+                </button>
+                <button type="button" class="btn btn-cancel" (click)="resetForm()">
+                    <i class="fa fa-ban" ></i>Reset Form
+                </button>
+            </div>
+        </div>
+        }
+
+        @if (isUpdated) {
+        <div class="ovic-over-right-section__foot-wrap-buttons flex-footer-right">
+
+            <div>
+                <button type="button" class="btn btn-primary" (click)="update()">
+                    <i class="fa fa-floppy-o" ></i>Cập nhật
+                </button>
+                <button type="button" class="btn btn-cancel" (click)="resetForm()">
+                    <i class="fa fa-ban" ></i>Hủy thao tác
+                </button>
+            </div>
+        </div>
+        }
+    </div>
+</ng-template>

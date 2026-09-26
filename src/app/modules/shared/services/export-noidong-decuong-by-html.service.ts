@@ -1,8 +1,6 @@
 import {Injectable} from '@angular/core';
-import {CoursePlanActivities} from "@shared/models/course-plan-activities";
 import { saveAs } from 'file-saver';
-import {asBlob} from "@shared/vendor/html-docx"
-import {Classes} from "@shared/models/classes";
+import { Document, Packer, Paragraph, TextRun } from 'docx';
 
 @Injectable({
     providedIn: 'root'
@@ -13,28 +11,39 @@ export class ExportNoidongDecuongByHtmlService {
     }
 
     async exportHtmlToWord(htmlContent:string, fileName?: string){
-
-
         try {
-            const fileBuffer = await asBlob(htmlContent , {
-                orientation : 'portrait' ,
-                margins     : {
-                    top    : 1000 ,
-                    right  : 1000 ,
-                    bottom : 1000 ,
-                    left   : 1000 ,
-                    header : 440 ,
-                    footer : 0 ,
-                    gutter : 0
-                },
+            const textContent = this.extractTextFromHtml(htmlContent);
+            const doc = new Document({
+                sections: [{
+                    properties: {},
+                    children: [
+                        new Paragraph({
+                            children: [
+                                new TextRun({
+                                    text: textContent || 'Không có nội dung',
+                                    break: 1
+                                })
+                            ]
+                        })
+                    ]
+                }]
+            });
 
-
-            } );
-            saveAs( fileBuffer , fileName + '.docx' );
-
+            const blob = await Packer.toBlob(doc);
+            saveAs(blob, (fileName ?? 'document') + '.docx');
         } catch ( e ) {
             console.log( e );
         }
+    }
+
+    private extractTextFromHtml(htmlContent: string): string {
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = htmlContent.replace(/<br\s*\/?>/gi, '\n');
+        const text = wrapper.textContent ?? '';
+        return text
+            .replace(/\s+\n/g, '\n')
+            .replace(/\n{3,}/g, '\n\n')
+            .trim();
     }
 
 
