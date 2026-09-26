@@ -1,4 +1,4 @@
-﻿import { Component, OnInit } from '@angular/core';
+﻿import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {RouterModule} from '@angular/router';
 
@@ -10,6 +10,10 @@ import {RouterModule} from '@angular/router';
     imports: [CommonModule,RouterModule]
 })
 export class DuyetFormDeComponent implements OnInit {
+    @Input() selectedCourse: unknown;
+    @Input() listThamDInh: unknown[];
+    @Input() typeForm: string;
+
     constructor() {}
     ngOnInit(): void {}
 }

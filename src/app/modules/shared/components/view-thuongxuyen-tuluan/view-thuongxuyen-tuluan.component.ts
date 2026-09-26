@@ -15,12 +15,13 @@ import { SafeHtmlPipe } from '../../../kiem-thu-ngan-hang-cau-hoi/pipes/safe-htm
 import { LoadMediaOnTextDirective } from '@modules/shared/directives/load-media-on-text.directive';
 import { Divider } from 'primeng/divider';
 import { KatexImgDirective } from '@modules/shared/directives/katex-img.directive';
+import { ShowLabelData } from '@modules/shared/pipes/show-label-data.pipe';
 
 @Component({standalone: true, 
     selector: 'app-view-thuongxuyen-tuluan',
     templateUrl: './view-thuongxuyen-tuluan.component.html',
     styleUrls: ['./view-thuongxuyen-tuluan.component.css'],
-    imports: [SafeHtmlPipe, LoadMediaOnTextDirective, Divider, KatexImgDirective]
+    imports: [SafeHtmlPipe, LoadMediaOnTextDirective, Divider, KatexImgDirective, ShowLabelData]
 })
 export class ViewThuongxuyenTuluanComponent implements OnInit, OnChanges {
 

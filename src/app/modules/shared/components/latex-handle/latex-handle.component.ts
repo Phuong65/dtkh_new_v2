@@ -5,12 +5,14 @@ import katex from 'katex';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import renderMathInElement from 'katex/contrib/auto-render';
 import { FormsModule, NgModel } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 // declare var EqEditor;
 
 @Component({standalone: true, 
     selector: 'latex-handle',
     templateUrl: './latex-handle.component.html',
     styleUrls: ['./latex-handle.component.css'],
+    imports: [CommonModule, FormsModule],
     providers: [NgbActiveModal,NgModel,FormsModule]
 })
 export class LatexHandleComponent implements OnInit, AfterViewInit, OnChanges {

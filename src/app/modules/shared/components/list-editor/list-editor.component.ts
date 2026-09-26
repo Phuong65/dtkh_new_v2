@@ -1,11 +1,16 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
-import { AbstractControl } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { AbstractControl, FormsModule } from '@angular/forms';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { ButtonModule } from 'primeng/button';
+import { ContenteditableModelDirective } from '../../directives/contenteditable-model.directive';
 
 @Component({standalone: true, 
     selector: 'app-list-editor',
     templateUrl: './list-editor.component.html',
-    styleUrls: ['./list-editor.component.css']
+    styleUrls: ['./list-editor.component.css'],
+    imports: [CommonModule, FormsModule, DragDropModule, ButtonModule, ContenteditableModelDirective]
 })
 export class ListEditorComponent implements OnInit, OnChanges {
 

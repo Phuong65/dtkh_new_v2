@@ -10,12 +10,17 @@ import { FULL_SIZE_MODAL_OPTIONS, LARGE_MODAL_OPTIONS } from '@modules/shared/ut
 import { Paginator } from 'primeng/paginator';
 import { MenuItem } from 'primeng/api';
 import { OpenFileManagerService } from '@modules/shared/services/open-file-manager.service';
+import { CommonModule } from '@angular/common';
+import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { OvicFileIconPipe } from '../../pipes/ovic-file-icon.pipe';
+import { ViewDocumentComponent } from '../view-document/view-document.component';
 
 
 @Component({standalone: true, 
     selector: 'open-file-manager-v2',
     templateUrl: './open-file-manager-v2.component.html',
     styleUrls: ['./open-file-manager-v2.component.css'],
+    imports: [CommonModule, NgbTooltipModule, OvicFileIconPipe, ViewDocumentComponent],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,

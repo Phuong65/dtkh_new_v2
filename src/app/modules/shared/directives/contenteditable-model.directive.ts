@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 
-@Directive({standalone: false, 
+@Directive({standalone: true,
     selector: '[contenteditableModel]',
     providers: [
         {

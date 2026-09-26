@@ -130,6 +130,64 @@
 .form-auto-cdr label {
     vertical-align: unset;
 }
+
+:host ::ng-deep .phanbo-cdr-layout .table-reBorder .p-datatable-thead > tr > th {
+    padding: 8px !important;
+    border: 1px solid #dee2e6 !important;
+    background: #f8f9fa;
+    color: #343a40;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+}
+
+:host ::ng-deep .phanbo-cdr-layout .table-reBorder .p-datatable-tbody > tr > td,
+:host ::ng-deep .phanbo-cdr-layout .table-reBorder .p-datatable-tbody > tr > th {
+    padding: 8px !important;
+    border: 1px solid #dee2e6 !important;
+    font-size: 14px;
+}
+
+:host ::ng-deep .phanbo-cdr-layout .p-inputgroup {
+    display: flex;
+    width: 100%;
+}
+
+:host ::ng-deep .phanbo-cdr-layout .p-inputgroup-addon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e9ecef;
+    color: #6c757d;
+    border-top: 1px solid #ced4da;
+    border-bottom: 1px solid #ced4da;
+    padding: 0;
+    min-width: 3rem;
+    font-size: 12px;
+}
+
+:host ::ng-deep .phanbo-cdr-layout .p-inputgroup-addon.tag-cdr-cauhoi-percent {
+    flex: 0 0 60px;
+    width: 60px;
+    border-left: 1px solid #ced4da;
+}
+
+:host ::ng-deep .phanbo-cdr-layout .p-inputgroup-addon:last-child {
+    border-right: 1px solid #ced4da;
+}
+
+:host ::ng-deep .phanbo-cdr-layout .p-inputgroup > .ovic-input-field,
+:host ::ng-deep .phanbo-cdr-layout .p-inputgroup > .form-control {
+    height: 30px;
+    min-width: 0;
+    border-radius: 0;
+}
+
+:host ::ng-deep .phanbo-cdr-layout .cdr-percent-info,
+:host ::ng-deep .phanbo-cdr-layout .cdr-condition-bottom {
+    font-size: 14px;
+}
+
 /*------------------------long customs---------------------------*/
 .reset-btn-st{
     padding:4px;

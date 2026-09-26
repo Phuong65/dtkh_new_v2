@@ -18,11 +18,15 @@ import { OpenFileManagerService } from '@modules/shared/services/open-file-manag
 import { NotificationService } from '@core/services/notification.service';
 import { LatexHandleComponent } from '../latex-handle/latex-handle.component';
 import { MatDialog } from '@angular/material/dialog';
+import { CommonModule } from '@angular/common';
+import { KatexImgDirective } from '../../directives/katex-img.directive';
+import { LoadMediaOnTextDirective } from '../../directives/load-media-on-text.directive';
 
 @Component({standalone: true, 
     selector: 'ovic-ckeditor-document',
     templateUrl: './ovic-ckeditor-document.component.html',
-    styleUrls: ['./ovic-ckeditor-document.component.css']
+    styleUrls: ['./ovic-ckeditor-document.component.css'],
+    imports: [CommonModule, KatexImgDirective, LoadMediaOnTextDirective, LatexHandleComponent]
 })
 
 export class OvicCkeditorDocumentComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {

@@ -1,0 +1,7 @@
+:host ::ng-deep *:not(i):not(svg):not(path):not(mat-icon):not(.pi):not([class*="pi-"]):not([class*="fa-"]):not(.material-icons) {
+	font-size: 14px !important;
+}
+
+:host ::ng-deep *::placeholder {
+	font-size: 14px !important;
+}

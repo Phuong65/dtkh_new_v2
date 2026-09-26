@@ -382,6 +382,92 @@
     color: orange;
 }
 
+:host ::ng-deep .form-de-layout-right.form-tracnghiem .p-inputgroup {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+}
+
+:host ::ng-deep .form-de-layout-right.form-tracnghiem .p-inputgroup > .p-inputgroup-addon:not(.private-color) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 3rem;
+    padding: 0 6px;
+    border: 1px solid #ced4da;
+    background-color: #e9ecef;
+    color: #6c757d;
+    font-size: 14px;
+    line-height: 1;
+}
+
+:host ::ng-deep .form-de-layout-right.form-tracnghiem .p-inputgroup > .ovic-input-field,
+:host ::ng-deep .form-de-layout-right.form-tracnghiem .p-inputgroup > .form-control {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    height: 30px;
+    margin: 0;
+    padding: 0 6px;
+    border: 1px solid #ced4da;
+    border-radius: 0;
+    background: #fff;
+    color: #495057;
+    font-size: 14px;
+    line-height: 1.25;
+    text-align: center;
+}
+
+:host ::ng-deep .form-de-layout-right.form-tracnghiem .p-inputgroup > .ovic-input-field + .p-inputgroup-addon,
+:host ::ng-deep .form-de-layout-right.form-tracnghiem .p-inputgroup > .form-control + .p-inputgroup-addon {
+    border-left: 0;
+}
+
+:host ::ng-deep .form-de-layout-right.form-tracnghiem .tab-lesson-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+:host ::ng-deep .form-de-layout-right.form-tracnghiem .tab-lesson-view .p-tablist {
+    flex: 0 0 51px;
+    background-color: #f8f9fa;
+}
+
+:host ::ng-deep .form-de-layout-right.form-tracnghiem .tab-lesson-view .p-tablist-tab-list {
+    justify-content: center;
+    height: 100%;
+    background-color: #f8f9fa;
+}
+
+:host ::ng-deep .form-de-layout-right.form-tracnghiem .tab-lesson-view .p-tab {
+    background-color: #f8f9fa;
+}
+
+:host ::ng-deep .form-de-layout-right.form-tracnghiem .tab-lesson-view .p-tab[data-p-active="true"] {
+    background-color: #fff;
+    color: #3b82f6;
+    font-weight: 600;
+}
+
+:host ::ng-deep .form-de-layout-right.form-tracnghiem .layout-tab-form-duyet-panel .p-tab {
+    padding: 7.25px 23px !important;
+}
+
+:host ::ng-deep .form-de-layout-right.form-tracnghiem .tab-lesson-view .p-tabpanels {
+    flex: 1 1 auto;
+    height: calc(100% - 51px);
+    min-height: 0;
+    overflow: auto;
+    padding: 0;
+    background-color: #eee;
+}
+
+:host ::ng-deep .form-de-layout-right.form-tracnghiem .tab-lesson-view .p-tabpanel {
+    height: 100%;
+}
+
 .dg-lesson-empty,
 .tuluan15p-empty {
     padding: 12px !important;

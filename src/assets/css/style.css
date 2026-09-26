@@ -3471,6 +3471,14 @@ p-calendar {
 
 .parent-lesson-layout-container {}
 
+body:has(app-quanly-monhoc-router-outlet) :is(.p-dialog, .p-popover, .p-overlay, .p-select-overlay, .p-multiselect-overlay, .p-datepicker, .p-tooltip, .modal, .ngb-tooltip-window) *:not(i):not(svg):not(path):not(mat-icon):not(.pi):not([class*="pi-"]):not([class*="fa-"]):not(.material-icons) {
+    font-size: 14px !important;
+}
+
+body:has(app-quanly-monhoc-router-outlet) :is(.p-dialog, .p-popover, .p-overlay, .p-select-overlay, .p-multiselect-overlay, .p-datepicker, .p-tooltip, .modal, .ngb-tooltip-window) *::placeholder {
+    font-size: 14px !important;
+}
+
 .parent-lesson-layout .cdk-drag-preview {
     z-index: 1099 !important;
     box-sizing: border-box;
