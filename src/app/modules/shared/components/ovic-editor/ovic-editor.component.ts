@@ -1,11 +1,14 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit, Input, SimpleChanges, OnChanges, EventEmitter, Output } from '@angular/core';
-import { AbstractControl } from '@angular/forms';
+import { AbstractControl, FormsModule } from '@angular/forms';
 import { HelperService } from '@core/services/helper.service';
+import { EditorModule } from 'primeng/editor';
 
 @Component({standalone: true, 
     selector: 'ovic-editor',
     templateUrl: './ovic-editor.component.html',
-    styleUrls: ['./ovic-editor.component.css']
+    styleUrls: ['./ovic-editor.component.css'],
+    imports: [CommonModule, FormsModule, EditorModule]
 })
 export class OvicEditorComponent implements OnInit, OnChanges {
 

@@ -3500,12 +3500,48 @@ p-calendar {
     border-radius: 0px !important;
     background-color: transparent;
     box-shadow: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 0 18px;
+    text-decoration: none;
+    text-align: center;
+}
+
+.menu-ctdt .p-tabmenu .p-tabmenu-nav .p-menuitem-text {
+    color: #000;
+    font-weight: 600;
 }
 
 .menu-ctdt .p-tabmenu .p-tabmenu-nav {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    list-style: none;
     background-color: transparent;
     border: none;
-    margin-right: 58px;
+    margin: 0;
+    padding: 4px 0;
+    height: 60px;
+    box-sizing: border-box;
+}
+
+.menu-ctdt .p-tabmenu .p-tabmenu-nav .p-tabmenuitem {
+    display: flex;
+    align-items: stretch;
+    margin: 0;
+}
+
+.menu-ctdt .p-tabmenu .p-tabmenu-nav .p-tabmenuitem.p-highlight {
+    background-color: #fff;
+    margin-bottom: 4px;
+}
+
+.menu-ctdt .p-tabmenu .p-tabmenu-nav .p-tabmenuitem.p-highlight .p-menuitem-link,
+.menu-ctdt .p-tabmenu .p-tabmenu-nav .p-tabmenuitem.p-highlight .p-menuitem-text {
+    color: #2673e8;
+    font-weight: 600;
 }
 
 .document-type-a4 {
