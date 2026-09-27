@@ -14,7 +14,7 @@
               (keyup)="search($event.target['value'], $event)" [placeholder]="searchPlaceholder" />
           }
           @if (addDropdown) {
-            <p-select appendTo="body" [showClear]="true" [placeholder]="placeholder_dropdown"
+            <p-select appendTo="body" [showClear]="true" [placeholder]="placeholder_dropdown" style="margin-left: 7px;"
               (onChange)="onChangeDropdown($event)" [options]="options_dropdown"
             [optionLabel]="label_dropdown"></p-select>
           }
@@ -145,7 +145,7 @@
                   @for (btn of col.field ; track btn) {
                     @if (btn=='edit') {
                       <span class="btn ovic-btn-edit " [class.ovic-btn-tooltip]="col.tooltip"
-                        data-title="Sửa {{col.tooltip}}">
+                        [attr.data-title]="'Sửa ' + col.tooltip">
                         @if (col.tooltip) {
                           <span class="ov-tooltip"><span>Sửa {{col.tooltip}}</span></span>
                         }
@@ -154,7 +154,7 @@
                     }
                     @if (btn=='lock') {
                       <span class="btn ovic-btn-lock btn-secondary" [class.ovic-btn-tooltip]="col.tooltip"
-                        data-title="Khóa {{col.tooltip}}">
+                        [attr.data-title]="'Khóa ' + col.tooltip">
                         @if (col.tooltip) {
                           <span class="ov-tooltip"><span>Khóa
                           {{col.tooltip}}</span></span>
@@ -164,7 +164,7 @@
                     }
                     @if (btn=='delete') {
                       <span class="btn ovic-btn-delete" [class.ovic-btn-tooltip]="col.tooltip"
-                        data-title="Xóa {{col.tooltip}}">
+                        [attr.data-title]="'Xóa ' + col.tooltip">
                         @if (col.tooltip) {
                           <span class="ov-tooltip"><span>Xóa {{col.tooltip}}</span></span>
                         }

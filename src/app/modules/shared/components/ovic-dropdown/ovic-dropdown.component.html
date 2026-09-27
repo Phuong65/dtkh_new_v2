@@ -2,7 +2,8 @@
   <p-select [options]="options" optionLabel="{{optionLabel}}" (onChange)="onChangeHandle($event)"
     placeholder="{{placeholder}}" [showClear]="showClear" [filter]="filter" [filterBy]="filterBy"
     [filterPlaceholder]="filterPlaceholder" styleClass="{{wrapClass}}"
-    emptyFilterMessage="{{emptyFilterMessage}}" panelStyleClass="ovic-input-line-dropdown-panel" [(ngModel)]="value"
+    emptyFilterMessage="{{emptyFilterMessage}}" panelStyleClass="ovic-input-line-dropdown-panel"
+    [overlayOptions]="overlayOptions" [(ngModel)]="value"
   [disabled]="disabled" appendTo="body" [scrollHeight]="scrollHeight"></p-select>
 
   

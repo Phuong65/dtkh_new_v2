@@ -43,6 +43,8 @@ export class OvicDropdownComponent implements OnInit, OnChanges {
 
     @Input() scrollHeight: string = '200px';
 
+    overlayOptions = { baseZIndex: 1000000 };
+
     @Output() onChange = new EventEmitter<any>();
 
     @Output() onChangeGetValue = new EventEmitter<any>();
