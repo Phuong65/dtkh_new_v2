@@ -1,1 +1,57 @@
-﻿<div class="p-3">ketqua-hocky.component works!</div>
+
+
+
+@switch (ngView) {
+    @case (-2) {
+        <!--        <div class="h-100 d-flex flex-column justify-content-center align-items-center"-->
+        <!--             style="gap:4px;background: #f3f3f3;line-height: 1;">-->
+        <!--            <div style="font-size:16px;"></div>-->
+        <!--            <div style="font-size:16px;">Mất kết nối với máy chủ vui lòng bấm 'Tải lại'</div>-->
+        <!--            <button pButton pRipple label="Tải lại" icon="pi pi-sync" (click)="reload()"></button>-->
+        <!--        </div>-->
+        <app-locked-content></app-locked-content>
+    }
+
+    @case (-1) {
+        <div class="h-100 d-flex flex-column justify-content-center align-items-center"
+             style="gap:4px;background: #f3f3f3;line-height: 1;">
+            <div style="font-size:16px;"></div>
+            <div style="font-size:16px;">Mất kết nối với máy chủ vui lòng bấm 'Tải lại'</div>
+            <button pButton pRipple label="Tải lại" icon="pi pi-sync" (click)="reload()"></button>
+        </div>
+    }
+    @case (0) {
+        <div class="w-100 h-100 d-flex flex-column justify-content-center align-items-center"
+             style="background:#ededed;">
+            <div class=" text-center"
+                 style="font-size: 15px;background: #d6def7;padding: 14px 20px;border-radius: 10px;border: 1px solid #ccc;">
+                <p>Đang tải dữ liệu, vui lòng chờ</p>
+                <div style=" width: 300px">
+                    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                </div>
+            </div>
+        </div>
+    }
+    @case (1) {
+
+        <div class="ketqua-container">
+            <div class="ketqua-head">
+                <div style="font-size: 16px;font-weight: 500;text-transform: uppercase;line-height: 24px;">Kết quá học tập</div>
+                <div class="ovic-w-200px">
+                    <ovic-dropdown [options]="listYear" optionLabel="_title" optionId="id" (onChange)="onChangeYear($event)" ></ovic-dropdown>
+                </div>
+            </div>
+            <div class="ketqua-body">
+                @if (!YearSelect) {
+                    <div class="w-100 h-100 d-flex justify-content-center align-items-center">
+                         <div style="padding: 10px;background: #b7d5fc;border-radius: 12px;line-height: 1;font-size: 16px;"> Chọn năm học, học kỳ.</div>
+                    </div>
+                } @else {
+                    <ng-template #haveYear>
+
+                    </ng-template>
+                }
+            </div>
+        </div>
+    }
+}

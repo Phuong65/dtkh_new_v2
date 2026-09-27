@@ -1,1 +1,206 @@
-﻿<div class="p-3">them-sinhvien.component works!</div>
+<div class="themsv-container">
+    <div class="themsv-head">
+        <div class="themsv-head_l">
+
+            <button (click)="changeObjectType('search')"
+                    [class]="typeAdd == 'search' ? 'p-button-primary' : 'ovic-button-none-selected'" pButton
+                    pRipple
+                    class="p-button-rounded mr-1" icon="pi pi-search" label="Tìm kiếm sinh viên"></button>
+            <button (click)="changeObjectType('import')"
+                    [class]="typeAdd == 'import' ? 'p-button-primary' : 'ovic-button-none-selected'" pButton
+                    pRipple
+                    class="p-button-rounded" icon="pi pi-file-import" label="Import sinh viên"></button>
+
+        </div>
+
+        <div class="themsv-head_r">
+            @if (typeAdd == 'search') {
+
+                <div style="width: 180px;">
+                    <ovic-dropdown [filter]="true" [filterBy]="'khoadaotao'" class="w-100" [options]="listKhoadaotao"
+                                   placeholder="Khóa đào tạo" optionLabel="khoadaotao" optionId="khoadaotao"
+                                   (onChange)="onChangedrdKhoa($event)" [showClear]="false"
+                    ></ovic-dropdown>
+
+                </div>
+                <!--                <span class="mr-2" style="font-size: 14px; color: #939393;"><i>Nhập mã Sv hoặc họ tên</i></span>-->
+                <input pInputText style="width: 200px" type="text"
+                       (keyup.enter)="searchByinput($event['target']['value'])"
+                       placeholder="Nhập và bấm enter">
+
+                <button class="mx-1" pButton pRipple label="Thêm" (click)="btnViewAddBySearch()"></button>
+            }
+            @if (typeAdd == 'import') {
+                <a href="assets/files/doi-tac/doitac-mau-import-sinhvien.xlsx" download="mau-imoport-duthi-tram.xlsx">
+                    <button pRipple pButton class="border-radius-0" label="Tải file mẫu" icon="pi pi-download">
+                    </button>
+                </a>
+                <button class="btn_upload_excel" (click)="inputFile()">
+                    @if (file_name) {
+                        <span class="text_in_line">{{ file_name }}</span>
+                    } @else {
+                        <i class="fi fa fa-paperclip" aria-hidden="true"> Upload file</i>
+                    }
+                </button>
+
+                <button pButton pRipple icon="pi pi-wallet" label="Thêm sinh viên" class="p-button-success  border-radius-0"
+                        (click)="btnSubmitImport()"></button>
+                <!--      <button pButton pRipple icon="pi pi-save" label="Ghi đè dữ liệu " class="p-button-success h-100 border-radius-0"></button>-->
+                <button pButton pRipple icon="pi pi-times" label="Reset" class="p-button-secondary border-radius-0"
+                        (click)="btnResetForm()"></button>
+            }
+        </div>
+    </div>
+    <div class="themsv-body">
+
+        @switch (typeView) {
+            @case ('loading') {
+                <div class="w-100 h-100 d-flex flex-column justify-content-center align-items-center"
+                     style="background:#ededed;">
+                    <div class=" text-center"
+                         style="font-size: 15px;background: #d6def7;padding: 14px 20px;border-radius: 10px;border: 1px solid #ccc;">
+                        <p>Đang tải dữ liệu, vui lòng chờ</p>
+                        <div style=" width: 300px">
+                            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                        </div>
+                    </div>
+                </div>
+            }
+            @case ('error') {
+                <div class="h-100 d-flex flex-column justify-content-center align-items-center"
+                     style="gap:4px;background:#c1ccd8">
+                    <div style="font-size:16px;"></div>
+                    <div style="font-size:16px;">Mất kết nối với máy chủ vui lòng bấm 'Tải lại'</div>
+                    <button pButton pRipple label="Tải lại" icon="pi pi-sync" (click)="reload()"></button>
+                </div>
+            }
+
+            @case ('viewSearch') {
+                <div class="h-100" style="overflow: hidden;overflow-y: auto">
+                    <p-table [(selection)]="objectSearch.dataSelect" [value]="objectSearch.dataView"
+                             styleClass="tbl-danhSachUser table-hover table-border">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th class="text-center ovic-w-100px" >
+                                    <p-checkbox [binary]="true" (onChange)="changeallBySearch($event)"></p-checkbox>
+                                </th>
+
+                                <th class="text-center ovic-w-80px">STT</th>
+                                <th class="text-center ovic-w-80px">Mã SV</th>
+                                <th class="text-left">Họ và tên</th>
+                                <th class="text-center ovic-w-120px">Ngày sinh</th>
+                                <th class="text-center ovic-w-100px">Giới tính</th>
+                                <th class="text-center ovic-w-200px">Khóa đào tạo</th>
+
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+                            <tr [ngClass]="row['checkByPartner'] ? 'have-use' :''"
+                                [pTooltip]="row['checkByPartner'] ? 'Sinh viên này đã được quản lý bới đối tác khác' : ''"
+                            >
+                                <td style="width: 3rem; text-align: center;" >
+                                    <p-tableCheckbox [disabled]="row['checkByPartner']" [value]="row"></p-tableCheckbox>
+                                </td>
+                                <td class="text-center">{{ rowIndex + 1 }}</td>
+                                <td class="text-center">{{ row.student_code }}</td>
+                                <td class="text-left">{{ row.full_name }}</td>
+                                <td class="text-center">{{ row.birthday }}</td>
+                                <td class="text-center">{{ row.gender }}</td>
+                                <td class="text-center">{{ row.khoadaotao }}</td>
+
+
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <td colspan="20"> không tìm thấy dữ liệu</td>
+                            </tr>
+
+                        </ng-template>
+
+
+                    </p-table>
+                </div>
+            }
+            @case ('viewImport') {
+                <div class="h-100" style="overflow: hidden;overflow-y: auto">
+                    <p-table  [value]="dataImport" [rowHover]="true"
+                             styleClass="tbl-danhSachUser table-hover table-border">
+                        <ng-template pTemplate="header">
+                            <tr>
+<!--                                <th class="text-center ovic-w-100px" >-->
+<!--                                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>-->
+<!--                                </th>-->
+
+                                <th class="text-center ovic-w-80px">STT</th>
+                                <th class="text-center ovic-w-80px">Mã SV</th>
+                                <th class="text-left">Họ và tên</th>
+                                <th class="text-center ovic-w-120px">Ngày sinh</th>
+                                <th class="text-center ovic-w-100px">Giới tính</th>
+                                <th class="text-center ovic-w-200px">Khóa đào tạo</th>
+
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+                            <tr [ngClass]="row['checkByPartner'] ? 'have-use' : '' "
+                                [pTooltip]="row['checkByPartner'] ? 'Sinh viên này đã được quản lý bới đối tác khác' : ''"
+
+                            >
+<!--                                <td style="width: 3rem; text-align: center;">-->
+<!--                                    <p-tableCheckbox [value]="row"></p-tableCheckbox>-->
+<!--                                </td>-->
+                                <td class="text-center">{{ rowIndex + 1 }}</td>
+                                <td class="text-center">{{ row.student_code }}</td>
+                                <td class="text-left">{{ row.full_name }}</td>
+                                <td class="text-center">{{ row.birthday }}</td>
+                                <td class="text-center">{{ row.gender }}</td>
+                                <td class="text-center">{{ row.khoadaotao }}</td>
+
+
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <td colspan="20"> không tìm thấy dữ liệu</td>
+                            </tr>
+
+                        </ng-template>
+
+
+                    </p-table>
+                </div>
+
+            }
+        }
+    </div>
+    <div class="themsv-bottom">
+
+
+        @switch (typeAdd) {
+
+            @case ('search') {
+                <div>
+                    @if (objectSearch.dataSelect.length > 0) {
+                        <div style="font-size: 14px; padding-left: 10px;">Đã chọn <span>{{objectSearch.dataSelect.length}}</span> sinh viên. </div>
+                    }
+                </div>
+                <div class="pani">
+                    <p-paginator [rows]="limit" [totalRecords]="objectSearch['recordTotal']"
+                                 (onPageChange)="onchangePageBySearch($event.page)"></p-paginator>
+                </div>
+
+            }
+            @case ('import') {
+                <div>
+                    @if (dataImport.length > 0) {
+                        <div style="font-size: 14px; padding-left: 10px;">Danh sách có <span>{{dataImport.length}}</span> sinh viên. </div>
+                    }
+                </div>
+                <div class="pani">
+                    <p-paginator [rows]="limit" [totalRecords]="0"></p-paginator>
+                </div>
+            }
+        }
+
+    </div>
+</div>

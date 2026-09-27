@@ -1,1 +1,87 @@
-﻿<div class="p-3">quatrinh-daotao.component works!</div>
+@switch (ngView) {
+    @case (-1) {
+        <div class="h-100 d-flex flex-column justify-content-center align-items-center"
+             style="gap:4px;background: #f3f3f3;line-height: 1;">
+            <div style="font-size:16px;"></div>
+            <div style="font-size:16px;">Mất kết nối với máy chủ vui lòng bấm 'Tải lại'</div>
+            <button pButton pRipple label="Tải lại" icon="pi pi-sync" (click)="reload()"></button>
+        </div>
+    }
+    @case (0) {
+        <div class="w-100 h-100 d-flex flex-column justify-content-center align-items-center"
+             style="background:#ededed;">
+            <div class=" text-center"
+                 style="font-size: 15px;background: #d6def7;padding: 14px 20px;border-radius: 10px;border: 1px solid #ccc;">
+                <p>Đang tải dữ liệu, vui lòng chờ</p>
+                <div style=" width: 300px">
+                    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                </div>
+            </div>
+        </div>
+    }
+    @case (1) {
+       <div class="w-100 h-100 " style="background: #fbfbfb;">
+           <div class="ctdt-container">
+               <div class="ctdt-head">
+                   <div class="ctdt-head_l">
+                       <div class="title">
+                           Chương trình đào tạo
+                       </div>
+                   </div>
+                   <div class="ctdt-head_r">
+                       <div class="">
+                           <p-select class="ovic-dropdown-style" [options]=" listHocky" placeholder=" Chọn học kỳ" optionLabel="_hocky"
+                                 [showClear]="true"      optionValue="hocky" (onChange)="changeHocky($event)"></p-select>
+                       </div>
+                   </div>
+               </div>
+               <div class="ctdt-body">
+                   <p-table
+                       [value]="listCtdt"
+                       styleClass="tbl-danhSachUser table-able-dropdown-p-table table-reBorder">
+
+                       <ng-template pTemplate="header">
+                           <tr>
+                               <th class="text-center ovic-w-50px">STT</th>
+                               <th class="text-center ">Tên Môn</th>
+                               <th class="text-center ovic-w-100px">Số TC</th>
+                               <th class="text-center ovic-w-100px">Số TC TH</th>
+                               <th class="text-center ovic-w-100px">Học kỳ</th>
+                               <th class="text-center ovic-w-100px"> Trạng thái</th>
+
+                           </tr>
+                       </ng-template>
+                       <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+                           <tr>
+                               <td class="text-center">{{ rowIndex + 1 }}</td>
+                               <!--                                <td class="text-center">{{ row['_mahocphan'] }}</td>-->
+                               <td class="text-left">{{ row['course_name'] }}</td>
+                               <td class="text-center">{{ row['sotinchi'] }}</td>
+                               <td class="text-center">{{ row['sotinchi_thuchanh'] }}</td>
+                               <td class="text-center">{{ row['hocky'] }}</td>
+                               <td class="text-center">
+                                   @if (row['_isStudy'] == 0) {
+                                       <div [class]="'study-' + row['_isStudy']  ">Chưa học</div>
+                                   }
+                                   @if (row['_isStudy'] == 1) {
+                                       <div [class]="'study-' + row['_isStudy']  ">Đang học</div>
+
+                                   }
+
+                               </td>
+
+                           </tr>
+                       </ng-template>
+                       <ng-template pTemplate="emptymessage">
+                           <tr>
+                               <td colspan="6">Chưa có dữ liệu</td>
+                           </tr>
+                       </ng-template>
+                   </p-table>
+               </div>
+           </div>
+       </div>
+
+
+    }
+}

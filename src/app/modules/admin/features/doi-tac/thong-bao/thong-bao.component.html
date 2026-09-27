@@ -1,1 +1,257 @@
-﻿<div class="p-3">thong-bao.component works!</div>
+<div class="mail-container">
+    <div class="mail-head">
+        <div class="mail-head_l">
+            <div class="input">
+                <input class="h-100" type="text" pInputText placeholder="Nhập và bấm enter"
+                       (keyup.enter)="inputSearch($event['target']['value'])" >
+            </div>
+
+        </div>
+        <div class="mail-head_r">
+            <div>
+                <button pButton pRipple icon="pi pi-plus-circle" label="Thêm mới" (click)="openViewForm()"></button>
+            </div>
+            <!--            <div class="input">-->
+            <!--                <input class="h-100" type="text" pInputText placeholder="Nhập và bấm enter">-->
+            <!--            </div>-->
+            <div class="icon" [ngClass]="objectFilter['sort'] == 'ASC' ? 'active' :''"
+                 (click)="btnChangeViewSort('sort')">
+                <i [ngClass]="objectFilter['sort'] == 'DESC' ? 'pi pi-sort-alpha-down-alt' : 'pi pi-sort-alpha-down'"></i>
+            </div>
+            <div class="pani">
+                <p-paginator [rows]="rows" class="notifi-pani" [totalRecords]="recordTotal"
+                             (onPageChange)=" panigate($event)"></p-paginator>
+            </div>
+        </div>
+    </div>
+    <div class="mail-body">
+        @switch (typeView) {
+            @case (0) {
+                <div class="w-100 h-100 d-flex justify-content-center align-items-center">
+                    <i class="pi pi-spin pi-sync" style="font-size: 30px;color: #b1b1b1;"></i>
+                </div>
+
+            }
+            @case (-1) {
+
+                <div class="w-100 h-100 d-flex justify-content-center align-items-center">
+                    <div
+                        class="layout_component_container__error__message alert alert-danger m-auto primary-font --fs-14">
+                        Mất kết nối với máy chủ.
+                        <button (click)="reload()" class="btn layout_component_container__btn-reload text-primary">Tải
+                            lại
+                        </button>
+                    </div>
+                </div>
+
+            }
+            @case (1) {
+                @if (listData.length > 0) {
+                    <div class="list-data">
+                        @for (item of listData; track item.id) {
+                            <div class="item -intro-x">
+                                <!--                            <div class="item-btn intro-x">-->
+                                <!--                                <button pRipple pButton icon="pi pi-database" class="p-button-secondary p-button-text" (click)="btnDelete(item)"></button>-->
+                                <!--                            </div>-->
+                                <div class="item-l">
+                                    <div class="check-box">
+                                        <p-checkbox  [binary]="true" [(ngModel)]="item['checked']"></p-checkbox>
+                                    </div>
+                                    <div class="start">
+                                        <i class="pi pi-star"></i>
+                                    </div>
+                                </div>
+                                <div class="item-r" (click)="viewAnnouncements(item)">
+                                    <div class="user">
+                                        <!--                                <div>-->
+                                        <!--                                    <img src="assets/images/a_none.jpg" alt="">-->
+                                        <!--                                </div>-->
+                                        <div>{{ item['send_name'] }}</div>
+                                    </div>
+                                    <div class="content">
+                                        <div class="content_title">
+                                            {{ item['title'] }}
+                                        </div>
+                                    </div>
+                                    @if (item.files && item.files.length > 0) {
+                                        <div class="file">
+                                            <i class="pi pi-paperclip"></i>
+                                        </div>
+                                    }
+                                    @if (item['user_seen']) {
+                                        <div class="user_seen">{{ item['user_seen'] }}</div>
+                                    }
+
+                                    <div class="date">{{ item['_date'] }}</div>
+                                </div>
+
+
+                            </div>
+                        }
+                    </div>
+                } @else {
+                    <div class="w-100 h-100 d-flex justify-content-center align-items-center">
+                        <div style="padding: 10px 20px;background: #e5e5e5;border-radius: 10px;font-size: 14px;">
+                            Chưa có dữ liệu
+                        </div>
+                    </div>
+                }
+            }
+            @case (2) {
+                <div class="view-container">
+                    <div class="view-h">
+                        <div class="view-h_l">
+                            <button pButton pRipple icon="pi pi-angle-left" class="p-button-text p-button-secondary" (click)="btnReturnPage()"></button>
+                            <div class="view-h_l-user">
+                                <div class="view-h_l-user_avatar" >
+                                    <img src="assets/images/a_none.jpg" alt="">
+                                </div>
+                                <div class="view-h_l-user_name">
+                                    {{itemSelect['send_name']}}
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="view-h_r">
+                            <div class="view-h_r-date">{{itemSelect['_date']}}</div>
+                            <div class="view-h_r-star">
+                                <i class="pi pi-star"></i>
+                            </div>
+                            <button pRipple pButton icon="pi pi-ellipsis-h" class="p-button-text p-button-secondary"></button>
+                        </div>
+                    </div>
+                    <div class="view-body">
+
+                        <div class="view-body_content" [innerHtml]="itemSelect.message | safeHtml">
+
+                        </div>
+
+                        <div class="view-body_file">
+                            @if (itemSelect.files && itemSelect.files.length > 0) {
+
+                                <div class="view-body_file-title">
+                                    <i class=" pi pi-paperclip"></i>
+                                    <span class="ml-2">{{itemSelect.files.length + ' Tệp đính kèm'}} </span>
+                                </div>
+
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<ng-template #formAdd let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">Thêm thông báo mới</h3>
+            <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
+        </div>
+        <div class="ovic-over-right-section__body users-layout-form" style="height: calc(100vh - 57px - 51px - 18px);">
+            <div class="ovic-vertical__inputs">
+                <form [formGroup]="form">
+                    <div class="send-form">
+                        <div class="send-form_l">
+                            <div class="form-row">
+                                <label>Khóa đào tạo<span class="ovic-mark">*</span></label>
+                                <p-select [options]="listKhoadaotao" optionLabel="_title" optionValue="khoadaotao" formControlName="khoadaotao"
+                                            placeholder="Chọn khóa đào tạo" (onChange)="onChangeKhoadaotao($event['value'])" [showClear]="false"
+                                ></p-select>
+
+
+                                @switch (loadThisinh) {
+                                    @case (0) {}
+                                    @case (1) {
+                                        <div style="line-height: 1;font-size: 14px;margin: 8px 0;display: flex;gap: 6px;">
+                                            <i class="pi pi-spin pi-sync"></i> <span>Đang tải dữ liệu</span>
+                                        </div>
+                                    }
+                                    @case (2) {
+                                        <div style="line-height: 1;font-size: 14px;margin: 8px 0;display: flex;gap: 6px;">
+                                            <i class="pi pi-check-circle" style="color:#0a7c24"></i> <span>Tải dữ liệu thành công</span>
+                                        </div>
+                                    }
+                                }
+
+
+
+                            </div>
+                            <div class="form-row">
+                                <label>Loại thông báo<span class="ovic-mark">*</span></label>
+
+                                <div class="d-flex" style="line-height: 1;gap:14px;flex-wrap: wrap">
+                                    @for (item of arrTypeSelectByKhoa; track item.value; let i = $index) {
+                                        <div class="d-flex align-items-center" style="gap:6px;">
+                                            <p-radioButton [inputId]="'chk_' + i"
+                                                           [value]="item['value']"
+                                                           formControlName="type"
+                                            ></p-radioButton>
+                                            <label [for]="'chk_' + i">{{ item['label'] }}</label>
+                                        </div>
+                                    }
+
+                                </div>
+                            </div>
+
+                            @if (f['type'].value == 'select' && listStudentByKhoadaotao.length > 0) {
+                                <div class="form-row">
+                                    <label>Chọn sinh viên gửi TB<span class="ovic-mark">*</span></label>
+                                    <div class="w-100">
+                                        <ovic-multi-select [options]="listStudentByKhoadaotao" [optionLabel]="'full_name'"
+                                                           placeholder="Chọn sinh viên..." [filter]="true" filterBy="full_name" optionId="student_id"
+                                                           [formField]="f['student_ids']"
+                                        ></ovic-multi-select>
+                                    </div>
+                                </div>
+                            }
+
+
+
+
+                        </div>
+                        <div class="send-form_r">
+                            <div class="form-row">
+                                <label>Tiêu đề<span class="ovic-mark">*</span></label>
+                                <input type="text" placeholder="Vd:Thông báo..." formControlName="title">
+                            </div>
+                            <div class="form-row">
+                                <label>Nội dung<span class="ovic-mark">*</span></label>
+
+                                <div class="w-100">
+                                    <app-input-question-direction (ckEditor)="ckEditorSetup($event,'editor1')"
+                                                                  styleClass="vietbaocao-doctument-content"
+                                                                  [abstractControl]="f['message']"></app-input-question-direction>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <label>Tệp đính kèm (chỉ cho phép tệp: pdf):</label>
+                                <open-file-manager-v2 [showDelete]="true" ext="pdf" [isMultipleMode]="true"
+                                                      [filesDefault]="f['files'].value" [formField]="f['files']">
+                                </open-file-manager-v2>
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+
+
+            </div>
+        </div>
+        <p class="ovic-form-notes ovic-over-right-section__foot-ovic-input-line">
+            <i class="pi pi-info-circle"></i>các trường có đánh dấu ( <span class="ovic-mark">*</span> ) là bắt
+            buộc phải nhập
+        </p>
+        <div class="ovic-over-right-section__foot-wrap-buttons flex-footer-right text-center">
+            <button type="button" class="btn btn-primary" (click)="btnSubmitForm()">
+                <i class="pi pi-send" aria-hidden="true"></i>Gửi thông báo
+            </button>
+            <button type="button" class="btn btn-cancel" (click)="closeForm()">
+                <i class="fa fa-ban" aria-hidden="true"></i>Hủy thao tác
+            </button>
+        </div>
+    </div>
+</ng-template>

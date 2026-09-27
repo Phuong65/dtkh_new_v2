@@ -1,18 +1,11 @@
-﻿import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import {RouterModule} from '@angular/router';
+import { Component } from '@angular/core';
 
 @Component({
-    selector: 'app-locked-content',
-    templateUrl: './locked-content.component.html',
-    styleUrls: ['./locked-content.component.css'],
-    standalone: true,
-    imports: [CommonModule,RouterModule]
+  selector: 'app-locked-content',
+  standalone: true,
+  imports: [],
+  templateUrl: './locked-content.component.html',
+  styleUrls: ['./locked-content.component.css']
 })
-export class LockedContentComponent implements OnInit {
-    constructor() {}
-    ngOnInit(): void {}
+export class LockedContentComponent {
 }
-
-
-

@@ -1,1 +1,195 @@
-﻿<div class="p-3">danhsach-sinhvien.component works!</div>
+<div class="layout_component_container" [ngClass]="closeLeft?'close-left-body':''">
+    @if (isAdmin) {
+    <div class="layout_component_container-course" style="position: relative;">
+        <button style="margin-left: 5px; padding: 0; min-width: 0; z-index: 50;" (click)="closeLeftBody()"
+                class="btn btn-success button-close-left-body">
+            <i style="margin: 0;vertical-align: middle; font-size: 13px;"
+               [ngClass]="closeLeft?'pi pi-angle-double-right':'pi pi-angle-double-left'"></i>
+        </button>
+        <div class="search-layout">
+            <div class="search-layout-top" style="display: flex; align-items: center;">
+                <input (keyup.enter)="onSearchByTitle()" [(ngModel)]="textSearch" type="text" class="ovic-input-field"
+                       placeholder="Nhập tên rồi nhấn enter" style="width: 100%;">
+
+            </div>
+
+        </div>
+        @if (listDoitac && listDoitac.length > 0) {
+            <div class="list-course-layout">
+                <div class="selection-list-mat">
+                    @for (row of listDoitac; track row.id) {
+                        <button type="button"
+                                class="course-item"
+                                [class.active]="doitacSelect && doitacSelect.id === row.id"
+                                (click)="onSelectDoitac(row)">
+                            <span>
+                                <strong>{{ row['display_name'] }}</strong><br>
+                                {{ row['email'] }} | {{ row['phone'] }}
+                            </span>
+                        </button>
+                    }
+                </div>
+            </div>
+        } @else {
+            <div class="list-course-layout">
+                <div class="w-100 h-100 d-flex flex-column justify-content-center">
+                    <div class="text-empty">{{ emptyMenu }}</div>
+                </div>
+            </div>
+        }
+        <div class="page-layout-set">
+            <p-paginator #paginator (onPageChange)="changePageDoitac($event.page)" [rows]="limit"
+                         [totalRecords]="recordsDoitac"></p-paginator>
+        </div>
+    </div>
+    }
+    <div class="layout_component_container-noidung mat-tab-chuandaura">
+        @if (doitacSelect) {
+            <div class="right-container-bottom h-100">
+                @if (loadingStudentFail) {
+                    <div
+                         class="ovic-form-layout import-question-body-right"
+                         [class.ovic-is-loading]="loadingStudent" style="width: 100%; height: 100%;">
+                        <div
+                            class="layout_component_container__error d-flex justify-content-center align-items-center w-100 h-100">
+                            <p
+                                class="layout_component_container__error__message alert alert-danger m-0 primary-font --fs-14">
+                                Mất kết nối với máy chủ.
+                                <button (click)="reloadingGetStudent()"
+                                        class="btn layout_component_container__btn-reload text-primary">Tải lại
+                                </button>
+                            </p>
+                        </div>
+
+                    </div>
+                } @else {
+                    <div class="student-component">
+                        <div class="head">
+                            <div class="title">
+                                Danh sách sinh viên
+                            </div>
+                            <div>
+                                <input style="width: 220px;" (keyup.enter)="searchStudents($event['target']['value'])"
+                                       type="text" placeholder="Nhập và nhấn enter để tìm kiếm">
+                                <!--                                <button pRipple pButton icon="pi pi-plus" label="thêm mới" class="ml-2 p-button-success" (click)="btnAddStudent()"></button>-->
+                            </div>
+                        </div>
+                        <div class="body">
+                            <p-table [value]="dataStudents" styleClass="tbl-danhSachUser table-hover table-border">
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th class="text-center ovic-w-80px">STT</th>
+                                        <th class="text-center ovic-w-80px">Mã SV</th>
+                                        <th class="text-left ovic-w-200px">Họ và tên</th>
+                                        <th class="text-center ovic-w-120px">Ngày sinh</th>
+                                        <th class="text-center ovic-w-100px">Giới tính</th>
+                                        <th class="text-center ovic-w-180px">khóa đạo tạo</th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-row>
+                                    <tr>
+                                        <td class="text-center">{{ row['_index'] }}</td>
+                                        <td class="text-center">{{ row.student_code }}</td>
+                                        <td class="text-left">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>{{ row.full_name }}</div>
+                                                <div>
+                                                    <button [matMenuTriggerFor]="menuAction"
+                                                            class="btn btn-success btn-icon btn-transparent">
+                                                        <i class="fa fa-ellipsis-v"></i>
+                                                    </button>
+                                                    <mat-menu #menuAction="matMenu">
+                                                        <button (click)="openViewQuatrinhdaotao(row)" mat-menu-item>
+                                                            <span style="margin-right: 10px;">
+                                                                <i class="fa fa-clock-o"></i>
+                                                            </span>
+                                                            <span>Chương trình đào tạo</span>
+                                                        </button>
+                                                        <button (click)="openKetquahoctap(row)" mat-menu-item>
+                                                            <span style="margin-right: 10px;">
+                                                                <i class="fa fa-tasks"></i>
+                                                            </span>
+                                                            <span>Kết quả học tập</span>
+                                                        </button>
+
+                                                    </mat-menu>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">{{ row['_student']['birthday'] }}</td>
+                                        <td class="text-center">{{ row['_student']['gender'] }}</td>
+                                        <td class="text-center">{{ row['_student']['khoadaotao'] }}</td>
+
+
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="emptymessage">
+                                    <tr>
+                                        <td colspan="20"> Chưa có thí sinh quản lý</td>
+                                    </tr>
+
+                                </ng-template>
+
+
+                            </p-table>
+                        </div>
+                        <div class="bottom">
+                            <div class="page-layout-set">
+                                <p-paginator (onPageChange)="changePageByStudent($event)"
+                                             [rows]="limit"
+                                             [totalRecords]="recordsTotalByStudent"></p-paginator>
+                            </div>
+
+                        </div>
+                    </div>
+                }
+            </div>
+        } @else {
+            <div
+                class="layout_component_container__error d-flex justify-content-center align-items-center w-100 h-100">
+                <p class="alert alert-secondary m-0 primary-font --fs-14">Vui lòng chọn đối tác </p>
+            </div>
+        }
+    </div>
+</div>
+
+<ng-template #addThiSinh let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">{{ doitacSelect.display_name }} > Thêm sinh viên quản lý</h3>
+            <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
+        </div>
+        <div class="ovic-over-right-section__body --no-footer users-layout-form" style="height: calc(100vh - 60px );">
+            <app-them-sinhvien [doitac]="doitacSelect"></app-them-sinhvien>
+        </div>
+
+    </div>
+</ng-template>
+
+<ng-template #quatrinhdaotao let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">{{ doitacSelect.display_name }} > {{ studentSelect.full_name }} > Chương trình đào tạo</h3>
+            <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
+        </div>
+        <div class="ovic-over-right-section__body --no-footer users-layout-form" style="height: calc(100vh - 60px );">
+            <app-quatrinh-daotao [student]="studentSelect"></app-quatrinh-daotao>
+        </div>
+
+    </div>
+
+</ng-template><ng-template #ketquahoctap let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">{{ doitacSelect.display_name }} > {{ studentSelect.full_name }}</h3>
+            <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
+        </div>
+        <div class="ovic-over-right-section__body --no-footer users-layout-form" style="height: calc(100vh - 60px );">
+            <app-ketqua-hocky [student]="studentSelect"></app-ketqua-hocky>
+        </div>
+
+    </div>
+</ng-template>
+
+
+

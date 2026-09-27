@@ -190,7 +190,7 @@ export class CauhoiTracnghiemManagerComponent implements OnInit {
 
         const setting = config.find(m => m.config_key === 'SETTING')['params'];
 
-        this.unLimitQuestion =  setting && setting['form_question'] ? setting['form_question']['unlimit'] : false;
+        this.unLimitQuestion = setting && setting['form_question'] ? setting['form_question']['unlimit'] : false;
 
         this.initData();
     }
@@ -260,6 +260,7 @@ export class CauhoiTracnghiemManagerComponent implements OnInit {
     }
 
     loadPageData_course(page: number) {
+        this.noitifi.isProcessing(true);
         this.dmKhoahoc = [];
         const condition_course: ConditionOption = {
             condition: [
@@ -579,7 +580,7 @@ export class CauhoiTracnghiemManagerComponent implements OnInit {
             keyboard: false,
             size: 'lg',
             windowClass: 'modal-custom modal-xoa-cau-hoi-theo-bai-cdr'
-           
+
         });
         const component = modal.componentInstance as XoaCauHoiTheoBaiCdrComponent;
 

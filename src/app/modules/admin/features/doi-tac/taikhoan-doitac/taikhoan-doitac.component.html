@@ -1,1 +1,107 @@
-﻿<div class="p-3">taikhoan-doitac.component works!</div>
+<div class="layout_component_container" style="padding: 5px;">
+    <div class="scroll-table-layout-set">
+        <!-- <ovic-table [headerButtons]="headButtons" [menuTemplate]="userMenu" [data]="data" styleClass="tbl-danhSachUser" dataKey="id" rowHover="false" [rows]="15" tableName="Danh sách tài khoản" [tblStructure]="cols" [enableSearch]="false" [globalFilterFields]="['name','email']" (editData)="editUser($event)" (deleteData)="deleteUser($event)" (switch)="switchEvent($event)" (addNewRow)="creatUser(tplCreateAccount)" (onButtonClick)="userActions($event)"></ovic-table>-->
+        <ovic-table [headerButtons]="headButtons" [data]="data"
+                    styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown table-reBorder" dataKey="id"
+                    rowHover="false" [rows]="15" tableName="Danh sách tài khoản đối tác" [tblStructure]="cols" [enableSearch]="true"
+                    [globalFilterFields]="['name','email']" (onButtonClick)="userActions($event)"
+                    searchType="server" searchPlaceholder="Nhập tên hiển thị rồi nhấn enter"
+                    (onSearch)="onSearchUser($event)"></ovic-table>
+    </div>
+    <div class="page-layout-set">
+        <p-paginator #paginator (onPageChange)="onPageChangeUser($event)" [rows]="limit_user" [first]="pag_first"
+                     [totalRecords]="total_user"></p-paginator>
+    </div>
+</div>
+
+<!-- Form tạo tài khoản -->
+<ng-template #tplCreateAccount let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+            <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
+        </div>
+        <div class="ovic-over-right-section__body users-layout-form" style="height: calc(100vh - 57px - 51px - 18px);">
+            <div class="ovic-vertical__inputs">
+                <form [formGroup]="formSave" autocomplete="off">
+                    <div class="form-row" [class.err-input]="f['username'].invalid">
+                        <label for="newusername">Tài khoản <span class="ovic-mark">*</span></label>
+                        <input type="text" id="newusername" formControlName="username" autocomplete="off">
+                    </div>
+                    <div class="form-row" [class.err-input]="f['email'].invalid">
+                        <label for="email">Email <span class="ovic-mark">*</span></label>
+                        <input type="text" id="email" formControlName="email" autocomplete="off">
+                    </div>
+                    <div class="form-row" [class.err-input]="f['display_name'].invalid">
+                        <label for="dname">Tên hiển thị <span class="ovic-mark">*</span></label>
+                        <input type="text" id="dname" formControlName="display_name" autocomplete="off">
+                    </div>
+                    <div class="form-row">
+                        <label for="phone">Số điện thoại <span class="ovic-mark">*</span></label>
+                        <input type="text" id="phone" formControlName="phone" autocomplete="off">
+                    </div>
+                    <div class="form-row form-group" [class.err-input]="changPassState && f['password'].invalid">
+                        <label for="new_password">{{isUpdateForm?'Mật khẩu mới':'Mật khẩu'}}<span class="ovic-mark"
+                                                                                                  style="font-size: 12px; font-weight: 400;">(mật khẩu
+                                phải có ít nhất 1 chữ thường, 1 chữ hoa, 1 số và 1 ký tự đặc biệt, dài tối thiểu 8 ký
+                                tự)</span><span class="ovic-mark">*</span></label>
+                        <input style="width: auto;" type="password" id="new_password" formControlName="password"
+                               [attr.disabled]=" !changPassState == true ? true : null" autocomplete="off">
+                        @if (isUpdateForm) {
+                            <button class="btn btn-checker" [class.checked]="changPassState" (click)="clickChangedPass()"
+                                    type="button"></button>
+                        }
+                    </div>
+
+                    <div class="form-row">
+                        <label>Trạng thái <span class="ovic-mark">*</span></label>
+                        <span class="form-row__switch-buttons" style="justify-content: left;">
+                            <button class="btn form-row__btn-switch"
+                                    [class.--btn-switch-active]="f['status'].value === 1"
+                                    (click)="creatUserChangeActive(1)">Kích hoạt</button>
+                            <button class="btn form-row__btn-switch"
+                                    [class.--btn-switch-active]="f['status'].value !== 1"
+                                    (click)="creatUserChangeActive(0)">Không kích hoạt</button>
+                        </span>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <p class="ovic-form-notes ovic-over-right-section__foot-ovic-input-line">
+            <i class="pi pi-info-circle"></i>các trường có đánh dấu ( <span class="ovic-mark">*</span> ) là bắt
+            buộc phải nhập
+        </p>
+        @if (!isUpdateForm) {
+            <div class="ovic-over-right-section__foot-wrap-buttons flex-footer-right">
+                @if (isAdmin) {
+                    <span class="dltk-school-name">{{schoolName}}</span>
+                }
+                <div>
+                    <button type="button" class="btn btn-primary" (click)="taoTaiKhoan(formSave)">
+                        <i class="fa fa-floppy-o" ></i>Tạo tài khoản
+                    </button>
+                    <button type="button" class="btn btn-cancel" (click)="resetForm(formSave)">
+                        <i class="fa fa-ban" ></i>Reset Form
+                    </button>
+                </div>
+            </div>
+        }
+
+        @if (isUpdateForm) {
+            <div class="ovic-over-right-section__foot-wrap-buttons flex-footer-right">
+                @if (isAdmin) {
+                    <span class="dltk-school-name">{{schoolName}}</span>
+                }
+                <div>
+                    <button type="button" class="btn btn-primary" (click)="capNhatTaiKhoan(formSave)">
+                        <i class="fa fa-floppy-o" ></i>Cập nhật tài khoản
+                    </button>
+                    <button type="button" class="btn btn-cancel" (click)="d('none')">
+                        <i class="fa fa-ban" ></i>Hủy thao tác
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+</ng-template>
+
