@@ -393,6 +393,8 @@ export class CauhoiThuchanhComponent implements OnInit {
                 this.selectedForm['tong'] = _cauhoi.recordsFiltered;
 
                 this.list_cauhoi = _cauhoi.data;
+                
+                this.notificationService.isProcessing(false);
             },
             error: () => {
                 this.notificationService.isProcessing(false);

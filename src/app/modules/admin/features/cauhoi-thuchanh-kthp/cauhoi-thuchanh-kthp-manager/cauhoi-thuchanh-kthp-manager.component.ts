@@ -175,8 +175,6 @@ export class CauhoiThuchanhKthpManagerComponent implements OnInit {
                         this.categoryFilter = this.user_profile.donvi_chuyenmon_id;
                 }
 
-                this.notificationService.isProcessing(false);
-
                 this.loadPageData_course(1);
             },
             error: () => {

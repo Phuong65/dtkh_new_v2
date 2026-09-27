@@ -20,21 +20,16 @@
         }
       </div>
       <div class="list-course-layout">
-        <mat-selection-list (selectionChange)="onSelectCourse($event)" [multiple]="false" class="selection-list-mat"
-          #courses>
-          @for (course of dmKhoahoc ; track course.id) {
-            <mat-list-option [selected]="courseSelected && courseSelected.id === course.id ? true: false"
-              [value]="course">
-              <div mat-line style="font-weight: 600;">{{course.title + ' (' + course.maso + ')'}}</div>
-              <div mat-line>{{course['creator_name'] + course['info_']}}</div>
-              @if (course['status_question']) {
-                <div mat-line>
-                  <span [innerHTML]="course['status_question']"></span>
-                </div>
-              }
-            </mat-list-option>
+        <div class="selection-list-mat" #courses>
+          @for (course of dmKhoahoc; track course.id) {
+            <button type="button"
+                    class="course-item"
+                    [class.active]="courseSelected && courseSelected.id === course.id"
+                    (click)="selectCourse(course)">
+              <span>{{course.title + ' (' + course.maso + ')'}}</span>
+            </button>
           }
-        </mat-selection-list>
+        </div>
       </div>
       <div class="page-layout-set">
         <p-paginator #paginator (onPageChange)="changePage($event)" [rows]="limitCourse"
@@ -46,23 +41,10 @@
         <div style="height: 100%;">
           <mat-tab-group [selectedIndex]="indexTap">
             @for (lvl of list_typeQuestion_practice; track lvl.id; let i = $index) {
-              <mat-tab labelClass="mat-tab-chuandaura-title"
-                [disabled]="true">
+              <mat-tab labelClass="mat-tab-chuandaura-title">
                 <ng-template mat-tab-label>
                   <div class="normal-color">
                     {{lvl.label}} ({{courseSelected[lvl.key]?courseSelected[lvl.key]:'0'}})
-                  </div>
-                  <div class="tqb-tbl-col-cdr-number__buttons">
-                    @if (canAdd) {
-                      <button (click)="onOpenAddQuestion(lvl, i)" ngbTooltip="Thêm câu hỏi"
-                        placement="bottom" container="body" class="btn tqb-col__btn">
-                        <i class="pi pi-plus"></i>
-                      </button>
-                    }
-                    <button ngbTooltip="Xem" placement="bottom" container="body" (click)="onSelectTap(lvl, i)"
-                      class="btn tqb-col__btn">
-                      <i class="pi pi-search"></i>
-                    </button>
                   </div>
                 </ng-template>
                 <div class="mat-tab-list-cauhoi">
@@ -74,6 +56,18 @@
                           ngbTooltip="Sắp xếp theo thứ tự mới nhất" placement="bottom" container="body"
                           class="btn btn-icon" [ngClass]="sortAZ?'btn-success':'btn-secondary'">
                           <i class="fa-solid fa-arrow-up-z-a"></i>
+                        </button>
+                      </span>
+                      <span class="tqb-tbl-col-cdr-number__buttons">
+                        @if (canAdd) {
+                          <button (click)="onOpenAddQuestion(lvl, i)" ngbTooltip="Thêm câu hỏi"
+                            placement="bottom" container="body" class="btn tqb-col__btn">
+                            <i class="pi pi-plus"></i>
+                          </button>
+                        }
+                        <button ngbTooltip="Xem" placement="bottom" container="body" (click)="onSelectTap(lvl, i)"
+                          class="btn tqb-col__btn">
+                          <i class="pi pi-search"></i>
                         </button>
                       </span>
                       @if (indexTap === 0) {

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import { saveAs } from 'file-saver';
-import { Document, Packer, Paragraph, TextRun } from 'docx';
+import { asBlob } from '@shared/vendor/html-docx/index';
 
 @Injectable({
     providedIn: 'root'
@@ -12,38 +12,11 @@ export class ExportNoidongDecuongByHtmlService {
 
     async exportHtmlToWord(htmlContent:string, fileName?: string){
         try {
-            const textContent = this.extractTextFromHtml(htmlContent);
-            const doc = new Document({
-                sections: [{
-                    properties: {},
-                    children: [
-                        new Paragraph({
-                            children: [
-                                new TextRun({
-                                    text: textContent || 'Không có nội dung',
-                                    break: 1
-                                })
-                            ]
-                        })
-                    ]
-                }]
-            });
-
-            const blob = await Packer.toBlob(doc);
-            saveAs(blob, (fileName ?? 'document') + '.docx');
+            const blob = await asBlob(htmlContent);
+            saveAs(blob as Blob, (fileName ?? 'document') + '.docx');
         } catch ( e ) {
             console.log( e );
         }
-    }
-
-    private extractTextFromHtml(htmlContent: string): string {
-        const wrapper = document.createElement('div');
-        wrapper.innerHTML = htmlContent.replace(/<br\s*\/?>/gi, '\n');
-        const text = wrapper.textContent ?? '';
-        return text
-            .replace(/\s+\n/g, '\n')
-            .replace(/\n{3,}/g, '\n\n')
-            .trim();
     }
 
 

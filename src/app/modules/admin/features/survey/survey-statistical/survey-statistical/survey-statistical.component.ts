@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ChartModule } from 'primeng/chart';
@@ -84,9 +84,9 @@ export class SurveyStatisticalComponent implements OnInit {
     questionStats: QuestionStat[] = [];
 
     // Trạng thái
-    isLoadingSurveys: boolean = false;
-    isLoadingPlans: boolean = false;
-    isLoadingStats: boolean = false;
+    isLoadingSurveys = signal(false);
+    isLoadingPlans = signal(false);
+    isLoadingStats = signal(false);
     hasData: boolean = false;
     isSurveyNavCollapsed: boolean = false;
     isLanhDaoKhoaContext: boolean = false;
@@ -119,7 +119,7 @@ export class SurveyStatisticalComponent implements OnInit {
      */
     private initializeFilters(): void {
         if (this.isLanhDaoKhoaContext) {
-            this.isLoadingSurveys = true;
+            this.isLoadingSurveys.set(true);
             this.elngUserProfileService.getElngUserProfileByCol('user_id', this.auth.user.id.toString()).pipe(
                 switchMap(profiles => {
                     const facultyId = Number(profiles[0]?.donvi_chuyenmon_id);
@@ -150,7 +150,7 @@ export class SurveyStatisticalComponent implements OnInit {
                 },
                 error: () => {
                     this.allowedCourseIds = [];
-                    this.isLoadingSurveys = false;
+                    this.isLoadingSurveys.set(false);
                     this.notifi.toastError('Không thể xác định đơn vị chuyên môn của người dùng');
                 }
             });
@@ -185,7 +185,7 @@ export class SurveyStatisticalComponent implements OnInit {
      * Bước 1: Load danh sách phiếu khảo sát.
      */
     private loadSurveys(): void {
-        this.isLoadingSurveys = true;
+        this.isLoadingSurveys.set(true);
         const condition: OvicConditionParam[] = [
             { conditionName: 'status', condition: OvicQueryCondition.equal, value: 'PUBLISHED' },
             { conditionName: 'status', condition: OvicQueryCondition.equal, value: 'CLOSED', orWhere: 'or' }
@@ -202,11 +202,11 @@ export class SurveyStatisticalComponent implements OnInit {
         ).subscribe({
             next: (surveys) => {
                 this.listSurveys = surveys;
-                this.isLoadingSurveys = false;
+                this.isLoadingSurveys.set(false);
             },
             error: () => {
                 this.listSurveys = [];
-                this.isLoadingSurveys = false;
+                this.isLoadingSurveys.set(false);
                 this.notifi.toastError('Không thể tải danh sách phiếu khảo sát');
             }
         });
@@ -231,8 +231,8 @@ export class SurveyStatisticalComponent implements OnInit {
         this.listPlans = [];
         this.selectedSchoolYear = '';
         this.selectedSemester = null;
-        this.isLoadingPlans = false;
-        this.isLoadingStats = false;
+        this.isLoadingPlans.set(false);
+        this.isLoadingStats.set(false);
         this.notifi.isProcessing(false);
         this.resetStats();
     }
@@ -276,7 +276,7 @@ export class SurveyStatisticalComponent implements OnInit {
         if (this.selectedPlanId != null && !this.filteredPlans.some(plan => plan.id === this.selectedPlanId)) {
             this.statsRequestVersion++;
             this.selectedPlanId = null;
-            this.isLoadingStats = false;
+            this.isLoadingStats.set(false);
             this.notifi.isProcessing(false);
             this.resetStats();
         }
@@ -286,7 +286,7 @@ export class SurveyStatisticalComponent implements OnInit {
      * Bước 2: Load PUBLISHED/CLOSED plans của đúng phiếu đã chọn.
      */
     private loadPlansBySurvey(surveyId: number): void {
-        this.isLoadingPlans = true;
+        this.isLoadingPlans.set(true);
         const condition: OvicConditionParam[] = [
             { conditionName: 'status', condition: OvicQueryCondition.equal, value: 'PUBLISHED' },
             { conditionName: 'status', condition: OvicQueryCondition.equal, value: 'CLOSED', orWhere: 'or' }
@@ -306,12 +306,12 @@ export class SurveyStatisticalComponent implements OnInit {
             next: (plans) => {
                 if (this.selectedSurveyId !== surveyId) return;
                 this.listPlans = plans;
-                this.isLoadingPlans = false;
+                this.isLoadingPlans.set(false);
             },
             error: () => {
                 if (this.selectedSurveyId !== surveyId) return;
                 this.listPlans = [];
-                this.isLoadingPlans = false;
+                this.isLoadingPlans.set(false);
                 this.notifi.toastError('Không thể tải danh sách đợt khảo sát');
             }
         });
@@ -325,7 +325,7 @@ export class SurveyStatisticalComponent implements OnInit {
 
         this.statsRequestVersion++;
         this.selectedPlanId = planId;
-        this.isLoadingStats = false;
+        this.isLoadingStats.set(false);
         this.notifi.isProcessing(false);
         this.resetStats();
         this.loadStatistics(planId, this.statsRequestVersion);
@@ -395,12 +395,12 @@ export class SurveyStatisticalComponent implements OnInit {
      * Load toàn bộ dữ liệu thống kê cho đợt khảo sát
      */
     loadStatistics(planId: number, requestVersion: number): void {
-        this.isLoadingStats = true;
+        this.isLoadingStats.set(true);
         this.notifi.isProcessing(true);
 
         const plan = this.listPlans.find(p => p.id === planId);
         if (!plan) {
-            this.isLoadingStats = false;
+            this.isLoadingStats.set(false);
             this.notifi.isProcessing(false);
             return;
         }
@@ -464,7 +464,7 @@ export class SurveyStatisticalComponent implements OnInit {
             error: () => {
                 if (requestVersion !== this.statsRequestVersion || this.selectedPlanId !== planId) return;
                 this.notifi.toastError('Không thể tải dữ liệu thống kê');
-                this.isLoadingStats = false;
+                this.isLoadingStats.set(false);
                 this.notifi.isProcessing(false);
             }
         });
@@ -533,7 +533,7 @@ export class SurveyStatisticalComponent implements OnInit {
         }));
 
         this.hasData = true;
-        this.isLoadingStats = false;
+        this.isLoadingStats.set(false);
         this.notifi.isProcessing(false);
     }
 

@@ -2,16 +2,18 @@
     <div class="survey-statistical__layout"
          [class.survey-statistical__layout--collapsed]="isSurveyNavCollapsed">
         <!-- Nút mở lại sidebar khi đang thu gọn -->
-        <button *ngIf="isSurveyNavCollapsed"
-                type="button"
-                class="survey-nav-open"
-                title="Mở cột phiếu khảo sát"
-                (click)="isSurveyNavCollapsed = false">
-            &gt;&gt;
-        </button>
+        @if (isSurveyNavCollapsed) {
+            <button type="button"
+                    class="survey-nav-open"
+                    title="Mở cột phiếu khảo sát"
+                    (click)="isSurveyNavCollapsed = false">
+                &gt;&gt;
+            </button>
+        }
 
         <!-- Sidebar: Phiếu khảo sát → Đợt khảo sát -->
-        <aside class="survey-nav" *ngIf="!isSurveyNavCollapsed">
+        @if (!isSurveyNavCollapsed) {
+        <aside class="survey-nav">
             <div class="survey-nav__header">
                 <span>Phiếu khảo sát</span>
                 <div class="survey-nav__header-actions">
@@ -30,28 +32,37 @@
                         [disabled]="selectedSurveyId == null || isLoadingPlans"
                         (change)="setSchoolYear($any($event.target).value)">
                     <option value="">Năm học</option>
-                    <option *ngFor="let year of schoolYearOptions" [value]="year">{{ year }}</option>
+                    @for (year of schoolYearOptions; track year) {
+                        <option [value]="year">{{ year }}</option>
+                    }
                 </select>
                 <select class="survey-nav__select"
                         [value]="selectedSemester == null ? '' : selectedSemester"
                         [disabled]="selectedSurveyId == null || isLoadingPlans"
                         (change)="setSemester($any($event.target).value)">
                     <option value="">Học kỳ</option>
-                    <option *ngFor="let semester of semesterOptions" [value]="semester">HK {{ semester }}</option>
+                    @for (semester of semesterOptions; track semester) {
+                        <option [value]="semester">HK {{ semester }}</option>
+                    }
                 </select>
             </div>
 
             <div class="survey-nav__body">
-                <div *ngIf="isLoadingSurveys" class="survey-nav__state">
+                @if (isLoadingSurveys()) {
+                <div class="survey-nav__state">
                     <i class="pi pi-spin pi-spinner"></i>
                     <span>Đang tải phiếu...</span>
                 </div>
+                }
 
-                <div *ngIf="!isLoadingSurveys && listSurveys.length === 0" class="survey-nav__state">
+                @if (!isLoadingSurveys() && listSurveys.length === 0) {
+                <div class="survey-nav__state">
                     Không có phiếu khảo sát
                 </div>
+                }
 
-                <div *ngFor="let survey of listSurveys" class="survey-nav__group">
+                @for (survey of listSurveys; track survey.id) {
+                <div class="survey-nav__group">
                     <button type="button"
                             class="survey-nav__survey"
                             [class.survey-nav__survey--active]="selectedSurveyId === survey.id"
@@ -62,19 +73,23 @@
                            [ngClass]="selectedSurveyId === survey.id ? 'pi-angle-down' : 'pi-angle-right'"></i>
                     </button>
 
-                    <div *ngIf="selectedSurveyId === survey.id" class="survey-nav__plans">
-                        <div *ngIf="isLoadingPlans" class="survey-nav__state survey-nav__state--small">
+                    @if (selectedSurveyId === survey.id) {
+                    <div class="survey-nav__plans">
+                        @if (isLoadingPlans()) {
+                        <div class="survey-nav__state survey-nav__state--small">
                             <i class="pi pi-spin pi-spinner"></i>
                             <span>Đang tải đợt...</span>
                         </div>
+                        }
 
-                        <div *ngIf="!isLoadingPlans && filteredPlans.length === 0"
-                             class="survey-nav__state survey-nav__state--small">
+                        @if (!isLoadingPlans() && filteredPlans.length === 0) {
+                        <div class="survey-nav__state survey-nav__state--small">
                             Không có đợt phù hợp
                         </div>
+                        }
 
-                        <button *ngFor="let plan of filteredPlans"
-                                type="button"
+                        @for (plan of filteredPlans; track plan.id) {
+                        <button type="button"
                                 class="survey-nav__plan"
                                 [class.survey-nav__plan--active]="selectedPlanId === plan.id"
                                 (click)="selectPlan(plan.id); $event.stopPropagation()"
@@ -82,36 +97,45 @@
                             <i class="pi pi-angle-right survey-nav__plan-arrow"></i>
                             <span>{{ plan.title }}</span>
                         </button>
+                        }
                     </div>
+                    }
                 </div>
+                }
             </div>
         </aside>
+        }
 
         <!-- Nội dung thống kê -->
         <main class="survey-content">
-            <div *ngIf="selectedSurveyId == null && !isLoadingSurveys" class="survey-content__hint-wrap">
+            @if (selectedSurveyId == null && !isLoadingSurveys) {
+            <div class="survey-content__hint-wrap">
                 <span class="badge-light-base badge-primary-light survey-content__guide-badge">
                     <i class="pi pi-file"></i>
                     Chọn phiếu khảo sát ở cột bên trái
                 </span>
             </div>
+              }
 
-            <div *ngIf="selectedSurveyId != null && selectedPlanId == null && !isLoadingPlans"
-                 class="survey-content__hint-wrap">
+              @if (selectedSurveyId != null && selectedPlanId == null && !isLoadingPlans) {
+              <div class="survey-content__hint-wrap">
                 <span class="badge-light-base badge-primary-light survey-content__guide-badge">
                     <i class="pi pi-calendar"></i>
                     Chọn đợt khảo sát để xem thống kê
                 </span>
             </div>
+            }
 
-            <ng-container *ngIf="hasData && !isLoadingStats">
+            @if (hasData && !isLoadingStats()) {
                 <app-stat-overview [overview]="overview"></app-stat-overview>
 
                 <div class="survey-statistical__questions">
                     <div class="survey-statistical__questions-header">
                         <h4>
                             Chi tiết theo câu hỏi
-                            <span *ngIf="isLanhDaoKhoaContext && currentFacultyName">({{ currentFacultyName }})</span>
+                            @if (isLanhDaoKhoaContext && currentFacultyName) {
+                                <span>({{ currentFacultyName }})</span>
+                            }
                         </h4>
                         <button type="button" class="btn btn-success btn-export" (click)="openExportDialog()">
                             <i class="pi pi-file-excel"></i>
@@ -119,41 +143,44 @@
                         </button>
                     </div>
 
-                    <div *ngFor="let stat of questionStats; let i = index" class="survey-statistical__question-item">
+                    @for (stat of questionStats; track stat.question.id; let i = $index) {
+                    <div class="survey-statistical__question-item">
                         <div class="question-item__header">
                             <span class="question-item__number">Câu {{ i + 1 }}</span>
                             <span class="question-item__title">{{ stat.question.title }}</span>
-                            <ng-container [ngSwitch]="stat.question.question_type">
-                                <span *ngSwitchCase="'RADIO'" class="badge-light-base badge-primary-light">Radio</span>
-                                <span *ngSwitchCase="'INPUT'" class="badge-light-base badge-secondary-light">Input</span>
-                                <span *ngSwitchCase="'TEXTAREA'" class="badge-light-base badge-warning-light">Textarea</span>
-                                <span *ngSwitchCase="'CHECKBOX'" class="badge-light-base badge-info-light">Checkbox</span>
-                                <span *ngSwitchCase="'SELECT'" class="badge-light-base badge-success-light">Select</span>
-                                <span *ngSwitchCase="'MULTI_SELECT'" class="badge-light-base badge-danger-light">Multi Select</span>
-                                <span *ngSwitchCase="'TIME'" class="badge-light-base badge-dark-light">Thời gian</span>
-                                <span *ngSwitchCase="'DATE'" class="badge-light-base badge-orange-light">Ngày tháng</span>
-                                <span *ngSwitchCase="'YES_NO'" class="badge-light-base badge-teal-light">Có / Không</span>
-                                <span *ngSwitchCase="'RATE'" class="badge-light-base badge-purple-light">Đánh giá</span>
-                            </ng-container>
+                            @switch (stat.question.question_type) {
+                                @case ('RADIO') { <span class="badge-light-base badge-primary-light">Radio</span> }
+                                @case ('INPUT') { <span class="badge-light-base badge-secondary-light">Input</span> }
+                                @case ('TEXTAREA') { <span class="badge-light-base badge-warning-light">Textarea</span> }
+                                @case ('CHECKBOX') { <span class="badge-light-base badge-info-light">Checkbox</span> }
+                                @case ('SELECT') { <span class="badge-light-base badge-success-light">Select</span> }
+                                @case ('MULTI_SELECT') { <span class="badge-light-base badge-danger-light">Multi Select</span> }
+                                @case ('TIME') { <span class="badge-light-base badge-dark-light">Thời gian</span> }
+                                @case ('DATE') { <span class="badge-light-base badge-orange-light">Ngày tháng</span> }
+                                @case ('YES_NO') { <span class="badge-light-base badge-teal-light">Có / Không</span> }
+                                @case ('RATE') { <span class="badge-light-base badge-purple-light">Đánh giá</span> }
+                            }
                             <span class="question-item__count">{{ stat.totalAnswers }} lượt trả lời</span>
                         </div>
 
                         <div class="question-item__body">
                             <div class="question-item__main">
-                                <app-stat-question-chart
-                                    *ngIf="stat.data.type === 'option' || stat.data.type === 'rate'"
-                                    [stat]="stat"
-                                    (optionSelected)="onOptionSelected(stat, $event)">
-                                </app-stat-question-chart>
+                                @if (stat.data.type === 'option' || stat.data.type === 'rate') {
+                                    <app-stat-question-chart
+                                        [stat]="stat"
+                                        (optionSelected)="onOptionSelected(stat, $event)">
+                                    </app-stat-question-chart>
+                                }
 
-                                <app-stat-text-responses
-                                    *ngIf="stat.data.type === 'text'"
-                                    [responses]="stat.data.responses"
-                                    [grouped]="stat.data.grouped"
-                                    [total]="stat.data.total"
-                                    [rawItems]="stat.data.rawItems"
-                                    [questionTitle]="stat.question.title">
-                                </app-stat-text-responses>
+                                @if (stat.data.type === 'text') {
+                                    <app-stat-text-responses
+                                        [responses]="stat.data.responses"
+                                        [grouped]="stat.data.grouped"
+                                        [total]="stat.data.total"
+                                        [rawItems]="stat.data.rawItems"
+                                        [questionTitle]="stat.question.title">
+                                    </app-stat-text-responses>
+                                }
                             </div>
 
                             <div class="question-item__side">
@@ -167,8 +194,9 @@
                             </div>
                         </div>
                     </div>
+                    }
                 </div>
-            </ng-container>
+            }
         </main>
     </div>
 
