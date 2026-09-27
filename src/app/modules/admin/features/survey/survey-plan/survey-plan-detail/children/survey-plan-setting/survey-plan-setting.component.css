@@ -14,6 +14,27 @@
   align-items: end;
 }
 
+.form-info-layout .form-row > div[class*="col-"] {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.form-info-layout .form-row > div[class*="col-"] > label {
+  display: block;
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+.form-info-layout .form-row > div[class*="col-"] > p-multiselect,
+.form-info-layout .form-row > div[class*="col-"] > ovic-dropdown {
+  width: 100%;
+}
+
+.form-info-layout .form-row > div[class*="col-"] > ovic-dropdown {
+  display: block;
+}
+
 .survey-form-control-title {
   display: flex;
   align-items: center;

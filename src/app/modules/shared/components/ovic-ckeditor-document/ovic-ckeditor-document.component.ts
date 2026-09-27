@@ -3,7 +3,7 @@ import { AbstractControl } from '@angular/forms';
 import { HelperService } from '@core/services/helper.service';
 import { AuthService } from '@core/services/auth.service';
 import { FileService } from '@core/services/file.service';
-import * as DecoupledEditor from './build/ckeditor';
+import ClassicEditor from './build/ckeditor';
 import { firstValueFrom, forkJoin, Observable, of, Subscription } from 'rxjs';
 import { APP_CONFIGS, environment, getLinkDownload, getLinkDownload_aws } from 'src/environments/environment';
 import { OvicFileExplorerService } from '../../../shared/services/ovic-file-explorer.service';
@@ -126,7 +126,7 @@ export class OvicCkeditorDocumentComponent implements OnInit, OnChanges, AfterVi
 
     openFileManager = false;
 
-    Editor = DecoupledEditor;
+    Editor = ClassicEditor;
 
     uploadImage = [];
 

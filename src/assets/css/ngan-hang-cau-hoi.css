@@ -359,7 +359,7 @@ body .create-edit-question-section .ovic-vertical__inputs--layout-2 .p-dropdown 
 	/*z-index: calc(var(--form-row-label-index) + 10);*/
 }
 
-body .create-edit-question-section .ovic-vertical__inputs--layout-2 .ovic-dropdown-style {
+body .create-edit-question-section .ovic-vertical__inputs--layout-2 .ovic-dropdown-style:not(.p-select) {
 	display: inline-block;
 	width: 100%;
 	height: auto;

@@ -562,8 +562,8 @@ export class CauhoiThuchanhComponent implements OnInit {
 
         this.coursePlanActivityTuluanTieuchichamService.getCoursePlanActivityTuluanTieuchichamByPageNew(condition_tieuchicham).subscribe({
             next: (tieuchi_cham) => {
-                tieuchi_cham.data.forEach(f => {
-                    f['collapsed'] = true;
+                tieuchi_cham.data.forEach((f, index) => {
+                    f['collapsed'] = index !== 0;
                 })
 
                 this.list_tieuchi_chamdiem = tieuchi_cham.data;
