@@ -36,10 +36,11 @@
         [totalRecords]="totalCourse"></p-paginator>
       </div>
     </div>
-    <div class="layout_component_container-noidung mat-tab-chuandaura">
+    <div class="layout_component_container-noidung mat-tab-chuandaura question-bank-layout">
       @if (courseSelected) {
         <div style="height: 100%;">
-          <mat-tab-group [selectedIndex]="indexTap">
+          <mat-tab-group [selectedIndex]="indexTap"
+            (selectedTabChange)="onSelectTap(list_typeQuestion_practice[$event.index], $event.index)">
             @for (lvl of list_typeQuestion_practice; track lvl.id; let i = $index) {
               <mat-tab labelClass="mat-tab-chuandaura-title">
                 <ng-template mat-tab-label>
@@ -58,12 +59,6 @@
                           <i class="fa-solid fa-arrow-up-z-a"></i>
                         </button>
                       </span>
-                      <span class="tqb-tbl-col-cdr-number__buttons">
-                        <button ngbTooltip="Xem" placement="bottom" container="body" (click)="onSelectTap(lvl, i)"
-                          class="btn tqb-col__btn">
-                          <i class="pi pi-search"></i>
-                        </button>
-                      </span>
                       @if (indexTap === 0) {
                         <button (click)="openSinhdeTuluan()" class="btn btn-primary">
                           <i class="fa fa-files-o"></i>
@@ -73,7 +68,7 @@
                       @if (canAdd) {
                         <button type="button" (click)="onOpenAddQuestion(lvl, i)" class="btn btn-success">
                           <i class="pi pi-plus"></i>
-                          Thêm câu hỏi
+                          {{lvl.key === 'GROUP_QUESTION' ? 'Thêm đề' : 'Thêm câu hỏi'}}
                         </button>
                       }
                     </div>
@@ -780,15 +775,15 @@
       <p-splitter panelStyleClass="class-tieuchi-spliter-panel" [panelSizes]="[50,50]"
         [style]="{'height': '100%'}">
         <ng-template pTemplate>
-          <div style="height: 100%; width: 100%;">
+          <div class="criteria-preview-panel" style="height: 100%; width: 100%;">
             <app-view-thuongxuyen-tuluan [courseSelected]="courseSelected" [tuluan]="selectedTuluan">
             </app-view-thuongxuyen-tuluan>
           </div>
         </ng-template>
         <ng-template pTemplate>
-          <div class="content-mat-tab-tieuchicham" style="height: 100%; width: 100%;">
+          <div class="content-mat-tab-tieuchicham criteria-panel-content" style="height: 100%; width: 100%;">
             <div style="padding: 5px; display: flex; align-items: center; border-bottom: 1px solid #c8c8c8; background-color: rgba(0, 0, 0, .1);"
-              class="content-mat-tab-tieuchicham-top">
+              class="content-mat-tab-tieuchicham-top criteria-panel-toolbar">
               <span style="flex:1; margin-right: 5px;">
                 <div style="font-size: 14px;">
                   <strong>Tổng tiêu chí:</strong> {{list_tieuchi_chamdiem.length}}
@@ -814,8 +809,7 @@
               }
             </div>
             @if (list_tieuchi_chamdiem && list_tieuchi_chamdiem.length) {
-              <div style="height: calc(100% - 41px); padding: 5px; overflow: auto;"
-                >
+              <div class="criteria-list-scroll" style="padding: 5px;">
                 @for (item of list_tieuchi_chamdiem; track item.id; let i = $index) {
                   <div class="tieuchicham-card-panel">
                     <p-panel #panel_tieuchi [collapsed]="item['collapsed']" [toggleable]="true">
@@ -891,8 +885,7 @@
                   }
                 </div>
               } @else {
-                <div
-                  style="display: flex; align-items: center; justify-content: center; height: calc(100% - 41px); width: 100%;">
+                <div class="criteria-list-empty">
                   @if (!selectedTuluan['tuluan_root_ids']) {
                     <div
                       style="text-align: center; width: 400px; margin: 0 auto;">

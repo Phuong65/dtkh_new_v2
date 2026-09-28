@@ -10,6 +10,8 @@
 .layout_component_container {
     display: flex;
     flex-direction: row;
+    min-height: 0;
+    overflow-y: hidden;
 }
 
 .criteria-fullscreen-drawer {
@@ -20,15 +22,19 @@
 
 .layout_component_container-course {
     border-right: 1px solid #c8c8c8;
+    min-height: 0;
 }
 
 .layout_component_container-noidung {
     width: calc(100% - 400px);
     height: 100%;
+    min-width: 0;
+    min-height: 0;
 }
 
 .list-course-layout {
     flex: 1;
+    min-height: 0;
     overflow: auto;
     background: #f8fafc;
 }
@@ -126,8 +132,17 @@
 }
 
 .mat-tab-list-cauhoi {
-    height: 100%;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 0;
     overflow: hidden;
+}
+
+.mat-tab-list-cauhoi-filter,
+.mat-tab-list-cauhoi > .page-layout-set {
+    flex: 0 0 auto;
 }
 
 .normal-color {
@@ -135,8 +150,13 @@
 }
 
 .mat-tab-list-cauhoi-list {
-    height: calc(100% - 40px - 41px);
-    overflow: auto;
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+    max-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
     background-color: #eaeaea;
 }
 
