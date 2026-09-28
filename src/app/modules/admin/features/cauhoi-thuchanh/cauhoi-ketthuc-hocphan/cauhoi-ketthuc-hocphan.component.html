@@ -36,20 +36,20 @@
         [totalRecords]="totalCourse"></p-paginator>
       </div>
     </div>
-    <div class="layout_component_container-noidung mat-tab-chuandaura question-bank-layout">
+    <div class="layout_component_container-noidung kthp-question-tabs">
       @if (courseSelected) {
         <div style="height: 100%;">
           <mat-tab-group [selectedIndex]="indexTap"
             (selectedTabChange)="onSelectTap(list_typeQuestion_practice[$event.index], $event.index)">
             @for (lvl of list_typeQuestion_practice; track lvl.id; let i = $index) {
-              <mat-tab labelClass="mat-tab-chuandaura-title">
+              <mat-tab labelClass="kthp-question-tab-title">
                 <ng-template mat-tab-label>
                   <div class="normal-color">
                     {{lvl.label}} ({{courseSelected[lvl.key]?courseSelected[lvl.key]:'0'}})
                   </div>
                 </ng-template>
-                <div class="mat-tab-list-cauhoi">
-                  <div class="mat-tab-list-cauhoi-filter">
+                <div class="kthp-question-tab-body">
+                  <div class="kthp-question-toolbar">
                     <span style="flex:1">
                       <input (keyup)="filterNone(1)" (keyup.enter)="filterIdTuluan(1)"
                         [(ngModel)]="codeTuluan" style="width: 200px;" placeholder="Tìm kiếm theo mã">
@@ -60,7 +60,7 @@
                         </button>
                       </span>
                       @if (indexTap === 0) {
-                        <button (click)="openSinhdeTuluan()" class="btn btn-primary">
+                        <button (click)="openSinhdeTuluan()" class="btn btn-primary" style="margin-right: 7px;">
                           <i class="fa fa-files-o"></i>
                           Sinh đề từ câu hỏi
                         </button>
@@ -72,9 +72,9 @@
                         </button>
                       }
                     </div>
-                    <div class="mat-tab-list-cauhoi-list">
+                    <div class="kthp-question-list">
                       @for (quest of list_tuluan; track quest.id) {
-                        <div class="mat-tab-list-cauhoi-doc">
+                        <div class="kthp-question-item">
                           <div class="header-question">
                             @switch (quest.type) {
                               @case ('QUESTION') {
