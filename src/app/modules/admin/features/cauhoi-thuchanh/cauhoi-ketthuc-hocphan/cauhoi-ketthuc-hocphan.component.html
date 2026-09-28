@@ -600,7 +600,7 @@
             <div class="row form-row form-row-flex-row">
               <div class="col-12">
                 <label>CĐR liên quan:<span class="ovic-mark">*</span></label>
-                <p-multiSelect [overlayOptions]="{ baseZIndex: 1999 }" appendTo="body" (onChange)="onSelectCDR()"
+                <p-multiSelect [overlayOptions]="{ baseZIndex: 1000000 }" appendTo="body" (onChange)="onSelectCDR()"
                   selectedItemsLabel="{0} items selected" formControlName="activity_cdr_ids"
                   [showClear]="true" [options]="list_activity_cdr" optionValue="id">
                 </p-multiSelect>
@@ -769,7 +769,7 @@
 
 
 <ng-template #templateFormAddTieuchicham let-c="close" let-d="dismiss">
-  <div class="ovic-over-right-section right-slide-class">
+  <div class="ovic-over-right-section right-slide-class criteria-fullscreen-drawer">
     <div class="ovic-over-right-section__head">
       <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
       <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
@@ -790,8 +790,12 @@
             <div style="padding: 5px; display: flex; align-items: center; border-bottom: 1px solid #c8c8c8; background-color: rgba(0, 0, 0, .1);"
               class="content-mat-tab-tieuchicham-top">
               <span style="flex:1; margin-right: 5px;">
-                <strong>Tổng tiêu chí:</strong> {{list_tieuchi_chamdiem.length}}
-                - <strong>Tổng điểm tiêu chí:</strong> {{returnTotalPointTieuChi()}}
+                <div style="font-size: 14px;">
+                  <strong>Tổng tiêu chí:</strong> {{list_tieuchi_chamdiem.length}}
+                </div>
+                <div style="font-size: 14px;">
+                  <strong>Tổng điểm tiêu chí:</strong> {{returnTotalPointTieuChi()}}
+                </div>
               </span>
               @if (list_tieuchi_chamdiem.length && selectedTuluan && selectedTuluan.status !== 1) {
                 <button
@@ -822,14 +826,14 @@
                               <div class="col-9">
                                 <textarea
                                   [disabled]="selectedTuluan && selectedTuluan.status === 1? true: false"
-                                  style="width: 100%; resize: none; height: -webkit-fill-available;"
+                                  style="width: 100%; resize: none; height: -webkit-fill-available; font-size: 14px;"
                                   cols="2" placeholder="Nhập tiêu đề cho tiêu chí {{i + 1}}"
                                   class="ovic-input-field" [(ngModel)]="item.title">
                                 </textarea>
                               </div>
                               <div class="col-3">
                                 <div style="margin-bottom: 5px;" class="p-inputgroup">
-                                  <span style="border-radius: 0px; padding: 0px;"
+                                  <span style="border-radius: 0px; padding: 0px; font-size: 14px;"
                                   class="p-inputgroup-addon">Điểm:</span>
                                   <input style="width: inherit;"
                                     [disabled]="selectedTuluan && selectedTuluan.status === 1? true: false"
@@ -842,7 +846,7 @@
                                   <div>
                                     <p-select
                                       [disabled]="selectedTuluan && selectedTuluan.status === 1? true: false"
-                                      [style]="{'width': '100%'}" optionDisabled="disabled"
+                                      [style]="{'width': '165px'}" optionDisabled="disabled"
                                       optionValue="id" [options]="chuandaura"
                                       [(ngModel)]="item.cdr" optionLabel="label">
                                     </p-select>
@@ -871,13 +875,13 @@
                         <div class="ovic-vertical__inputs form-setting-lesson edit-hight-200"
                           style="padding: 0px;">
                           <div class="row form-row form-row-flex-row">
-                            <div class="col-12">
+                            <div class="col-10">
                               <label>Hướng dẫn chấm:</label>
                               <ovic-ckeditor-document
                                 [isReadOnly]="selectedTuluan && selectedTuluan.status === 1 ? true : false"
                                 (onSaveData)="onChangeEditorTieuchi($event,item)"
                                 [changeId]="item.id" [autoSave]="true" [default]="item.desc"
-                                styleClass="vietbaocao-doctument-content">
+                                styleClass="vietbaocao-doctument-content tieuchicham-editor-width">
                               </ovic-ckeditor-document>
                             </div>
                           </div>

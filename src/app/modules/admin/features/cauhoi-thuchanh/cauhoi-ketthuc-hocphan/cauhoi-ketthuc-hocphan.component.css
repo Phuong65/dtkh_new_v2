@@ -12,6 +12,12 @@
     flex-direction: row;
 }
 
+.criteria-fullscreen-drawer {
+    width: 100vw;
+    height: 100vh;
+    box-sizing: border-box;
+}
+
 .layout_component_container-course {
     border-right: 1px solid #c8c8c8;
 }
@@ -389,6 +395,8 @@ textarea:focus {
 .text-open-huong-dancham{
     color: #007bff;
     cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
 }
 
 .text-open-huong-dancham:hover{
