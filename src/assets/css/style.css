@@ -2603,6 +2603,12 @@ p-calendar {
     opacity: 1;
 }
 
+.mat-tab-chuandaura .mat-mdc-tab.mat-mdc-tab-disabled,
+.mat-tab-chuandaura .mat-mdc-tab.mat-mdc-tab-disabled .mdc-tab__content {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 .mat-tab-chuandaura .mat-tab-label:hover .tqb-tbl-col-cdr-number__buttons {
     visibility: visible;
     opacity: 1;
@@ -3211,11 +3217,27 @@ p-calendar {
     border-radius: 0px !important;
 }
 
+.criteria-editor-card .p-panel-header {
+    padding: 6px 8px;
+    font-size: 14px;
+}
+
+.criteria-instructions-editor .ck-content {
+    min-height: 120px !important;
+    max-height: 120px;
+    overflow-y: auto;
+    font-size: 14px;
+}
+
 .tieuchicham-card-panel .p-panel .p-panel-content {
     border-radius: 0px !important;
 }
 
 .tieuchicham-card-panel .p-panel .p-panel-icons {
+    display: none;
+}
+
+.tieuchicham-card-panel .p-panel-header-actions {
     display: none;
 }
 

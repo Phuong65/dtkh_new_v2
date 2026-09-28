@@ -1862,6 +1862,23 @@ textarea:focus {
     margin-bottom: 10px;
 }
 
+.criteria-editor-toolbar {
+    font-size: 14px;
+}
+
+.criteria-title-input {
+    height: 56px !important;
+    min-height: 56px;
+    padding: 6px 8px;
+    font-size: 14px;
+    line-height: 1.25;
+}
+
+.criteria-point-label,
+.criteria-point-input {
+    font-size: 14px;
+}
+
 .text-open-huong-dancham {
     color: #007bff;
     cursor: pointer;

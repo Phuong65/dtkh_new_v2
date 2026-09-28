@@ -307,7 +307,7 @@
           <ng-template pTemplate>
             <div class="content-mat-tab-tieuchicham" style="width: 100%; height: 100%;">
               <div style="padding: 5px; display: flex; align-items: center; background-color: #ead6fd;"
-                class="content-mat-tab-tieuchicham-top">
+                class="content-mat-tab-tieuchicham-top criteria-editor-toolbar">
                 <span style="flex:1; margin-right: 5px;">
                   <strong>Tổng tiêu chí:</strong> {{list_tieuchi_chamdiem.length}}
                   - <strong>Tổng điểm tiêu chí:</strong> {{returnTotalPointTieuChi()}}
@@ -331,7 +331,7 @@
                 <div style="height: calc(100% - 41px); padding: 5px; overflow: auto;"
                   >
                   @for (item of list_tieuchi_chamdiem; track item.id; let i = $index) {
-                    <div class="tieuchicham-card-panel">
+                    <div class="tieuchicham-card-panel criteria-editor-card">
                       <p-panel #panel_tieuchi [collapsed]="item['collapsed']" [toggleable]="true">
                         <ng-template pTemplate="header">
                           <div style="width: 100%;">
@@ -340,20 +340,20 @@
                                 <div class="col-9">
                                   <textarea
                                     [disabled]="selectedCauhoi && selectedCauhoi.status === 1? true: false"
-                                    style="width: 100%; resize: none; height: -webkit-fill-available;"
+                                    style="width: 100%; resize: none; height: 56px;"
                                     cols="2" placeholder="Nhập tiêu đề cho tiêu chí {{i + 1}}"
-                                    class="ovic-input-field" [(ngModel)]="item.title">
+                                    class="ovic-input-field criteria-title-input" [(ngModel)]="item.title">
                                   </textarea>
                                 </div>
                                 <div class="col-3">
                                   <div style="margin-bottom: 5px;" class="p-inputgroup">
                                     <span style="border-radius: 0px; padding: 0px;"
-                                    class="p-inputgroup-addon">Điểm:</span>
+                                    class="p-inputgroup-addon criteria-point-label">Điểm:</span>
                                     <input style="width: inherit;"
                                       [disabled]="selectedCauhoi && selectedCauhoi.status === 1? true: false"
                                       #input_point_tieuchi
                                       (keydown)="pointQuestionKeyDown($event,input_point_tieuchi)"
-                                      type="text" class="ovic-input-field"
+                                      type="text" class="ovic-input-field criteria-point-input"
                                       [(ngModel)]="item.point">
                                     </div>
                                     <div>
@@ -382,7 +382,7 @@
                               </div>
                             </div>
                           </ng-template>
-                          <div class="ovic-vertical__inputs form-setting-lesson edit-hight-200"
+                          <div class="ovic-vertical__inputs form-setting-lesson edit-hight-200 criteria-instructions-editor"
                             style="padding: 0px;">
                             @if (!item['collapsed']) {
                               <div class="row form-row form-row-flex-row">
