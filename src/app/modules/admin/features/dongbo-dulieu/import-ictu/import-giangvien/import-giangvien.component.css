@@ -1,3 +1,11 @@
+.ghi-de-dulieu {
+    gap: 7px;
+}
+
+:host ::ng-deep .ghi-de-dulieu .p-checkbox-label {
+    margin-left: 7px;
+}
+
 .hover-underline:hover {
     cursor: pointer;
     text-decoration: underline;

@@ -144,6 +144,20 @@
     flex: 0 0 auto;
 }
 
+.criteria-panel-content {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.criteria-list-scroll {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
 .normal-color {
     color: #333;
 }
@@ -409,6 +423,49 @@ textarea:focus {
 
 .tieuchicham-card-panel{
     margin-bottom: 10px;
+}
+
+.criteria-point-controls {
+    --criteria-score-label-width: 40px;
+    --criteria-control-width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 5px;
+    margin-bottom: 5px;
+    width: calc(var(--criteria-score-label-width) + var(--criteria-control-width));
+    max-width: 100%;
+}
+
+.criteria-point-input {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+}
+
+.criteria-point-input .p-inputgroup-addon {
+    display: flex;
+    align-items: center;
+    flex: 0 0 var(--criteria-score-label-width);
+    width: var(--criteria-score-label-width);
+    white-space: nowrap;
+}
+
+.criteria-point-input input {
+    flex: 1 1 0;
+    width: 0;
+    min-width: 0;
+    max-width: var(--criteria-control-width);
+}
+
+.criteria-point-select {
+    flex: 0 0 auto;
+    min-width: 0;
+    width: min(var(--criteria-control-width), calc(100% - var(--criteria-score-label-width)));
+    margin-left: var(--criteria-score-label-width);
 }
 
 .text-open-huong-dancham{

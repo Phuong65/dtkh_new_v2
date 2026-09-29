@@ -334,46 +334,41 @@
                     <div class="tieuchicham-card-panel criteria-editor-card">
                       <p-panel #panel_tieuchi [collapsed]="item['collapsed']" [toggleable]="true">
                         <ng-template pTemplate="header">
-                          <div style="width: 100%;">
-                            <div style="display: flex;">
-                              <div class="row form-row" style="flex: 1;margin-right: 5px;">
-                                <div class="col-9">
-                                  <textarea
-                                    [disabled]="selectedCauhoi && selectedCauhoi.status === 1? true: false"
-                                    style="width: 100%; resize: none; height: 56px;"
-                                    cols="2" placeholder="Nhập tiêu đề cho tiêu chí {{i + 1}}"
-                                    class="ovic-input-field criteria-title-input" [(ngModel)]="item.title">
-                                  </textarea>
-                                </div>
-                                <div class="col-3">
-                                  <div style="margin-bottom: 5px;" class="p-inputgroup">
-                                    <span style="border-radius: 0px; padding: 0px;"
-                                    class="p-inputgroup-addon criteria-point-label">Điểm:</span>
-                                    <input style="width: inherit;"
+                          <div class="criteria-editor-header">
+                            <div class="criteria-editor-main">
+                              <div class="criteria-editor-fields">
+                                <textarea
+                                  [disabled]="selectedCauhoi && selectedCauhoi.status === 1? true: false"
+                                  cols="2" placeholder="Nhập tiêu chí cho tiêu chí {{i + 1}}"
+                                  class="ovic-input-field criteria-title-input" [(ngModel)]="item.title">
+                                </textarea>
+                                <div class="criteria-point-controls">
+                                  <div class="p-inputgroup criteria-point-input">
+                                    <span class="p-inputgroup-addon criteria-point-label">Điểm:</span>
+                                    <input
                                       [disabled]="selectedCauhoi && selectedCauhoi.status === 1? true: false"
                                       #input_point_tieuchi
                                       (keydown)="pointQuestionKeyDown($event,input_point_tieuchi)"
-                                      type="text" class="ovic-input-field criteria-point-input"
+                                      type="text" class="ovic-input-field criteria-point-input-field"
                                       [(ngModel)]="item.point">
-                                    </div>
-                                    <div>
-                                      <p-select
-                                        [disabled]="selectedCauhoi && selectedCauhoi.status === 1? true: false"
-                                        [style]="{'width': '100%'}" optionDisabled="disabled"
-                                        optionValue="id" [options]="chuandaura"
-                                        [(ngModel)]="item.cdr" optionLabel="label">
-                                      </p-select>
-                                    </div>
+                                  </div>
+                                  <div class="criteria-point-select">
+                                    <p-select
+                                      [disabled]="selectedCauhoi && selectedCauhoi.status === 1? true: false"
+                                      [style]="{'width': '100%'}" optionDisabled="disabled"
+                                      optionValue="id" [options]="chuandaura"
+                                      [(ngModel)]="item.cdr" optionLabel="label">
+                                    </p-select>
                                   </div>
                                 </div>
-                                <div>
+                                <div class="criteria-editor-delete-column">
                                   <button (click)="deleteTieuchi(item.id)"
-                                    class="btn btn-danger btn-icon btn-transparent">
+                                    class="btn btn-danger btn-icon btn-transparent criteria-point-delete">
                                     <i class="fa fa-trash"></i>
                                   </button>
                                 </div>
                               </div>
-                              <div style="padding-top: 0.75rem;">
+                              <div class="criteria-editor-instructions">
                                 <span (click)="openHuongdancham(panel_tieuchi,item)"
                                   class="text-open-huong-dancham">
                                   <i class="fa fa-angle-double-down"></i>
@@ -381,7 +376,8 @@
                                 </span>
                               </div>
                             </div>
-                          </ng-template>
+                          </div>
+                        </ng-template>
                           <div class="ovic-vertical__inputs form-setting-lesson edit-hight-200 criteria-instructions-editor"
                             style="padding: 0px;">
                             @if (!item['collapsed']) {

@@ -825,28 +825,28 @@
                                   class="ovic-input-field" [(ngModel)]="item.title">
                                 </textarea>
                               </div>
-                              <div class="col-3">
-                                <div style="margin-bottom: 5px;" class="p-inputgroup">
+                              <div class="col-3 criteria-point-controls">
+                                <div class="p-inputgroup criteria-point-input">
                                   <span style="border-radius: 0px; padding: 0px; font-size: 14px;"
-                                  class="p-inputgroup-addon">Điểm:</span>
-                                  <input style="width: inherit;"
+                                    class="p-inputgroup-addon">Điểm:</span>
+                                  <input
                                     [disabled]="selectedTuluan && selectedTuluan.status === 1? true: false"
                                     #input_point_tieuchi
                                     (keydown)="pointQuestionKeyDown($event,input_point_tieuchi)"
                                     (keyup)="pointTieuchiKeyup($event,input_point_tieuchi,item)"
                                     type="text" class="ovic-input-field"
                                     [(ngModel)]="item.point">
-                                  </div>
-                                  <div>
-                                    <p-select
-                                      [disabled]="selectedTuluan && selectedTuluan.status === 1? true: false"
-                                      [style]="{'width': '165px'}" optionDisabled="disabled"
-                                      optionValue="id" [options]="chuandaura"
-                                      [(ngModel)]="item.cdr" optionLabel="label">
-                                    </p-select>
-                                  </div>
+                                </div>
+                                <div class="criteria-point-select">
+                                  <p-select
+                                    [disabled]="selectedTuluan && selectedTuluan.status === 1? true: false"
+                                    [style]="{'width': '100%'}" optionDisabled="disabled"
+                                    optionValue="id" [options]="chuandaura"
+                                    [(ngModel)]="item.cdr" optionLabel="label">
+                                  </p-select>
                                 </div>
                               </div>
+                            </div>
                               <div>
                                 @if (list_tieuchi_chamdiem.length > selectedTuluan.point) {
                                   <button
