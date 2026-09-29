@@ -33,7 +33,7 @@ import { TableModule } from 'primeng/table';
         SharedModule,
         FormsModule,
         ReactiveFormsModule,
-        FilterPipe,
+     
         PaginatorModule,
         TableModule,
         RouterModule

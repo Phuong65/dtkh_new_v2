@@ -1,0 +1,233 @@
+@if (!canShowBulkActivateTest) {
+<div class="bulk-activate-denied">
+    <i class="fa fa-lock"></i>
+    <span>Chức năng kích hoạt bài kiểm tra hàng loạt chỉ dành cho Lãnh đạo Khoa, Lãnh đạo Bộ môn, Quản trị viên và
+        Chuyên viên phòng Đào tạo trên hệ thống ĐTTX.</span>
+</div>
+}
+
+@if (canShowBulkActivateTest) {
+<div class="layout_component_container">
+    <div class="class-layout-top">
+        <div class="row form-row form-row-flex-row" style="margin: 0px;padding: 5px; width: 100%;">
+            <div class="p-col-12 p-md-4 ui-inputgroup-search" style="flex:1;">
+                <div class="ui-inputgroup ">
+                    <input (keyup)="searchClass($event)" class="class-layout-top-option-search" type="text" pInputText
+                        placeholder="Nhập tên lớp rồi nhấn enter">
+                </div>
+            </div>
+
+            <p-popover #op appendTo="body">
+                <ng-template pTemplate>
+                    <ng-container [ngTemplateOutlet]="templateFilterShift">
+                    </ng-container>
+                </ng-template>
+            </p-popover>
+            <button (click)="op.toggle($event)" class="btn btn-icon btn-primary" container="body" placement="left"
+                ngbTooltip="Lọc">
+                <i style="margin-right: 0px;" class="pi pi-filter"></i>
+            </button>
+
+            <button class="btn btn-icon" (click)="onResetPage()" container="body" placement="left"
+                ngbTooltip="Làm mới danh sách">
+                <i style="margin-right: 0px;" class="pi pi-refresh"></i>
+            </button>
+        </div>
+    </div>
+    @if (canShowBulkActivateTest && selectedClasses.length > 0) {
+    <div class="bulk-activate-toolbar">
+        <div class="bulk-activate-toolbar__summary">
+            <i class="pi pi-check-square"></i>
+            <strong>Đã chọn {{selectedClasses.length}} lớp học phần</strong>
+        </div>
+        <button type="button" class="btn btn-warning bulk-activate-toolbar__button" (click)="openBulkActivateTest()">
+            <i class="pi pi-bolt"></i>
+            <span>Kích hoạt bài kiểm tra</span>
+        </button>
+    </div>
+    }
+    <div class="class-layout-bottom">
+        <div class="content-class-layout-bottom content-list">
+            <p-table [value]="listClass" [(selection)]="selectedClasses" dataKey="id"
+                styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-none-header table-reBorder">
+                <ng-template pTemplate="header">
+                    <tr>
+                        @if (canShowBulkActivateTest) {
+                        <th class="bulk-selection-column">
+                            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                        </th>
+                        }
+                        @for (col of cols_class; track col.key) {
+                        <th [width]="col['width']" [ngClass]="col['class']">
+                            {{col['label']}}
+                        </th>
+                        }
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-row>
+                    <tr>
+                        @if (canShowBulkActivateTest) {
+                        <td class="bulk-selection-column">
+                            <p-tableCheckbox [value]="row"></p-tableCheckbox>
+                        </td>
+                        }
+                        @for (col of cols_class; track col.key) {
+                        <td [width]="col['width']" [ngClass]="col['class']">
+                            @if (col['key'] !== 'name') {
+                            <span>{{row[col['key']]}}</span>
+                            }
+                            @if (col['key'] === 'name') {
+                            <div class="title-col-flex">
+                                <span class="title-col-flex-text">
+                                    <a style="color: #333;" [routerLink]="['../lop-hoc-phan/class-details']"
+                                        [queryParams]="{code:row.id}">
+                                        {{row[col['key']]}}
+                                    </a>
+                                </span>
+                            </div>
+                            }
+                        </td>
+                        }
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td [attr.colspan]="canShowBulkActivateTest ? cols_class.length + 1 : cols_class.length"
+                            class="text-center">
+                            {{emptyList || 'Không có dữ liệu'}}
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+    <div class="page-layout-set">
+        <p-paginator #paginator (onPageChange)="changePage($event)" [rows]="limitList"
+            [totalRecords]="countClass"></p-paginator>
+    </div>
+</div>
+}
+
+<p-dialog [header]="'Kích hoạt bài kiểm tra hàng loạt'" [modal]="true" [closable]="!isActivating"
+    [(visible)]="displayActivateTestDialog" [style]="{width: '640px'}">
+    <div class="bulk-activate-dialog">
+        <div class="selected-classes-summary">
+            <div class="selected-classes-summary__header">Đã chọn <strong>{{selectedClassesForTest.length}}</strong> lớp học phần</div>
+            <ul class="selected-classes-summary__list">
+                @for (cls of selectedClassesForTest; track cls.id) {
+                <li>
+                    <span class="selected-classes-summary__code">{{cls.id}}</span>
+                    <span class="selected-classes-summary__name">{{cls.name}}</span>
+                    <span class="selected-classes-summary__course">{{cls['course_name'] || cls['show_mon'] || ''}}</span>
+                </li>
+                }
+            </ul>
+        </div>
+        <div class="bulk-activate-field">
+            <label>Ngày giờ bắt đầu kích hoạt:<span class="ovic-mark">*</span></label>
+            <p-datepicker [(ngModel)]="dateStartTest" appendTo="body" dateFormat="dd/mm/yy" [showTime]="true"
+                hourFormat="24" [showIcon]="true" placeholder="Chọn ngày giờ bắt đầu"></p-datepicker>
+        </div>
+        <div class="bulk-activate-field">
+            <label>Số ngày mở bài kiểm tra (PRACTICE_TIME_FOR_A_TEST):<span class="ovic-mark">*</span></label>
+            <input type="number" class="ovic-input-field" [(ngModel)]="practiceTimeForTest" min="1" step="1"
+                placeholder="Nhập số nguyên dương">
+        </div>
+        <div class="bulk-activate-warning">
+            <i class="fa fa-exclamation-triangle"></i>
+            Chỉ bài học có nội dung đã duyệt và câu hỏi/đề kiểm tra CC mới được kích hoạt.
+        </div>
+        @if (isActivating) {
+        <div class="bulk-activate-progress">
+            <p-progressBar [value]="progressValue"></p-progressBar>
+            <span>Đang xử lý {{progressValue | number:'1.0-0'}}%</span>
+        </div>
+        }
+        @if (failedClasses.length) {
+        <div class="failed-classes-summary">
+            <strong>Lớp bị bỏ qua:</strong>
+            <ul>
+                @for (entry of failedClasses; track entry.class.id) {
+                <li>{{entry.class.name}} — {{entry.reason}}</li>
+                }
+            </ul>
+        </div>
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <button type="button" class="btn btn-secondary" [disabled]="isActivating" (click)="cancelBulkActivateTest()">
+            <i class="fa fa-times"></i> Hủy
+        </button>
+        <button type="button" class="btn btn-primary" [disabled]="isActivating" (click)="startBulkActivateTest()">
+            <i class="fa fa-bolt"></i> Bắt đầu kích hoạt
+        </button>
+    </ng-template>
+</p-dialog>
+
+<ng-template #templateFilterShift>
+    <div class="layout-filter-shift" style="width: 500px;">
+        <div class="ovic-vertical__inputs" style="line-height: 1.5;">
+            <div class="row form-row form-row-flex-row">
+                <div class="col-6">
+                    <label>Năm học:</label>
+                    <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?objectFilter['namhoc']: null"
+                        (onChange)="onChangeFilter($event, 'namhoc')" placeholder="- Năm học -" [options]="listNamhoc"
+                        optionId="value" optionLabel="label" [filter]="true">
+                    </ovic-dropdown>
+                </div>
+                <div class="col-6">
+                    <label>Học kỳ:</label>
+                    <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?objectFilter['hocky']: null"
+                        (onChange)="onChangeFilter($event, 'hocky' )" [options]="listHocky" placeholder="- Học kỳ -"
+                        optionId="value" optionLabel="label" [filter]="true">
+                    </ovic-dropdown>
+                </div>
+            </div>
+            <div class="row form-row form-row-flex-row">
+                <div class="col-12">
+                    <label>Khoa:</label>
+                    <ovic-dropdown [defaultValue]="objectFilter['category_id'] ? objectFilter['category_id'] : null"
+                        (onChange)="onChangeBulkFacultyFilter($event)" placeholder="- - - - -" scrollHeight="400px"
+                        styleClass="shift-dropdown-filter width-250px" [options]="list_donvi_chuyenmon"
+                        optionLabel="title" optionId="id" [filter]="true" filterBy="title">
+                    </ovic-dropdown>
+                </div>
+            </div>
+            <div class="row form-row form-row-flex-row bulk-filter-row">
+                <div class="col-6">
+                    <label>Khóa:</label>
+                    <input type="text" class="ovic-input-field" [ngModel]="objectFilter['khoa']"
+                        (ngModelChange)="onChangeTextFilter($event, 'khoa')" placeholder="Nhập khóa">
+                </div>
+                <div class="col-6">
+                    <label>Đợt học:</label>
+                    <input type="number" min="1" class="ovic-input-field" [ngModel]="objectFilter['dothoc']"
+                        (ngModelChange)="onChangeTextFilter($event, 'dothoc')" placeholder="Nhập đợt">
+                </div>
+            </div>
+            <div class="row form-row form-row-flex-row bulk-filter-row">
+                <div class="col-6">
+                    <label>Ngành / Bộ môn:</label>
+                    <ovic-dropdown [defaultValue]="objectFilter['nganh_bomon_id'] ? objectFilter['nganh_bomon_id'] : null"
+                        (onChange)="onChangeFilter($event, 'nganh_bomon_id')" placeholder="- Ngành/Bộ môn -"
+                        [options]="listCategory" optionLabel="title" optionId="id" [filter]="true" filterBy="title">
+                    </ovic-dropdown>
+                </div>
+                <div class="col-6">
+                    <label>Môn học:</label>
+                    <ovic-dropdown [defaultValue]="objectFilter['course_id'] ? objectFilter['course_id'] : null"
+                        (onChange)="onChangeFilter($event, 'course_id')" placeholder="- Môn học -"
+                        [options]="listCourse" optionLabel="title" optionId="id" [filter]="true" filterBy="title">
+                    </ovic-dropdown>
+                </div>
+            </div>
+            <div class="row form-row form-row-flex-row">
+                <div class="col-12" style="text-align: right;">
+                    <button style="line-height: 1;" (click)="cancelFilter()" class="btn btn-secondary">
+                        <i class="fa fa-refresh"></i>Hủy tìm kiếm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>

@@ -1,11 +1,10 @@
-import { request } from 'http';
-import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { FileDto, OvicDocument, OvicFile, OvicFileStore, OvicFileUpload } from '@core/models/file';
+import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, Optional, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
+import {  FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FileDto, OvicDocument, OvicFile, OvicFileUpload } from '@core/models/file';
 import { AuthService } from '@core/services/auth.service';
 import { FileService } from '@core/services/file.service';
 import { NotificationService } from '@core/services/notification.service';
-import { APP_CONFIGS, getLinkDownload_aws } from '../../../../../environments/environment';
+import { APP_CONFIGS } from '../../../../../environments/environment';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FULL_SIZE_MODAL_OPTIONS, LARGE_MODAL_OPTIONS, TYPE_FILE_LIST } from '@modules/shared/utils/syscat';
 import { Paginator } from 'primeng/paginator';
@@ -43,7 +42,7 @@ import { ConfirmPopupModule } from 'primeng/confirmpopup';
     styleUrls: ['./files-management-new.component.css'],
     providers: [ContextMenuService, ConfirmationService],
     imports: [CommonModule, TreeCustomComponent,ConfirmPopupModule,DrawerModule, ContextMenu, TableModule, Checkbox, OvicFileIconPipe, Paginator, Dialog, MatProgressBar, ViewDocumentComponent, MatSelectionList, MatListOption, GeneralModule, FilterPipe]
-
+ 
 })
 export class FilesManagementNewComponent implements OnInit, OnChanges, AfterViewInit {
     @Input() filesDefault: OvicFile[] = [];
@@ -163,7 +162,7 @@ export class FilesManagementNewComponent implements OnInit, OnChanges, AfterView
         private fileService: FileService,
         private auth: AuthService,
         private modalService: NgbModal,
-        private activeModal: NgbActiveModal,
+        @Optional() private activeModal: NgbActiveModal,
         private mediaService: MediaService,
         private mediaFolderService: MediaFolderService,
         public formBuilder: FormBuilder,
@@ -601,7 +600,9 @@ export class FilesManagementNewComponent implements OnInit, OnChanges, AfterView
                 })
             })
         }
-        this.activeModal.close(data);
+        if (this.activeModal) {
+            this.activeModal.close(data);
+        }
     }
 
     closeDialogUpload() {

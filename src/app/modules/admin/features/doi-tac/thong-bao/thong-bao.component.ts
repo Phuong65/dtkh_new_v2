@@ -22,7 +22,6 @@ import {MatCheckboxModule} from "@angular/material/checkbox";
 import {PaginatorModule} from "primeng/paginator";
 import {RippleModule} from "primeng/ripple";
 import {SharedModule} from "@shared/shared.module";
-import {ThongbaoFilesComponent} from "@modules/admin/features/thong-bao/thongbao-files/thongbao-files.component";
 import {OpenFileManagerV2Component} from "@modules/shared/components/open-file-manager-v2/open-file-manager-v2.component";
 import {OvicMultiSelectComponent} from "@modules/shared/components/ovic-multi-select/ovic-multi-select.component";
 import {DoitacSinhvienService, PartnerStudents} from "@shared/services/doitac-sinhvien.service";
@@ -33,7 +32,7 @@ import {MultiSelectModule} from "primeng/multiselect";
 @Component({
   selector: 'app-thong-bao',
   standalone: true,
-    imports: [CommonModule, FormsModule, ButtonModule, CheckboxModule, SelectModule, InputQuestionDirectionComponent, InputTextModule, MatCheckboxModule, PaginatorModule, ReactiveFormsModule, RippleModule, SharedModule, ThongbaoFilesComponent, OpenFileManagerV2Component, OvicMultiSelectComponent, RadioButtonModule, MultiSelectModule],
+    imports: [CommonModule, FormsModule, ButtonModule, CheckboxModule, SelectModule, InputQuestionDirectionComponent, InputTextModule, MatCheckboxModule, PaginatorModule, ReactiveFormsModule, RippleModule, SharedModule, OpenFileManagerV2Component, OvicMultiSelectComponent, RadioButtonModule, MultiSelectModule],
   templateUrl: './thong-bao.component.html',
   styleUrls: ['./thong-bao.component.css']
 })

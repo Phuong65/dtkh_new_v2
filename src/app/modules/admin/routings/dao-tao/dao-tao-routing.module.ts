@@ -1,9 +1,6 @@
-import { APP_CONFIGS } from '@env';
 import { ChamDiemKiemtraDaugioGuard } from '@modules/admin/features/lop-hoc-phan/class-details/cham-diem-kiemtra-daugio/cham-diem-kiemtra-daugio.guard';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
-const loadNewCom = APP_CONFIGS.loadNewCom;
 
 const routes: Routes = [
     {
@@ -45,10 +42,7 @@ const routes: Routes = [
     {
         path: 'cauhoi-tracnghiem',
         // loadComponent: () => import('@modules/admin/features/cauhoi-tracnghiem/topical-question-bank/topical-question-bank.component').then(c => c.TopicalQuestionBankComponent),
-        ...(loadNewCom
-            ? { loadChildren: () => import('@modules/admin/features/cauhoi-tracnghiem-v2/cauhoi-tracnghiem.module').then(m => m.CauhoiTracnghiemModule) }
-            : { loadComponent: () => import('@modules/admin/features/cauhoi-tracnghiem/topical-question-bank-v2/topical-question-bank-v2.component').then(c => c.TopicalQuestionBankV2Component) }
-        )
+        loadChildren: () => import('@modules/admin/features/cauhoi-tracnghiem-v2/cauhoi-tracnghiem.module').then(m => m.CauhoiTracnghiemModule)
     },
     {
         path: 'cauhoi-thuchanh-kthp',

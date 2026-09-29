@@ -65,8 +65,8 @@
                 <p-checkbox [disabled]="!isMultipleMode" name="group" [binary]="true"
                   (onChange)="onChangeCheckAllInPage($event)"></p-checkbox>
               </th>
-              <th style="width: 50px; text-align: center;">#</th>
-              <th>Tên <i (click)="sortFiles('title')" style="margin-left: 5px; cursor: pointer;" class="fa fa-sort"></i>
+              <th  style="width: 50px; text-align: center;">#</th>
+              <th class="text-left">Tên <i (click)="sortFiles('title')" style="margin-left: 5px; cursor: pointer;" class="fa fa-sort"></i>
               </th>
               <th style="width: 150px; text-align: center;">Kích thước <i (click)="sortFiles('size')"
                   style="margin-left: 5px; cursor: pointer;" class="fa fa-sort"></i></th>
@@ -87,7 +87,7 @@
                 {{file["index_"]}}
               </td>
               <td>
-                <div style="display: flex;">
+                <div style="display: flex; text-align:left;">
                   <i style="font-size: 18px; margin-right: 10px" class="icon-in-open-download-file"
                     [ngClass]="file | ovicFileIcon"></i>
                   <span

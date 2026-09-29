@@ -21,7 +21,7 @@ import { LoadMediaOnTextDirective } from '@modules/shared/directives/load-media-
 import { KatexDirective } from '@modules/shared/directives/katex.directive';
 import { LatexHandleComponent } from '@modules/shared/components/latex-handle/latex-handle.component';
 import { MatDialog } from '@angular/material/dialog';
-import renderMathInElement from 'katex/dist/contrib/auto-render';
+
 import katex from 'katex'
 import { KatexImgDirective } from '@modules/shared/directives/katex-img.directive';
 import { SkeletonModule } from 'primeng/skeleton';

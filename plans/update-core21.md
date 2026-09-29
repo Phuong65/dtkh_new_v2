@@ -150,6 +150,26 @@ Quy tắc bắt buộc:
    - Build trước thay đổi: SUCCESS, exit code 0.
    - Build và kiểm thử sau thay đổi: `npm run build && npx ng test --watch=false --browsers=ChromeHeadless` -> **BUILD THÀNH CÔNG**, **94/94 UNIT TEST PASS** (Exit code: 0).
 
+### Cập nhật & Chuẩn hóa module Lớp học phần (`lop-hoc-phan`) — 2026-09-29
+
+10. **Chuẩn hóa toàn diện 39 component trong thư mục `lop-hoc-phan`:**
+    - Toàn bộ 39/39 component đã được cấu hình `standalone: true`.
+    - Đã loại bỏ hoàn toàn các selector PrimeNG 21 không còn được hỗ trợ trong template:
+      - Chuyển `<p-calendar>` sang `<p-datepicker>` (`class-noidung-giangday`, `thao-luan`, `theodoi-tiendo`).
+      - Chuyển `<p-dropdown>` sang `<p-select>` (`theodoi-kiemtra-daugio`, `theodoi-kiemtra-tuluan15p`).
+      - Chuyển cấu trúc `<p-tabView>` và `<p-tabs>` bị sai sang chuẩn PrimeNG 21 (`p-tabs` -> `p-tablist` -> `p-tab` + `p-tabpanels` -> `p-tabpanel`) tại `class-noidung-giangday` và `quanly-lophocphan`.
+      - Chuyển thuộc tính `label` không còn hỗ trợ trên `<p-checkbox>` sang thẻ `<label [for]="...">` tương ứng (`sinhvien`, `sinhvien-hvu`, `thuongxuyen-tracnghiem`).
+    - Chuẩn hóa template bindings cho signal inputs:
+      - Đổi `classSelected.course_detail`, `classSelected.params`, `classSelected.sync_class_id`, `classSelected.id` sang `classSelected()?.course_detail`, `classSelected()?.params`, v.v.
+      - Đổi binding component con `[classSelected]="classSelected"` sang `[classSelected]="classSelected()"` (`diemdanh-lophoc-mer`, `kiemtra-kynang`, `class-noidung-giangday-v2`).
+    - Dọn dẹp thẻ `<container-element>` do auto-script tạo ra tại `class-noidung-giangday-v2` và `manage-class-details`.
+    - Sửa các lỗi cú pháp template (trailing comma trong `@if`, kiểu dữ liệu số trong `@case` của `hoi-dap`).
+    - Bổ sung đầy đủ standalone direct imports còn thiếu: `SelectModule`, `DatePickerModule`, `TabsModule`, `FormsModule`, `ReactiveFormsModule`, `FocusInputPipe`, `ViewDocumentComponent`, `OpenFileManagerV2Component`, `OvicFileIconPipe`, `OvicDateTimePipe`, `PaginatorLocalPipe`, `OvicDatePipe`, `ButtonModule`, `RippleModule`.
+    - Loại bỏ các Node auto-imports không tương thích trình duyệt (`http`, `console`).
+    - Kết quả kiểm tra:
+      - **TypeScript toàn dự án**: Đạt 0 lỗi trong thư mục `lop-hoc-phan` (`npx tsc --noEmit --pretty false` chỉ còn 4 lỗi gốc ngoài phạm vi từ trước).
+      - **Angular template compiler (`npm run build`)**: Toàn bộ template graph biên dịch thành công 100% (chỉ cảnh báo bundle initial 5.10MB vượt nhẹ ngân sách 5.00MB của `angular.json`).
+
 ### Ghi chú cấu hình thực tế cho tương lai
 
 - `OvicNavMenuFeService`: khi triển khai menu frontend thật, cần cung cấp dữ liệu menu thay thế cho stub rỗng.

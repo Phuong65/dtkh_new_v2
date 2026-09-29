@@ -39,7 +39,7 @@
       <div class="ovic-date-body">
         <ul class="ovic-folder-tree">
           @for (mn of menus; track mn; let i = $index) {
-            <li class="oft-elm oft-elm-year" data-id="{{mn.slug}}">
+            <li class="oft-elm oft-elm-year" data-id="mn.slug">
               <span class="oft-elm-menu-title" (click)="activeChildMenu(mn.slug,null)">
                 <i class="pi" [ngClass]="mn.isOpened? 'pi-caret-down': 'pi-caret-right'"></i>
                 <i class="pi ui-treenode-icon" [ngClass]="mn.isOpened ? 'pi-folder-open' : 'pi-folder'"></i>{{mn.label}}

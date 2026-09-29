@@ -7,6 +7,8 @@ import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { AbstractControl } from '@angular/forms';
 import { AuthService } from '@core/services/auth.service';
 import { BUTTON_NO , BUTTON_YES } from '@core/models/buttons';
+import { OvicProgressComponent } from '../ovic-progress/ovic-progress.component';
+import { BrowserModule } from '@angular/platform-browser';
 
 interface OvicFolderTreeObject {
 	slug : string;
@@ -18,7 +20,8 @@ interface OvicFolderTreeObject {
 @Component( {standalone: true, 
 	selector    : 'ovic-file-manager' ,
 	templateUrl : './ovic-file-manager.component.html' ,
-	styleUrls   : [ './ovic-file-manager.component.css' ]
+	styleUrls   : [ './ovic-file-manager.component.css' ],
+ imports: [OvicProgressComponent, BrowserModule]
 } )
 export class OvicFileManagerComponent implements OnInit , OnChanges {
 

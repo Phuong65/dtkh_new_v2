@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import * as moment from 'moment-timezone';
+import moment from 'moment-timezone';
 import { DurationInputArg1 , DurationInputArg2 , MomentFormatSpecification , MomentInput } from 'moment/moment';
 import { Moment } from 'moment';
 

@@ -1,1 +1,26 @@
-﻿<div class="p-3">diemdanh-lophoc-mer.component works!</div>
+<div class="diemdanh-layout">
+    <p-tabs [(value)]="activityIndex" styleClass="tab-lesson-view tab-diem-danh-view">
+
+        <p-tablist>
+            <p-tab [value]="0">Điểm danh</p-tab>
+            <p-tab [value]="1">Tổng hợp kết quả</p-tab>
+        </p-tablist>
+
+        <p-tabpanels>
+            <p-tabpanel [value]="0">
+                @if (activityIndex === 0) {
+                <app-diemdanh-lophoc-v2 [classSelected]="classSelected()">
+                </app-diemdanh-lophoc-v2>
+                }
+            </p-tabpanel>
+
+            <p-tabpanel [value]="1">
+                @if (activityIndex === 1) {
+                <app-diemdanh-lophoc [classSelected]="classSelected()">
+                </app-diemdanh-lophoc>
+                }
+            </p-tabpanel>
+        </p-tabpanels>
+
+    </p-tabs>
+</div>

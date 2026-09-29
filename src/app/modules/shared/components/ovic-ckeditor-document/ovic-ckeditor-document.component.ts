@@ -26,7 +26,7 @@ import { LoadMediaOnTextDirective } from '../../directives/load-media-on-text.di
     selector: 'ovic-ckeditor-document',
     templateUrl: './ovic-ckeditor-document.component.html',
     styleUrls: ['./ovic-ckeditor-document.component.css'],
-    imports: [CommonModule, KatexImgDirective, LoadMediaOnTextDirective, LatexHandleComponent]
+    imports: [CommonModule, KatexImgDirective, LoadMediaOnTextDirective]
 })
 
 export class OvicCkeditorDocumentComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
