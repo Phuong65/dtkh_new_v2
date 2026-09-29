@@ -257,7 +257,7 @@
         <p-splitter panelStyleClass="class-tieuchi-spliter-panel" [panelSizes]="[50,50]"
           [style]="{'height': '100%'}">
           <ng-template pTemplate>
-            <div style="width: 100%; height: 100%; background-color: #eaeaea; overflow: auto;">
+            <div style="width: 100%; height: 100%; background-color: #eaeaea; overflow: auto; font-size: 14px;">
               <div class="document-type-a4 document-cauhoi-layout">
                 <div
                   style="display: flex; align-items: center; padding: 10px; background: var(--orange-100);">
@@ -382,9 +382,10 @@
                             style="padding: 0px;">
                             @if (!item['collapsed']) {
                               <div class="row form-row form-row-flex-row">
-                                <div class="col-12">
+                                <div class="col-10">
                                   <label>Hướng dẫn chấm:</label>
                                   <ovic-ckeditor-document
+                                    [eagerLoad]="true"
                                     (onSaveData)="onChangeEditorTieuchi($event,item)"
                                     [changeId]="item.id" [autoSave]="true" [default]="item.desc"
                                     styleClass="vietbaocao-doctument-content">

@@ -50,6 +50,8 @@ export class OvicCkeditorDocumentComponent implements OnInit, OnChanges, AfterVi
 
     @Input() isReadOnly = false;
 
+    @Input() eagerLoad = false;
+
     @Input() toolBarPosition: TemplateRef<any>;
 
     @Input() styleClass: string;
@@ -199,6 +201,13 @@ export class OvicCkeditorDocumentComponent implements OnInit, OnChanges, AfterVi
     }
 
     ngAfterViewInit() {
+        if (this.eagerLoad) {
+            this.isReadyToLoad = true;
+            this.cd.detectChanges();
+            this.createEditor();
+            return;
+        }
+
         this.initLazyLoad();
     }
 

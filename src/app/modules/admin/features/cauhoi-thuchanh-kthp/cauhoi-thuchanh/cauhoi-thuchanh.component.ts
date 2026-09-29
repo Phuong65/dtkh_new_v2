@@ -4,7 +4,7 @@ import { ElngUserProfileService } from '@modules/shared/services/elearning-user-
 import { CoursePlanActivitiesService } from '@modules/shared/services/course-plan-activities.service';
 
 import { NotificationService } from '@core/services/notification.service';
-import { Component, OnInit, TemplateRef, inject, viewChild, viewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, TemplateRef, inject, viewChild, viewChildren } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ConditionOption } from '@modules/shared/models/condition-option';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -69,6 +69,7 @@ import { OvicDateTimePipe } from '@modules/shared/pipes/ovic-date-time.pipe';
 })
 export class CauhoiThuchanhComponent implements OnInit {
     private activatedRoute = inject(ActivatedRoute);
+    private changeDetectorRef = inject(ChangeDetectorRef);
     private ElnKhoaHocService = inject(ElnKhoaHocService);
     private notificationService = inject(NotificationService);
     private coursePlanActivitiesService = inject(CoursePlanActivitiesService);
@@ -393,7 +394,8 @@ export class CauhoiThuchanhComponent implements OnInit {
                 this.selectedForm['tong'] = _cauhoi.recordsFiltered;
 
                 this.list_cauhoi = _cauhoi.data;
-                
+                this.changeDetectorRef.detectChanges();
+
                 this.notificationService.isProcessing(false);
             },
             error: () => {
