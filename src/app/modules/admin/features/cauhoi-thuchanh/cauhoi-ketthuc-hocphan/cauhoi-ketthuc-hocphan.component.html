@@ -36,19 +36,20 @@
         [totalRecords]="totalCourse"></p-paginator>
       </div>
     </div>
-    <div class="layout_component_container-noidung mat-tab-chuandaura">
+    <div class="layout_component_container-noidung kthp-question-tabs">
       @if (courseSelected) {
         <div style="height: 100%;">
-          <mat-tab-group [selectedIndex]="indexTap">
+          <mat-tab-group [selectedIndex]="indexTap"
+            (selectedTabChange)="onSelectTap(list_typeQuestion_practice[$event.index], $event.index)">
             @for (lvl of list_typeQuestion_practice; track lvl.id; let i = $index) {
-              <mat-tab labelClass="mat-tab-chuandaura-title">
+              <mat-tab labelClass="kthp-question-tab-title">
                 <ng-template mat-tab-label>
                   <div class="normal-color">
                     {{lvl.label}} ({{courseSelected[lvl.key]?courseSelected[lvl.key]:'0'}})
                   </div>
                 </ng-template>
-                <div class="mat-tab-list-cauhoi">
-                  <div class="mat-tab-list-cauhoi-filter">
+                <div class="kthp-question-tab-body">
+                  <div class="kthp-question-toolbar">
                     <span style="flex:1">
                       <input (keyup)="filterNone(1)" (keyup.enter)="filterIdTuluan(1)"
                         [(ngModel)]="codeTuluan" style="width: 200px;" placeholder="Tìm kiếm theo mã">
@@ -58,28 +59,22 @@
                           <i class="fa-solid fa-arrow-up-z-a"></i>
                         </button>
                       </span>
-                      <span class="tqb-tbl-col-cdr-number__buttons">
-                        @if (canAdd) {
-                          <button (click)="onOpenAddQuestion(lvl, i)" ngbTooltip="Thêm câu hỏi"
-                            placement="bottom" container="body" class="btn tqb-col__btn">
-                            <i class="pi pi-plus"></i>
-                          </button>
-                        }
-                        <button ngbTooltip="Xem" placement="bottom" container="body" (click)="onSelectTap(lvl, i)"
-                          class="btn tqb-col__btn">
-                          <i class="pi pi-search"></i>
-                        </button>
-                      </span>
                       @if (indexTap === 0) {
-                        <button (click)="openSinhdeTuluan()" class="btn btn-primary">
+                        <button (click)="openSinhdeTuluan()" class="btn btn-primary" style="margin-right: 7px;">
                           <i class="fa fa-files-o"></i>
                           Sinh đề từ câu hỏi
                         </button>
                       }
+                      @if (canAdd) {
+                        <button type="button" (click)="onOpenAddQuestion(lvl, i)" class="btn btn-success">
+                          <i class="pi pi-plus"></i>
+                          {{lvl.key === 'GROUP_QUESTION' ? 'Thêm đề' : 'Thêm câu hỏi'}}
+                        </button>
+                      }
                     </div>
-                    <div class="mat-tab-list-cauhoi-list">
+                    <div class="kthp-question-list">
                       @for (quest of list_tuluan; track quest.id) {
-                        <div class="mat-tab-list-cauhoi-doc">
+                        <div class="kthp-question-item">
                           <div class="header-question">
                             @switch (quest.type) {
                               @case ('QUESTION') {
@@ -600,7 +595,7 @@
             <div class="row form-row form-row-flex-row">
               <div class="col-12">
                 <label>CĐR liên quan:<span class="ovic-mark">*</span></label>
-                <p-multiSelect [overlayOptions]="{ baseZIndex: 1999 }" appendTo="body" (onChange)="onSelectCDR()"
+                <p-multiSelect [overlayOptions]="{ baseZIndex: 1000000 }" appendTo="body" (onChange)="onSelectCDR()"
                   selectedItemsLabel="{0} items selected" formControlName="activity_cdr_ids"
                   [showClear]="true" [options]="list_activity_cdr" optionValue="id">
                 </p-multiSelect>
@@ -769,7 +764,7 @@
 
 
 <ng-template #templateFormAddTieuchicham let-c="close" let-d="dismiss">
-  <div class="ovic-over-right-section right-slide-class">
+  <div class="ovic-over-right-section right-slide-class criteria-fullscreen-drawer">
     <div class="ovic-over-right-section__head">
       <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
       <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
@@ -780,18 +775,22 @@
       <p-splitter panelStyleClass="class-tieuchi-spliter-panel" [panelSizes]="[50,50]"
         [style]="{'height': '100%'}">
         <ng-template pTemplate>
-          <div style="height: 100%; width: 100%;">
+          <div class="criteria-preview-panel" style="height: 100%; width: 100%;">
             <app-view-thuongxuyen-tuluan [courseSelected]="courseSelected" [tuluan]="selectedTuluan">
             </app-view-thuongxuyen-tuluan>
           </div>
         </ng-template>
         <ng-template pTemplate>
-          <div class="content-mat-tab-tieuchicham" style="height: 100%; width: 100%;">
+          <div class="content-mat-tab-tieuchicham criteria-panel-content" style="height: 100%; width: 100%;">
             <div style="padding: 5px; display: flex; align-items: center; border-bottom: 1px solid #c8c8c8; background-color: rgba(0, 0, 0, .1);"
-              class="content-mat-tab-tieuchicham-top">
+              class="content-mat-tab-tieuchicham-top criteria-panel-toolbar">
               <span style="flex:1; margin-right: 5px;">
-                <strong>Tổng tiêu chí:</strong> {{list_tieuchi_chamdiem.length}}
-                - <strong>Tổng điểm tiêu chí:</strong> {{returnTotalPointTieuChi()}}
+                <div style="font-size: 14px;">
+                  <strong>Tổng tiêu chí:</strong> {{list_tieuchi_chamdiem.length}}
+                </div>
+                <div style="font-size: 14px;">
+                  <strong>Tổng điểm tiêu chí:</strong> {{returnTotalPointTieuChi()}}
+                </div>
               </span>
               @if (list_tieuchi_chamdiem.length && selectedTuluan && selectedTuluan.status !== 1) {
                 <button
@@ -810,8 +809,7 @@
               }
             </div>
             @if (list_tieuchi_chamdiem && list_tieuchi_chamdiem.length) {
-              <div style="height: calc(100% - 41px); padding: 5px; overflow: auto;"
-                >
+              <div class="criteria-list-scroll" style="padding: 5px;">
                 @for (item of list_tieuchi_chamdiem; track item.id; let i = $index) {
                   <div class="tieuchicham-card-panel">
                     <p-panel #panel_tieuchi [collapsed]="item['collapsed']" [toggleable]="true">
@@ -822,33 +820,33 @@
                               <div class="col-9">
                                 <textarea
                                   [disabled]="selectedTuluan && selectedTuluan.status === 1? true: false"
-                                  style="width: 100%; resize: none; height: -webkit-fill-available;"
+                                  style="width: 100%; resize: none; height: -webkit-fill-available; font-size: 14px;"
                                   cols="2" placeholder="Nhập tiêu đề cho tiêu chí {{i + 1}}"
                                   class="ovic-input-field" [(ngModel)]="item.title">
                                 </textarea>
                               </div>
-                              <div class="col-3">
-                                <div style="margin-bottom: 5px;" class="p-inputgroup">
-                                  <span style="border-radius: 0px; padding: 0px;"
-                                  class="p-inputgroup-addon">Điểm:</span>
-                                  <input style="width: inherit;"
+                              <div class="col-3 criteria-point-controls">
+                                <div class="p-inputgroup criteria-point-input">
+                                  <span style="border-radius: 0px; padding: 0px; font-size: 14px;"
+                                    class="p-inputgroup-addon">Điểm:</span>
+                                  <input
                                     [disabled]="selectedTuluan && selectedTuluan.status === 1? true: false"
                                     #input_point_tieuchi
                                     (keydown)="pointQuestionKeyDown($event,input_point_tieuchi)"
                                     (keyup)="pointTieuchiKeyup($event,input_point_tieuchi,item)"
                                     type="text" class="ovic-input-field"
                                     [(ngModel)]="item.point">
-                                  </div>
-                                  <div>
-                                    <p-select
-                                      [disabled]="selectedTuluan && selectedTuluan.status === 1? true: false"
-                                      [style]="{'width': '100%'}" optionDisabled="disabled"
-                                      optionValue="id" [options]="chuandaura"
-                                      [(ngModel)]="item.cdr" optionLabel="label">
-                                    </p-select>
-                                  </div>
+                                </div>
+                                <div class="criteria-point-select">
+                                  <p-select
+                                    [disabled]="selectedTuluan && selectedTuluan.status === 1? true: false"
+                                    [style]="{'width': '100%'}" optionDisabled="disabled"
+                                    optionValue="id" [options]="chuandaura"
+                                    [(ngModel)]="item.cdr" optionLabel="label">
+                                  </p-select>
                                 </div>
                               </div>
+                            </div>
                               <div>
                                 @if (list_tieuchi_chamdiem.length > selectedTuluan.point) {
                                   <button
@@ -871,13 +869,13 @@
                         <div class="ovic-vertical__inputs form-setting-lesson edit-hight-200"
                           style="padding: 0px;">
                           <div class="row form-row form-row-flex-row">
-                            <div class="col-12">
+                            <div class="col-10">
                               <label>Hướng dẫn chấm:</label>
                               <ovic-ckeditor-document
                                 [isReadOnly]="selectedTuluan && selectedTuluan.status === 1 ? true : false"
                                 (onSaveData)="onChangeEditorTieuchi($event,item)"
                                 [changeId]="item.id" [autoSave]="true" [default]="item.desc"
-                                styleClass="vietbaocao-doctument-content">
+                                styleClass="vietbaocao-doctument-content tieuchicham-editor-width">
                               </ovic-ckeditor-document>
                             </div>
                           </div>
@@ -887,8 +885,7 @@
                   }
                 </div>
               } @else {
-                <div
-                  style="display: flex; align-items: center; justify-content: center; height: calc(100% - 41px); width: 100%;">
+                <div class="criteria-list-empty">
                   @if (!selectedTuluan['tuluan_root_ids']) {
                     <div
                       style="text-align: center; width: 400px; margin: 0 auto;">

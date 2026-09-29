@@ -2585,30 +2585,67 @@ p-calendar {
     height: calc(100% - 70px);
 }
 
-.mat-tab-chuandaura .mat-tab-labels {
+.kthp-question-tabs .mat-tab-labels {
     justify-content: center;
 }
 
-.mat-tab-chuandaura .mat-tab-group {
+.kthp-question-tabs .mat-tab-group {
     height: 100%;
     overflow: hidden;
 }
 
-.mat-tab-chuandaura .mat-tab-body-wrapper {
+.kthp-question-tabs .mat-tab-body-wrapper {
     height: calc(100% - 49px);
     overflow: auto;
 }
 
-.mat-tab-chuandaura .mat-tab-label {
+.kthp-question-tabs .mat-mdc-tab-group {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.kthp-question-tabs .mat-mdc-tab-header {
+    flex: 0 0 auto;
+}
+
+.kthp-question-tabs .mat-mdc-tab-body-wrapper {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.kthp-question-tabs .mat-mdc-tab-body {
+    min-height: 0;
+    overflow: hidden;
+}
+
+.kthp-question-tabs .mat-mdc-tab-body-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.kthp-question-tabs .mat-tab-label {
     opacity: 1;
 }
 
-.mat-tab-chuandaura .mat-tab-label:hover .tqb-tbl-col-cdr-number__buttons {
+.kthp-question-tabs .mat-mdc-tab.mat-mdc-tab-disabled,
+.kthp-question-tabs .mat-mdc-tab.mat-mdc-tab-disabled .mdc-tab__content {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.kthp-question-tabs .mat-tab-label:hover .tqb-tbl-col-cdr-number__buttons {
     visibility: visible;
     opacity: 1;
 }
 
-.mat-tab-chuandaura .mat-tab-label:hover .tqb-tbl-col-cdr-number__buttons .tqb-col__btn {
+.kthp-question-tabs .mat-tab-label:hover .tqb-tbl-col-cdr-number__buttons .tqb-col__btn {
     -webkit-transform: scale(1);
     -moz-transform: scale(1);
     transform: scale(1);
@@ -3211,11 +3248,33 @@ p-calendar {
     border-radius: 0px !important;
 }
 
+.tieuchicham-card-panel .tieuchicham-editor-width {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.criteria-editor-card .p-panel-header {
+    padding: 6px 8px;
+    font-size: 14px;
+}
+
+.criteria-instructions-editor .ck-content {
+    min-height: 120px !important;
+    max-height: 120px;
+    overflow-y: auto;
+    font-size: 14px;
+}
+
 .tieuchicham-card-panel .p-panel .p-panel-content {
     border-radius: 0px !important;
 }
 
 .tieuchicham-card-panel .p-panel .p-panel-icons {
+    display: none;
+}
+
+.tieuchicham-card-panel .p-panel-header-actions {
     display: none;
 }
 

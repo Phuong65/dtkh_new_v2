@@ -1,1 +1,10 @@
-﻿<div class="p-3">import-sinhvien-main.component works!</div>
+<div class="layout_component_container">
+    @switch (key_server) {
+        @case ('hvu') {
+            <app-import-sinhvien-hvu [hide_back]="true"></app-import-sinhvien-hvu>
+        }
+        @case ('ictu') {
+            <app-import-sinhvien-ictu [hide_back]="true"></app-import-sinhvien-ictu>
+        }
+    }
+</div>

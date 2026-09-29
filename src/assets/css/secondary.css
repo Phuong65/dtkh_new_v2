@@ -116,7 +116,6 @@
 
 p-select:has(.p-select-open) {
     position: relative;
-    z-index: 2147483647;
 }
 
 .p-select .p-select-label {

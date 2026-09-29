@@ -11,6 +11,7 @@ import { OvicSafeUrlPipe } from './pipes/ovic-safe-url.pipe';
 import { ShowLabelData } from './pipes/show-label-data.pipe';
 import { StringToArrayPipe } from './pipes/string-to-array-pipe';
 import { IctuMediaLinkPipe } from './pipes/ictu-media-link.pipe';
+import { PaginatorLocalPipe } from './pipes/paginator-local.pipe';
 import { KatexImgDirective } from './directives/katex-img.directive';
 import { LoadMediaOnTextDirective } from './directives/load-media-on-text.directive';
 
@@ -29,6 +30,7 @@ import { LoadMediaOnTextDirective } from './directives/load-media-on-text.direct
     ShowLabelData,
     StringToArrayPipe,
     IctuMediaLinkPipe,
+    PaginatorLocalPipe,
     KatexImgDirective,
     LoadMediaOnTextDirective
   ],
@@ -43,8 +45,10 @@ import { LoadMediaOnTextDirective } from './directives/load-media-on-text.direct
     ShowLabelData,
     StringToArrayPipe,
     IctuMediaLinkPipe,
+    PaginatorLocalPipe,
     KatexImgDirective,
     LoadMediaOnTextDirective
   ]
 })
 export class SharedModule { }
+

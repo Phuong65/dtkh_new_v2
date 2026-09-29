@@ -1,1 +1,35 @@
-﻿<div class="p-3">import-tueba-main.component works!</div>
+<div class="layout_component_container">
+    @switch (keyImport) {
+        @default {
+            <div class="import-content row">
+                @for (item of list_import_function; track item.key) {
+                    <div class="col-4 item-card-import">
+                        <div class="card-import">
+                            <a [routerLink]="[]" [queryParams]="{code: item.key}" class="card-import-desc">
+                                <span [innerHTML]="item['icon']"></span>
+                                <span>
+                                    {{item['label']}}
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        @case ('mon-hoc') {
+            <app-import-monhoc-tueba></app-import-monhoc-tueba>
+        }
+        @case ('sinh-vien') {
+            <app-import-sinhvien-tueba></app-import-sinhvien-tueba>
+        }
+        @case ('giang-vien') {
+            <app-import-giangvien-tueba></app-import-giangvien-tueba>
+        }
+        @case ('lop-hoc') {
+            <app-import-lophoc-tueba></app-import-lophoc-tueba>
+        }
+        @case ('lich-hoc') {
+            <app-import-lichhoc-tueba></app-import-lichhoc-tueba>
+        }
+    }
+</div>

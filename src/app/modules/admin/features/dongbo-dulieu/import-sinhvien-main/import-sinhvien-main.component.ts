@@ -1,18 +1,27 @@
-﻿import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {RouterModule} from '@angular/router';
+import { ImportSinhvienComponent as ImportSinhvienComponentHvu } from '../import-hvu/import-sinhvien/import-sinhvien.component';
+import { ImportSinhvienComponent as ImportSinhvienComponentIctu } from '../import-ictu/import-sinhvien/import-sinhvien.component';
+import { key_server } from '@env';
 
 @Component({
     selector: 'app-import-sinhvien-main',
-    templateUrl: './import-sinhvien-main.component.html',
-    styleUrls: ['./import-sinhvien-main.component.css'],
     standalone: true,
-    imports: [CommonModule,RouterModule]
+    imports: [
+        CommonModule,
+        ImportSinhvienComponentHvu,
+        ImportSinhvienComponentIctu
+    ],
+    templateUrl: './import-sinhvien-main.component.html',
+    styleUrls: ['./import-sinhvien-main.component.css']
 })
 export class ImportSinhvienMainComponent implements OnInit {
-    constructor() {}
-    ngOnInit(): void {}
+
+    key_server = key_server;
+
+    constructor() { }
+
+    ngOnInit(): void {
+    }
+
 }
-
-
-
