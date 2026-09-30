@@ -1,1 +1,762 @@
-﻿<div class="p-3">noidung-hoctap.component works!</div>
+<div class="ovic-khoa-hoc__container expander-setting-lesson-layout layout_component_container">
+  <div class="khoa-hoc-header"
+    style="padding: 5px; border-bottom: 1px solid #c8c8c8; display: flex; justify-content: space-between;">
+    <input (keyup)="seacherKhoaHocWithTitle($event)" type="text" class="ovic-input-field" autocomplete="off"
+      placeholder="Nhập tên rồi nhấn enter" style="width: 300px;" />
+      <div style="display: flex;">
+        @if (routerDaotao || routerAdmin) {
+          <ovic-dropdown styleClass="dropdown-250"
+            (onChange)="onChangeFilterChuyenmon($event)" placeholder="---chọn khoa---"
+            [options]="list_donvi_chuyenmon" optionId="id" optionLabel="title" [filter]="true"
+            [defaultValue]="categoryFilter" filterBy="title">
+          </ovic-dropdown>
+        }
+        @if (routerLanhdaokhoa && canAdd) {
+          <button style="margin-left: 5px; line-height: 1; "
+            (click)="openFolderDeCuong()" class="btn btn-success">
+            <i style="font-size: 13px;" class="fa fa-book"></i>
+            Cập nhật đề cương
+          </button>
+        }
+
+        @if ((routerDaotao || routerAdmin) && canAdd && (key_server === 'dttx-ictu' || key_server === 'ictu' || key_server === 'tueba_dttx')) {
+          <button (click)="reUpdateCourse()"
+            class="btn btn-success" style="margin-left: 5px;line-height: 1; ">
+            <i class="fa fa-plus"></i>Thêm mới
+          </button>
+        }
+
+        @if ((routerDaotao || routerAdmin || routerLanhdaobomon || routerLanhdaokhoa) && canAdd && key_server === 'hvu') {
+          <button
+            (click)="reUpdateCourse()" class="btn btn-success" style="margin-left: 5px;line-height: 1; ">
+            <i class="fa fa-plus"></i>Thêm mới
+          </button>
+        }
+
+        @if ((routerDaotao || routerAdmin || routerLanhdaokhoa) && canAdd) {
+          <button
+            [matMenuTriggerFor]="menuMonhoc" class="btn btn-primary btn-icon" style="margin-left: 5px;">
+            <i class="fa fa-ellipsis-h"></i>
+          </button>
+        }
+        <mat-menu #menuMonhoc="matMenu">
+          @if (routerDaotao || routerAdmin || routerLanhdaokhoa) {
+            <button (click)="openFolderDeCuong()"
+              mat-menu-item>
+              <span>Cập nhật đề cương</span>
+            </button>
+          }
+          @if (routerDaotao || routerAdmin || routerLanhdaokhoa) {
+            <button (click)="openTemplateImportCbthi()"
+              mat-menu-item>
+              <span>Import GV test bộ câu hỏi TN</span>
+            </button>
+          }
+          @if (routerDaotao || routerAdmin || routerLanhdaokhoa) {
+            <button (click)="onOpenImportTemplate()"
+              mat-menu-item>
+              <span>Import Hội đồng duyệt</span>
+            </button>
+          }
+          @if (routerDaotao || routerAdmin || routerLanhdaokhoa) {
+            <button (click)="btnDowloadUpateData()" [disabled]="categoryFilter == null"
+              mat-menu-item>
+              <span>Tải về báo cáo cập nhật dữ liệu</span>
+            </button>
+          }
+        </mat-menu>
+      </div>
+    </div>
+    <div class="khoa-hoc-list" style="padding: 5px;">
+      <p-table [value]="dmKhoahoc"
+        styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-none-header ovic-ui-table table-reBorder ">
+        <ng-template pTemplate="header">
+          <tr>
+            @for (col of cols_course; track $index) {
+              <th [ngClass]="col['class']">{{col['label']}}</th>
+            }
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr [ngClass]="selectedKhoahoc && selectedKhoahoc.id === row.id?'focus-row-table':''">
+            @for (col of cols_course; track $index) {
+              <td [ngClass]="col['class']">
+                @if (col['key'] !== 'title' && col['key'] !== 'editor_name') {
+                  <span>{{row[col['key']]}}</span>
+                }
+                @if (col['key'] === 'title') {
+                  <div class="title-col-flex">
+                    <span class="title-col-flex-text">{{row[col['key']]}}</span>
+                    @if (canAdd && canUpdate) {
+                      <button [matMenuTriggerFor]="menuAction"
+                        class="btn btn-success btn-icon btn-transparent">
+                        <i class="fa fa-ellipsis-v"></i>
+                      </button>
+                    }
+                    <mat-menu #menuAction="matMenu">
+                      <!-- <a [routerLink]="['clo']" [queryParams]="{code: row.id}"
+                      style="text-decoration: none; color: #333;" mat-menu-item>
+                      <span style="margin-right: 10px;">
+                        <i class="fa fa-list-ul" ></i>
+                      </span>
+                      <span>Quản lý CLO</span>
+                    </a> -->
+                    <a [routerLink]="['chitiet-kehoach']" [queryParams]="{code: row.id}"
+                      style="text-decoration: none; color: #333;" mat-menu-item>
+                      <span style="margin-right: 10px;">
+                        <i class="fa fa-list-ul" ></i>
+                      </span>
+                      <span>Cập nhật nội dung giảng dạy</span>
+                    </a>
+                    <a [routerLink]="['phanbo-cdr-cauhoi']" [queryParams]="{code: row.id}"
+                      style="text-decoration: none; color: #333;" mat-menu-item>
+                      <span style="margin-right: 10px;">
+                        <i class="fa fa-table" ></i>
+                      </span>
+                      <span>Phân bổ câu hỏi CDR</span>
+                    </a>
+                    <a [routerLink]="['form-de']" [queryParams]="{code: row.id}"
+                      style="text-decoration: none; color: #333;" mat-menu-item>
+                      <span style="margin-right: 10px;">
+                        <i class="fa fa-list-alt" ></i>
+                      </span>
+                      <span>Quản lý form đề</span>
+                    </a>
+                    <button (click)="openTestTuan(row)" mat-menu-item>
+                      <span style="margin-right: 10px;">
+                        <i class="fa fa-calendar" ></i>
+                      </span>
+                      <span>Sinh đề trắc nghiệm tuần</span>
+                    </button>
+                    @if (key_server == 'hvu') {
+                    } @else {
+                      <button (click)="openTest15p(row)" mat-menu-item>
+                        <span style="margin-right: 10px;">
+                          <i class="fa fa-list-alt" ></i>
+                        </span>
+                        <span>Sinh đề trắc nghiệm 15p</span>
+                      </button>
+                    }
+                    <button (click)="openTestKynang(row)" mat-menu-item>
+                      <span style="margin-right: 10px;">
+                        <i class="fa fa-clock-o" ></i>
+                      </span>
+                      <span>Sinh đề trắc nghiệm thường xuyên</span>
+                    </button>
+                    @if ((routerDaotao || routerAdmin) && canAdd) {
+                      <button
+                        (click)="actionsEvent({key: 'pms-create-plan'},row)" mat-menu-item>
+                        <span style="margin-right: 10px;">
+                          <i class="fa fa-tasks" ></i>
+                        </span>
+                        <span>Phân quyền cập nhật nội dung</span>
+                      </button>
+                    }
+                    <button (click)="editKhoaHoc(row)" mat-menu-item>
+                      <span style="margin-right: 10px;">
+                        <i class="fa fa-pencil-square-o" ></i>
+                      </span>
+                      <span>Sửa</span>
+                    </button>
+                    @if ((routerDaotao || routerAdmin) && canDelete) {
+                      <button
+                        (click)="deleteKhoahoc(row.id)" mat-menu-item>
+                        <span style="margin-right: 10px;">
+                          <i class="fa fa-trash" ></i>
+                        </span>
+                        <span>Xóa</span>
+                      </button>
+                    }
+                    @if ((routerDaotao || routerAdmin)) {
+                      <button (click)="cloneCourse(row)" mat-menu-item>
+                        <span style="margin-right: 10px;">
+                          <i class="fa fa-clipboard" ></i>
+                        </span>
+                        <span>Sao chép nội dung từ môn học khác</span>
+                      </button>
+                    }
+                    @if (routerDaotao || routerAdmin || key_server==='hvu') {
+                      <button
+                        (click)="dowloadCoursePlanDocument(row)" mat-menu-item>
+                        <span style="margin-right: 10px;">
+                          <i class="fa fa-file-archive-o" ></i>
+                        </span>
+                        <span>Tải tài liệu giảng dạy</span>
+                      </button>
+                    }
+                  </mat-menu>
+                </div>
+              }
+              @if (col['key'] === 'editor_name') {
+                <div [innerHTML]="row[col['key']]">
+                </div>
+              }
+            </td>
+          }
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  <div class="page-layout-set">
+    <p-paginator #paginator (onPageChange)="changePage($event)" [rows]="limitCourse"
+    [totalRecords]="totalCourse"></p-paginator>
+  </div>
+</div>
+
+<ng-template #templateImporCbthi let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section right-slide-class">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">Import danh sách cán bộ thi</h3>
+      <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+      (click)="closeForm()"></button>
+    </div>
+    <div style="line-height: 1.25; padding: 0px; height: calc(100vh - 58px)"
+      class="ovic-over-right-section__body footer-no-hint no-footer">
+      <app-import-canbothi></app-import-canbothi>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #templateImporthoidong let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section right-slide-class">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">Import danh sách hội đồng duyệt và người phụ trách môn học</h3>
+      <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+      (click)="closeForm()"></button>
+    </div>
+    <div style="line-height: 1.25; padding: 0px; height: calc(100vh - 58px)"
+      class="ovic-over-right-section__body footer-no-hint no-footer">
+      <app-import-hoidong-duyet></app-import-hoidong-duyet>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #templateTestWeek let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section right-slide-class">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header"> Sinh đề trắc nghiệm theo tuần</h3>
+      <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+      (click)="closeForm()"></button>
+    </div>
+    <div style="line-height: 1.25; padding: 15px; height: calc(100vh - 57px);"
+      class="ovic-over-right-section__body footer-no-hint">
+      <div class="">
+        <p-table [value]="list_week" styleClass="tbl-danhSachUser table-reBorder">
+          <ng-template pTemplate="caption">
+            <div>
+              <span>{{selectedKhoahoc?selectedKhoahoc.title:''}}</span>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 80px;"></th>
+              <th style="width: 150px; text-align: center;">Câu hỏi đã duyệt</th>
+              <th style="width: 100px; text-align: center;">Có đề</th>
+              <th style="text-align: center;">Trạng thái</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-row>
+            <tr>
+              <td>
+                <span style="font-weight: 600;">{{this.label_week + ' ' + row['week']}}</span>
+              </td>
+              <td style="text-align: center;">{{row['datuyet_question']}}</td>
+              <td style="text-align: center;">
+                @if (row['has_test']) {
+                  <span><i class="fa fa-check blue"></i></span>
+                }
+                @if (!row['has_test']) {
+                  <span>-</span>
+                }
+              </td>
+              <td style="text-align: center;">
+                @if (row['has_form'] === false || row['datuyet_question'] === 0) {
+                  <div>
+                    <span class="red">
+                      Chưa tạo form đề, không thể sinh đề kiểm tra
+                    </span>
+                  </div>
+                } @else {
+                  <div>
+                    <span style="margin-right: 10px;" class="blue">
+                      Đã sẵn sàng sinh đề kiểm tra
+                    </span>
+                    <button (click)="sinhDeByWeek(row)" style="line-height: 1;"
+                      class="btn btn-success">
+                      Sinh đề tại đây
+                    </button>
+                    @if (row['has_test']  && key_server === 'ictu') {
+                      <button
+                        pTooltip="Xóa tất cả đề" tooltipPosition="left" (click)="deleteDeWeek(row)"
+                        style="line-height: 1; margin-left: 10px;" class="btn btn-danger btn-icon">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                    }
+                    @if (row['has_test'] && (routerAdmin || routerDaotao || routerLanhdaokhoa) && key_server === 'hvu') {
+                      <button
+                        pTooltip="Xóa tất cả đề" tooltipPosition="left" (click)="deleteDeWeek(row)"
+                        style="line-height: 1; margin-left: 10px;" class="btn btn-danger btn-icon">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                    }
+                  </div>
+                }
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #templateTestdg let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section right-slide-class">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header"> Sinh đề trắc nghiệm 15p</h3>
+      <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+      (click)="closeForm()"></button>
+    </div>
+    <div style="line-height: 1.25; padding: 15px; height: calc(100vh - 57px);"
+      class="ovic-over-right-section__body footer-no-hint">
+      <div class="">
+        <p-table [value]="list_week_dg" styleClass="tbl-danhSachUser table-reBorder">
+          <ng-template pTemplate="caption">
+            <div>
+              <span>{{selectedKhoahoc?selectedKhoahoc.title:''}}</span>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 80px;"></th>
+              <th style="width: 150px; text-align: center;">Câu hỏi đã duyệt</th>
+              <th style="width: 100px; text-align: center;">Có đề</th>
+              <th style="text-align: center;">Trạng thái</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-row>
+            <tr>
+              <td>
+                <span style="font-weight: 600;">{{this.label_week + ' ' + row['week']}}</span>
+              </td>
+              <td style="text-align: center;">{{row['datuyet_question']}}</td>
+              <td style="text-align: center;">
+                @if (row['has_test']) {
+                  <span><i class="fa fa-check blue"></i></span>
+                }
+                @if (!row['has_test']) {
+                  <span>-</span>
+                }
+              </td>
+              <td style="text-align: center;">
+                @if (row['has_form'] === false || row['datuyet_question'] === 0) {
+                  <div>
+                    <span class="red">
+                      Chưa tạo form đề, không thể sinh đề kiểm tra
+                    </span>
+                  </div>
+                } @else {
+                  <div>
+                    <span style="margin-right: 10px;" class="blue">
+                      Đã sẵn sàng sinh đề kiểm tra
+                    </span>
+                    <button (click)="sinhDe15pByWeek(row)" style="line-height: 1;"
+                    class="btn btn-success">Sinh đề tại đây</button>
+                    @if (row['has_test'] && key_server==='ictu') {
+                      <button pTooltip="Xóa tất cả đề"
+                        tooltipPosition="left" (click)="delete15pDeByWeek(row)"
+                        style="line-height: 1; margin-left: 10px;" class="btn btn-danger btn-icon">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                    }
+                    @if (row['has_test'] && (routerAdmin || routerDaotao || routerLanhdaokhoa) && key_server === 'hvu') {
+                      <button
+                        pTooltip="Xóa tất cả đề" tooltipPosition="left"
+                        (click)="delete15pDeByWeek(row)" style="line-height: 1; margin-left: 10px;"
+                        class="btn btn-danger btn-icon">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                    }
+                  </div>
+                }
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #templateTestKynang let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section right-slide-class">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">Sinh đề trắc nghiệm thường xuyên</h3>
+      <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+      (click)="closeForm()"></button>
+    </div>
+    <div style="line-height: 1.25; padding: 15px; height: calc(100vh - 57px);"
+      class="ovic-over-right-section__body footer-no-hint">
+      <div class="ovic-vertical__inputs">
+        <div class="row form-row form-row-flex-row">
+          <p-table [value]="list_test_kynang" styleClass="tbl-danhSachUser table-reBorder ">
+            <ng-template pTemplate="caption">
+              <div>
+                <span>{{selectedKhoahoc?selectedKhoahoc.title:''}}</span>
+              </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 200px;"></th>
+                <th style="width: 90px; text-align: center;">Câu hỏi đã duyệt</th>
+                <th style="text-align: center; width:100px"> Có đề</th>
+                <th style="text-align: center;">Thao tác</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+              <tr>
+                <td>
+                  <span style="font-weight: 600;">{{row['title']}}</span>
+                </td>
+                <td style="text-align: center;">{{row['datuyet_question']}}</td>
+                <td style="text-align: center; width:100px">
+                  @if (row['has_test']) {
+                    <span><i class="fa fa-check blue"></i></span>
+                  }
+                  @if (!row['has_test']) {
+                    <span>-</span>
+                  }
+                </td>
+                <td style="text-align: center;">
+                  @if (row['has_form'] === false || row['datuyet_question'] === 0) {
+                    <div
+                      >
+                      <span class="red">
+                        Chưa tạo form đề, không thể sinh đề kiểm tra
+                      </span>
+                    </div>
+                  } @else {
+                    <div>
+                      <span style="margin-right: 10px;" class="blue">
+                        Đã sãn sàng sinh đề kiểm tra
+                      </span>
+                      <button (click)="sinhDeByKynang(row)" style="line-height: 1;"
+                      class="btn btn-success">Sinh đề tại đây</button>
+                      @if (row['has_test'] && key_server === 'ictu') {
+                        <button
+                          (click)="deleteDeKynang(row)" pTooltip="Xóa tất cả đề"
+                          tooltipPosition="left" style="line-height: 1; margin-left: 10px;"
+                          class="btn btn-danger btn-icon">
+                          <i class="fa fa-trash"></i>
+                        </button>
+                      }
+                      @if (row['has_test'] && (routerAdmin || routerDaotao || routerLanhdaokhoa) && key_server === 'hvu') {
+                        <button
+                          (click)="deleteDeKynang(row)" pTooltip="Xóa tất cả đề"
+                          tooltipPosition="left" style="line-height: 1; margin-left: 10px;"
+                          class="btn btn-danger btn-icon">
+                          <i class="fa fa-trash"></i>
+                        </button>
+                      }
+                    </div>
+                  }
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+        @if (key_server !== 'hvu') {
+          <div class="row form-row form-row-flex-row"
+            style="text-align: justify;">
+            <!-- <div class="col-12 flex-div"
+            style="font-size: 14px; color: red; padding: 10px; background: var(--yellow-100);">
+            <label style="font-weight: bold; margin-bottom: 10px;" for="title">Lưu ý:</label>
+            <div style="color: red;">
+              <p>- Đối với học phần 2 tín chỉ: Bài kiểm tra số 1 tổ chức tại tuần 3, bài kiểm tra số 2 tổ
+              chức tại tuần 5</p>
+              <p>- Đối với học phần 3 tín chỉ: Bài kiểm tra số 1 tổ chức tại tuần 4, bài kiểm tra số 2 tổ
+              chức tại tuần 6, bài kiểm tra số 3 tổ chức tại tuần 8</p>
+              <p>- Đối với học phần 4 tín chỉ: Bài kiểm tra số 1 tổ chức tại tuần 4, bài kiểm tra số 2 tổ
+                chức tại tuần 7, bài kiểm tra số
+              3 tổ chức tại tuần 9, bài kiểm tra số 4 tổ chức tại tuần 11</p>
+              <p>
+                <span style="text-decoration: underline; cursor: pointer;" (click)="openViewQuydinh()">
+                > Xem chi tiết quy định < </span>
+              </p>
+            </div>
+          </div> -->
+        </div>
+      } @else {
+        <div class="col-12 flex-div"
+          style="font-size: 14px; color: red; padding: 10px; background: var(--yellow-100);">
+          <span style="text-decoration: underline; cursor: pointer;" (click)="openViewQuydinhHvu()">
+          > Xem chi tiết quy định tạo bài kiểm tra thường xuyên < </span>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+</ng-template>
+
+<ng-template #templatePmsGiangvien let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section right-slide-class">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">Danh sách giảng viên</h3>
+      <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+      (click)="closeForm()"></button>
+    </div>
+    <div style="line-height: 1.25; padding: 5px; height: calc(100vh - 51px - 57px);"
+      class="ovic-over-right-section__body footer-no-hint">
+      <div style="height: 100%;" class="phanquyen-dulieu-content-left ovic-vertical__inputs">
+        <div class="form-row row">
+          <div class="col-12">
+            <input class="ovic-input-field" type="text" [(ngModel)]="searchUser" placeholder="Search">
+          </div>
+        </div>
+        @if ((listGiangvien |filter: searchUser : ['display_name','email']).length > 0) {
+          <mat-selection-list [multiple]="false" class="selection-list-mat" #users
+            (selectionChange)="changeSelecGiangvien($event)"
+            >
+            @for (user of listGiangvien | filter: searchUser : ['display_name','email']; track $index) {
+              <mat-list-option [selected]="user['check']"
+                [value]="user">
+                <div mat-line style="display: flex; align-items: center;">
+                  <div mat-line style="flex: 1;">
+                    <div mat-line>{{user.display_name}}</div>
+                    <div mat-line style="font-size: 12px;">{{user.email}} </div>
+                  </div>
+                  @if (user['check']) {
+                    <i class="fa fa-check" style="color: green;"></i>
+                  }
+                </div>
+              </mat-list-option>
+            }
+          </mat-selection-list>
+        } @else {
+          <div class="result-search-none">Không có cán bộ nào...</div>
+        }
+      </div>
+    </div>
+    <div class="ovic-dynamic-right-section__foot">
+      <p class="ovic-over-right-section__foot-wrap-buttons">
+        <button type="button" class="btn btn ovic-over-right-section__foot-btn btn-primary btn-primary"
+          (click)="savePmsGiangVien()"><i class="fa fa-floppy-o" ></i>Lưu lại
+        </button>
+      </p>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #templateKhoaHoc>
+  <div class="ovic-over-right-section">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+      <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
+    </div>
+    <div class="ovic-over-right-section__body" style="height: calc(100vh - 51px - 57px - 18px);">
+      <div class="ovic-vertical__inputs" style="line-height: 1.5;">
+        <form [formGroup]="formKhoaHoc" class="formKhoaHoc">
+          <div class="row form-row form-row-flex-row">
+            <div class="col-12 flex-div" [ngClass]="{ 'field-err' : !slugIsValid }">
+              <label for="title">Tên học phần:<span class="ovic-mark">*</span></label>
+              <input
+                [attr.disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa || routerLanhdaobomon? null : true"
+                type="text" id="title" class="ovic-input-field" formControlName="title"
+                autocomplete="off">
+              </div>
+            </div>
+
+            <div class="row form-row form-row-flex-row">
+              <div class="col-4 flex-div">
+                <label for="maso">Mã học phần:<span class="ovic-mark">*</span></label>
+                <input
+                  [attr.disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa || routerLanhdaobomon? null: true"
+                  type="text" id="maso" formControlName="maso" class="ovic-input-field">
+                </div>
+                <div class="col-4 flex-div">
+                  <label for="sotinchi">Số tín chỉ:<span class="ovic-mark">*</span></label>
+                  <input
+                    [attr.disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa || routerLanhdaobomon? null : true"
+                    type="number" id="sotinchi" formControlName="sotinchi" class="ovic-input-field">
+                  </div>
+                  <div class="col-4 flex-div">
+                    <label for="sotinchi_th">Số tín chỉ thực hành:<span class="ovic-mark">*</span></label>
+                    <input
+                      [attr.disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa || routerLanhdaobomon? null: true"
+                      type="number" id="sotinchi_th" formControlName="sotinchi_th" class="ovic-input-field">
+                    </div>
+                  </div>
+                  <div class="row form-row form-row-flex-row">
+                    <div class="col-12 flex-div">
+                      <label for="keywords">Khoa quản lý:<span class="ovic-mark">*</span></label>
+                      <ovic-dropdown [disabled]="routerDaotao || routerAdmin ? false : true"
+                        (onChange)="onChangeDonviCM($event)" placeholder="---chọn khoa---"
+                        [options]="list_donvi_chuyenmon" [defaultValue]="f['category_ids'].value" optionId="id"
+                        optionLabel="title" [formField]="f['category_ids']" [filter]="true"
+                      filterBy="title"></ovic-dropdown>
+                    </div>
+                  </div>
+                  <div class="row form-row form-row-flex-row">
+                    <div class="col-12 flex-div">
+                      <label for="keywords">Bộ môn:<span class="ovic-mark"></span></label>
+                      <ovic-dropdown [disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa? false : true"
+                        placeholder="---chọn bộ môn---" [options]="list_nganh_bomon"
+                        [defaultValue]="f['nganh_bomon_id'].value" optionId="id" optionLabel="title"
+                      [formField]="f['nganh_bomon_id']" [filter]="true" filterBy="title"></ovic-dropdown>
+                    </div>
+                  </div>
+                  <div class="row form-row form-row-flex-row">
+                    <div class="col-12 flex-div">
+                      <label for="keywords">Hình thức thi:<span class="ovic-mark">*</span></label>
+                      <ovic-groups-radio-v2 (onChange)="onChangeExam($event)" [formField]="f['exam_type']"
+                        group_name="EXAMFORMAT" [columns]="3" [verticalMode]="false" [options]="EXAMFORMAT"
+                        optionLabel="label" optionId="id"
+                        [defaultValue]="f['exam_type'].value ? f['exam_type'].value:null">
+                      </ovic-groups-radio-v2>
+                    </div>
+                  </div>
+
+                  <div class="row form-row form-row-flex-row">
+                    <div class="col-12 flex-div">
+                      <label>Mức độ yêu cầu CDR:<span class="ovic-mark">*</span></label>
+                      <ovic-groups-radio-v2
+                        [disabled]="selectedKhoahoc && selectedKhoahoc.params && selectedKhoahoc.params.cdr && !routerDaotao && !routerAdmin && !routerLanhdaobomon && !routerLanhdaokhoa? true : false"
+                        [disabled_item]="true" group_name="CHUAN_DAU_RA" optionLabel="label" [columns]="3"
+                        [options]="chuandaura" [defaultValue]="f['cdr']['value']" [formField]="f['cdr']"
+                        optionId="id">
+                      </ovic-groups-radio-v2>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <div class="ovic-dynamic-right-section__foot">
+              <p class="ovic-form-notes ovic-over-right-section__foot-ovic-input-line">
+                <i class="pi pi-info-circle"></i>các trường có đánh dấu ( <span class="ovic-mark">*</span> ) là bắt
+                buộc phải nhập
+              </p>
+              <p class="ovic-over-right-section__foot-wrap-buttons">
+                <button class="btn ovic-over-right-section__foot-btn btn-primary" (click)="processAddForm()">
+                  <i class="fa fa-floppy-o" ></i>Lưu lại
+                </button>
+              </p>
+            </div>
+          </div>
+        </ng-template>
+
+
+        <ng-template #templateFolder let-c="close" let-d="dismiss">
+          <div class="ovic-over-right-section right-slide-class">
+            <div class="ovic-over-right-section__head">
+              <h3 class="ovic-over-right-section__header">Danh sách tệp tin</h3>
+              <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+              (click)="closeRightForm()"></button>
+            </div>
+            <div style="line-height: 1.25; padding: 5px; height: calc(100vh - 57px - 50px);"
+              class="ovic-over-right-section__body footer-no-hint">
+              <div style="height: 100%; display: flex; flex-direction: column;"
+                class="phanquyen-dulieu-content-left ovic-vertical__inputs">
+                <div class="row form-row form-row-flex-row">
+                  <div class="col-12"
+                    style="color: red; padding: 10px; font-size: 14px; background-color: #f2d06642; line-height: 1.5;">
+                    <label style="color: red;" for="video">Lưu ý:</label>
+                    <div style="display: flex; flex-direction: column;">
+                      <span>- Chức năng này dùng để cập nhật đề cương cho nhiều môn</span>
+                      <span>- Đề cương phải là file pdf và tên file có cấu trúc: "Mã môn"_"Tên đề cương"</span>
+                      <span>- Chọn thư mục chứa đề cương cần cập nhật</span>
+                      <!-- <span>- Độ phân giải cho mỗi video tối thiểu là 720p</span> -->
+                    </div>
+                  </div>
+                </div>
+                <div style="flex: 1; overflow: auto; padding: 10px;">
+                  <tree-custom [data]="treeFolder" (selectNode)="nodeSelect($event)" [select]="selectedFolder"
+                  (closeAndOpenNode)="closeAndOpenNode($event)" [merNodeAndIcon]="true"></tree-custom>
+                </div>
+              </div>
+            </div>
+            <div class="ovic-dynamic-right-section__foot">
+              <p class="ovic-over-right-section__foot-wrap-buttons">
+                <button (click)="openFolder()" [disabled]="selectedFolder?false:true" type="button"
+                  class="btn btn ovic-over-right-section__foot-btn btn-primary btn-primary"><i
+                class="fa fa-external-link" ></i>Chọn tệp tin
+              </button>
+            </p>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template #templateFolderSelect let-c="close" let-d="dismiss">
+        <div class="ovic-over-right-section right-slide-class">
+          <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">Cập nhật đề cương</h3>
+            <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+            (click)="d(true)"></button>
+          </div>
+          <div style="line-height: 1.25; padding: 5px; height: calc(100vh - 51px - 57px);"
+            class="ovic-over-right-section__body">
+            <div style="height: 100%;" class="phanquyen-dulieu-content-left ovic-vertical__inputs">
+              <p-table [paginator]="true" [rows]="20" [value]="file_list"
+                styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-none-header ovic-ui-table table-reBorder table-scroll-able-page">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>Tên đề cương</th>
+                    <th>Tên môn</th>
+                    <th style="text-align: center; width: 100px;">Trạng thái</th>
+                    <th style="text-align: center; width: 100px;">Thao tác</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-row>
+                  <tr>
+                    <td>
+                      {{row['title']}}
+                    </td>
+                    <td>
+                      {{row['monhoc_name']}}
+                    </td>
+                    <td style="text-align: center; width: 100px;">
+                      <i class="fa fa-check" [ngClass]="!row['done']?'not-sync-yet':'done-sync'"></i>
+                    </td>
+                    <td style="text-align: center; width: 100px;">
+                      <button (click)="deleteFileDecuong(row)" style="line-height: 1;"
+                        class="btn btn-danger"><i class="fa fa-times" style="margin: 0px;"></i></button>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+            </div>
+            <div class="ovic-dynamic-right-section__foot">
+              <p class="ovic-over-right-section__foot-wrap-buttons">
+                <button (click)="startSyncDecuong()" type="button"
+                  class="btn btn ovic-over-right-section__foot-btn btn-primary btn-primary"><i class="fa fa-play"
+                ></i>Bắt đầu đồng bộ
+              </button>
+            </p>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template #templateClone let-c="close" let-d="dismiss">
+        <div class="ovic-over-right-section right-slide-class">
+          <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+            <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+            (click)="closeForm()"></button>
+          </div>
+          <div style="line-height: 1.25; padding: 0px; height: calc(100vh - 58px)"
+            class="ovic-over-right-section__body footer-no-hint no-footer">
+            <app-clone-course [courseSelected]="selectedKhoahoc"></app-clone-course>
+          </div>
+        </div>
+      </ng-template>
+
+      <p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+        [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+        <div class="popup-waiting-loading">
+          <label style="width: 100%;">{{waitingTitle}}</label>
+          <div class="tn-import-student-progressbar">
+            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+          </div>
+        </div>
+      </p-dialog>

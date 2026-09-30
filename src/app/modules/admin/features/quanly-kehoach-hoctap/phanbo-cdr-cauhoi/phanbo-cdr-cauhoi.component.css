@@ -13,6 +13,41 @@
     width: 60px;
 }
 
+:host ::ng-deep .phanbo-cdr-layout .p-inputgroup {
+    display: flex;
+    width: 100%;
+}
+
+:host ::ng-deep .phanbo-cdr-layout .p-inputgroup-addon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e9ecef;
+    color: #6c757d;
+    border-top: 1px solid #ced4da;
+    border-bottom: 1px solid #ced4da;
+    padding: 0;
+    min-width: 3rem;
+    font-size: 12px;
+}
+
+:host ::ng-deep .phanbo-cdr-layout .p-inputgroup-addon.tag-cdr-cauhoi-percent {
+    flex: 0 0 60px;
+    width: 60px;
+    border-left: 1px solid #ced4da;
+}
+
+:host ::ng-deep .phanbo-cdr-layout .p-inputgroup-addon:last-child {
+    border-right: 1px solid #ced4da;
+}
+
+:host ::ng-deep .phanbo-cdr-layout .p-inputgroup > .ovic-input-field,
+:host ::ng-deep .phanbo-cdr-layout .p-inputgroup > .form-control {
+    height: 30px;
+    min-width: 0;
+    border-radius: 0;
+}
+
 .phanbo-cdr-layout {
     height: 100%;
     display: flex;

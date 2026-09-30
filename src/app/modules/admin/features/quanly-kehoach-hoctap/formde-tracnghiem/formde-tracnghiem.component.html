@@ -1,1 +1,676 @@
-﻿<div class="p-3">formde-tracnghiem.component works!</div>
+<div class="layout_component_container">
+  <div class="form-de-layout" [ngClass]="closeLeft?'close-left-body':''">
+    <div class="form-de-layout-left">
+      <button style="margin-left: 5px; padding: 0px; min-width: 0px; z-index: 50;" (click)="closeLeftBody()"
+        class="btn btn-success button-close-left-body">
+        <i style="margin: 0px;vertical-align: middle; font-size: 13px;"
+        [ngClass]="closeLeft?'pi pi-angle-double-right':'pi pi-angle-double-left'"></i>
+      </button>
+      @if (selectedKhoahoc) {
+        <div class="info-course">
+          <div class="info-course-content">
+            <div class="info-course-item">
+              <label>- Tên môn</label>:
+              <span>{{selectedKhoahoc?selectedKhoahoc.title:null}}</span>
+            </div>
+            <div class="info-course-item">
+              <label>- Mã môn</label>:
+              <span>{{selectedKhoahoc?selectedKhoahoc.maso:null}}</span>
+            </div>
+            <div class="info-course-item">
+              <label>- Số tín chỉ</label>:
+              @if (selectedKhoahoc && selectedKhoahoc.params && selectedKhoahoc.params.sotinchi) {
+                <span
+                >{{selectedKhoahoc.params.sotinchi}}</span>
+              }
+            </div>
+            <div class="info-course-item">
+              <label>- Hình thức thi</label>:
+              @if (selectedKhoahoc && selectedKhoahoc.params && selectedKhoahoc.params.exam_format) {
+                <span
+                  >{{selectedKhoahoc.params.exam_format
+                | showlabel : EXAMFORMAT : 'key'}}</span>
+              }
+            </div>
+            <div class="info-course-item">
+              <label>- Yêu cầu CDR</label>:
+              @if (selectedKhoahoc && selectedKhoahoc.params && selectedKhoahoc.params.cdr) {
+                <span
+                  >{{selectedKhoahoc.params.cdr
+                | showlabel : chuandaura : 'id' : 'label' }}</span>
+              }
+            </div>
+            <div class="info-course-item">
+              <label>- Giảng viên phụ trách</label>:
+              @if (selectedKhoahoc['user_label']) {
+                <span>{{selectedKhoahoc['user_label']}}</span>
+              }
+            </div>
+            <!-- <ng-template #noCdrCourse>
+            <div style="color: red; font-size: 16px; text-align: center;">
+              <div style="width: 100%; margin: 0 auto;">
+                Môn học này chưa xác định CDR, vui lòng cập nhật lại CDR hoặc liên hệ tới <strong>PHÒNG
+              ĐÀO TẠO</strong> để được hỗ trợ
+            </div>
+          </div>
+        </ng-template> -->
+        <hr />
+        <!-- <div *ngIf="selectedCdr">
+        <div class="info-course-item" style="text-align: center;">
+          <strong>
+            Tỉ lệ phân bổ câu hỏi cho: {{selectedCdr['kyhieu']+' - '+selectedCdr['cdr_name']}}
+            <br>phải thỏa mãn điều kiện dưới đây
+            </strong>
+          </div>
+          <div class="info-course-item" *ngFor="let item of khuyennghi">
+            <label style="width: 250px;">- {{item.label}}</label>
+            <span [innerHTML]="item.html"></span>
+            <span>
+              {{item['value']}}%
+            </span>
+          </div>
+        </div> -->
+      </div>
+    </div>
+  }
+</div>
+<div class="form-de-layout-right form-tracnghiem">
+  @if (selectedKhoahoc) {
+    <p-tabs class="tab-lesson-view" [value]="activeIndexTab.toString()"
+      (valueChange)="activeIndexTab = +$event; changeTabView()">
+      <p-tablist>
+        <p-tab value="0">Đề kiểm tra trắc nghiệm tuần</p-tab>
+        <p-tab value="1">Đề kiểm tra trắc nghiệm TX</p-tab>
+        @if ((selectedKhoahoc && selectedKhoahoc.av !== 0) || (selectedKhoahoc.category_ids === 99 && key_server === 'ictu')) {
+          <p-tab value="2">Đề kiểm tra trắc nghiệm KTHP</p-tab>
+        }
+      </p-tablist>
+      <p-tabpanels>
+      <p-tabpanel value="0">
+        <div class="form-tracnghiem-panel-content">
+          <div class="form-tracnghiem-panel-content-table">
+            @switch (selectedKhoahoc.av) {
+              @default {
+                <div class="content-table-cauhoi">
+                  <p-table [value]="list_cdr_cauhoi"
+                    styleClass="tbl-danhSachUser table-reBorder table-scroll-able">
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th style="width: 120px; text-align: center;"></th>
+                        <th style="width: 150px; text-align: center;">Tổng câu lấy / Tổng câu hỏi
+                        </th>
+                        @for (cdr of chuandaura; track $index) {
+                          <th [ngClass]="cdr.disabled ? 'display-none':''"
+                            style="text-align: center; width: 150px;">
+                            {{cdr.label}}
+                          </th>
+                        }
+                      </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-row>
+                      <tr
+                        [ngClass]="!row['children'] || row['children'].length === 0?'require-cdr-backgroud-color':''">
+                        <th style="text-align: left; background-color: #f8f9fa;">
+                          <div style="display: flex;">
+                            <span style="flex: 1;">{{label_week +' '+row['week']}}</span>
+                            @if (row['has_test']) {
+                              <span style="margin-left: 10px; font-weight: normal;" class="blue"
+                                >
+                                Đã có đề
+                              </span>
+                            }
+                          </div>
+                        </th>
+                        <th style="background-color: #f8f9fa;">
+                          <span>
+                            {{row['question_take_total']}} / {{row['total_question']}}
+                          </span>
+                        </th>
+                        <th style="background-color: #f8f9fa;" [colSpan]="4">
+                        </th>
+                      </tr>
+                      @for (child of row['children']; track $index) {
+                        <tr
+                          [ngClass]="child['require_cdr']?'background-color-red':''">
+                          <td style="text-align: left; color: #3B82F6;">
+                            {{child['kyhieu']+' - '+child['cdr_name']}}
+                          </td>
+                          <td style="text-align: center;">
+                            <span>
+                              {{child['question_take_total']}} / {{child['total_question_cdr']}}
+                            </span>
+                          </td>
+                          @for (cdr of chuandaura; track $index) {
+                            <td [ngClass]="cdr.disabled?'display-none':''" style="text-align: center;"
+                              >
+                              @if (child.cdr_cauhoi && !cdr.disabled && child.cdr_cauhoi[cdr.id]) {
+                                <div class="p-inputgroup"
+                                  >
+                                  @if (row['canEdit']) {
+                                    <input [disabled]="!row['canEdit']"
+                                      [(ngModel)]="child['question_take'][cdr.id]"
+                                      #inputNumberQuestion class="ovic-input-field"
+                                      (keyup)="setNumberCdrCauhoi(row,child)"
+                                      (keydown)="pointQuestionKeyDown($event,inputNumberQuestion)"
+                                      style="text-align: center; flex:1; width: 100%;" type="number">
+                                  }
+                                  @if (!row['canEdit']) {
+                                    <span class="cant-edit-question">
+                                      {{child['question_take'][cdr.id]}}
+                                    </span>
+                                  }
+                                  <span class="p-inputgroup-addon tag-cdr-cauhoi-percent">
+                                    / {{child.cdr_cauhoi[cdr.id]}}
+                                  </span>
+                                </div>
+                              }
+                              @if (!child.cdr_cauhoi || cdr.disabled || !child.cdr_cauhoi[cdr.id]) {
+                                <span
+                                  >
+                                  -
+                                </span>
+                              }
+                            </td>
+                          }
+                        </tr>
+                      }
+                    </ng-template>
+                  </p-table>
+                </div>
+              }
+              @case (1) {
+                <div class="content-table-cauhoi">
+                  <p-table [value]="list_cdr_cauhoi"
+                    styleClass="tbl-danhSachUser table-reBorder table-scroll-able">
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th style="width: 150px; text-align: center;"></th>
+                        <th style="width: 150px; text-align: center;">Tổng câu lấy / Tổng
+                        câu hỏi</th>
+                        @for (part of list_part; track $index) {
+                          <th
+                            style="text-align: center; width: 150px;">
+                            {{part}}
+                          </th>
+                        }
+                      </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-row>
+                      <tr
+                        [ngClass]="!row['children'] || row['children'].length === 0?'require-cdr-backgroud-color':''">
+                        <th style="text-align: left; background-color: #f8f9fa;">
+                          <div style="display: flex;">
+                            <span style="flex: 1;">{{label_week +' '+row['week']}}</span>
+                            @if (row['has_test']) {
+                              <span style="margin-left: 10px; font-weight: normal;" class="blue"
+                                >
+                                Đã có đề
+                              </span>
+                            }
+                          </div>
+                        </th>
+                        <th style="background-color: #f8f9fa;">
+                          <span>
+                            {{row['question_take_total']}} / {{row['total_question']}}
+                          </span>
+                        </th>
+                        <th style="background-color: #f8f9fa;" [colSpan]="list_part.length">
+                        </th>
+                      </tr>
+                      @for (child of row['children']; track $index) {
+                        <tr
+                          [ngClass]="child['require_part']?'background-color-red':''">
+                          <td style="text-align: left; color: #3B82F6;">
+                            {{child['kyhieu']+' - '+child['cdr_name']}}
+                          </td>
+                          <td style="text-align: center;">
+                            <span>
+                              {{child['question_take_total']}} / {{child['total_question_cdr']}}
+                            </span>
+                          </td>
+                          @for (part of list_part; track $index; let i = $index) {
+                            <td style="text-align: center;">
+                              @if (child['parts'][part]) {
+                                <div class="p-inputgroup">
+                                  @if (row['canEdit']) {
+                                    <input [disabled]="!row['canEdit']"
+                                      [(ngModel)]="child['parts'][part]['question_take']"
+                                      (keyup)="setNumberPartQuestionType1(row,child)"
+                                      (keydown)="pointQuestionKeyDown($event,inputNumberQuestion)"
+                                      #inputNumberQuestion class="ovic-input-field"
+                                      style="text-align: center; flex:1; width: 100%;" type="number">
+                                  }
+                                  @if (!row['canEdit']) {
+                                    <span class="cant-edit-question">
+                                      {{child['parts'][part]['question_take']}}
+                                    </span>
+                                  }
+                                  <span class="p-inputgroup-addon tag-cdr-cauhoi-percent">
+                                    / {{child['parts'][part]['max_question']}}
+                                  </span>
+                                </div>
+                              }
+                              @if (!child['parts'][part]) {
+                                <span>
+                                  -
+                                </span>
+                              }
+                            </td>
+                          }
+                        </tr>
+                      }
+                    </ng-template>
+                  </p-table>
+                </div>
+              }
+            }
+          </div>
+          <div class="form-tracnghiem-panel-content-footer">
+            <button (click)="saveFormCc()" class="btn btn-primary"><i class="fa fa-floppy-o"></i>Lưu
+          lại</button>
+        </div>
+      </div>
+    </p-tabpanel>
+    <p-tabpanel value="1">
+      <div class="form-tracnghiem-panel-content">
+        <div class="form-tracnghiem-panel-content-table av-panel--content"
+          >
+          @switch (selectedKhoahoc.av) {
+            @default {
+              <div class="content-table-cauhoi">
+                @for (test of list_test_tx; track $index; let i = $index) {
+                  <div class="panel-text-av-tx"
+                    style="margin-bottom: 10px;">
+                    <p-panel>
+                      <ng-template pTemplate="header">
+                        <div style="display: flex;align-items: center; width: 100%;">
+                          <strong style="flex:1;margin-right: 10px;">{{test.title}}
+                            @if (test['has_test']) {
+                              <span> - <span class="blue">
+                                Đã có đề
+                              </span></span>
+                            }
+                          </strong>
+                          @if (test['canEdit']) {
+                            <button (click)="addBaiGiangToTest(test)"
+                              style="margin-right: 10px;" ngbTooltip="chọn {{label_week}}"
+                              container="body" placement="top" pButton pRipple type="button"
+                              icon="pi pi-plus"
+                              class="p-button-rounded p-button-success btn-30-30">
+                            </button>
+                          }
+                          @if (test['canEdit']) {
+                            <button (click)="saveFormTx(test)"
+                              ngbTooltip="Lưu lại" container="body" placement="top" pButton
+                              pRipple type="button" icon="pi pi-save"
+                              class="p-button-rounded p-button-primary btn-30-30">
+                            </button>
+                          }
+                          <!-- <button style="line-height: 1;" (click)="saveFormTx(test)"
+                          class="btn btn-primary">
+                          <i class="fa fa-floppy-o"></i>
+                          Lưu lại
+                        </button> -->
+                      </div>
+                    </ng-template>
+                    <div class="panel-av-test-content">
+                      <p-table [value]="test['weeks_test']"
+                        styleClass="tbl-danhSachUser table-reBorder table-scroll-able">
+                        <ng-template pTemplate="header">
+                          <tr>
+                            <th rowspan="2" style="width: 150px; text-align: center;"></th>
+                            <th rowspan="2" style="width: 150px; text-align: center;">Tổng
+                            câu hỏi</th>
+                            <th style="text-align: center; width: 150px;">
+                              Số câu lấy
+                              @if (test['total_question_take']) {
+                                <span
+                                >({{test['total_question_take']}})</span>
+                              }
+                            </th>
+                          </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-row>
+                          <tr [ngClass]="row['require_question']?'background-color-red':''">
+                            <td style="text-align: left; color: #3B82F6;">
+                              <div style="display: flex; align-items: center;">
+                                <span style="flex:1; margin-right: 10px;">{{label_week+'
+                                - '+row['week']}}</span>
+                                @if (test['canEdit']) {
+                                  <button
+                                    (click)="deleteWeek(row,test)" ngbTooltip="Xoá"
+                                    container="body" placement="top" pButton pRipple
+                                    type="button" icon="pi pi-trash"
+                                    class="p-button-rounded p-button-danger btn-30-30">
+                                  </button>
+                                }
+                              </div>
+                            </td>
+                            <td style="text-align: center;">
+                              <span>
+                                {{row['total_question']}}
+                              </span>
+                            </td>
+                            <td style="text-align: center;">
+                              <div class="p-inputgroup">
+                                <input [ngClass]="!test['canEdit']?'gray-400':''"
+                                  [disabled]="!test['canEdit']"
+                                  [(ngModel)]="row['total_question_take']"
+                                  (keydown)="pointQuestionKeyDown($event,inputNumberQuestion)"
+                                  #inputNumberQuestion
+                                  (keyup)="setQuestiontakeFormTxType0(test)"
+                                  class="ovic-input-field"
+                                  style="text-align: center; flex:1; width: 100%;"
+                                  type="number">
+                                </div>
+                              </td>
+                            </tr>
+                          </ng-template>
+                        </p-table>
+                      </div>
+                    </p-panel>
+                  </div>
+                }
+              </div>
+            }
+            @case (1) {
+              <div class="content-table-cauhoi">
+                @for (test of list_test_tx; track $index; let i = $index) {
+                  <div class="panel-text-av-tx"
+                    style="margin-bottom: 10px;">
+                    <p-panel>
+                      <ng-template pTemplate="header">
+                        <div style="display: flex;align-items: center; width: 100%;">
+                          <strong style="flex:1;margin-right: 10px;">{{test.title}}
+                            @if (test['has_test']) {
+                              <span> - <span class="blue">
+                                Đã có đề
+                              </span></span>
+                            }
+                          </strong>
+                          @if (test['canEdit']) {
+                            <button (click)="addBaiGiangToTest(test)"
+                              style="margin-right: 10px;" ngbTooltip="chọn {{label_week}}"
+                              container="body" placement="top" pButton pRipple type="button"
+                              icon="pi pi-plus"
+                              class="p-button-rounded p-button-success btn-30-30">
+                            </button>
+                          }
+                          @if (test['canEdit']) {
+                            <button (click)="saveFormTx(test)"
+                              ngbTooltip="Lưu lại" container="body" placement="top" pButton
+                              pRipple type="button" icon="pi pi-save"
+                              class="p-button-rounded p-button-primary btn-30-30">
+                            </button>
+                          }
+                        </div>
+                      </ng-template>
+                      <div class="panel-av-test-content">
+                        <p-table [value]="test['weeks_test']"
+                          styleClass="tbl-danhSachUser table-reBorder table-scroll-able">
+                          <ng-template pTemplate="header">
+                            <tr>
+                              <th style="width: 150px; text-align: center;"></th>
+                              <th style="width: 150px; text-align: center;">Tổng câu lấy /
+                                Tổng
+                              câu hỏi</th>
+                              @for (part of list_part; track $index) {
+                                <th
+                                  style="text-align: center; width: 120px;">
+                                  {{part}}
+                                </th>
+                              }
+                            </tr>
+                          </ng-template>
+                          <ng-template pTemplate="body" let-row>
+                            <tr
+                              [ngClass]="!row['children'] || row['children'].length === 0?'require-cdr-backgroud-color':''">
+                              <th style="text-align: left; background-color: #f8f9fa;">
+                                <div style="display: flex; align-items: center;">
+                                  <span style="flex:1; margin-right: 10px;">{{label_week+'
+                                  - '+row['week']}}</span>
+                                  @if (test['canEdit']) {
+                                    <button
+                                      (click)="deleteWeek(row,test)" ngbTooltip="Xoá"
+                                      container="body" placement="top" pButton pRipple
+                                      type="button" icon="pi pi-trash"
+                                      class="p-button-rounded p-button-danger btn-30-30">
+                                    </button>
+                                  }
+                                </div>
+                              </th>
+                              <th style="background-color: #f8f9fa;">
+                                <span>
+                                  {{row['question_take_total']}} /
+                                  {{row['total_question']}}
+                                </span>
+                              </th>
+                              <th style="background-color: #f8f9fa;"
+                                [colSpan]="list_part.length">
+                              </th>
+                            </tr>
+                            @for (child of row['children']; track $index) {
+                              <tr
+                                [ngClass]="child['require_part']?'background-color-red':''">
+                                <td style="text-align: left; color: #3B82F6;">
+                                  {{child['kyhieu']+' - '+child['cdr_name']}}
+                                </td>
+                                <td style="text-align: center;">
+                                  <span>
+                                    {{child['question_take_total']}} /
+                                    {{child['total_question_cdr']}}
+                                  </span>
+                                </td>
+                                @for (part of list_part; track $index; let i = $index) {
+                                  <td style="text-align: center;"
+                                    >
+                                    @if (child['parts'][part]) {
+                                      <div class="p-inputgroup">
+                                        <input [ngClass]="!test['canEdit']?'gray-400':''"
+                                          [disabled]="!test['canEdit']"
+                                          [(ngModel)]="child['parts'][part]['question_take']"
+                                          (keyup)="setNumberPartQuestionType1(row,child)"
+                                          (keydown)="pointQuestionKeyDown($event,inputNumberQuestion)"
+                                          #inputNumberQuestion class="ovic-input-field"
+                                          style="text-align: center; flex:1; width: 100%;"
+                                          type="number">
+                                          <span class="p-inputgroup-addon tag-cdr-cauhoi-percent">
+                                            / {{child['parts'][part]['max_question']}}
+                                          </span>
+                                        </div>
+                                      }
+                                      @if (!child['parts'][part]) {
+                                        <span>
+                                          -
+                                        </span>
+                                      }
+                                    </td>
+                                  }
+                                </tr>
+                              }
+                            </ng-template>
+                          </p-table>
+                        </div>
+                      </p-panel>
+                    </div>
+                  }
+                </div>
+              }
+              @case (2) {
+                <div class="content-table-cauhoi">
+                  @for (test of list_test_tx; track $index; let i = $index) {
+                    <div class="panel-text-av-tx"
+                      style="margin-bottom: 10px;">
+                      <p-panel>
+                        <ng-template pTemplate="header">
+                          <div style="display: flex;align-items: center; width: 100%;">
+                            <strong style="flex:1;margin-right: 10px;">{{test.title}}
+                              @if (test['has_test']) {
+                                <span> - <span class="blue">
+                                  Đã có đề
+                                </span></span>
+                              }
+                            </strong>
+                            @if (test['canEdit']) {
+                              <button (click)="addBaiGiangToTest(test)"
+                                style="margin-right: 10px;" ngbTooltip="chọn {{label_week}}"
+                                container="body" placement="top" pButton pRipple type="button"
+                                icon="pi pi-plus"
+                                class="p-button-rounded p-button-success btn-30-30">
+                              </button>
+                            }
+                            @if (test['canEdit']) {
+                              <button (click)="saveFormTx(test)"
+                                ngbTooltip="Lưu lại" container="body" placement="top" pButton
+                                pRipple type="button" icon="pi pi-save"
+                                class="p-button-rounded p-button-primary btn-30-30">
+                              </button>
+                            }
+                          </div>
+                        </ng-template>
+                        <div class="panel-av-test-content">
+                          <p-table [value]="test['weeks_test']"
+                            styleClass="tbl-danhSachUser table-reBorder table-scroll-able">
+                            <ng-template pTemplate="header">
+                              <tr>
+                                <th style="width: 100px; text-align: center;"></th>
+                                <th style="width: 150px; text-align: center;">Tổng câu lấy /
+                                  Tổng câu hỏi
+                                </th>
+                                @for (cdr of chuandaura; track $index) {
+                                  <th [ngClass]="cdr.disabled ? 'display-none':''"
+                                    style="text-align: center; width: 150px;">
+                                    {{cdr.label}}
+                                  </th>
+                                }
+                              </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-row>
+                              <tr
+                                [ngClass]="!row['children'] || row['children'].length === 0?'require-cdr-backgroud-color':''">
+                                <th style="text-align: left; background-color: #f8f9fa;">
+                                  <div style="display: flex; align-items: center;">
+                                    <span style="flex:1; margin-right: 10px;">{{label_week+'
+                                    - '+row['week']}}</span>
+                                    @if (test['canEdit']) {
+                                      <button
+                                        (click)="deleteWeek(row,test)" ngbTooltip="Xoá"
+                                        container="body" placement="top" pButton pRipple
+                                        type="button" icon="pi pi-trash"
+                                        class="p-button-rounded p-button-danger btn-30-30">
+                                      </button>
+                                    }
+                                  </div>
+                                </th>
+                                <th style="background-color: #f8f9fa;">
+                                  <span>
+                                    {{row['question_take_total']}} /
+                                    {{row['total_question']}}
+                                  </span>
+                                </th>
+                                <th style="background-color: #f8f9fa;" [colSpan]="4">
+                                </th>
+                              </tr>
+                              @for (child of row['children']; track $index) {
+                                <tr
+                                  [ngClass]="child['require_cdr']?'background-color-red':''">
+                                  <td style="text-align: left; color: #3B82F6;">
+                                    {{child['kyhieu']+' - '+child['cdr_name']}}
+                                  </td>
+                                  <td style="text-align: center;">
+                                    <span>
+                                      {{child['question_take_total']}} /
+                                      {{child['total_question_cdr']}}
+                                    </span>
+                                  </td>
+                                  @for (cdr of chuandaura; track $index) {
+                                    <td [ngClass]="cdr.disabled?'display-none':''"
+                                      style="text-align: center;">
+                                      @if (child.cdr_cauhoi && !cdr.disabled && child.cdr_cauhoi[cdr.id]) {
+                                        <div class="p-inputgroup"
+                                          >
+                                          <input [ngClass]="!test['canEdit']?'gray-400':''"
+                                            [disabled]="!test['canEdit']"
+                                            [(ngModel)]="child['question_take'][cdr.id]"
+                                            #inputNumberQuestion class="ovic-input-field"
+                                            (keyup)="setNumberCdrCauhoi(row,child)"
+                                            (keydown)="pointQuestionKeyDown($event,inputNumberQuestion)"
+                                            style="text-align: center; flex:1; width: 100%;"
+                                            type="number">
+                                            <span class="p-inputgroup-addon tag-cdr-cauhoi-percent">
+                                              / {{child.cdr_cauhoi[cdr.id]}}
+                                            </span>
+                                          </div>
+                                        }
+                                        @if (!child.cdr_cauhoi || cdr.disabled || !child.cdr_cauhoi[cdr.id]) {
+                                          <span
+                                            >
+                                            -
+                                          </span>
+                                        }
+                                      </td>
+                                    }
+                                  </tr>
+                                }
+                              </ng-template>
+                            </p-table>
+                          </div>
+                        </p-panel>
+                      </div>
+                    }
+                  </div>
+                }
+              }
+            </div>
+          </div>
+        </p-tabpanel>
+        @if ((selectedKhoahoc && selectedKhoahoc.av !== 0) || (selectedKhoahoc.category_ids === 99 && key_server === 'ictu')) {
+          <p-tabpanel value="2">
+            <div class="form-tracnghiem-panel-content">
+              <app-form-de-kthp [_tap_index]="activeIndexTab" [_course]="selectedKhoahoc"></app-form-de-kthp>
+            </div>
+          </p-tabpanel>
+        }
+      </p-tabpanels>
+      </p-tabs>
+    }
+  </div>
+</div>
+</div>
+
+<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+  [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+  <div class="popup-waiting-loading">
+    <label style="width: 100%;">{{waitingTitle}}</label>
+    <div class="tn-import-student-progressbar">
+      <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+    </div>
+  </div>
+</p-dialog>
+
+<ng-template #templateAddBaigiang>
+  <div class="ovic-over-right-section">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">Chọn {{label_week}} cho {{selectedTestTx.title}}</h3>
+      <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
+    </div>
+    <div class="ovic-over-right-section__body" style="height: calc(100vh - 58px);">
+      <div class="ovic-vertical__inputs list-course-layout" style="line-height: 1.5;">
+        <mat-selection-list [multiple]="false" class="selection-list-mat" #weeks>
+          @for (week of list_week; track $index) {
+            <mat-list-option (click)="onSelectWeek(week)" [value]="week">
+              <div mat-line style="font-weight: 600; display: flex;">
+                <span style="flex:1">
+                  {{label_week+' '+week.week}}
+                </span>
+                @if (week['checked']) {
+                  <span><i class="fa fa-check blue"></i></span>
+                }
+              </div>
+            </mat-list-option>
+          }
+        </mat-selection-list>
+      </div>
+    </div>
+  </div>
+</ng-template>

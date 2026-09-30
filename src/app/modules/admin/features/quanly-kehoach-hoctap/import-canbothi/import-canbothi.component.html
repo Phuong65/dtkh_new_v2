@@ -1,1 +1,55 @@
-﻿<div class="p-3">import-canbothi.component works!</div>
+<div style="height: 100%;">
+    <div class="layout-import-top" style="line-height: 1; padding: 5px; border-bottom: 1px solid #c8c8c8;">
+        <input type="file" #inputImport style="visibility: hidden; display: contents;"
+            (change)="changeInputImport($event)" accept=".xlsx, .xls" />
+        <div class="layout-import-top-left">
+            <button style="line-height: 1;" (click)="downLoadEx()" class="btn btn-secondary margin-right-5">
+                <i class="fa fa-download"></i>
+                Tải file mẫu
+            </button>
+            <button style="line-height: 1;" (click)="onGetFileImport()" class="btn btn-success margin-right-5">
+                <i class="fa fa-upload"></i>
+                Chọn file
+            </button>
+            <button (click)="startImportHoidong()" style="line-height: 1;" class="btn btn-primary margin-right-5">
+                <i class="fa fa-play"></i>
+                Bắt đầu import
+            </button>
+        </div>
+    </div>
+    <div class="layout-import-bottom" style="height: calc(100% - 42px); padding: 5px;">
+        <div style="overflow: auto;height: 100%;">
+            <p-table [paginator]="true" [rows]="40" [value]="list_show_import"
+                styleClass="tbl-danhSachUser table-scroll-able table-none-header ovic-ui-table table-reBorder sticky-page-table table-background-row">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 3rem; text-align: center;">#</th>
+                        <th style="width: 200px;">Họ tên</th>
+                        <th style="width: 400px;">Khóa học</th>
+                        <th style="width: 100px;text-align: center;">Bài</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+                    <tr>
+                        <td style="width: 3rem;text-align: center;">{{rowIndex + 1}}</td>
+                        <td style="width: 200px;">{{item.email_user | showlabel : list_user : 'email': 'display_name'}}
+                        </td>
+                        <td style="width: 400px;">{{item.course_maso | showlabel: list_course : 'maso' : 'title'}}</td>
+                        <td style="width: 100px;text-align: center;">{{item.weeks}}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+    </div>
+</div>
+
+<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+    [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+    <div class="popup-waiting-loading">
+        <label style="width: 100%;">Đang đồng bộ dữ liêu, vui lòng không tắt trình duỵet...</label>
+        <div class="tn-import-student-progressbar">
+            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+        </div>
+    </div>
+</p-dialog>
