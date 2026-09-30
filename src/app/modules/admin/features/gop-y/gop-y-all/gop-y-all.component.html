@@ -1,1 +1,352 @@
-﻿<div class="p-3">gop-y-all.component works!</div>
+<section class="feedback-page">
+    <header class="feedback-page__header">
+        <div class="feedback-page__actions">
+            <button
+                type="button"
+                class="btn feedback-chart-toggle"
+                [disabled]="!!selectedCategoryId()"
+                (click)="toggleChart()"
+            >
+                <i [class]="chartVisible() ? 'pi pi-eye-slash' : 'pi pi-chart-pie'" aria-hidden="true"></i>
+                {{ chartVisible() ? 'Ẩn biểu đồ' : 'Hiện biểu đồ' }}
+            </button>
+        </div>
+        <nav class="feedback-category-chips" aria-label="Lĩnh vực">
+            <button
+                type="button"
+                class="feedback-category-chip"
+                [class.feedback-category-chip--active]="selectedCategoryId() === null"
+                (click)="selectCategory()"
+            >
+                Tất cả lĩnh vực
+                <span class="feedback-category-chip__count">{{ chartTotal() }}</span>
+            </button>
+            @for (category of categories(); track category.id) {
+                <button
+                    type="button"
+                    class="feedback-category-chip"
+                    [class.feedback-category-chip--active]="selectedCategoryId() === category.id"
+                    (click)="selectCategory(category.id)"
+                >
+                    {{ category.name }}
+                    <span class="feedback-category-chip__count">{{ getCategoryCount(category.id) }}</span>
+                </button>
+            }
+        </nav>
+    </header>
+
+    @if (chartVisible() && !selectedCategoryId() && chartTotal() > 0) {
+    <section class="feedback-chart" aria-labelledby="feedback-chart-title">
+        <div class="feedback-chart__head">
+            <div>
+                <h2 id="feedback-chart-title">Lĩnh vực</h2>
+                <span>Thống kê toàn bộ lĩnh vực của đơn vị</span>
+            </div>
+            <strong>{{ chartTotal() }} lĩnh vực</strong>
+        </div>
+
+        @if (!chartLoading() && chartError()) {
+        <div class="feedback-chart__state feedback-chart__state--error">
+            <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+            <span>Không tải được dữ liệu biểu đồ.</span>
+            <button type="button" class="btn btn-primary" (click)="loadChartFeedbacks()">Thử lại</button>
+        </div>
+        }
+
+        @if (!chartLoading() && !chartError() && chartData()) {
+        <div class="feedback-chart__content">
+            <div class="feedback-chart__canvas">
+                <p-chart
+                    type="doughnut"
+                    width="220px"
+                    height="220px"
+                    [data]="chartData()"
+                    [options]="chartOptions"
+                ></p-chart>
+                <div class="feedback-chart__center" aria-hidden="true">
+                    <strong>{{ chartTotal() }}</strong>
+                    <span>Tổng lĩnh vực</span>
+                </div>
+            </div>
+
+            <div class="feedback-chart__table-wrap">
+                <table class="feedback-chart__table" aria-label="Số lĩnh vực">
+                    <thead>
+                        <tr>
+                            <th colspan="2">Lĩnh vực</th>
+                            <th>Số lượt</th>
+                            <th>Tỷ lệ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (item of chartSummary(); track item.label) {
+                        <tr>
+                            <td class="feedback-chart__color-cell">
+                                <i [style.backgroundColor]="item.color" aria-hidden="true"></i>
+                            </td>
+                            <td>{{ item.label }}</td>
+                            <td>{{ item.value }}</td>
+                            <td>{{ chartTotal() ? (item.value * 100 / chartTotal() | number:'1.1-1') : '0.0' }}%</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        }
+
+        @if (!chartLoading() && !chartError() && !chartData()) {
+        <div class="feedback-chart__state">
+            <i class="pi pi-chart-pie" aria-hidden="true"></i>
+            Chưa có dữ liệu lĩnh vực để thống kê.
+        </div>
+        }
+    </section>
+    }
+
+    <div class="feedback-page__body">
+        @if (!loading()) {
+            @if (feedbacks().length > 0) {
+            <div class="feedback-list">
+                @for (feedback of feedbacks(); track feedback.id) {
+            <article
+                class="feedback-card card"
+            >
+                <div class="feedback-card__header card-header">
+                    <div class="feedback-card__identity">
+                        <span class="feedback-card__category-label">
+                            <i class="pi pi-tag" aria-hidden="true"></i>
+                            {{ getCategoryName(feedback.student_feedback_category_id) }}
+                        </span>
+                        @if (formatRelativeTime(feedback.created_at); as relativeTime) {
+                        <span class="feedback-card__time">
+                            <i class="pi pi-clock" aria-hidden="true"></i>
+                            {{ relativeTime }}
+                        </span>
+                        }
+                    </div>
+                </div>
+
+                <div class="feedback-card__body card-body">
+                    <div
+                        class="feedback-card__content-row"
+                        [class.feedback-card__content-row--expanded]="isContentExpanded(feedback)"
+                    >
+                        <div
+                            #feedbackContent
+                            class="feedback-card__content"
+                            [class.feedback-card__content--expanded]="isContentExpanded(feedback)"
+                        >{{ feedback.content }}</div>
+                        @if (shouldShowExpand(feedback, feedbackContent)) {
+                        <button
+                            type="button"
+                            class="feedback-card__expand"
+                            (click)="toggleContentExpanded(feedback)"
+                            [attr.aria-label]="isContentExpanded(feedback) ? 'Thu gọn nội dung' : 'Xem thêm nội dung'"
+                        >
+                            {{ isContentExpanded(feedback) ? 'Thu gọn' : 'Xem thêm' }}
+                        </button>
+                        }
+                    </div>
+
+                    @if (feedback.attachments?.length) {
+                    <div class="feedback-card__attachments">
+                        <div class="feedback-card__attachments-title">
+                            <i class="pi pi-paperclip" aria-hidden="true"></i>
+                            Có {{ feedback.attachments.length }} file đính kèm
+                            <button
+                                type="button"
+                                class="feedback-card__attachment-toggle"
+                                (click)="toggleAttachmentExpanded(feedback)"
+                                [attr.aria-label]="isAttachmentExpanded(feedback) ? 'Ẩn file đính kèm' : 'Mở file đính kèm'"
+                            >
+                                <i
+                                    class="pi"
+                                    [class.pi-angle-up]="isAttachmentExpanded(feedback)"
+                                    [class.pi-angle-down]="!isAttachmentExpanded(feedback)"
+                                    aria-hidden="true"
+                                ></i>
+                            </button>
+                        </div>
+
+                        @if (isAttachmentExpanded(feedback)) {
+                        @if (getVideoAttachments(feedback.attachments); as videos) {
+                            @if (videos.length) {
+                            <div
+                                class="attachment-videos"
+                                [class.attachment-videos--grid]="videos.length > 1"
+                            >
+                                @for (file of videos; track file.id || file.name || $index) {
+                                <article class="attachment-video">
+                                    <video
+                                        #videoPlayer
+                                        [hidden]="hasMediaError(file)"
+                                        [src]="getMediaUrl(file)"
+                                        controls
+                                        preload="metadata"
+                                        playsinline
+                                        (loadeddata)="onMediaLoaded(file)"
+                                        (error)="onMediaError(file)"
+                                    ></video>
+                                    @if (hasMediaError(file)) {
+                                    <div class="attachment-media__error">
+                                        <i class="pi pi-video" aria-hidden="true"></i>
+                                        <span>Không tải được video</span>
+                                        <button type="button" class="btn btn-primary" (click)="retryMedia(file)">
+                                            <i class="pi pi-refresh" aria-hidden="true"></i> Tải lại
+                                        </button>
+                                    </div>
+                                    }
+                                    <div class="attachment-media__caption">
+                                        <span>{{ file.title || file.name }}</span>
+                                        <div class="attachment-media__actions">
+                                            <button
+                                                type="button"
+                                                class="attachment-media__download"
+                                                (click)="openVideoFullscreen(videoPlayer)"
+                                                [attr.aria-label]="'Xem toàn màn hình ' + (file.title || file.name)"
+                                            ><i class="pi pi-window-maximize" aria-hidden="true"></i></button>
+                                            <button
+                                                type="button"
+                                                class="attachment-media__download"
+                                                [disabled]="!file.id || downloadingFileIds().has(file.id)"
+                                                (click)="downloadAttachment(file)"
+                                                [attr.aria-label]="'Tải file ' + (file.title || file.name)"
+                                            ><i class="pi pi-download" aria-hidden="true"></i></button>
+                                        </div>
+                                    </div>
+                                </article>
+                                }
+                            </div>
+                            }
+                        }
+
+                        @if (getImageAttachments(feedback.attachments); as images) {
+                            @if (images.length) {
+                            <div
+                                class="attachment-images"
+                                [class.attachment-images--grid]="images.length > 2"
+                            >
+                                @for (file of images; track file.id || file.name || $index) {
+                                <article class="attachment-image">
+                                    <div
+                                        class="attachment-image__preview-button"
+                                        role="button"
+                                        [attr.tabindex]="hasMediaError(file) ? -1 : 0"
+                                        (click)="!hasMediaError(file) && openImagePreview(file)"
+                                        (keydown.enter)="!hasMediaError(file) && openImagePreview(file)"
+                                        (keydown.space)="!hasMediaError(file) && openImagePreview(file); $event.preventDefault()"
+                                        [attr.aria-label]="'Xem ảnh ' + (file.title || file.name)"
+                                    >
+                                        @if (!hasMediaError(file)) {
+                                        <img
+                                            [src]="getMediaUrl(file)"
+                                            [alt]="file.title || file.name"
+                                            loading="lazy"
+                                            (load)="onMediaLoaded(file)"
+                                            (error)="onMediaError(file)"
+                                        >
+                                        }
+                                        @if (!hasMediaError(file)) {
+                                        <span><i class="pi pi-search-plus" aria-hidden="true"></i></span>
+                                        }
+                                        @if (hasMediaError(file)) {
+                                        <span class="attachment-media__error attachment-media__error--image">
+                                            <i class="pi pi-image" aria-hidden="true"></i>
+                                            <b>Không tải được ảnh</b>
+                                            <button type="button" class="btn btn-primary" (click)="$event.stopPropagation(); retryMedia(file)">
+                                                <i class="pi pi-refresh" aria-hidden="true"></i> Tải lại
+                                            </button>
+                                        </span>
+                                        }
+                                    </div>
+                                    <div class="attachment-media__caption">
+                                        <span>{{ file.title || file.name }}</span>
+                                        <button
+                                            type="button"
+                                            class="attachment-media__download"
+                                            [disabled]="!file.id || downloadingFileIds().has(file.id)"
+                                            (click)="downloadAttachment(file)"
+                                            [attr.aria-label]="'Tải file ' + (file.title || file.name)"
+                                        ><i class="pi pi-download" aria-hidden="true"></i></button>
+                                    </div>
+                                </article>
+                                }
+                            </div>
+                            }
+                        }
+
+                        @for (file of getDocumentAttachments(feedback.attachments); track file.id || file.name || $index) {
+                        <div
+                            class="attachment"
+                        >
+                            <div class="attachment__details">
+                                <i class="pi pi-file attachment__icon" aria-hidden="true"></i>
+                                <div class="attachment__info">
+                                    <span class="attachment__name">{{ file.title || file.name }}</span>
+                                    <span class="attachment__meta">
+                                        @if (file.ext) { {{ file.ext | uppercase }} · }
+                                        {{ formatFileSize(file.size) }}
+                                    </span>
+                                </div>
+                                <button
+                                    type="button"
+                                    class="attachment__download"
+                                    [disabled]="!file.id || downloadingFileIds().has(file.id)"
+                                    (click)="downloadAttachment(file)"
+                                    [attr.aria-label]="'Tải file ' + (file.title || file.name)"
+                                >
+                                    <i class="pi pi-download" aria-hidden="true"></i>
+                                    <span>Tải xuống</span>
+                                </button>
+                            </div>
+                        </div>
+                        }
+                        }
+                    </div>
+                    }
+
+                </div>
+            </article>
+                }
+        </div>
+            } @else {
+            <div class="feedback-state feedback-state--empty">
+                <i class="pi pi-inbox" aria-hidden="true"></i>
+                <strong>Chưa có lĩnh vực</strong>
+                <span>Các lĩnh vực của sinh viên sẽ hiển thị tại đây.</span>
+            </div>
+            }
+        }
+    </div>
+
+    @if (!loading() && totalRecords() > 0) {
+    <p-paginator
+        class="feedback-paginator"
+        [rows]="rows"
+        [first]="firstRecordIndex()"
+        [totalRecords]="totalRecords()"
+        [showCurrentPageReport]="false"
+        (onPageChange)="onPageChange($event)"
+    ></p-paginator>
+    }
+</section>
+
+@if (previewImage(); as preview) {
+<div
+    class="image-lightbox"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="'Xem ảnh ' + (preview.title || preview.name)"
+    (click)="closeImagePreview()"
+>
+    <button type="button" class="image-lightbox__close" (click)="closeImagePreview()" aria-label="Đóng ảnh">
+        <i class="pi pi-times" aria-hidden="true"></i>
+    </button>
+    <figure class="image-lightbox__content" (click)="$event.stopPropagation()">
+        <img [src]="getMediaUrl(preview)" [alt]="preview.title || preview.name">
+        <figcaption>{{ preview.title || preview.name }}</figcaption>
+    </figure>
+</div>
+    }
+

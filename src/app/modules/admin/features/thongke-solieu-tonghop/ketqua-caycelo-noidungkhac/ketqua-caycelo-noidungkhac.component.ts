@@ -1,4 +1,4 @@
-import { Component, inject, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, inject, OnChanges, OnInit, signal, SimpleChanges } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { OvicQueryCondition } from '@core/models/dto';
 import { AuthService } from '@core/services/auth.service';
@@ -52,8 +52,8 @@ export class KetquaCayceloNoidungkhacComponent implements OnInit, OnChanges {
     private elngUserProfileService = inject(ElngUserProfileService);
     _parent_Khoa: number;
     ds_dotCapnhat: ElnKhoaHoc[];
-    list_cdr: ElnKhoaHoc[];
-    dataWeek: CoursePlanActivities[];
+    list_cdr = signal<ElnKhoaHoc[]>([]);
+    dataWeek = signal<CoursePlanActivities[]>([]);
     limitCourse = 20;
     totalCourse = 0;
     donviId: number;
@@ -73,7 +73,7 @@ export class KetquaCayceloNoidungkhacComponent implements OnInit, OnChanges {
     userId: number;
     isLanhDaoKhoa: boolean = false;
     progressValue = 0;
-    displayModal = false;
+    displayModal = signal(false);
     waitting_title = 'Vui lòng không tắt trình duyệt';
 
     constructor(
@@ -105,7 +105,7 @@ export class KetquaCayceloNoidungkhacComponent implements OnInit, OnChanges {
     }
 
     initData() {
-        this.displayModal = true;
+        this.displayModal.set(true);
         this.waitting_title = "Đang tải dữ liệu, vui lòng không tắt trình duyệt";
 
         const condition_group_namhoc = this.httpHelper.paramsConditionBuilder(
@@ -175,13 +175,17 @@ export class KetquaCayceloNoidungkhacComponent implements OnInit, OnChanges {
 
 
             },
-            error: () => { this.noitifi.isProcessing(false); this.noitifi.toastError("Lỗi kết nối"); }
+            error: () => {
+                this.noitifi.isProcessing(false);
+                this.displayModal.set(false);
+                this.noitifi.toastError("Lỗi kết nối");
+            }
         })
     }
 
     loadData() {
         //Load khoá học
-        this.displayModal = true;
+        this.displayModal.set(true);
         this.waitting_title = "Đang tải dữ liệu, vui lòng không tắt trình duyệt";
         // this.noitifi.isProcessing(true);
 
@@ -227,18 +231,21 @@ export class KetquaCayceloNoidungkhacComponent implements OnInit, OnChanges {
             ]).subscribe({
                 next: ([dtKhoaHoc, dtWeekCoures]) => {
                     // this.displayModal = true;
-                    this.dataWeek = dtWeekCoures.data.filter(dt => dt.week > 0 && dt.week < 13);
+                    this.dataWeek.set(dtWeekCoures.data.filter(dt => dt.week > 0 && dt.week < 13));
                     if (dtKhoaHoc.data.length > 0) {
-                        this.loopGetPlanActivities(1, [], dtKhoaHoc.data.map(m => m.id), 1000, dtKhoaHoc.data, this.dataWeek);
+                        this.loopGetPlanActivities(1, [], dtKhoaHoc.data.map(m => m.id), 1000, dtKhoaHoc.data, this.dataWeek());
                     }
                     else {
-                        this.displayModal = false;
-                        this.list_cdr = [];
+                        this.displayModal.set(false);
+                        this.list_cdr.set([]);
                         this.noitifi.isProcessing(false);
 
                     }
                 },
+                error: () => this.handleLoadError(),
             })
+        } else {
+            this.displayModal.set(false);
         }
     }
 
@@ -268,22 +275,20 @@ export class KetquaCayceloNoidungkhacComponent implements OnInit, OnChanges {
 
                     this.loopGetPlanActivities(page + 1, plan.concat(dataPlans.data), ids, dataPlans.recordsFiltered, dtKhoahoc, dtWeek);
                 },
-                error: () => {
-
-                }
+                error: () => this.handleLoadError(),
             })
         } else {
-            this.list_cdr = dtKhoahoc.map(kh => {
+            this.list_cdr.set(dtKhoahoc.map(kh => {
                 kh['__plans'] = plan.filter(pl => pl.course_id === kh.id).sort((a, b) => (a.week - b.week));
 
-                kh['__celoResult'] = this.dataWeek.map(week => {
+                kh['__celoResult'] = this.dataWeek().map(week => {
                     const plansForWeek = kh['__plans'].filter(p => p.week === week.week && p.type === 'ACTIVITY_CDR');
                     const countStatus1 = plansForWeek.filter(p => p.status === 1).length;
                     const countValidPlans = plansForWeek.filter(p => p.status !== -3).length;
                     return countValidPlans > 0 ? (countStatus1 === countValidPlans ? 'ĐẠT' : `${countStatus1}/${countValidPlans}`) : '-';
                 });
 
-                kh['__otherResult'] = this.dataWeek.map(week => {
+                kh['__otherResult'] = this.dataWeek().map(week => {
                     const plansForWeek = kh['__plans'].filter(p => p.week === week.week && p.type === 'ACTIVITY');
                     if (plansForWeek.length > 0) {
                         const countStatus1 = plansForWeek.filter(p => p.status === 1).length;
@@ -292,11 +297,17 @@ export class KetquaCayceloNoidungkhacComponent implements OnInit, OnChanges {
                     return '-';
                 });
                 return kh;
-            });
+            }));
 
             this.noitifi.isProcessing(false);
-            this.displayModal = false;
+            this.displayModal.set(false);
         }
+    }
+
+    private handleLoadError(): void {
+        this.noitifi.isProcessing(false);
+        this.displayModal.set(false);
+        this.noitifi.toastError('Lỗi tải dữ liệu');
     }
 
 

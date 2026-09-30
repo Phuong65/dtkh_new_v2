@@ -22,19 +22,19 @@
     </div>
     <div class="layout_component_container-bottom">
         <div class="container-bottom-right">
-            <p-table [value]="list_cdr"
+            <p-table [value]="list_cdr()"
                 styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-none-header ovic-ui-table table-reBorder th-td-padding-5px">
                 <ng-template pTemplate="header">
                     <tr>
                         <th [rowSpan]="2" style="text-align: center; width: 50px;" pFrozenColumn>TT</th>
                         <th [rowSpan]="2" style="text-align: center; width: 250px;" pFrozenColumn>Tên học phần</th>
                         <th [rowSpan]="2" style="text-align: center; width: 140px;">Thông tin chung</th>
-                        @for (week of dataWeek; track week.week; let i = $index) {
+                        @for (week of dataWeek(); track week.week; let i = $index) {
                             <th [colSpan]="2" style="text-align: center; width: 200px;">Bài {{ i + 1 }}</th>
                         }
                     </tr>
                     <tr>
-                        @for (week of dataWeek; track week.week) {
+                        @for (week of dataWeek(); track week.week) {
                             <th style="text-align: center; width: 140px;">Cây celo</th>
                             <th style="text-align: center; width: 140px;">Nội dung khác</th>
                         }
@@ -46,7 +46,7 @@
                         <td>{{ cdr.title }}</td>
                         <td style="text-align: center;">-</td>
 
-                        @for (week of dataWeek; track week.week) {
+                        @for (week of dataWeek(); track week.week) {
                             <td style="text-align: center;" [ngClass]="cdr['__celoResult'][week.week - 1] ? {
                                   'blue-text': cdr['__celoResult'][week.week - 1] === 'ĐẠT',
                                   'red-bg': cdr['__celoResult'][week.week - 1] === 'Chưa đạt',
@@ -81,7 +81,8 @@
     </div>
 </div>
 
-<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false"
+    [visible]="displayModal()" (visibleChange)="displayModal.set($event)"
     [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
     <div class="popup-waiting-loading">
         <label style="width: 100%;">{{waitting_title}}</label>

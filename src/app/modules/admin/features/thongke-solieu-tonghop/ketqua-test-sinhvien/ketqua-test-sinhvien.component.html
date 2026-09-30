@@ -41,17 +41,18 @@
                             <td style="text-align: center;" [innerHTML]="getResultStudent(class, week)"></td>
                         </ng-container> -->
 
-                                                @for (week of dataWeekClass; track week.week) {
+                        @for (week of dataWeekClass; track week.week; let i = $index) {
                             <td style="text-align: center;">
-                                                            @if (class['__textShow'][week.week - 1] !== '-') {
-                                <span>{{ class['__textShow'][week.week - 1].split(' - ')[0] }}</span> -
-                                <span [style.color]="'red'">{{ class['__textShow'][week.week - 1].split(' - ')[1].split(' | ')[0] }}</span> |
-                                <span>{{ class['__textShow'][week.week - 1].split(' | ')[1] }}</span>
-                                                            } @else {
-                                {{ class['__textShow'][week.week - 1] }}
-                                                            }
+                                @let result = class['__textShow']?.[i];
+                                @if (result && result !== '-') {
+                                    <span>{{ result.split(' - ')[0] }}</span> -
+                                    <span [style.color]="'red'">{{ result.split(' - ')[1]?.split(' | ')[0] }}</span> |
+                                    <span>{{ result.split(' | ')[1] }}</span>
+                                } @else {
+                                    {{ result || '-' }}
+                                }
                             </td>
-                                                }
+                        }
 
 
                     </tr>

@@ -1,4 +1,4 @@
-import {Component, inject, OnInit, TemplateRef, viewChild} from '@angular/core';
+import { Component, inject, OnInit, signal, TemplateRef, viewChild } from '@angular/core';
 import {ButtonModule} from "primeng/button";
 import {DialogModule} from "primeng/dialog";
 import {MatProgressBarModule} from "@angular/material/progress-bar";
@@ -64,8 +64,8 @@ export class KetquaNghiemthuCauhoiLmsComponent implements OnInit {
     formTitle:string= '';
 
     ds_dotCapnhat: ElnKhoaHoc[];
-    list_cdr: ElnKhoaHoc[];
-    dataWeek: CoursePlanActivities[];
+    list_cdr = signal<ElnKhoaHoc[]>([]);
+    dataWeek = signal<CoursePlanActivities[]>([]);
     limitCourse = 20;
     totalCourse = 0;
     donviId: number;
@@ -234,18 +234,19 @@ export class KetquaNghiemthuCauhoiLmsComponent implements OnInit {
             ]).subscribe({
                 next: ([dtKhoaHoc, dtWeekCoures]) => {
                     // this.displayModal = true;
-                    this.dataWeek = dtWeekCoures.data.filter(dt => (dt.week > 0 && dt.week < 13) || dt.week == 100  );
+                    this.dataWeek.set(dtWeekCoures.data.filter(dt => (dt.week > 0 && dt.week < 13) || dt.week == 100  ));
                     // this.dataWeek = dtWeekCoures.data.filter(dt => dt.week > 0);
                     if (dtKhoaHoc.data.length > 0) {
-                        this.loopGetPlanActivities(1, [], dtKhoaHoc.data.map(m => m.id), 1000, dtKhoaHoc.data, this.dataWeek);
+                        this.loopGetPlanActivities(1, [], dtKhoaHoc.data.map(m => m.id), 1000, dtKhoaHoc.data, this.dataWeek());
                     }
                     else {
-                        this.list_cdr = [];
+                        this.list_cdr.set([]);
                         this.noitifi.isProcessing(false);
                         this.displayModal = false;
 
                     }
                 },
+                error: () => this.closeLoadingWithError(),
             })
         }
     }
@@ -277,9 +278,7 @@ export class KetquaNghiemthuCauhoiLmsComponent implements OnInit {
                 next: (dataPlans) => {
                     this.loopGetPlanActivities(page + 1, plan.concat(dataPlans.data), ids, dataPlans.recordsFiltered, dtKhoahoc, dtWeek);
                 },
-                error: () => {
-
-                }
+                error: () => this.closeLoadingWithError(),
             })
         } else {
             dtKhoahoc.map(kh => {
@@ -314,13 +313,11 @@ export class KetquaNghiemthuCauhoiLmsComponent implements OnInit {
                     this.lopGetCoursesQuestions(page + 1, courses.concat(dataCourses.data), ids, dataCourses.recordsFiltered, dtKhoahoc, dtWeek);
 
                 },
-                error: () => {
-
-                }
+                error: () => this.closeLoadingWithError(),
             })
 
         } else {
-            this.list_cdr = dtKhoahoc.map(m => {
+            this.list_cdr.set(dtKhoahoc.map(m => {
                 if (m.av === 1) {
                     const courseQuestionParent  = Array.from(courses).filter(f=>f['group_id']===0).map(parent => {
                         return {...parent,
@@ -332,7 +329,7 @@ export class KetquaNghiemthuCauhoiLmsComponent implements OnInit {
                     m['__total'] = m['__courses'] ? this.getTotalQuestionByChild(m['__courses'].filter(cs=>cs.group_id === 0)) + ' - ' + this.getTotalQuestionByChild(m['__courses']) : 0;
 
 
-                    m['__textShow'] = this.dataWeek.map(week => {
+                    m['__textShow'] = this.dataWeek().map(week => {
                         const plansForWeek = m['__plans'].filter(p => p.week === week.week);
 
 
@@ -358,7 +355,7 @@ export class KetquaNghiemthuCauhoiLmsComponent implements OnInit {
 
                     m['__total'] = m['__courses'] ? m['__courses'].filter(cs=>cs.group_id === 0).length + ' - ' + this.countRelatedItems(m['__courses']) : 0;
 
-                    m['__textShow'] = Array.from(this.dataWeek).map(week => {
+                    m['__textShow'] = Array.from(this.dataWeek()).map(week => {
                         const plansForWeek = m['__plans'].filter(p => p.week === week.week);
                         const course_question = m['__courses'].filter(q =>
                             plansForWeek.filter(p => p.id === q.reference_id).length > 0
@@ -379,11 +376,16 @@ export class KetquaNghiemthuCauhoiLmsComponent implements OnInit {
                 }
 
 
-            });
+            }));
 
             this.displayModal = false;
             this.noitifi.isProcessing(false);
         }
+    }
+
+    private closeLoadingWithError(): void {
+        this.displayModal = false;
+        this.noitifi.toastError('Tải dữ liệu không thành công');
     }
 
     onChangeDonviCM(event) {
@@ -457,7 +459,7 @@ export class KetquaNghiemthuCauhoiLmsComponent implements OnInit {
                 return {arr :newArr.length > 0 ? newArr : [], title:e.label, soluong:numOfView} }).filter(f=>f.arr.length >0);
             arrTotalByQuestionType.push(itemTotal);
             //==========================================
-            const dataWee = Array.from([...this.dataWeek.slice(0,(item.params.sotinchi * 3)),this.dataWeek.find(a=>a.week ==100)]).map(dw=>{
+            const dataWee = Array.from([...this.dataWeek().slice(0,(item.params.sotinchi * 3)),this.dataWeek().find(a=>a.week ==100)]).map(dw=>{
                 dw['__cdrList']= this.cdrList.map(e=>{
                     const newArr =  Array.from(courseQuestionParent).filter(cq => cq['cdr'] === e.id && cq['week'] === dw.week);
                     const numOfViewByChild = this.rplTotalAllByChild(newArr,'__child',true)
@@ -491,7 +493,7 @@ export class KetquaNghiemthuCauhoiLmsComponent implements OnInit {
                 const  newArr =Array.from(courseQuestionParent).filter(cq => e.value === cq['question_type'] );
                 return {arr :newArr.length > 0 ? newArr : [], title:e.label, soluong:this.getTotalQuestionByChild(newArr,true)} }).filter(f=>f.soluong !==0);
             //==========================================
-            const dataWee = Array.from([...this.dataWeek.slice(0,(item.params.sotinchi * 3)),this.dataWeek.find(a=>a.week ==100)]).map(dw=>{
+            const dataWee = Array.from([...this.dataWeek().slice(0,(item.params.sotinchi * 3)),this.dataWeek().find(a=>a.week ==100)]).map(dw=>{
                 dw['__cdrList']= this.cdrList.map(e=>{
                     const newArr =  Array.from(courseQuestionParent).filter(cq => cq['cdr'] === e.id && cq['week'] === dw.week);
                     return {arr :newArr.length > 0 ? newArr : [], title:e.label, soluong:newArr.length > 0 ? this.getTotalQuestionByChild(newArr,true) : '-' };

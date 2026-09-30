@@ -25,14 +25,14 @@
     </div>
     <div class="layout_component_container-bottom">
         <div class="container-bottom-right">
-            <p-table [value]="list_cdr"
+            <p-table [value]="list_cdr()"
                      styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table table-none-header ovic-ui-table table-reBorder th-td-padding-5px">
                 <ng-template pTemplate="header">
                     <tr>
                         <th  style="text-align: center; width: 50px;">TT</th>
                         <th  style="text-align: center; width: 250px;">Tên học phần</th>
                         <th  style="text-align: center; width: 80px;">Tổng số câu hỏi</th>
-                        @for (week of dataWeek; track week.week) {
+                        @for (week of dataWeek(); track week.week) {
                             @if (week.week !== 100) {
                                 <th colspan="1" style="text-align: center; width: 120px;">Bài {{ week.week }}</th>
                             } @else {
@@ -47,7 +47,7 @@
                         <td class="btn-hover"  (click)="btnselectRows(cdr)">{{ cdr.title }}</td>
                         <td style="text-align: center;">{{ cdr['__total'] }}</td>
 
-                        @for (week of dataWeek; track week.week) {
+                        @for (week of dataWeek(); track week.week) {
                             <td style="text-align: center;">
 
                                 @if (week.week !== 100) {

@@ -153,7 +153,7 @@
         </div>
         <div style="line-height: 1.25; padding: 0px; height: calc(100vh - 57px);background: #eaeaea;"
             class="ovic-over-right-section__body footer-no-hint tuluan-comment-slide">
-            <app-view-thuongxuyen-tuluan [courseSelected]="selectedCourse()"
+            <app-view-thuongxuyen-tuluan [courseSelected]="selectedCourse"
                 [tuluan]="selectedTuluan"></app-view-thuongxuyen-tuluan>
             <div style="padding: 15px 0px;">
                 <ng-container [ngTemplateOutlet]="templateDuyet"
@@ -201,15 +201,9 @@
                             </div>
                         } @else {
                             <div class="ketquaduyet-hoidong" style="padding-bottom: 10px; ">
-                                <div style="text-align: center;">
-                                    @switch (activity['status']) {
-                                        @case (0) {
-                                            <span class="gray status-duyet-hoidong">Chờ duyệt</span>
-                                        }
-                                        @case (-2) {
-                                            <span class="blue status-duyet-hoidong">Đã sửa, chờ duyệt</span>
-                                        }
-                                    }
+                                <div style="text-align: center;" [ngSwitch]="activity['status']">
+                                    <span *ngSwitchCase="0" class="gray status-duyet-hoidong">Chờ duyệt</span>
+                                    <span *ngSwitchCase="-2" class="blue status-duyet-hoidong">Đã sửa, chờ duyệt</span>
                                 </div>
                             </div>
                         }
@@ -225,15 +219,10 @@
                             style="padding-bottom: 10px; ">
 
                             <div class="ketquaduyet-hoidong-left col-6">
-                                <div class="ketquaduyet-hoidong-left-status" style="text-align: center;">
-                                    @switch (activity['status_captruong']) {
-                                        @case (1) {
-                                            <span class="true-blue status-duyet-hoidong">Đạt</span>
-                                        }
-                                        @case (-1) {
-                                            <span class="red status-duyet-hoidong">Yêu cầu sửa</span>
-                                        }
-                                    }
+                                <div class="ketquaduyet-hoidong-left-status" style="text-align: center;"
+                                    [ngSwitch]="activity['status_captruong']">
+                                    <span *ngSwitchCase="1" class="true-blue status-duyet-hoidong">Đạt</span>
+                                    <span *ngSwitchCase="-1" class="red status-duyet-hoidong">Yêu cầu sửa</span>
                                 </div>
                             </div>
                             <div class="ketquaduyet-hoidong-right col-6">
@@ -243,15 +232,9 @@
                         </div>
                     } @else {
                         <div class="ketquaduyet-hoidong" style="padding-bottom: 10px; ">
-                            <div style="text-align: center;">
-                                @switch (activity['status_captruong']) {
-                                    @case (0) {
-                                        <span class="gray status-duyet-hoidong">Chờ duyệt</span>
-                                    }
-                                    @case (-2) {
-                                        <span class="blue status-duyet-hoidong">Đã sửa, chờ duyệt</span>
-                                    }
-                                }
+                            <div style="text-align: center;" [ngSwitch]="activity['status_captruong']">
+                                <span *ngSwitchCase="0" class="gray status-duyet-hoidong">Chờ duyệt</span>
+                                <span *ngSwitchCase="-2" class="blue status-duyet-hoidong">Đã sửa, chờ duyệt</span>
                             </div>
                         </div>
                     }
@@ -263,13 +246,14 @@
                 <div class="comment-box">
                     <div class="inner-comment">
                         <div class="inner-comment-header">
-                            <div style="flex: 1;">
-                                <span [ngClass]="comment['user_id'] === userId ? 'blue':''"
-                                    style="font-weight: 600; margin-right: 10px; text-decoration: underline;">
-                                    {{comment['display_name'] + ' ('+HOIDONGDUYET[comment['cap_hoidong']]+')' + ':'}}
-                                </span>
-                            </div>
+                        <div style="flex: 1;">
+                            <span [ngClass]="comment['user_id'] === userId ? 'blue':''"
+                                style="font-weight: 600; margin-right: 10px; text-decoration: underline;">
+                                {{comment['display_name'] + ' ('+HOIDONGDUYET[comment['cap_hoidong']]+')' + ':'}}
+                            </span>
                         </div>
+
+                    </div>
                     @if (comment['children'] && comment['children'].length) {
                         <div>
                             @for (children of comment['children']; track children.id) {
@@ -315,7 +299,7 @@
                                         }
                                     </div>
 
-                                    @if (canReply() || kd_hoidong || kd_uyvien || (selectedCourse() && userId === selectedCourse().creator_plan_id)) {
+                                    @if (canReply || kd_hoidong || kd_uyvien || (selectedCourse && userId === selectedCourse.creator_plan_id)) {
                                         <div style="display: flex; position: relative;">
                                             <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;"><img
                                                     style="width: 100%;" src="../../../assets/images/a_none.jpg"></div>
@@ -333,11 +317,9 @@
                         </div>
                     }
                 </div>
-            }
+            </div>
         </div>
-    </div>
-}
-</div>
+    }
 }
         @if ((kd_uyvien || kd_hoidong) && activity['status'] === 1 && activity['status_captruong'] !== 1) {
             <div [ngClass]="(!activity['comments'] || !activity['comments'].length) ? 'padding-top-15px':''"
