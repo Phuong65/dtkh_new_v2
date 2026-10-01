@@ -22,7 +22,7 @@ import {NotificationService} from '@core/services/notification.service';
 import {ElngUserProfile} from '@modules/shared/models/elng-user-profile';
 import {HttpParamsHeplerService} from '@core/services/http-params-hepler.service';
 import {OvicQueryCondition} from '@core/models/dto';
-import {forkJoin, mergeMap, Observable, of, switchMap} from 'rxjs';
+import {forkJoin, mergeMap, of} from 'rxjs';
 import {Classes} from '@modules/shared/models/classes';
 import {RoleService} from '@core/services/role.service';
 import {ConditionOption} from '@modules/shared/models/condition-option';
@@ -37,7 +37,6 @@ import {ElnChuyenMucService} from '@modules/shared/services/elearning-chuyen-muc
 import {ElnChuyenMuc} from '@modules/shared/models/Elng';
 import {ElnKhoaHoc} from '@modules/shared/models/elng-khoa-hoc';
 import {PopoverModule} from 'primeng/popover';
-import {RptClassStudentPointsService} from "@shared/services/rpt-class-student-points.service";
 import { ResizingImageComponent } from '@modules/shared/components/resizing-image/resizing-image.component';
 
 @Component({
@@ -142,7 +141,6 @@ export class QuanlyLophocphanV2Component implements OnInit, OnDestroy {
     private classesService = inject(ClassesService);
     private elnKhoaHocService = inject(ElnKhoaHocService);
     private userService = inject(UserService);
-    private modalService = inject(NgbModal);
     private router = inject(Router);
     private noitifi = inject(NotificationService);
     private httpHelper = inject(HttpParamsHeplerService);
@@ -152,11 +150,13 @@ export class QuanlyLophocphanV2Component implements OnInit, OnDestroy {
     private sanitizer = inject(DomSanitizer);
     private classStudentService = inject(ClassStudentService);
     private elnChuyenMucService = inject(ElnChuyenMucService);
-    private rptClassStudentPointsService = inject(RptClassStudentPointsService);
 
     constructor() {
 
         const url = this.router.url.substring(7).split('?')[0];
+        console.log(this.auth.hasRouter(ROUTERS.daotao));
+        console.log(this.auth.hasRouter(ROUTERS.admin));
+        
 
         this.routerAdmin = this.auth.hasRouter(ROUTERS.admin);
 
@@ -225,87 +225,6 @@ export class QuanlyLophocphanV2Component implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.initData();
-        // this.btngetClass()
-    }
-
-
-    btngetClass(){
-        const condtion: ConditionOption = {
-            condition:[
-                {
-                    conditionName:'namhoc',
-                    condition: OvicQueryCondition.equal,
-                    value:'2025_2026'
-                },
-                {
-                    conditionName:'hocky',
-                    condition: OvicQueryCondition.equal,
-                    value:'2'
-                }
-            ],page:'1',
-            set:[
-                {
-                    label:'limit', 'value' :'-1'
-                }
-            ]
-        }
-        this.classesService.getClassesByPageNew(condtion).pipe(switchMap(m=>{
-            return forkJoin([of(m.data), this.getStudent(m.data,[])])
-            }
-
-        )).subscribe({
-            next:([dataClass, dataStudent])=>{
-                console.log(dataClass)
-                console.log(dataStudent)
-
-            }
-        })
-    }
-
-    private getStudent(classes: Classes[], data: any[]): Observable<any[]> {
-        const index = classes.findIndex(f => !f['haveGet']);
-
-        if (index !== -1) {
-            const currentClass = classes[index];
-
-            const condtion: ConditionOption = {
-                condition: [
-                    {
-                        conditionName: 'class_id',
-                        condition: OvicQueryCondition.equal,
-                        value: currentClass.id.toString()
-                    },
-                    {
-                        conditionName: 'check_ban',
-                        condition: OvicQueryCondition.equal,
-                        value: 'CAM'
-                    },
-                    {
-                        conditionName: 'nghi_20_pecent',
-                        condition: OvicQueryCondition.equal,
-                        value: 'CẤM THI',
-                        orWhere: 'or'
-                    }
-                ],
-                page: '1',
-                set: [
-                    { label: 'limit', value: '-1' },
-                    { label: 'select', value: 'id,class_id,so_buoinghi,check_ban,nghi_20_pecent' }
-                ]
-            };
-
-            return this.rptClassStudentPointsService.getDataByPageNew(condtion).pipe(
-                switchMap(m => {
-                    classes[index]['haveGet'] = true;
-
-                    data.push(...m.data); // FIX
-
-                    return this.getStudent(classes, data);
-                })
-            );
-        } else {
-            return of(data);
-        }
     }
 
     get fC() {
@@ -363,11 +282,18 @@ export class QuanlyLophocphanV2Component implements OnInit, OnDestroy {
         ]).set('limit', -1).set("order", "ASC").set("orderby", "title");
 
         const roleATeacher = this.auth.roles.find((r) => r.name === ROLES.giangvien);
+        const teacherRoleId = roleATeacher?.['id'] ?? this.objectRoles[ROLES.giangvien]?.id;
+
+        if (!teacherRoleId) {
+            this.noitifi.isProcessing(false);
+            this.noitifi.toastError('Không tìm thấy vai trò giảng viên');
+            return;
+        }
 
         forkJoin([
             this.classesService.getClassesByCols(condition_group_namhoc),
             this.classesService.getClassesByCols(condition_group_hocky),
-            this.userService.getUserByCol('role_ids', roleATeacher ? roleATeacher['id'] : this.objectRoles[ROLES.giangvien].id),
+            this.userService.getUserByCol('role_ids', teacherRoleId),
             this.donViService.getDonViByCols(condition_donvi),
             this.elngUserProfileService.getElngUserProfileByItem(this.userId.toString(), 'user_id'),
         ]).subscribe({
@@ -661,8 +587,9 @@ export class QuanlyLophocphanV2Component implements OnInit, OnDestroy {
     }
 
     onResetPage() {
-        if (!this.paginator().empty()) {
-            this.paginator().changePage(0);
+        const paginator = this.paginator();
+        if (paginator && !paginator.empty()) {
+            paginator.changePage(0);
         } else {
             this.loadPageClass(1);
         }
@@ -773,7 +700,7 @@ export class QuanlyLophocphanV2Component implements OnInit, OnDestroy {
                     ]).subscribe({
                         next: () => {
                             this.noitifi.toastSuccess('Xóa thành công');
-                            this.loadPageClass(this.pageIndex);
+                            this.loadPageClass(this.pageIndex || 1);
                         },
                         error: () => {
                             this.noitifi.toastError('Xóa thất bại, lỗi kết nối');
@@ -1004,10 +931,12 @@ export class QuanlyLophocphanV2Component implements OnInit, OnDestroy {
             this.noitifi.isProcessing(true);
             if (this.isUpdated) {
                 if (this.selectedClass.manager_ids) {
-                    const manager_ids = this.selectedClass.manager_ids.splice(1, this.selectedClass.manager_ids.length);
-                    const manager_info = this.selectedClass.manager_info.split(',').splice(1, this.selectedClass.manager_info.split(',').length);
+                    const manager_ids = this.selectedClass.manager_ids.slice(1);
+                    const manager_info = this.selectedClass.manager_info ? this.selectedClass.manager_info.split(',').slice(1) : [];
                     data['manager_ids'] = data['manager_ids'].concat(manager_ids);
-                    data['manager_info'] = data['manager_info'].concat(',', manager_info.toString());
+                    if (manager_info.length > 0) {
+                        data['manager_info'] = data['manager_info'].concat(',', manager_info.join(','));
+                    }
                     data['manager_ids'] = data['manager_ids'] ? '|'.concat(data['manager_ids'].join('|'), '|') : '';
                 } else if (Array.isArray(data['manager_ids']) && data['manager_ids'].length === 1) {
                     data['manager_ids'] = data['manager_ids'] ? '|'.concat(data['manager_ids'].join('|'), '|') : '';
@@ -1017,7 +946,7 @@ export class QuanlyLophocphanV2Component implements OnInit, OnDestroy {
                     next: () => {
                         this.noitifi.toastSuccess('Cập nhật thành công');
                         this.resetForm();
-                        this.loadPageClass(this.pageIndex);
+                        this.loadPageClass(this.pageIndex || 1);
                         this.closeSideMenu();
                     },
                     error: () => {

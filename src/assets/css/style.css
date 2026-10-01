@@ -3848,7 +3848,12 @@ body .question-content .p-dropdown-label {
     max-height: calc(100% - 30px);
     overflow: hidden;
 }
-
+.mat-list-no-endcontent .mdc-list-item__end {
+    display: none !important;
+}
+/* ::ng-deep ::ng-deep .mdc-list-item.mdc-list-item--with-one-line {
+    height: auto !important;
+} */
 
 /***/
 

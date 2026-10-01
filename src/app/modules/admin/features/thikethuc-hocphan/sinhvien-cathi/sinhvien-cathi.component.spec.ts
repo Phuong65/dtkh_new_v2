@@ -8,7 +8,7 @@ describe('SinhvienCathiComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SinhvienCathiComponent ]
+      imports: [ SinhvienCathiComponent ]
     })
     .compileComponents();
 

@@ -21,19 +21,66 @@
             </button>
 
             <p-popover #op appendTo="body">
-                <ng-template pTemplate>
-                    <ng-container [ngTemplateOutlet]="templateFilterShift">
-                    </ng-container>
-                </ng-template>
-            </p-popover>
-            
-            <button (click)="op.toggle($event)" class="btn btn-icon btn-primary" container="body" placement="left"
-                ngbTooltip="Lọc">
-                <i style="margin-right: 0px;" class="pi pi-filter"></i>
+                <div class="layout-filter-shift" style="width: 500px;">
+                    <div class="ovic-vertical__inputs" style="line-height: 1.5;">
 
-                
+                        <div class="row form-row form-row-flex-row">
+                            <div class="col-6">
+                                <label>Năm học:</label>
+
+                                <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?.['namhoc'] ?? null"
+                                    (onChange)="onChangeFilter($event, 'namhoc')" [options]="listNamhoc"
+                                    optionId="value" optionLabel="label" placeholder="- Năm học -" [filter]="true">
+                                </ovic-dropdown>
+                            </div>
+
+                            <div class="col-6">
+                                <label>Học kỳ:</label>
+
+                                <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?.['hocky'] ?? null"
+                                    (onChange)="onChangeFilter($event, 'hocky')" [options]="listHocky" optionId="value"
+                                    optionLabel="label" placeholder="- Học kỳ -" [filter]="true">
+                                </ovic-dropdown>
+                            </div>
+                        </div>
+
+                        @if (routerDaotao || routerAdmin) {
+                        <div class="row form-row form-row-flex-row">
+                            <div class="col-12">
+                                <label>Khoa:</label>
+
+                                <ovic-dropdown [defaultValue]="objectFilter?.['category_id'] ?? null"
+                                    (onChange)="onChangeFilter($event, 'category_id')" [options]="list_donvi_chuyenmon"
+                                    optionLabel="title" optionId="id" placeholder="- - - - -" scrollHeight="400px"
+                                    styleClass="shift-dropdown-filter width-250px" [filter]="true" filterBy="title">
+                                </ovic-dropdown>
+                            </div>
+                        </div>
+                        }
+
+                        @if (routerDaotao || routerAdmin) {
+                        <div class="row form-row form-row-flex-row">
+                            <div class="col-12">
+                                <label>Giảng viên:</label>
+
+                                <ovic-dropdown [defaultValue]="objectFilter?.['manager_ids'] ?? null"
+                                    (onChange)="onChangeFilter($event, 'manager_ids')" [options]="listTeacher"
+                                    optionLabel="show_name" optionId="id" placeholder="- - - - -" scrollHeight="400px"
+                                    styleClass="shift-dropdown-filter width-250px" [filter]="true" filterBy="show_name">
+                                </ovic-dropdown>
+                            </div>
+                        </div>
+                        }
+
+                    </div>
+                </div>
+            </p-popover>
+
+            <button type="button" class="btn btn-icon btn-primary" (click)="op.toggle($event)" ngbTooltip="Lọc"
+                container="body" placement="left">
+                <i class="pi pi-filter"></i>
             </button>
-            
+
             @if (routerDaotao) {
             <button class="btn btn-icon" (click)="openFormAddClass(false)" container="body" placement="left"
                 ngbTooltip="Thêm lớp học phần" class="btn btn-success">
@@ -44,18 +91,11 @@
     </div>
     <div class="class-layout-bottom class-layout-bottom-headertabview">
         <p-tabs [(value)]="activeIndex_class">
-
-            <!-- <p-tablist>
-                <p-tab [value]="0">
-                    class-list
-                </p-tab>
-
-                <p-tab [value]="1">
-                    class-grid
-                </p-tab>
+            <p-tablist class="d-none">
+                <p-tab [value]="0">class-list</p-tab>
+                <p-tab [value]="1">class-grid</p-tab>
             </p-tablist>
-            -->
-            <p-tabpanels> 
+            <p-tabpanels>
 
                 <!-- ==================== CLASS LIST ==================== -->
                 <p-tabpanel [value]="0">
@@ -376,59 +416,7 @@
     </div>
 </div>
 
-<ng-template #templateFilterShift>
-    <div class="layout-filter-shift" style="width: 500px;">
-        <div class="ovic-vertical__inputs" style="line-height: 1.5;">
-            <div class="row form-row form-row-flex-row">
-                <div class="col-6">
-                    <label>Năm học:</label>
-                    <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?objectFilter['namhoc']: null"
-                        (onChange)="onChangeFilter($event, 'namhoc')" placeholder="- Năm học -" [options]="listNamhoc"
-                        optionId="value" optionLabel="label" [filter]="true">
-                    </ovic-dropdown>
-                </div>
-                <div class="col-6">
-                    <label>Học kỳ:</label>
-                    <ovic-dropdown [showClear]="false" [defaultValue]="objectFilter?objectFilter['hocky']: null"
-                        (onChange)="onChangeFilter($event, 'hocky' )" [options]="listHocky" placeholder="- Học kỳ -"
-                        optionId="value" optionLabel="label" [filter]="true">
-                    </ovic-dropdown>
-                </div>
-            </div>
-            @if (routerDaotao || routerAdmin) {
-            <div class="row form-row form-row-flex-row">
-                <div class="col-12">
-                    <label>Khoa:</label>
-                    <ovic-dropdown [defaultValue]="objectFilter['category_id'] ? objectFilter['category_id'] : null"
-                        (onChange)="onChangeFilter($event, 'category_id' )" placeholder="- - - - -" scrollHeight="400px"
-                        styleClass="shift-dropdown-filter width-250px" [options]="list_donvi_chuyenmon"
-                        optionLabel="title" optionId="id" [filter]="true" filterBy="title">
-                    </ovic-dropdown>
-                </div>
-            </div>
-            }
-            @if (routerDaotao || routerAdmin) {
-            <div class="row form-row form-row-flex-row">
-                <div class="col-12">
-                    <label>Giảng viên:</label>
-                    <ovic-dropdown [defaultValue]="objectFilter['manager_ids'] ? objectFilter['manager_ids'] : null"
-                        (onChange)="onChangeFilter($event, 'manager_ids' )" placeholder="- - - - -" scrollHeight="400px"
-                        styleClass="shift-dropdown-filter width-250px" [options]="listTeacher" optionLabel="show_name"
-                        optionId="id" [filter]="true" filterBy="title">
-                    </ovic-dropdown>
-                </div>
-            </div>
-            }
-            <!-- <div class="row form-row form-row-flex-row">
-                <div class="col-12" style="text-align: right;">
-                    <button style="line-height: 1;" (click)="cancelFilter()" class="btn btn-secondary">
-                        <i class="fa fa-refresh"></i>Hủy tìm kiếm
-                    </button>
-                </div>
-            </div> -->
-        </div>
-    </div>
-</ng-template>
+
 
 <ng-template #createClass let-c="close" let-d="dismiss">
     <div class="ovic-over-right-section">

@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1790565872757,
+  "lastScanned": 1790751532817,
   "projectRoot": "d:\\data\\project\\angular\\v21\\dtkh_new_v2",
   "techStack": {
     "languages": [
@@ -32,7 +32,7 @@
     "runtime": null
   },
   "build": {
-    "buildCommand": "npx tsc --noEmit --pretty false",
+    "buildCommand": "npm run build",
     "testCommand": "npm test",
     "lintCommand": null,
     "devCommand": "npm run start",
@@ -69,14 +69,14 @@
       "path": "dist",
       "purpose": "Distribution/build output",
       "fileCount": 0,
-      "lastAccessed": 1790565872721,
+      "lastAccessed": 1790751532766,
       "keyFiles": []
     },
     "docs": {
       "path": "docs",
       "purpose": "Documentation",
       "fileCount": 2,
-      "lastAccessed": 1790565872722,
+      "lastAccessed": 1790751532767,
       "keyFiles": [
         "FRONTEND_API_GUIDE.md",
         "_rules.md"
@@ -86,7 +86,7 @@
       "path": "plans",
       "purpose": null,
       "fileCount": 77,
-      "lastAccessed": 1790565872734,
+      "lastAccessed": 1790751532782,
       "keyFiles": [
         "arrange-paragraphs-editor.md",
         "cauhoi-tracnghiem-chitiet.md",
@@ -99,7 +99,7 @@
       "path": "src",
       "purpose": "Source code",
       "fileCount": 7,
-      "lastAccessed": 1790565872735,
+      "lastAccessed": 1790751532783,
       "keyFiles": [
         "custom-theme.scss",
         "favicon.ico",
@@ -112,7 +112,7 @@
       "path": "src\\app",
       "purpose": "Application code",
       "fileCount": 5,
-      "lastAccessed": 1790565872737,
+      "lastAccessed": 1790751532785,
       "keyFiles": [
         "app-routing.module.ts",
         "app.component.css",
@@ -123,22 +123,28 @@
       "path": "src\\assets",
       "purpose": "Static assets",
       "fileCount": 1,
-      "lastAccessed": 1790565872737,
+      "lastAccessed": 1790751532785,
       "keyFiles": []
     }
   },
   "hotPaths": [
     {
       "path": "src/app/modules/admin/features/lop-hoc-phan",
-      "accessCount": 72,
-      "lastAccessed": 1790649546544,
+      "accessCount": 74,
+      "lastAccessed": 1790667943151,
       "type": "directory"
     },
     {
       "path": "src/app",
-      "accessCount": 42,
-      "lastAccessed": 1790649405193,
+      "accessCount": 63,
+      "lastAccessed": 1790756320441,
       "type": "directory"
+    },
+    {
+      "path": "src\\app\\modules\\admin\\features\\lop-hoc-phan\\quanly-lophocphan-v2\\quanly-lophocphan-v2.component.ts",
+      "accessCount": 32,
+      "lastAccessed": 1790656778500,
+      "type": "file"
     },
     {
       "path": "src\\app\\modules\\admin\\features\\lop-hoc-phan\\class-details\\class-noidung-giangday-v2\\class-noidung-giangday-v2.component.html",
@@ -165,6 +171,12 @@
       "type": "file"
     },
     {
+      "path": "",
+      "accessCount": 12,
+      "lastAccessed": 1790753756484,
+      "type": "directory"
+    },
+    {
       "path": "src\\app\\modules\\admin\\features\\lop-hoc-phan\\class-details\\kiemtra-kynang\\kiemtra-kynang.component.ts",
       "accessCount": 11,
       "lastAccessed": 1790646100739,
@@ -186,12 +198,6 @@
       "path": "src\\app\\modules\\admin\\features\\lop-hoc-phan\\class-details\\hoi-dap\\hoi-dap.component.ts",
       "accessCount": 11,
       "lastAccessed": 1790648277609,
-      "type": "file"
-    },
-    {
-      "path": "src\\app\\modules\\admin\\features\\lop-hoc-phan\\quanly-lophocphan-v2\\quanly-lophocphan-v2.component.ts",
-      "accessCount": 10,
-      "lastAccessed": 1790645044695,
       "type": "file"
     },
     {
@@ -231,12 +237,6 @@
       "type": "file"
     },
     {
-      "path": "",
-      "accessCount": 7,
-      "lastAccessed": 1790645324919,
-      "type": "directory"
-    },
-    {
       "path": "src\\app\\modules\\admin\\features\\lop-hoc-phan\\class-details\\hoi-dap\\hoi-dap-files\\hoi-dap-files.component.ts",
       "accessCount": 7,
       "lastAccessed": 1790647895132,
@@ -255,6 +255,18 @@
       "type": "file"
     },
     {
+      "path": "package.json",
+      "accessCount": 5,
+      "lastAccessed": 1790753464043,
+      "type": "file"
+    },
+    {
+      "path": "angular.json",
+      "accessCount": 5,
+      "lastAccessed": 1790753749463,
+      "type": "file"
+    },
+    {
       "path": "src\\app\\modules\\admin\\features\\lop-hoc-phan\\caidat-lophocphan\\caidat-lophocphan.component.html",
       "accessCount": 4,
       "lastAccessed": 1790581424300,
@@ -262,8 +274,14 @@
     },
     {
       "path": "src\\app\\modules\\admin\\features\\lop-hoc-phan",
-      "accessCount": 3,
-      "lastAccessed": 1790579614709,
+      "accessCount": 4,
+      "lastAccessed": 1790654513194,
+      "type": "directory"
+    },
+    {
+      "path": "src/app/modules/admin/features",
+      "accessCount": 4,
+      "lastAccessed": 1790667969950,
       "type": "directory"
     },
     {
@@ -282,6 +300,12 @@
       "path": "src\\app\\modules\\admin\\features\\lop-hoc-phan\\class-details\\thongtin-giangvienkhac\\thongtin-giangvienkhac.component.ts",
       "accessCount": 3,
       "lastAccessed": 1790582343787,
+      "type": "file"
+    },
+    {
+      "path": "plans\\update21.md",
+      "accessCount": 3,
+      "lastAccessed": 1790753242891,
       "type": "file"
     },
     {
@@ -345,21 +369,9 @@
       "type": "directory"
     },
     {
-      "path": "plans\\update21.md",
-      "accessCount": 2,
-      "lastAccessed": 1790590617512,
-      "type": "file"
-    },
-    {
       "path": "C:\\Users\\2311\\.claude\\plans\\playful-waddling-waffle.md",
       "accessCount": 2,
       "lastAccessed": 1790590704412,
-      "type": "file"
-    },
-    {
-      "path": "package.json",
-      "accessCount": 2,
-      "lastAccessed": 1790644999439,
       "type": "file"
     },
     {
@@ -372,18 +384,6 @@
       "path": "src\\app\\modules\\admin\\routings\\dao-tao\\dao-tao-routing.module.ts",
       "accessCount": 2,
       "lastAccessed": 1790645287292,
-      "type": "file"
-    },
-    {
-      "path": "src/app/modules/admin/features",
-      "accessCount": 2,
-      "lastAccessed": 1790647074880,
-      "type": "directory"
-    },
-    {
-      "path": "angular.json",
-      "accessCount": 2,
-      "lastAccessed": 1790649118349,
       "type": "file"
     },
     {

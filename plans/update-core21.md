@@ -170,6 +170,34 @@ Quy tắc bắt buộc:
       - **TypeScript toàn dự án**: Đạt 0 lỗi trong thư mục `lop-hoc-phan` (`npx tsc --noEmit --pretty false` chỉ còn 4 lỗi gốc ngoài phạm vi từ trước).
       - **Angular template compiler (`npm run build`)**: Toàn bộ template graph biên dịch thành công 100% (chỉ cảnh báo bundle initial 5.10MB vượt nhẹ ngân sách 5.00MB của `angular.json`).
 
+### Cập nhật & Chuẩn hóa thư mục Khảo thí (`khao-thi`) — 2026-09-29
+
+11. **Chuẩn hóa các component trong thư mục `khao-thi`:**
+    - `KetquaThiComponent`: loại bỏ imports PrimeNG dư thừa/trùng lặp, thêm `OnDestroy` để unsubscribe, bỏ log debug, đổi các nhánh template sang Angular built-in control flow và thêm optional chaining cho `row.params`.
+    - `KqChartComponent`: giữ direct imports cần cho `p-chart`/template, bỏ log debug, bảo vệ việc đọc `document` trong môi trường không có DOM, xử lý `_users` rỗng an toàn.
+    - `BieudoPhodiemComponent`: loại bỏ imports dư thừa, chuyển toàn bộ `*ngIf`/`*ngFor`/`ngSwitch` sang `@if`/`@for`/`@switch`, sửa cú pháp `*ngIf` có dấu phẩy và tạo chart datasets bằng immutable mapping.
+    - Bổ sung regression specs cho cả ba component tại các file `*.component.spec.ts` tương ứng.
+    - Build/test toàn dự án hiện còn bị ảnh hưởng bởi các lỗi PrimeNG 21 và spec cũ ngoài phạm vi `khao-thi`; không gán các lỗi đó cho migration này.
+
+### Cập nhật & Chuẩn hóa module Thi kết thúc học phần (`thikethuc-hocphan`) — 2026-09-29
+
+12. **Chuẩn hóa toàn diện 15 component trong thư mục `thikethuc-hocphan`:**
+    - Khôi phục và sửa các import lỗi cú pháp tại `form-de-chitiet.component.ts`.
+    - Thay thế toàn bộ import và selector của các module PrimeNG không còn tồn tại:
+      - `primeng/calendar` (`CalendarModule`, `<p-calendar>`) -> `primeng/datepicker` (`DatePickerModule`, `<p-datepicker>`).
+      - `primeng/overlaypanel` (`OverlayPanelModule`, `<p-overlayPanel>`) -> `primeng/popover` (`PopoverModule`, `<p-popover>`).
+      - `primeng/sidebar` (`SidebarModule`, `<p-sidebar>`) -> `primeng/drawer` (`DrawerModule`, `<p-drawer>`).
+      - `primeng/tabview` (`TabViewModule`, `<p-tabView>`) -> `primeng/tabs` (`TabsModule`, `<p-tabs>` + `<p-tablist>` + `<p-tabpanels>`).
+      - `primeng/dropdown` (`DropdownModule`, `<p-dropdown>`) -> `primeng/select` (`SelectModule`, `<p-select>`).
+    - Chuẩn hóa cấu trúc Tab sang PrimeNG 21 cho 3 component: `sinhvien-cathi`, `sinhvien-cathi-hvu`, `sinhvien-cathi-duan`.
+    - Chuẩn hóa đường dẫn interface `PlanActivityCdr` tại `form-de-chitiet` và `form-de-kthp-ictu-v2`.
+    - Bổ sung direct standalone imports còn thiếu cho `OvicGroupsRadioV2Component` và `ButtonModule`.
+    - Chuyển 6 namespace imports `file-saver` sang default import, loại bỏ cảnh báo gọi namespace object gây crash runtime.
+    - Kết quả kiểm tra:
+      - **TypeScript**: 0 lỗi trong thư mục `thikethuc-hocphan` (`npx tsc --noEmit --pretty false` chỉ còn 4 lỗi cũ ngoài phạm vi).
+      - **Production build**: `npm run build` thành công, exit code 0; output `dist/lcms_v2`.
+      - **Scoped unit test**: chưa chạy được do Angular test builder vẫn compile 3 spec cũ ngoài phạm vi đang import `async` đã bị xóa (`bai-hoc`, `bank-audio-viewer`, `khoa-hoc`).
+
 ### Ghi chú cấu hình thực tế cho tương lai
 
 - `OvicNavMenuFeService`: khi triển khai menu frontend thật, cần cung cấp dữ liệu menu thay thế cho stub rỗng.

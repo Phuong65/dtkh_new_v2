@@ -1,1 +1,541 @@
-﻿<div class="p-3">dongbo-cathi-ictu.component works!</div>
+<div class="dongbo-container">
+    <!-- Loading overlay toàn màn hình (chặn thao tác khi loading/profileLoading) -->
+    @if((loading || profileLoading) && !syncing){
+    <div class="full-loading-overlay">
+        <div class="full-loading-content">
+
+            @if( loading && !profileLoading){
+            <i class="fa fa-spinner fa-spin fa-2x"></i>
+            }
+            <span>{{loading ? 'Đang tải danh sách ca thi...' : profileLoadingText}}</span>
+            @if(profileLoading && profileTotal){
+            <div class="tn-import-student-progressbar" style="margin-top: 12px; max-width: 400px;">
+                <mat-progress-bar mode="determinate" [value]="syncProgressValue"></mat-progress-bar>
+                <div style="font-size:12px;color:#aaa;margin-top:4px;">{{profileLoadedCount}}/{{profileTotal}}</div>
+            </div>
+            }
+
+        </div>
+    </div>
+    }
+
+
+    <!-- Header -->
+    <div class="dongbo-header">
+        <!-- <h3 *ngIf="!detailCathi"><i class="fa fa-refresh"></i>Đồng bộ ca thi</h3>
+        <h3 *ngIf="detailCathi"><i class="fa fa-eye"></i>Chi tiết ca thi</h3> -->
+        @if(detailCathi){
+        <h3><i class="fa fa-eye"></i>Chi tiết ca thi</h3>
+        }
+        @else{
+        <h3><i class="fa fa-refresh"></i>Đồng bộ ca thi</h3>
+        }
+        <button class="btn ovic-over-right-section__close-button"
+            (click)="detailCathi ? closeDetail() : close()"></button>
+    </div>
+
+    <!-- Detail view -->
+    @if(detailCathi){
+    <div class="dongbo-detail">
+        <!-- Info -->
+        <div class="detail-info">
+            <div class="detail-info-row"><strong>Tên ca thi:</strong>
+                @if (detailCathi.kyhieu_cathi?.trim()) {
+                <span style="font-weight: 600;">
+                    {{ detailCathi.kyhieu_cathi }} -
+                </span>
+                }
+
+                @if (!detailCathi.kyhieu_cathi?.trim()) {
+                <span style="color: red; font-weight: 600;">
+                    (chưa nhập thứ tự Ca trên hệ thống quản lý của trường) -
+                </span>
+                }
+                {{detailShiftName}}
+            </div>
+            <div class="detail-info-row"><strong>Thời gian:</strong> {{detailTimeLabel}}</div>
+            <div class="detail-info-row"><strong>Hình thức:</strong> {{detailCathi.Hinh_thuc_thi}}</div>
+        </div>
+
+        @if(loadingDetail && !profileLoading){
+        <div class="loading-overlay">
+            <i class="fa fa-spinner fa-spin fa-2x"></i>
+            <span>Đang tải chi tiết...</span>
+        </div>
+        }
+
+        @if(!loadingDetail){
+        <div class="detail-layout">
+            <!-- Left panel: Rooms list -->
+            <div class="detail-left">
+                <h4>Phòng thi ({{detailRooms.length}})</h4>
+                <div class="room-list">
+                    @for (r of detailRooms; track r) {
+<div class="room-list-item"
+                        [class.active]="selectedRoom === r.So_phong" (click)="selectRoom(r.So_phong)">
+                        <div class="room-list-header">
+                            <strong class="room-name">Phòng {{r.So_phong}}</strong>
+                            <span class="room-student-count">{{roomStudentCountMap[r.So_phong] || 0}} SV</span>
+                        </div>
+                        <div class="room-list-teachers">
+                            @if (r.Ma_cb_coi_thi1 || r.Email_coi_thi1) {
+<div class="room-list-teacher">
+                                <span class="teacher-label">CB1:</span>
+                                <span class="teacher-name">{{r.Giao_vien_coi_thi1 || r.Ma_cb_coi_thi1 ||
+                                    r.Email_coi_thi1}}</span>
+                                <span class="exists-badge" [class.exists]="r.cb1Exists" [class.missing]="!r.cb1Exists">
+                                    {{r.cb1Exists ? 'Có' : 'Không'}}
+                                </span>
+                            </div>
+}
+                            @if (r.Ma_cb_coi_thi2 || r.Email_coi_thi2) {
+<div class="room-list-teacher">
+                                <span class="teacher-label">CB2:</span>
+                                <span class="teacher-name">{{r.Giao_vien_coi_thi2 || r.Ma_cb_coi_thi2 ||
+                                    r.Email_coi_thi2}}</span>
+                                <span class="exists-badge" [class.exists]="r.cb2Exists" [class.missing]="!r.cb2Exists">
+                                    {{r.cb2Exists ? 'Có' : 'Không'}}
+                                </span>
+                            </div>
+}
+                        </div>
+                    </div>
+}
+                </div>
+
+                <!-- Students without room -->
+                @if(studentsWithoutRoom.length){
+                <div class="no-room-section">
+                    <h4 (click)="selectRoom('__no_room__')" style="cursor:pointer;"
+                        [class.active]="selectedRoom === '__no_room__'">
+                        SV chưa xếp phòng ({{studentsWithoutRoom.length}})
+                    </h4>
+                </div>
+                }
+
+            </div>
+
+            <!-- Right panel: Students of selected room -->
+            <div class="detail-right">
+                @if(selectedRoom && selectedRoom !== '__no_room__') {
+                <h4>Danh sách sinh viên — Phòng {{selectedRoom}}</h4>
+                <div class="student-list">
+                    @for (sv of filteredStudents; track sv) {
+<div class="student-item">
+                        <span class="sbd">{{sv.So_bao_danh || 'N/A'}}</span>
+                        <span class="sv-name">{{sv.Ho_ten}}</span>
+                        <span class="sv-code">{{sv.Ma_sv}}</span>
+                        <span class="exists-badge" [class.exists]="sv.existsInSystem"
+                            [class.missing]="!sv.existsInSystem">
+                            {{sv.existsInSystem ? 'Có' : 'Không'}}
+                        </span>
+                    </div>
+}
+                    @if (!filteredStudents.length) {
+<div class="no-data">Không có sinh viên</div>
+}
+                </div>
+                }
+                @if(selectedRoom === '__no_room__'){
+                <h4>Danh sách sinh viên chưa xếp phòng</h4>
+                <div class="student-list">
+                    @for (sv of studentsWithoutRoom; track sv) {
+<div class="student-item">
+                        <span class="sbd">{{sv.So_bao_danh || 'N/A'}}</span>
+                        <span class="sv-name">{{sv.Ho_ten}}</span>
+                        <span class="sv-code">{{sv.Ma_sv}}</span>
+                        <span class="exists-badge" [class.exists]="sv.existsInSystem"
+                            [class.missing]="!sv.existsInSystem">
+                            {{sv.existsInSystem ? 'Có' : 'Không'}}
+                        </span>
+                    </div>
+}
+                </div>
+                }
+                @if(!selectedRoom){
+                <div class="empty-state">
+                    <div class="empty-icon">👈</div>
+                    <div class="empty-title">Chọn một phòng thi</div>
+                    <div class="empty-hint">Nhấp vào phòng bên trái để xem danh sách sinh viên</div>
+                </div>
+                }
+
+            </div>
+        </div>
+        }
+
+    </div>
+    }
+
+
+    <!-- Main sync view -->
+    @if (!detailCathi) {
+
+        <!-- Filters -->
+        <div class="dongbo-filters">
+            <div class="ovic-vertical__inputs" style="line-height:1.5;">
+                <div class="row form-row form-row-flex-row">
+                    <div class="col-3">
+                        <label>Năm học:</label>
+                        <ovic-dropdown [defaultValue]="selectedNamhoc" (onChangeGetValue)="onNamhocChange($event)"
+                            placeholder="- - - - -" [options]="list_namhoc()" optionLabel="label" optionId="value">
+                        </ovic-dropdown>
+                    </div>
+                    <div class="col-3">
+                        <label>Học kỳ:</label>
+                        <ovic-dropdown [defaultValue]="selectedHocky" (onChangeGetValue)="onHockyChange($event)"
+                            placeholder="- - - - -" [options]="list_hocky()" optionLabel="label" optionId="value">
+                        </ovic-dropdown>
+                    </div>
+                    <div class="col-3">
+                        <label>Môn học:</label>
+                        <ovic-dropdown [defaultValue]="selectedCourse?.id" (onChangeGetValue)="onCourseChange($event)"
+                            placeholder="- - - - -" scrollHeight="400px" [options]="list_course()"
+                            optionLabel="label_name" optionId="id" [filter]="true" filterBy="label_name">
+                        </ovic-dropdown>
+                    </div>
+                    <div class="col-3">
+                        <label>Đợt thi:</label>
+                        <ovic-dropdown [defaultValue]="selectedDotThi" (onChangeGetValue)="onDotThiChange($event)"
+                            placeholder="Tất cả" [options]="dotThiOptions" optionLabel="label" optionId="value">
+                        </ovic-dropdown>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="dongbo-body">
+            <!-- Empty — chưa chọn đủ filter -->
+            @if(!loading && !filteredListCathiNV.length && !noData){
+            <div class="empty-state">
+                <div class="empty-icon">🔍</div>
+                <div class="empty-title">Chọn điều kiện tìm kiếm</div>
+                <div class="empty-hint">Vui lòng chọn đầy đủ Năm học, Học kỳ và Môn học</div>
+            </div>
+            }
+
+
+            <!-- Empty — không có dữ liệu -->
+            @if(!loading && noData){
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <div class="empty-title">Không có dữ liệu</div>
+                <div class="empty-hint">Không tìm thấy ca thi nào từ hệ thống</div>
+            </div>
+            }
+
+
+            <!-- Table -->
+
+            @if(!loading && filteredListCathiNV.length){
+            <div class="dongbo-table-wrap">
+                <p-table [value]="filteredListCathiNV"
+                    styleClass="table-scroll-able table-able-dropdown-p-table table-none-header table-reBorder">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width:3rem;text-align:center;">#</th>
+                            <th style="width:3rem;text-align:center;">
+                                <input type="checkbox" [checked]="allSelected"
+                                    (change)="allSelected ? deselectAll() : selectAll()">
+                            </th>
+                            <th>Tên ca thi</th>
+                            <th style="width:160px;text-align:center;">Thời gian bắt đầu</th>
+                            <th style="width:200px;text-align:center;">Hình thức thi</th>
+                            <th style="width:130px;text-align:center;">Trạng thái</th>
+                            <th style="width:100px;text-align:center;">Chi tiết</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-cathi let-idx="rowIndex">
+                        <tr>
+                            <td style="text-align:center;">{{idx + 1}}</td>
+                            <td class="text-left" style="text-align:center;">
+                                <input type="checkbox" [checked]="selectedIds.has(cathi.ID_thi)"
+                                    [disabled]="statusMap.get(cathi.ID_thi) === 'exists' || statusMap.get(cathi.ID_thi) === 'synced'"
+                                    (change)="toggleSelect(cathi)">
+                            </td>
+                            <td>
+                                @if (shiftHasKyhieuMap[cathi.ID_thi]) {
+                                <span style="font-weight: 600;">
+                                    {{ cathi.kyhieu_cathi }} -
+                                </span>
+                                } @else {
+                                <span style="color: red; font-weight: 600;">
+                                    (chưa nhập thứ tự Ca trên hệ thống quản lý của trường) -
+                                </span>
+                                }
+
+                                {{ shiftDisplayNameMap[cathi.ID_thi] }}
+                            </td>
+                            <td style="text-align:center;">{{timeLabelMap[cathi.ID_thi]}}</td>
+                            <td style="text-align:center;">{{cathi.Hinh_thuc_thi}}</td>
+                            <td style="text-align:center;">
+
+
+                                @switch (statusMap.get(cathi.ID_thi)) {
+                                @case ('exists') {
+                                <span class="status-badge exists">Đã có</span>
+                                }
+
+                                @case ('synced') {
+                                <span class="status-badge synced">Đã đồng bộ</span>
+                                }
+
+                                @case ('pending') {
+                                <span class="status-badge pending">Chưa đồng bộ</span>
+                                }
+
+                                @case ('reimport') {
+                                <span class="status-badge reimport">Nhập lại</span>
+                                }
+                                }
+                                <!-- <span class="status-badge exists" *ngIf="statusMap.get(cathi.ID_thi) === 'exists'">Đã
+                                    có</span>
+                                <span class="status-badge synced" *ngIf="statusMap.get(cathi.ID_thi) === 'synced'">Đã
+                                    đồng
+                                    bộ</span>
+                                <span class="status-badge pending"
+                                    *ngIf="statusMap.get(cathi.ID_thi) === 'pending'">Chưa đồng bộ</span>
+                                <span class="status-badge reimport"
+                                    *ngIf="statusMap.get(cathi.ID_thi) === 'reimport'">Nhập lại</span> -->
+                            </td>
+                            <td style="text-align:center;">
+                                <button (click)="openDetail(cathi)" class="btn btn-sm btn-info"
+                                    [disabled]="loadingDetail">
+                                    <i class="fa fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+            }
+
+        </div>
+
+        <!-- Footer -->
+        <div class="dongbo-footer">
+            <span class="selected-info">
+                Đã chọn: <strong>{{selectedCount}}</strong> / {{filteredListCathiNV.length}} ca thi
+                @if(selectedCount){
+
+                <span style="margin-left:8px;color:#999;font-style:italic;">
+                    ({{readyCount}} ca có thể đồng bộ)
+                </span>
+                }
+
+            </span>
+            <button (click)="syncSelected()" [disabled]="!readyCount || syncing" class="btn btn-primary">
+                <i class="fa fa-refresh"></i>
+                Đồng bộ
+            </button>
+        </div>
+
+        <!-- Dialog-waiting progress modal -->
+        <p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false"
+            [(visible)]="displaySyncModal" [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099"
+            [draggable]="false" [resizable]="false">
+            <div class="popup-waiting-loading">
+                <label style="width: 100%;">{{waitting_title}}</label>
+                <div class="tn-import-student-progressbar">
+                    <mat-progress-bar mode="determinate" [value]="syncProgressValue"></mat-progress-bar>
+                </div>
+                @if (profileLoading && profileTotal) {
+<div style="margin-top:4px;font-size:12px;color:#999;text-align:center;"
+                   >
+                    {{profileLoadedCount}}/{{profileTotal}}
+                </div>
+}
+                @if (syncStepText) {
+<div style="margin-top:8px;font-size:13px;color:#555;text-align:center;">
+                    {{syncStepText}}
+                    @if (syncStepTotal) {
+<span> ({{syncStepCurrent}}/{{syncStepTotal}})</span>
+}
+                </div>
+}
+            </div>
+        </p-dialog>
+
+        <!-- Warning dialog: ca thi chưa có kyhieu_cathi -->
+        @if (showEmptyKyhieuWarning) {
+<div class="sync-results-overlay">
+            <div class="sync-results-card" style="max-width:640px;">
+                <div class="sync-results-header">
+                    <h3 style="color:#dc3545;"><i class="fa fa-exclamation-triangle"></i> CẢNH BÁO</h3>
+                    <button class="btn ovic-over-right-section__close-button"
+                        (click)="cancelEmptyKyhieuWarning()"></button>
+                </div>
+                <div class="sync-results-body">
+                    <div style="font-size:15px;margin-bottom:16px;color:#333;line-height:1.6;">
+                        Có <strong>{{emptyKyhieuShifts.length}}</strong> ca thi chưa nhập thứ tự ca thi (kyhieu_cathi
+                        rỗng):
+                    </div>
+                    <ul style="margin:0 0 16px 0;padding-left:20px;color:#555;font-size:14px;line-height:1.8;">
+                        @for (c of emptyKyhieuShifts; track c) {
+<li>
+                            <span style="color:red;">(chưa nhập thứ tự Ca trên hệ thống quản lý của trường)</span> -
+                            {{shiftDisplayNameMap[c.ID_thi]}}
+                        </li>
+}
+                    </ul>
+                    <div
+                        style="font-size:14px;color:#856404;background:#fff3cd;padding:12px 16px;border-radius:8px;margin-bottom:16px;">
+                        <i class="fa fa-info-circle"></i>
+                        Nếu import, tên ca thi sẽ không có thứ tự ca thi ở đầu. Bạn có thể sửa lại thủ công sau khi
+                        import.
+                    </div>
+                </div>
+                <div class="sync-results-footer"
+                    style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                    <label class="kyhieu-warning-checkbox" style="margin:0;">
+                        <input type="checkbox" [(ngModel)]="confirmImportEmptyKyhieu"
+                            style="width:18px;height:18px;margin-right:10px;cursor:pointer;">
+                        Tôi đã đọc và đồng ý import
+                    </label>
+                    <div style="display:flex;gap:12px;">
+                        <button (click)="cancelEmptyKyhieuWarning()" class="btn btn-secondary"
+                            style="line-height:1;min-width:120px;">
+                            <i class="fa fa-times"></i> Hủy
+                        </button>
+                        <button (click)="confirmAndImportEmptyKyhieu()" [disabled]="!confirmImportEmptyKyhieu"
+                            class="btn btn-primary" style="line-height:1;min-width:120px;">
+                            <i class="fa fa-refresh"></i> Import
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+}
+
+        <!-- Sync results overlay -->
+        @if (syncComplete) {
+<div class="sync-results-overlay">
+            <div class="sync-results-card">
+                <div class="sync-results-header">
+                    <h3><i class="fa fa-check-circle"></i> KẾT QUẢ ĐỒNG BỘ</h3>
+                    <button class="btn ovic-over-right-section__close-button"
+                        (click)="closeSyncResults(false)"></button>
+                </div>
+
+                <div class="sync-results-summary">
+                    <span class="sync-results-success">✔ Thành công: {{syncSuccessCount}} ca thi</span>
+                    @if (syncFailCount) {
+<span class="sync-results-fail">✘ Thất bại: {{syncFailCount}} ca thi</span>
+}
+                </div>
+
+                <div class="sync-results-body">
+                    <!-- Students missing -->
+                    @if (studentErrors.length) {
+<div class="sync-results-section">
+                        <div class="sync-results-section-title danger">
+                            <i class="fa fa-exclamation-circle"></i>
+                            SINH VIÊN KHÔNG CÓ TRONG HỆ THỐNG ({{studentErrors.length}})
+                        </div>
+                        <table class="sync-results-table">
+                            <thead>
+                                <tr>
+                                    <th>Ca thi</th>
+                                    <th>Mã SV</th>
+                                    <th>Họ tên</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (e of studentErrors; track e) {
+<tr>
+                                    <td>{{e.tenCaThi}}</td>
+                                    <td>{{e.maSv}}</td>
+                                    <td>{{e.hoTen}}</td>
+                                </tr>
+}
+                            </tbody>
+                        </table>
+                    </div>
+}
+
+                    <!-- Teachers missing -->
+                    @if (teacherErrors.length) {
+<div class="sync-results-section">
+                        <div class="sync-results-section-title danger">
+                            <i class="fa fa-exclamation-circle"></i>
+                            CÁN BỘ COI THI KHÔNG CÓ TRONG HỆ THỐNG ({{teacherErrors.length}})
+                        </div>
+                        <table class="sync-results-table">
+                            <thead>
+                                <tr>
+                                    <th>Ca thi</th>
+                                    <th>Cán bộ</th>
+                                    <th>Phòng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (e of teacherErrors; track e) {
+<tr>
+                                    <td>{{e.tenCaThi}}</td>
+                                    <td>{{e.tenCb}}</td>
+                                    <td>{{e.soPhong}}</td>
+                                </tr>
+}
+                            </tbody>
+                        </table>
+                    </div>
+}
+
+                    <!-- SBD Duplicate errors -->
+                    @if (sbdDuplicateErrors.length) {
+<div class="sync-results-section">
+                        <div class="sync-results-section-title danger">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            CA THI CÓ SINH VIÊN TRÙNG SỐ BÁO DANH ({{sbdDuplicateErrors.length}})
+                        </div>
+                        <table class="sync-results-table">
+                            <thead>
+                                <tr>
+                                    <th>Ca thi</th>
+                                    <th>Số báo danh</th>
+                                    <th>Danh sách sinh viên</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (e of sbdDuplicateErrors; track e) {
+<tr>
+                                    <td>{{e.tenCaThi}}</td>
+                                    <td>{{e.sbdTrung}}</td>
+                                    <td>{{e.danhSachSV}}</td>
+                                </tr>
+}
+                            </tbody>
+                        </table>
+                    </div>
+}
+
+                    <!-- Failed shifts -->
+                    @if(syncFailCount){
+                    <div class="sync-results-section">
+                        <div class="sync-results-section-title fail">
+                            <i class="fa fa-times-circle"></i>
+                            CA THI ĐỒNG BỘ THẤT BẠI ({{syncFailCount}})
+                        </div>
+                    </div>
+                    }
+
+                </div>
+
+                <div class="sync-results-footer">
+                    @if (studentErrors.length) {
+<button style="line-height: 1;" (click)="exportStudentErrorsToExcel()"
+                        class="btn btn-warning" [ngStyle]="{'margin-right':'8px'}">
+                        <i class="fa fa-file-excel"></i> Xuất sinh viên không có trên hệ thống DTKH
+                    </button>
+}
+                    <button style="line-height: 1;" (click)="closeSyncResults(false)" class="btn btn-primary">
+                        <i class="fa fa-check"></i> Hoàn tất
+                    </button>
+                </div>
+            </div>
+        </div>
+}
+    
+}
+</div>
