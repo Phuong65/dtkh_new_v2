@@ -1,1 +1,129 @@
-﻿<div class="p-3">thongke-hoidong-nghiemthu.component works!</div>
+<div class="dashboard-page">
+    <div class="dashboard-page__scroll">
+        <div class="dashboard-page__header">
+            <div>
+                <h2 class="dashboard-page__title">Dashboard hội đồng nghiệm thu</h2>
+                <p class="dashboard-page__subtitle">Tổng hợp theo năm nghiệm thu, mặc định hiển thị năm hiện tại.</p>
+            </div>
+            <div class="dashboard-page__filters">
+                <label for="dashboard-year" class="dashboard-page__filter-label">Năm thống kê</label>
+                <p-datepicker
+                    inputId="dashboard-year"
+                    view="year"
+                    dateFormat="yy"
+                    [showIcon]="true"
+                    [(ngModel)]="selectedYear"
+                    (onSelect)="onYearChange()">
+                </p-datepicker>
+            </div>
+        </div>
+
+        <div class="dashboard-stats-grid">
+            <div *ngFor="let card of statCards" class="dashboard-stat-card" [ngClass]="card.colorClass">
+                <div class="dashboard-stat-card__label">{{ card.label }}</div>
+                <div class="dashboard-stat-card__value" [ngClass]="{ 'dashboard-stat-card__value--loading': card.loading }">
+                    {{ card.loading ? 'Đang tải...' : card.value }}
+                </div>
+                <div *ngIf="card.subLabel || card.loading" class="dashboard-stat-card__sub-label">
+                    {{ card.loading ? 'Đang cập nhật số liệu' : card.subLabel }}
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-progress-grid">
+            <p-panel header="Tiến độ duyệt CPI + Bài giảng">
+                <div class="dashboard-progress__info">
+                    <strong>{{ summary.approvedLectureItems + summary.approvedCpiItems }}/{{ summary.totalLectureItems + summary.totalCpiItems }}</strong>
+                    <span>{{ celoProgress }}%</span>
+                </div>
+                <p-progressBar [value]="celoProgress"></p-progressBar>
+            </p-panel>
+
+            <p-panel header="Tiến độ duyệt Câu hỏi">
+                <div class="dashboard-progress__info">
+                    <strong>{{ summary.acceptedQuestionCourses }}/{{ summary.totalQuestionCourses }}</strong>
+                    <span>{{ questionProgress }}%</span>
+                </div>
+                <p-progressBar [value]="questionProgress"></p-progressBar>
+            </p-panel>
+        </div>
+
+        <div *ngIf="councilGroups.length" class="dashboard-council-list">
+            <p-panel
+                *ngFor="let group of councilGroups"
+                [header]="group.councilTitle"
+                styleClass="dashboard-council-panel"
+                [ngClass]="group.councilType === 'celo' ? 'dashboard-council-panel--celo' : 'dashboard-council-panel--question'">
+                <div class="dashboard-council__meta">
+                    <div><strong>Loại hội đồng:</strong> {{ group.councilType === 'celo' ? 'CPI/Bài giảng' : 'Câu hỏi/Đề' }}</div>
+                    <div><strong>Trạng thái:</strong> {{ group.councilStatusLabel }}</div>
+                    <div><strong>Số thành viên hội đồng:</strong> {{ group.councilMemberCount }}</div>
+                    <div *ngIf="group.councilChairmanCount"><strong>Chủ tịch hội đồng:</strong> {{ group.councilChairmanCount }}</div>
+                    <div><strong>Số môn học:</strong> {{ group.rows.length }}</div>
+                    <div><strong>Bắt đầu nghiệm thu:</strong> {{ group.councilDateStart | date : 'dd/MM/yyyy' : 'UTC+7' }}</div>
+                    <div><strong>Kết thúc nghiệm thu:</strong> {{ group.councilDateEnd | date : 'dd/MM/yyyy' : 'UTC+7' }}</div>
+                </div>
+
+                <div class="dashboard-course-table-wrap">
+                    <p-table
+                        [value]="group.rows"
+                        styleClass="table-scroll-able table-reBorder dashboard-course-table"
+                        [rowHover]="true">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th style="width: 260px;">Tên môn học</th>
+                                <th style="width: 120px; text-align: center;">Mã môn</th>
+                                <th style="width: 90px; text-align: center;">Tín chỉ</th>
+                                <th *ngIf="group.councilType === 'celo'" style="width: 160px; text-align: center;">Bài giảng duyệt / tổng</th>
+                                <th *ngIf="group.councilType === 'celo'" style="width: 140px; text-align: center;">CPI duyệt / tổng</th>
+                                <th *ngIf="group.councilType === 'cauhoi'" style="width: 150px; text-align: center;">Câu hỏi duyệt / tổng</th>
+                                <th *ngIf="group.councilType === 'cauhoi'" style="width: 150px; text-align: center;">Đề duyệt / tổng</th>
+                                <th style="width: 150px; text-align: center;">Bắt đầu</th>
+                                <th style="width: 150px; text-align: center;">Kết thúc</th>
+                                <th style="min-width: 240px;">Thành viên duyệt</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-row>
+                            <tr>
+                                <td>{{ row.courseTitle }}</td>
+                                <td style="text-align: center;">{{ row.courseCode }}</td>
+                                <td style="text-align: center;">{{ row.credits }}</td>
+                                <td *ngIf="group.councilType === 'celo'" style="text-align: center;">
+                                    <span class="dashboard-pill dashboard-pill--approved">{{ row.approvedLectures }}</span>
+                                    /
+                                    <span class="dashboard-pill dashboard-pill--total">{{ row.totalLectures }}</span>
+                                </td>
+                                <td *ngIf="group.councilType === 'celo'" style="text-align: center;">
+                                    <span class="dashboard-pill dashboard-pill--approved">{{ row.approvedCpi }}</span>
+                                    /
+                                    <span class="dashboard-pill dashboard-pill--total">{{ row.totalCpi }}</span>
+                                </td>
+                                <td *ngIf="group.councilType === 'cauhoi'" style="text-align: center;">
+                                    <span class="dashboard-pill dashboard-pill--approved">{{ row.approvedQuestions }}</span>
+                                    /
+                                    <span class="dashboard-pill dashboard-pill--total">{{ row.totalQuestions }}</span>
+                                </td>
+                                <td *ngIf="group.councilType === 'cauhoi'" style="text-align: center;">
+                                    <span class="dashboard-pill dashboard-pill--approved">{{ row.approvedProposals }}</span>
+                                    /
+                                    <span class="dashboard-pill dashboard-pill--total">{{ row.totalProposals }}</span>
+                                </td>
+                                <td style="text-align: center;">{{ row.councilDateStart | date : 'dd/MM/yyyy' : 'UTC+7' }}</td>
+                                <td style="text-align: center;">{{ row.councilDateEnd | date : 'dd/MM/yyyy' : 'UTC+7' }}</td>
+                                <td>{{ row.memberStatusLabel }}</td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </p-panel>
+        </div>
+
+        <div *ngIf="isDashboardLoading && !councilGroups.length" class="dashboard-empty-state">
+            Đang tải danh sách hội đồng nghiệm thu trong năm {{ selectedYearNumber }}.
+        </div>
+
+        <div *ngIf="!isDashboardLoading && !councilGroups.length" class="dashboard-empty-state">
+            Không có dữ liệu hội đồng nghiệm thu trong năm {{ selectedYearNumber }}.
+        </div>
+    </div>
+</div>

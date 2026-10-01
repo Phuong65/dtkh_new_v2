@@ -1,1 +1,268 @@
-﻿<div class="p-3">hd-thamdinh-manager.component works!</div>
+<div class="layout_component_container">
+    <div class="hoidong-layout-top">
+        <div class="row form-row form-row-flex-row" style="margin: 0px;padding: 5px; width: 100%; align-items: center;">
+            <div style="flex:1;">
+                <input style="width: 250px;" (keyup)="searchHoidong($event)" class="class-layout-top-option-search"
+                    type="text" pInputText placeholder="Tìm kiếm">
+            </div>
+            <div style="display: flex; align-items: center;">
+                @if (isManager) {
+                    <ovic-dropdown styleClass="dropdown-250" (onChange)="onChangeFilterChuyenmon($event)"
+                        placeholder="---chọn khoa---" [options]="list_donvi_chuyenmon" optionId="id" optionLabel="title"
+                        [filter]="true" filterBy="title">
+                    </ovic-dropdown>
+                }
+                <!-- <button (click)="openCopyHoidong()" style="line-height:1; margin-left: 5px;"
+                    *ngIf="canAdd && isManager" class="btn btn-primary">
+                    <i class="fa fa-clone"></i>
+                    {{copyButtonLabel}}
+                </button> -->
+                @if (canAdd && isManager) {
+                    <button (click)="openAddFormHoidong()" style="line-height:1; margin-left: 5px;" class="btn btn-success">
+                        <i class="fa fa-plus"></i>
+                        Thêm hội đồng
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="hoidong-layout-bottom" style="padding: 5px">
+        <p-table [value]="list_hoidong"
+            styleClass="table-scroll-able table-able-dropdown-p-table table-none-header table-reBorder">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 80px; text-align: center;">TT</th>
+                    <th style="text-align: center;width: 400px; ">Tên hội đồng</th>
+                    <th style="text-align: center; width: 150px;">Trạng thái</th>
+                    <th style="text-align: center; width: 300px;">Đơn vị phối hợp</th>
+                    <th style="text-align: center; width: 150px;">SL thành viên</th>
+                    <th style="text-align: center; width: 150px;">SL môn học</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+                <tr [ngClass]="selectHoidong && selectHoidong.id === row.id?'activity-row':''">
+                    <td style="width: 80px; text-align: center;">{{row['index_']}}</td>
+                    <td>
+                        <div style="display:flex; align-items: center;">
+                            <div style="flex: 1; text-align: left;">
+                                <a style="font-weight: 600;" [routerLink]="['hoidong-info']"
+                                    [queryParams]="{code:row.id}">
+                                    {{row['title']}}
+                                </a>
+                                <div style="font-style:italic; font-size: 11px;">
+                                    <span>
+                                        {{row['date_start'] | date : 'dd/MM/yyyy':'UTC+7'}} -
+                                        {{row['date_end'] | date : 'dd/MM/yyyy':'UTC+7'}}
+                                    </span>
+                                </div>
+                            </div>
+                            @if (isManager) {
+                                <div class="action-button">
+                                    <button (click)="openEditFormHoidong(row)" style="margin-left: 5px;"
+                                        class="btn btn-primary btn-icon btn-transparent">
+                                        <i class="fa fa-pencil"></i>
+                                    </button>
+                                    <button (click)="deleteHoidong(row)" style="margin-left: 5px;"
+                                        class="btn btn-danger btn-icon btn-transparent">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </td>
+                    <td style="text-align: center;">
+                        @if (row['ended']) {
+                            <span class="box-span dat-box">Đã kết thúc</span>
+                        } @else if (row['not_start']) {
+                            <span class="box-span cho-duyet-box">Chưa bắt đầu</span>
+                        } @else {
+                            @switch (row['status']) {
+                                @case (0) { <span class="box-span cho-duyet-box">Đang thiết lập</span> }
+                                @case (1) { <span class="box-span dang-caidat">Đang thực hiện</span> }
+                                @case (2) { <span class="box-span dat-box">Đã hoàn thành</span> }
+                            }
+                        }
+                    </td>
+                    <td>
+                        {{row['category_id'] | showlabel : list_donvi_chuyenmon : 'id' :'title'}}
+                    </td>
+                    <td (click)="viewThanhviens(row)" style="text-align: center; cursor: pointer;">
+                        <span>
+                            {{row['countthanhviens']}}
+                        </span>
+                    </td>
+                    <td (click)="viewCourses(row)" style="text-align: center; cursor: pointer;">
+                        <span>
+                            {{row['countcourses']}}
+                        </span>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+    <div class="page-layout-set">
+        <p-paginator #paginator (onPageChange)="changePage($event)" [rows]="limit_hoidong"
+            [totalRecords]="total_hoidong"></p-paginator>
+    </div>
+</div>
+
+
+<ng-template #createHoidong let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section" style="height: 100%">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
+            <button class="btn ovic-over-right-section__close-button" (click)="closeSideMenu()"></button>
+        </div>
+        <div class="ovic-over-right-section__body" style="height: calc(100% - 58px - 50px - 18px); overflow: auto;">
+            <div class="ovic-vertical__inputs" style="line-height: 1.5;">
+                <form [formGroup]="formData">
+                    <div class="row form-row form-row-flex-row">
+                        <div class="col-12">
+                            <label>Tên hội đồng:<span class="ovic-mark">*</span></label>
+                            <input type="text" class="ovic-input-field" formControlName="title">
+                        </div>
+                    </div>
+                    @if (isManager) {
+                        <div class="row form-row form-row-flex-row">
+                            <div class="col-12">
+                                <label>Đơn vị phối hợp:<span class="ovic-mark">*</span></label>
+                                <ovic-dropdown [filter]="true" [placeholder]="'---Chọn khoa quản lý---'"
+                                    [options]="list_donvi_chuyenmon" optionId="id" optionLabel="title"
+                                    [formField]="f['category_id']" [defaultValue]="f['category_id']['value']"
+                                    filterBy="title">
+                                </ovic-dropdown>
+                            </div>
+                        </div>
+                    }
+                    <div class="row form-row form-row-flex-row">
+                        <div class="col-4">
+                            <label>Ngày bắt đầu:<span class="ovic-mark">*</span></label>
+                            <p-datepicker formControlName="date_start" dateFormat="dd/mm/yy"></p-datepicker>
+                        </div>
+                        <div class="col-4">
+                            <label>Ngày kết thúc:<span class="ovic-mark">*</span></label>
+                            <p-datepicker formControlName="date_end" dateFormat="dd/mm/yy"></p-datepicker>
+                        </div>
+                        <div class="col-4">
+                            <label>Trạng thái:<span class="ovic-mark">*</span></label>
+                            <ovic-dropdown [showClear]="false" [options]="hoidong_status" optionId="key"
+                                optionLabel="label" [formField]="f['status']" [defaultValue]="f['status']['value']">
+                            </ovic-dropdown>
+                        </div>
+                    </div>
+                    <div class="row form-row form-row-flex-row">
+                        <div class="col-12">
+                            <label>Mô tả:</label>
+                            <ovic-editor height="auto" [default]="f['desc'].value" [formField]="f['desc']">
+                            </ovic-editor>
+                        </div>
+                    </div>
+                    <div class="row form-row form-row-flex-row">
+                        <div class="col-12">
+                            <label>Tài liệu (pdf):</label>
+                            <open-file-manager-v2 ext="pdf" [filesDefault]="f['files'].value" [formField]="f['files']">
+                            </open-file-manager-v2>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="ovic-dynamic-right-section__foot">
+            <p class="ovic-form-notes ovic-over-right-section__foot-ovic-input-line">
+                <i class="pi pi-info-circle"></i>các trường có đánh dấu ( <span class="ovic-mark">*</span> ) là
+                bắt
+                buộc phải nhập
+            </p>
+            <p class="ovic-over-right-section__foot-wrap-buttons">
+                <button (click)="saveHoidong()" class="btn ovic-over-right-section__foot-btn btn-primary">
+                    <i class="fa fa-floppy-o"></i>Lưu lại
+                </button>
+            </p>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #templateMonhoc let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section right-slide-class">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">
+                Danh sách môn học
+            </h3>
+            <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+                (click)="closeForm()"></button>
+        </div>
+        <div style="line-height: 1.25; padding: 5px; height: calc(100vh - 57px);"
+            class="ovic-over-right-section__body footer-no-hint">
+            <div style="height: 100%;" class="phanquyen-dulieu-content-left ovic-vertical__inputs">
+                <div class="form-row row">
+                    <div class="col-12">
+                        <input class="ovic-input-field" type="text" [(ngModel)]="searchMonhoc" placeholder="Search">
+                    </div>
+                </div>
+                @if ((list_hoidong_monhoc | filter: searchMonhoc : ['course_title','course_maso']).length > 0) {
+                    <mat-selection-list [multiple]="false" class="selection-list-mat" #courses>
+                        @for (course of list_hoidong_monhoc | filter: searchMonhoc : ['course_title','course_maso']; track course.id) {
+                            <mat-list-option [value]="course">
+                                <div mat-line style="display: flex; align-items: center;">
+                                    <div mat-line style="flex: 1;">
+                                        <div mat-line>
+                                            <strong>{{course['course_title'].concat(" - [",course['course_maso'],"]")}}</strong>
+                                        </div>
+                                        <div mat-line style="font-size: 13px;">{{course['created_plan_name'] + course['info_']}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-list-option>
+                        }
+                    </mat-selection-list>
+                } @else {
+                    <div class="result-search-none">Không có cán bộ nào...</div>
+                }
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #templateSaoChepHoidong let-c="close" let-d="dismiss">
+    <app-sao-chep-hoidong [sourceType]="sourceCopyType" [targetType]="targetCopyType"
+        [categories]="list_donvi_chuyenmon" [showCategoryFilter]="isManager"
+        (close)="closeSideMenu()" (completed)="copyHoidongCompleted($event)">
+    </app-sao-chep-hoidong>
+</ng-template>
+
+<ng-template #templateThanhvien let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section right-slide-class">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">Danh sách thành viên</h3>
+            <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+                (click)="closeForm()"></button>
+        </div>
+        <div style="line-height: 1.25; padding: 5px; height: calc(100vh - 57px);"
+            class="ovic-over-right-section__body footer-no-hint">
+            <div style="height: 100%;" class="phanquyen-dulieu-content-left ovic-vertical__inputs">
+                <div class="form-row row">
+                    <div class="col-12">
+                        <input class="ovic-input-field" type="text" [(ngModel)]="searchUser" placeholder="Search">
+                    </div>
+                </div>
+                @if ((list_thanhvien | filter: searchUser : ['display_name','email']).length > 0) {
+                    <mat-selection-list [multiple]="false" class="selection-list-mat" #users>
+                        @for (user of list_thanhvien | filter: searchUser : ['display_name','email']; track user.id) {
+                            <mat-list-option [selected]="user['check']" [value]="user">
+                                <div mat-line style="display: flex; align-items: center;">
+                                    <div mat-line style="flex: 1;">
+                                        <div mat-line><strong>{{user['display_name']}}</strong></div>
+                                        <div mat-line style="font-size: 12px;">{{user['email']}}</div>
+                                    </div>
+                                </div>
+                            </mat-list-option>
+                        }
+                    </mat-selection-list>
+                } @else {
+                    <div class="result-search-none">Không có cán bộ nào...</div>
+                }
+            </div>
+        </div>
+    </div>
+</ng-template>

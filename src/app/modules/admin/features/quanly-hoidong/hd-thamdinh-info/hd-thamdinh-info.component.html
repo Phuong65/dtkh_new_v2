@@ -1,1 +1,66 @@
-﻿<div class="p-3">hd-thamdinh-info.component works!</div>
+<div class="layout_component_container">
+    <div class="document-type-a4">
+        <div class="ovic-vertical__inputs" style="line-height: 1.5;">
+            <form [formGroup]="formData">
+                <div class="row form-row form-row-flex-row">
+                    <div class="col-12">
+                        <label>Tên hội đồng:<span class="ovic-mark">*</span></label>
+                        <input type="text" class="ovic-input-field" formControlName="title">
+                    </div>
+                </div>
+                @if (isManager) {
+                    <div class="row form-row form-row-flex-row">
+                        <div class="col-12">
+                            <label>Đơn vị phối hợp:<span class="ovic-mark">*</span></label>
+                            <ovic-dropdown [filter]="true" [placeholder]="'---Chọn khoa quản lý---'"
+                                [options]="list_donvi_chuyenmon" optionId="id" optionLabel="title"
+                                [formField]="f['category_id']" [defaultValue]="f['category_id']['value']" filterBy="title">
+                            </ovic-dropdown>
+                        </div>
+                    </div>
+                }
+                <div class="row form-row form-row-flex-row">
+                    <div class="col-4">
+                        <label>Ngày bắt đầu:<span class="ovic-mark">*</span></label>
+                        <p-datepicker formControlName="date_start" dateFormat="dd/mm/yy"></p-datepicker>
+                    </div>
+                    <div class="col-4">
+                        <label>Ngày kết thúc:<span class="ovic-mark">*</span></label>
+                        <p-datepicker formControlName="date_end" dateFormat="dd/mm/yy"></p-datepicker>
+                    </div>
+                    <div class="col-4">
+                        <label>Trạng thái:<span class="ovic-mark">*</span></label>
+                        <ovic-dropdown [showClear]="false" [options]="hoidong_status" optionId="key" optionLabel="label"
+                            [formField]="f['status']" [defaultValue]="f['status']['value']">
+                        </ovic-dropdown>
+                    </div>
+                </div>
+                <div class="row form-row form-row-flex-row">
+                    <div class="col-12">
+                        <label>Mô tả:</label>
+                        <ovic-editor height="auto" [default]="f['desc'].value" [formField]="f['desc']">
+                        </ovic-editor>
+                    </div>
+                </div>
+                <div class="row form-row form-row-flex-row">
+                    <div class="col-12">
+                        <label>Tài liệu (pdf):</label>
+                        <open-file-manager-v2 ext="pdf" [filesDefault]="f['files'].value" [formField]="f['files']">
+                        </open-file-manager-v2>
+                    </div>
+                </div>
+                <div class="row form-row form-row-flex-row">
+                    <div class="col-12" style="text-align: right;">
+                        @if (isManager || isLanhdaokhoa) {
+                            <button (click)="saveHoidong()" style="line-height: 1;"
+                                class="btn btn-primary">
+                                <i class="fa fa-floppy-o"></i>
+                                Lưu lại
+                            </button>
+                        }
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
