@@ -1,10 +1,7 @@
 import { ButtonModule } from 'primeng/button';
-import { style } from '@angular/animations';
-import { ThiStudentAnswerService } from './../../../../shared/services/thi-student-answer.service';
 import { CourseQuestionsService } from '@modules/shared/services/course-questions.service';
 import { ExportPointForIUService } from '@shared/services/export-point-for-IU.service';
 import { FileService } from '@core/services/file.service';
-import { ThiLogsService } from '@shared/services/thi-log.service';
 import { Component, OnInit, TemplateRef, inject, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ElnKhoaHoc } from '@modules/shared/models/elng-khoa-hoc';
@@ -22,10 +19,6 @@ import { ConditionOption } from '@modules/shared/models/condition-option';
 import { ClassesService } from '@modules/shared/services/classes.service';
 import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
 import { OvicDateTimeService } from '@modules/shared/services/ovic-date-time.service';
-import { ThiFormService } from '@modules/shared/services/thi-form.service';
-import { ThiShiftRoomssService } from '@modules/shared/services/thi-shift-rooms.service';
-import { ThiShiftStudentsService } from '@modules/shared/services/thi-shift-students.service';
-import { ThiShiftsService } from '@modules/shared/services/thi-shifts.service';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { DatePickerModule } from 'primeng/datepicker';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -39,9 +32,7 @@ import { ThiShiftRooms } from '@modules/shared/models/thi-shift-room';
 import { User } from '@core/models/user';
 import { TYPELOG } from '@modules/shared/models/thi-logs';
 import { ThiShiftStudents } from '@modules/shared/models/thi-shift-students';
-import * as XLSX from 'xlsx';
-import { APP_CONFIGS, getLinkDownload_aws } from '@env';
-// import { KEY_ANSWER_new } from '@modules/shared/utils/syscat';
+import { APP_CONFIGS } from '@env';
 import { TabsModule } from 'primeng/tabs';
 import { CarouselModule } from 'primeng/carousel';
 import { DialogModule } from 'primeng/dialog';
@@ -49,7 +40,6 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { CourseQuestions } from '@modules/shared/models/course-questions';
 import { StepsModule } from 'primeng/steps';
 import { ThiStudentAnswer } from '@modules/shared/models/thi-student-answer';
-import * as pdfFonts from '@shared/utils/vs_font';
 import JSZip from 'jszip';
 import * as fs from 'file-saver';
 import { ThibackupFormService } from '@modules/shared/services/thibackup-form.service';
@@ -59,7 +49,6 @@ import { ThibackupShiftStudentsService } from '@modules/shared/services/thibacku
 import { ThibackupShiftsService } from '@modules/shared/services/thibackup-shift.service';
 import { ThibackupStudentAnswerService } from '@modules/shared/services/thibackup-student-answer.service';
 import { LatexToImageSvgService } from '@modules/shared/services/latex-to-image-svg.service';
-// (<any>pdfMake).vfs = pdfFonts.default;
 
 @Component({
     selector: 'app-xuat-baithi',
@@ -91,7 +80,6 @@ export class XuatBaithiComponent implements OnInit {
     private thiShiftsService = inject(ThibackupShiftsService);
     private notificationService = inject(NotificationService);
     private helperService = inject(HelperService);
-    private formBuilder = inject(FormBuilder);
     private auth = inject(AuthService);
     private classesService = inject(ClassesService);
     private ovicDateTimeService = inject(OvicDateTimeService);
@@ -100,10 +88,8 @@ export class XuatBaithiComponent implements OnInit {
     private roleService = inject(RoleService);
     private userService = inject(UserService);
     private thiShiftStudentsService = inject(ThibackupShiftStudentsService);
-    private thiFormService = inject(ThibackupFormService);
     private thiLogsService = inject(ThibackupLogsService);
     private fileService = inject(FileService);
-    private exportPointForIUService = inject(ExportPointForIUService);
     private courseQuestionsService = inject(CourseQuestionsService);
     private thiStudentAnswerService = inject(ThibackupStudentAnswerService);
     private latexToImageSvgService = inject(LatexToImageSvgService);

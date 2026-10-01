@@ -25,7 +25,7 @@
                 @for (shift of list_shifts; track shift) {
                 <mat-list-option class="mat-list-no-endcontent" [selected]="selectedShift && selectedShift.id === shift.id ? true: false"
                     [value]="shift">
-                    <div mat-line style="display: flex;">
+                    <div matListItemLine style="display: flex;">
                         <div (click)="onSelectShift(shift)" style="display: flex; flex: 1; padding: 10px;">
                             <div style="padding: 2px; margin-right: 5px;">
                                 <span>
@@ -45,11 +45,11 @@
                                     }
                                 </span>
                             </div>
-                            <div mat-line>
-                                <div mat-line
-                                    style="font-weight: 600; white-space: break-spaces; color: #333; margin-bottom: 5px;">
+                            <div >
+                                <div matListItemLine
+                                    style="font-size:14px; font-weight: 600; white-space: break-spaces; color: #333; margin-bottom: 5px;">
                                     {{shift.name}}</div>
-                                <div mat-line style="color: #666;">
+                                <div matListItemLine style="color: #666;">
                                     {{shift.time_start | date : 'dd/MM/yyyy HH:mm ':'UTC+7'}} -
                                     {{shift['user_created']?shift['user_created']['display_name']:''}}</div>
                             </div>

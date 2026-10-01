@@ -46,43 +46,41 @@
                                 <div class="text-left" style="flex: 1; display: flex; flex-direction: column;">
                                     <span style="font-weight: 600; margin-bottom: 5px;">{{shift.name}}</span>
                                     @if (shift['type_of_test'] === 'TRACNGHIEM') {
-<div class="row"
-                                        style="font-style: italic;">
+                                    <div class="row" style="font-style: italic;">
                                         <span class="col-4">- Thời lượng: {{shift['time_of_test']}} phút</span>
                                     </div>
-}
+                                    }
                                 </div>
                                 <button [matMenuTriggerFor]="menuActionShift" style="margin-left: 10px;"
                                     class="btn btn-primary btn-icon btn-transparent">
                                     <i class="fa fa-ellipsis-v"></i>
                                 </button>
                                 <mat-menu #menuActionShift="matMenu">
-                                    @if ((shift.status === 1 || shift.status === 2) && shift.type_of_test === 'TRACNGHIEM') {
-<a
-                                        target="_blank" style="text-decoration: none; color: #333;" mat-menu-item
+                                    @if ((shift.status === 1 || shift.status === 2) && shift.type_of_test ===
+                                    'TRACNGHIEM') {
+                                    <a target="_blank" style="text-decoration: none; color: #333;" mat-menu-item
                                         [routerLink]="['phongthi']" [queryParams]="{code:shift.id}">
                                         <span style="margin-right: 10px;">
-                                            <i class="fa fa-list-ul" ></i>
+                                            <i class="fa fa-list-ul"></i>
                                         </span>
                                         <span>Danh sách phòng thi</span>
                                     </a>
-}
+                                    }
                                     @if ((shift.status === 1 || shift.status === 2) && shift.type_of_test === 'DUAN') {
-<a
-                                        target="_blank" style="text-decoration: none; color: #333;" mat-menu-item
+                                    <a target="_blank" style="text-decoration: none; color: #333;" mat-menu-item
                                         [routerLink]="['phongthi-duan']" [queryParams]="{code:shift.id}">
                                         <span style="margin-right: 10px;">
-                                            <i class="fa fa-list-ul" ></i>
+                                            <i class="fa fa-list-ul"></i>
                                         </span>
                                         <span>Danh sách phòng thi</span>
                                     </a>
-}
+                                    }
                                     @if (shift.status === 0) {
-<button mat-menu-item [disabled]="true">
-                                        <i style="margin-right: 10px;" class="fa fa-list-ul" ></i>
+                                    <button mat-menu-item [disabled]="true">
+                                        <i style="margin-right: 10px;" class="fa fa-list-ul"></i>
                                         <span>Ca thi chưa được kích hoạt</span>
                                     </button>
-}
+                                    }
                                     <!-- <button *ngIf="shift.status === 1" (click)="changeStatusCathi(shift, 2)"
                                         mat-menu-item>
                                         <i class="fa fa-circle margin-right-10px width-16px"></i>
@@ -93,14 +91,14 @@
                         </td>
                         <td style="text-align: center;">
                             @if (shift.status === 0) {
-<span class="status-shift status-deactive">Chưa kích hoạt</span>
-}
+                            <span class="status-shift status-deactive">Chưa kích hoạt</span>
+                            }
                             @if (shift.status === 1) {
-<span class="status-shift status-activite">Đã kích hoạt</span>
-}
+                            <span class="status-shift status-activite">Đã kích hoạt</span>
+                            }
                             @if (shift.status === 2) {
-<span class="status-shift status-done">Đã hoàn thành</span>
-}
+                            <span class="status-shift status-done">Đã hoàn thành</span>
+                            }
                         </td>
                         <td style="text-align: center;">{{shift['time_start'] | date : 'dd/MM/yyyy HH:mm ' :'UTC+7'}}
                         </td>
@@ -113,12 +111,11 @@
                         </td>
                         <td>
                             @if (shift['user_created']) {
-<div
-                                style="display:flex; flex-direction: column; line-height: 1.25;">
+                            <div style="display:flex; flex-direction: column; line-height: 1.25;">
                                 <span style="font-weight: 600;">{{shift['user_created'].display_name}}</span>
                                 <span style="font-style: italic;">{{shift['user_created'].email}}</span>
                             </div>
-}
+                            }
                         </td>
                     </tr>
                 </ng-template>
@@ -137,9 +134,9 @@
             <div class="row form-row form-row-flex-row">
                 <div class="col-12">
                     @if (hdthi_thuky || hdthi_qlct) {
-<p-checkbox (onChange)="initLoad()" [(ngModel)]="shiftcoithi_show"
-                        [binary]="true" label="Hiển thị theo ca thi thầy/cô được phân công coi thi"></p-checkbox>
-}
+                    <p-checkbox (onChange)="initLoad()" [(ngModel)]="shiftcoithi_show" [binary]="true"
+                        label="Hiển thị theo ca thi thầy/cô được phân công coi thi"></p-checkbox>
+                    }
                 </div>
             </div>
             <div class="row form-row form-row-flex-row">

@@ -193,17 +193,50 @@
 }
 
 .card-enter-password {
-    width: 300px;
+    width: min(300px, calc(100% - 32px));
     margin: 0 auto;
 }
 
-.mat-card-subtitle, .mat-card-title {
+.card-enter-password .mat-mdc-card {
+    padding: 16px;
+}
+
+.card-enter-password .mat-mdc-card-subtitle,
+.card-enter-password .mat-mdc-card-title {
     font-size: 14px;
     text-align: center;
 }
 
-.mat-card-actions {
-    text-align: right;
+.card-enter-password .mat-mdc-card-subtitle {
+    margin-bottom: 8px;
+}
+
+.card-enter-password .mat-mdc-card-title {
+    margin-bottom: 16px;
+    font-weight: 600;
+}
+
+.card-enter-password .mat-mdc-card-content {
+    padding: 0;
+}
+
+.card-enter-password .ovic-input-field {
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid #c8c8c8;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.card-enter-password .ovic-input-field:focus-visible {
+    border-color: #007aa6;
+    outline: 2px solid #007aa6;
+    outline-offset: 2px;
+}
+
+.card-enter-password .mat-mdc-card-actions {
+    justify-content: flex-end;
+    padding: 8px 0 0;
 }
 
 .layout-add-student-right-table-header button {
@@ -284,4 +317,45 @@
 
 .hoan-thi{
     color: #eab308;
+}
+
+/* Angular Material 21 MDC selectors */
+:host ::ng-deep .list-course-layout .selection-list-mat.mat-mdc-selection-list {
+    padding: 0;
+    background: #fff;
+}
+
+:host ::ng-deep .list-course-layout .selection-list-mat .mat-mdc-list-option {
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 8px 12px !important;
+    box-sizing: border-box;
+    align-items: flex-start;
+    border-bottom: 1px solid #c8c8c8;
+}
+
+:host ::ng-deep .list-course-layout .selection-list-mat .mat-mdc-list-option:last-child {
+    border-bottom: 0;
+}
+
+:host ::ng-deep .list-course-layout .selection-list-mat .mat-mdc-list-option:hover,
+:host ::ng-deep .list-course-layout .selection-list-mat .mat-mdc-list-option[aria-selected='true'] {
+    background-color: #f3f9ff;
+}
+
+:host ::ng-deep .list-course-layout .selection-list-mat .mat-mdc-list-option .mdc-list-item__content {
+    display: block;
+    width: 100%;
+    min-width: 0;
+}
+
+:host ::ng-deep .list-course-layout .selection-list-mat .mat-mdc-list-option .mat-mdc-list-item-line {
+    height: auto;
+    min-height: 20px;
+    line-height: 1.35;
+    white-space: normal;
+}
+
+:host ::ng-deep .list-course-layout .selection-list-mat .mat-list-no-endcontent .mdc-list-item__end {
+    display: none;
 }

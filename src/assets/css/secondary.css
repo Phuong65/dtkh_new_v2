@@ -151,3 +151,9 @@ p-select:has(.p-select-open) {
     min-height: 30px;
     padding-block: 10px;
 }
+.tbl-danhSachUser{
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}

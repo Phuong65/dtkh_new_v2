@@ -11,27 +11,27 @@
                     <div class="info-course-item">
                         <label>- Tên ca thi:</label>
                         @if (selectedShift) {
-<span>{{selectedShift.name}}</span>
-}
+                        <span>{{selectedShift.name}}</span>
+                        }
                     </div>
                     <div class="info-course-item">
                         <label>- Thời gian bắt đầu:</label>
                         @if (selectedShift) {
-<span>{{selectedShift.time_start | date : 'dd/MM/yyyy HH:mm '
+                        <span>{{selectedShift.time_start | date : 'dd/MM/yyyy HH:mm '
                             :'UTC+7'}}</span>
-}
+                        }
                     </div>
                     <div class="info-course-item">
                         <label>- Thời gian làm bài:</label>
                         @if (selectedShift) {
-<span>{{selectedShift.time_of_test}} Phút</span>
-}
+                        <span>{{selectedShift.time_of_test}} Phút</span>
+                        }
                     </div>
                     <div class="info-course-item">
                         <label>- Môn học:</label>
                         @if (selectedShift) {
-<span>{{selectedShift['course_label']}}</span>
-}
+                        <span>{{selectedShift['course_label']}}</span>
+                        }
                     </div>
                 </div>
                 <div class="info-course-content">
@@ -41,14 +41,14 @@
                     <div class="info-course-item">
                         <label>- Họ và tên:</label>
                         @if (selectedShift) {
-<span>{{selectedShift['created_by_name']}}</span>
-}
+                        <span>{{selectedShift['created_by_name']}}</span>
+                        }
                     </div>
                     <div class="info-course-item">
                         <label>- Số điện thoại:</label>
                         @if (selectedShift) {
-<span>{{selectedShift['created_by_phone']}}</span>
-}
+                        <span>{{selectedShift['created_by_phone']}}</span>
+                        }
                     </div>
                 </div>
             </div>
@@ -57,55 +57,55 @@
                     <input [(ngModel)]="searRoom" style="width: 100%;" placeholder="Nhập tên phòng" type="text">
                 </div>
                 @if ((list_room |filter: searRoom : ['room']).length > 0) {
-<div class="layout-add-student-left-bottom list-course-layout"
-                   >
+                <div class="layout-add-student-left-bottom list-course-layout">
                     <mat-selection-list [multiple]="false" class="selection-list-mat" #courses>
                         @for (room of list_room | filter : searRoom : ['room'] ; track room) {
-<mat-list-option (click)="onSelectedRoom(room)"
-                            [selected]="selectedRoom && selectedRoom.room === room.room ? true: false"
-                            [value]="room">
-                            <div mat-line
-                                style="font-weight: 600; margin-bottom: 5px; display: flex; align-items: center; font-size: 14px;">
-                                <span style="flex:1">{{room.id ? 'Phòng':''}} {{room.room}}</span>
-                                @if (room['status'] === 1) {
-<span class="blue">(Hoàn thành coi thi)</span>
-}
+                        <mat-list-option class="mat-list-no-endcontent" (click)="onSelectedRoom(room)"
+                            [selected]="selectedRoom && selectedRoom.room === room.room ? true: false" [value]="room">
+                            <div>
+                                <div
+                                    style="font-weight: 600; margin-bottom: 5px; display: flex; align-items: center; font-size: 14px;">
+                                    <span style="flex:1">{{room.id ? 'Phòng':''}} {{room.room}}</span>
+                                    @if (room['status'] === 1) {
+                                    <span class="blue">(Hoàn thành coi thi)</span>
+                                    }
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Tổng sinh viên: {{room['count_students']}}</span>
+                                    <span class="blue">Có đề: {{room['shift_Students']}}</span>
+                                </div>
+                                @if (isManager && room['canEdit']) {
+                                <div style="display: flex; font-size: 14px; margin-top: 5px;">
+                                    <span style="color: #007AA6">( Phòng thi được phân công coi thi )</span>
+                                </div>
+                                }
                             </div>
-                            <div mat-line style="display: flex; justify-content: space-between;">
-                                <span>Tổng sinh viên: {{room['count_students']}}</span>
-                                <span class="blue">Có đề: {{room['shift_Students']}}</span>
-                            </div>
-                            @if (isManager && room['canEdit']) {
-<div mat-line
-                                style="display: flex; font-size: 14px; margin-top: 5px;">
-                                <span style="color: #007AA6">( Phòng thi được phân công coi thi )</span>
-                            </div>
-}
+
                         </mat-list-option>
-}
+                        }
                     </mat-selection-list>
                 </div>
-} @else {
+                } @else {
 
-                    <div style="height: calc(100% - 42px);" class="result-search-none">Không tìm thấy...</div>
-                
-}
-                
+                <div style="height: calc(100% - 42px);" class="result-search-none">Không tìm thấy...</div>
+
+                }
+
             </div>
         </div>
         <div class="layout-add-student-right" #topResize [ngClass]="smallWidth?'small-width-phongthi':''">
             @if (selectedRoom) {
-<div style="height: 100%">
-                @if (object_pass_of_room[selectedRoom.id.toString()+'_'+selectedRoom.room] === selectedRoom.pass_of_room && selectedRoom['open'] === true) {
-<div style="height: 100%"
-                   >
+            <div style="height: 100%">
+                @if (object_pass_of_room[selectedRoom.id.toString()+'_'+selectedRoom.room] === selectedRoom.pass_of_room
+                && selectedRoom['open'] === true) {
+                <div style="height: 100%">
                     <div class="layout-add-student-right-table-header" style="display: flex; align-items: center;">
                         <!-- <button class="btn btn-primary btn-icon btn-group-left"><i class="fa fa-list"></i></button>
                     <button class="btn btn-primary btn-icon btn-group-right"><i class="fa fa-th-large"></i></button> -->
                         <span style="flex: 1;margin-right: 10px; text-transform: uppercase; font-size: 14px; ">
                             @if (selectedRoom) {
-<strong>Phòng: {{selectedRoom.room}}</strong>
-}</span>
+                            <strong>Phòng: {{selectedRoom.room}}</strong>
+                            }</span>
                         <button (click)="loadForStatusOnly()" class="btn btn-success">
                             <i class="fa fa-refresh"></i>
                             Làm mới
@@ -155,30 +155,30 @@
                         </ng-container>
                     </div>
                 </div>
-} @else {
+                } @else {
 
-                    <div class="enter-pass-word" style="height:100%">
-                        <div class="card-enter-password">
-                            <mat-card class="example-card">
-                                <mat-card-subtitle>{{selectedRoom.room}}</mat-card-subtitle>
-                                <mat-card-title>Nhập Mã truy cập phòng thi</mat-card-title>
-                                <mat-card-content>
-                                    <input [(ngModel)]="passOfRoom" type="text" class="ovic-input-field"
-                                        style="width: 100%; text-align: center;">
-                                </mat-card-content>
-                                <mat-divider inset></mat-divider>
-                                <mat-card-actions>
-                                    <button (click)="setPassOfRoom(selectedRoom)" pButton pRipple type="button"
-                                        label="Vào phòng" class="p-button-info p-button-text"></button>
-                                </mat-card-actions>
-                            </mat-card>
-                        </div>
+                <div class="enter-pass-word" style="height:100%">
+                    <div class="card-enter-password">
+                        <mat-card class="example-card">
+                            <mat-card-subtitle>{{selectedRoom.room}}</mat-card-subtitle>
+                            <mat-card-title>Nhập Mã truy cập phòng thi</mat-card-title>
+                            <mat-card-content>
+                                <input [(ngModel)]="passOfRoom" type="text" class="ovic-input-field"
+                                    style="width: 100%; text-align: center;">
+                            </mat-card-content>
+                            <mat-divider inset></mat-divider>
+                            <mat-card-actions>
+                                <button (click)="setPassOfRoom(selectedRoom)" pButton pRipple type="button"
+                                    label="Vào phòng" class="p-button-info p-button-text"></button>
+                            </mat-card-actions>
+                        </mat-card>
                     </div>
-                
-}
-                
+                </div>
+
+                }
+
             </div>
-}
+            }
 
         </div>
         <!-- <div *ngIf="!selectedRoom" class="layout-add-student-right"
@@ -248,31 +248,29 @@
                                 <span>{{student.student.student_code}}</span>
                             </div>
                             <div class="student-action-phongthi">
-                                @if (selectedRoom && selectedRoom['canEdit'] && (student._student_status === 1 || student._student_status === -2)) {
-<button (click)="pauseAndContinue(student)"
-                                   
+                                @if (selectedRoom && selectedRoom['canEdit'] && (student._student_status === 1 ||
+                                student._student_status === -2)) {
+                                <button (click)="pauseAndContinue(student)"
                                     [ngbTooltip]="student._student_status === 1? 'Cho tạm dừng bài thi':'Cho bài thi tiếp tục'"
                                     container="body" placement="left" style="margin-right: 5px;" pButton pRipple
                                     type="button" [icon]="student._student_status === -2 ?'pi pi-play':'pi pi-pause'"
                                     class="p-button-help p-button-text">
                                 </button>
-}
-                                @if (selectedRoom && selectedRoom['canEdit'] && student.user && student.user['is_locked'] === 1) {
-<button (click)="unLockLoginStudent(student)"
-                                   
-                                    ngbTooltip="Đã khóa đăng nhập" container="body" placement="left"
-                                    style="margin-right: 5px;" pButton pRipple type="button" icon="pi pi-lock"
-                                    class="p-button-danger p-button-text">
+                                }
+                                @if (selectedRoom && selectedRoom['canEdit'] && student.user &&
+                                student.user['is_locked'] === 1) {
+                                <button (click)="unLockLoginStudent(student)" ngbTooltip="Đã khóa đăng nhập"
+                                    container="body" placement="left" style="margin-right: 5px;" pButton pRipple
+                                    type="button" icon="pi pi-lock" class="p-button-danger p-button-text">
                                 </button>
-}
-                                @if (selectedRoom && selectedRoom['canEdit'] && student.user && student.user['is_locked'] === 0) {
-<button (click)="lockLoginStudent(student)"
-                                   
-                                    ngbTooltip="Đã mở khóa đăng nhập" container="body" placement="left"
-                                    style="margin-right: 5px;" pButton pRipple type="button" icon="pi pi-lock-open"
-                                    class="p-button-secondary p-button-text">
+                                }
+                                @if (selectedRoom && selectedRoom['canEdit'] && student.user &&
+                                student.user['is_locked'] === 0) {
+                                <button (click)="lockLoginStudent(student)" ngbTooltip="Đã mở khóa đăng nhập"
+                                    container="body" placement="left" style="margin-right: 5px;" pButton pRipple
+                                    type="button" icon="pi pi-lock-open" class="p-button-secondary p-button-text">
                                 </button>
-}
+                                }
                                 <button [matMenuTriggerFor]="menuActionShift" pButton pRipple type="button"
                                     icon="pi pi-ellipsis-h" class="p-button-info p-button-text"></button>
                                 <mat-menu #menuActionShift="matMenu">
@@ -334,21 +332,20 @@
                     </td>
                     <td class="lock-col" style="width: 100px; text-align: center;">
                         @if (student['thi_question_bank_tn_id']) {
-<div [matMenuTriggerFor]="menuDiemdanh" style="cursor: pointer; font-size: 14px;"
-                           >
-@switch (student['locked']) {
+                        <div [matMenuTriggerFor]="menuDiemdanh" style="cursor: pointer; font-size: 14px;">
+                            @switch (student['locked']) {
                             @case (0) {
-<span class="hover-underline" class="co-mat blue">Có</span>
-}
+                            <span class="hover-underline" class="co-mat blue">Có</span>
+                            }
                             @case (1) {
-<span class="vang-mat">Vắng KP</span>
-}
+                            <span class="vang-mat">Vắng KP</span>
+                            }
                             @case (2) {
-<span class="hoan-thi">Hoãn thi</span>
-}
+                            <span class="hoan-thi">Hoãn thi</span>
+                            }
+                            }
+                        </div>
                         }
-</div>
-}
                         <mat-menu #menuDiemdanh="matMenu">
                             <button (click)="onChangeLock(student, 0)" mat-menu-item
                                 [disabled]="student['locked'] === 0? true: false">
@@ -364,30 +361,30 @@
                             </button>
                         </mat-menu>
                         @if (!student['thi_question_bank_tn_id']) {
-<span>-</span>
-}
+                        <span>-</span>
+                        }
                     </td>
                     <td style="text-align: center;">
                         <div>
-@switch (student['_student_status']) {
+                            @switch (student['_student_status']) {
                             @case (-2) {
-<span class="status-shift status-pause">Đã tạm dừng</span>
-}
+                            <span class="status-shift status-pause">Đã tạm dừng</span>
+                            }
                             @case (-1) {
-<span class="status-shift status-danger">Đã hủy bài</span>
-}
+                            <span class="status-shift status-danger">Đã hủy bài</span>
+                            }
                             @case (0) {
-<span class="status-shift status-deactive">Chưa làm</span>
-}
+                            <span class="status-shift status-deactive">Chưa làm</span>
+                            }
                             @case (1) {
-<span class="status-shift status-doing">Đang làm bài</span>
-}
+                            <span class="status-shift status-doing">Đang làm bài</span>
+                            }
                             @case (2) {
-<span class="status-shift status-activite">{{student['submited_by'] ===
+                            <span class="status-shift status-activite">{{student['submited_by'] ===
                                 student['student_user_id']?'Đã nộp bài':'Đã thu bài'}} </span>
-}
-                        }
-</div>
+                            }
+                            }
+                        </div>
                     </td>
                     <td style="text-align: center;">
                         {{student._student_status === 1 || student._student_status === -2 ? student['time_left_convert']
@@ -403,43 +400,40 @@
                             student.point}} </td>
                     <td style="text-align: center;">
                         @if (key_server === 'hvu') {
-<span>
-                            {{student.sbd < 10 ? "0" + student.sbd.toString() :student.sbd}} 
-                        </span>
-}
-                        @if (key_server === 'ictu') {
-<span>
-                            {{student.sbd}} 
-                        </span>
-}
+                        <span>
+                            {{student.sbd < 10 ? "0" + student.sbd.toString() :student.sbd}} </span>
+                                }
+                                @if (key_server === 'ictu') {
+                                <span>
+                                    {{student.sbd}}
+                                </span>
+                                }
                     </td>
                     <td style="text-align: center;">
                         @if (student['thi_question_bank_tn_id']) {
-<span class='blue'><i class='fa fa-check'></i></span>
-}
+                        <span class='blue'><i class='fa fa-check'></i></span>
+                        }
                         {{!student['thi_question_bank_tn_id']?'-':''}}
                     </td>
                     <td style="text-align: center;">
                         {{student.tracking?student.tracking.length:'-'}}
                         @if (student.tracking && student.tracking.length) {
-<button
-                            class="btn btn-primary btn-icon btn-transparent" (click)="openTrackingStudent(student)">
+                        <button class="btn btn-primary btn-icon btn-transparent" (click)="openTrackingStudent(student)">
                             <i class="fa fa-info-circle" ngbTooltip="Thông tin chi tiết truy cập" container="body"
                                 placement="top">
                             </i>
                         </button>
-}
+                        }
                         &nbsp;/&nbsp;
                         {{student['warning_array'] && student['warning_array'].length?
                         student['warning_array'].length:'-'}}
                         @if (student['warning_array'] && student['warning_array'].length) {
-<button
-                            class="btn btn-primary btn-icon btn-transparent" (click)="openWarningStudent(student)">
+                        <button class="btn btn-primary btn-icon btn-transparent" (click)="openWarningStudent(student)">
                             <i class="fa fa-exclamation-triangle" ngbTooltip="Thông tin chi tiết cảnh báo"
                                 container="body" placement="top">
                             </i>
                         </button>
-}
+                        }
                     </td>
                     <td style="text-align: center;">
                         {{student.violation_of_exam?student.violation_of_exam.title +' (đã trừ '+
@@ -455,7 +449,7 @@
     [draggable]="false" [resizable]="false" [modal]="true" header="Title" [(visible)]="displayAddtime"
     [style]="{width: '700px'}" [closable]="false">
     @if (selectedShiftStudent) {
-<div class="step-sync-plans" style="background-color: #fff;">
+    <div class="step-sync-plans" style="background-color: #fff;">
         <div class="step-sync-plans-header" style="display: flex; align-items: center;">
             <span style="flex: 1;">Sinh viên: {{selectedShiftStudent.student.full_name + ' - ' +
                 selectedShiftStudent.student.student_code }}</span>
@@ -479,7 +473,7 @@
             </div>
         </div>
     </div>
-}
+    }
 </p-dialog>
 
 
@@ -487,7 +481,7 @@
     position="center" [draggable]="false" [resizable]="false" [modal]="true" header="Title" [(visible)]="displayCancel"
     [style]="{width: '700px'}" [closable]="false">
     @if (selectedShiftStudent) {
-<div class="step-sync-plans" style="background-color: #fff;">
+    <div class="step-sync-plans" style="background-color: #fff;">
         <div class="step-sync-plans-header" style="display: flex; align-items: center;">
             <span style="flex: 1;">Thông báo</span>
             <span (click)="closeAddTime()" class="action-span"
@@ -518,7 +512,7 @@
             </div>
         </div>
     </div>
-}
+    }
 </p-dialog>
 
 
@@ -526,7 +520,7 @@
     position="center" [draggable]="false" [resizable]="false" [modal]="true" header="Title"
     [(visible)]="displayViolation" [style]="{width: '700px'}" [closable]="false">
     @if (selectedShiftStudent) {
-<div class="step-sync-plans" style="background-color: #fff;">
+    <div class="step-sync-plans" style="background-color: #fff;">
         <div class="step-sync-plans-header" style="display: flex; align-items: center;">
             <span style="flex: 1;">Xử lý vi phạm sinh viên: {{selectedShiftStudent.student.full_name + ' - ' +
                 selectedShiftStudent.student.student_code }}</span>
@@ -547,7 +541,7 @@
             </div>
             <div class="row form-row form-row-flex-row" style="text-align: justify;">
                 @if (violationData['key']) {
-<div class="col-12 flex-div">
+                <div class="col-12 flex-div">
                     <label style="font-weight: bold;" for="title">Mô tả:</label>
                     <div style="color: red;" [innerHTML]="violationData['key'] | showlabel : dbConfig : 'key' : 'DESC'">
 
@@ -556,7 +550,7 @@
                             'key'
                             : 'POINT'}}%</em></div>
                 </div>
-}
+                }
             </div>
             <div class="row form-row form-row-flex-row">
                 <div class="col-12 flex-div">
@@ -579,12 +573,12 @@
             </div>
         </div>
     </div>
-}
+    }
 </p-dialog>
 
 <ng-template #templateTrackingStudent>
     @if (selectedShiftStudent) {
-<div class="ovic-over-right-section">
+    <div class="ovic-over-right-section">
         <div class="ovic-over-right-section__head">
             <h3 class="ovic-over-right-section__header">
                 {{selectedShiftStudent.student.full_name + ' ('+selectedShiftStudent.student.student_code+')'}} - Số
@@ -594,8 +588,7 @@
         <div class="ovic-over-right-section__body"
             style="height: calc(100vh - 58px); padding: 0px; line-height: 1.25; font-size: 14px;">
             @if (selectedShiftStudent.tracking && selectedShiftStudent.tracking.length) {
-<div style="height: 100%; padding: 5px;"
-               >
+            <div style="height: 100%; padding: 5px;">
                 <p-table [value]="selectedShiftStudent.tracking" styleClass="table-reBorder p-datatable-striped">
                     <ng-template pTemplate="header">
                         <tr>
@@ -617,15 +610,15 @@
                     </ng-template>
                 </p-table>
             </div>
-}
+            }
         </div>
     </div>
-}
+    }
 </ng-template>
 
 <ng-template #templateWarningStudent>
     @if (selectedShiftStudent) {
-<div class="ovic-over-right-section">
+    <div class="ovic-over-right-section">
         <div class="ovic-over-right-section__head">
             <h3 class="ovic-over-right-section__header">
                 {{selectedShiftStudent.student.full_name + ' ('+selectedShiftStudent.student.student_code+')'}} - Số lần
@@ -635,8 +628,7 @@
         <div class="ovic-over-right-section__body"
             style="height: calc(100vh - 58px); padding: 0px; line-height: 1.25; font-size: 14px;">
             @if (selectedShiftStudent['warning_array'] && selectedShiftStudent['warning_array'].length) {
-<div style="height: 100%; padding: 5px;"
-               >
+            <div style="height: 100%; padding: 5px;">
                 <p-table [value]="selectedShiftStudent['warning_array']"
                     styleClass="table-reBorder p-datatable-striped">
                     <ng-template pTemplate="header">
@@ -653,10 +645,10 @@
                     </ng-template>
                 </p-table>
             </div>
-}
+            }
         </div>
     </div>
-}
+    }
 </ng-template>
 
 <ng-template #templateLogStudentShift>
@@ -670,8 +662,7 @@
         <div class="ovic-over-right-section__body"
             style="height: calc(100vh - 58px); padding: 0px; line-height: 1.25; font-size: 14px;">
             @if (selectedShiftStudent && selectedShiftStudent.controls && selectedShiftStudent.controls.length) {
-<div class="re-background-table" style="height: 100%; padding: 5px;"
-               >
+            <div class="re-background-table" style="height: 100%; padding: 5px;">
                 <p-table [value]="selectedShiftStudent.controls" styleClass="table-reBorder p-datatable-striped">
                     <ng-template pTemplate="header">
                         <tr>
@@ -692,15 +683,15 @@
                             </td>
                             <td style="width: 100px; text-align: center;">
                                 @if (row['type']==='ADD_TIME') {
-<span>
+                                <span>
                                     {{row['value']?row['value'] / 60 +'p':'-'}}
                                 </span>
-}
+                                }
                                 @if (row['type'] === 'VIOLATION') {
-<span>
+                                <span>
                                     {{row['value']?'-'+row['value'] +'%':'-'}}
                                 </span>
-}
+                                }
                             </td>
                             <td style="width: 100px;text-align: center;">{{row['sender']}}</td>
                             <td style="width: 230px;">{{row['message']}}</td>
@@ -708,7 +699,7 @@
                     </ng-template>
                 </p-table>
             </div>
-}
+            }
         </div>
     </div>
 </ng-template>
@@ -755,7 +746,7 @@
     position="center" [draggable]="false" [resizable]="false" [modal]="true" header="Title"
     [(visible)]="displayDeleteViolaytion" [style]="{width: '700px'}" [closable]="false">
     @if (selectedShiftStudent) {
-<div class="step-sync-plans" style="background-color: #fff;">
+    <div class="step-sync-plans" style="background-color: #fff;">
         <div class="step-sync-plans-header" style="display: flex; align-items: center;">
             <span style="flex: 1;">Hủy xử lý vi phạm sinh viên: {{selectedShiftStudent.student.full_name + ' - ' +
                 selectedShiftStudent.student.student_code }}</span>
@@ -779,7 +770,7 @@
             </div>
         </div>
     </div>
-}
+    }
 </p-dialog>
 
 

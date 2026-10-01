@@ -37,7 +37,7 @@
             <div class="layout_component_container-bottom">
                 <div class="container-bottom-right">
                     <p-table [value]="listData"
-                             styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table  ovic-ui-table table-reBorder th-td-padding-5px">
+                             class="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table ovic-ui-table table-reBorder th-td-padding-5px">
                         <ng-template pTemplate="header">
                             <tr>
                                 <th rowspan="2" class="text-center ovic-w-50px">TT</th>
@@ -81,7 +81,7 @@
                             <tr>
                                 <td style="text-align: center;">{{ rowIndex + 1 }}</td>
                                 @if (objectFilter['donvi_id'] !== 0) {
-                                    <td class="btn-hover" (click)="viewClassAndChart(row)">{{ row.title }}
+                                    <td class="btn-hover text-left" (click)="viewClassAndChart(row)">{{ row.title }}
                                         ( {{ row.maso }} )
                                     </td>
                                     <td class="text-center">{{ row.params?.['sotinchi'] ?? '' }}</td>
@@ -90,7 +90,7 @@
                                     <td class="text-center">{{ row['_total_classes'] }}</td>
                                     <td class="text-center">{{ row['_total_students'] }}</td>
                                 } @else {
-                                    <td class="btn-hover">{{ row.title }}</td>
+                                    <td class="btn-hover text-left">{{ row.title }}</td>
                                     <td class="text-center">{{ row['_total_course'] }}</td>
                                     <td class="text-center">{{ row['_total_students'] }}</td>
                                 }

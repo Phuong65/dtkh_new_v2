@@ -174,3 +174,10 @@
         width: 400px;
     }
 }
+
+.tbl-danhSachUser{
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
