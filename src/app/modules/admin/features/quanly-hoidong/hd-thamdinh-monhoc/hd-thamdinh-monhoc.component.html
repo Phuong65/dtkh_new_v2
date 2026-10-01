@@ -1,6 +1,6 @@
 <div class="layout_component_container">
     <p-table #dt1
-        styleClass="table-reBorder table-scroll-able table-able-dropdown-p-table table-has-caption table-has-paginator"
+        styleClass="council-course-table table-reBorder table-scroll-able table-able-dropdown-p-table table-has-caption table-has-paginator"
         [(selection)]="selectedListMonhoc" [value]="list_hoidong_monhoc | filter: search_bomon_id : ['nganh_bomon_id']"
         dataKey="id" [paginator]="true" [rows]="50" [rowsPerPageOptions]="[50,100]"
         [globalFilterFields]="['course_title','course_maso']">
@@ -34,9 +34,9 @@
                     <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
                 </th>
                 <th style="width: 80px; text-align: center;">TT</th>
-                <th style="text-align: left;width: 400px;">Tên môn</th>
+                <th style="text-align: center;width: 400px;">Tên môn</th>
                 @for (i of [].constructor(maxThanhvien); track $index) {
-                    <th style="text-align: left; width: 200px;">
+                    <th style="text-align: center; width: 200px;">
                         {{$index === 0 ? 'Chủ tịch' : 'Ủy viên ' + $index}}
                     </th>
                 }
@@ -50,7 +50,7 @@
                 <td style="width: 80px; text-align: center;">{{rowIndex + 1}}</td>
                 <td>
                     <div style="display: flex; align-items: center;">
-                        <div style="flex:1">
+                        <div style="flex:1; text-align: left;">
                             <div>
                                 <strong>{{row['course_title'].concat(" - [",row['course_maso'],"]")}}</strong>
                             </div>
@@ -73,9 +73,9 @@
                 @for (i of [].constructor(maxThanhvien); track $index; let idx = $index) {
                     <td>
                         <div style="display:flex; align-items: center;">
-                            <div style="flex:1">
+                            <div style="flex:1; text-align: left;">
                                 @if (row['thanhvien'][idx] && row['thanhvien'][idx].user) {
-                                    <div>
+                                    <div style="text-align: left;">
                                         <div><strong>{{row['thanhvien'][idx].user.display_name}}</strong></div>
                                         <div>{{row['thanhvien'][idx].user.email}}</div>
                                     </div>
@@ -90,7 +90,7 @@
 </div>
 
 <ng-template #templateMonhoc let-c="close" let-d="dismiss">
-    <div class="ovic-over-right-section right-slide-class">
+    <div class="ovic-over-right-section right-slide-class template-monhoc-list">
         <div class="ovic-over-right-section__head">
             <h3 class="ovic-over-right-section__header">Danh sách môn học</h3>
             <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
@@ -110,11 +110,10 @@
                         @for (course of list_monhoc | filter: searchMonhoc : ['title','maso']; track course.id) {
                             <mat-list-option [(selected)]="course['check']" [value]="course">
                                 <div mat-line style="display: flex; align-items: center;">
-                                    <div mat-line style="flex: 1;">
-                                        <div mat-line>
-                                            <strong>{{course.title.concat(" - [",course.maso,"]")}}</strong>
+                                    <div mat-line style="flex: 1; text-align: left;">
+                                        <div mat-line style="font-size: 14px; font-weight: 500;">{{course.title.concat(" - [",course.maso,"]")}}
                                         </div>
-                                        <div mat-line style="font-size: 13px;">{{course['created_plan_name'] + course['info_']}}
+                                        <div mat-line style="font-size: 12px;">{{course['created_plan_name'] + course['info_']}}
                                         </div>
                                     </div>
                                 </div>
@@ -183,8 +182,8 @@
                                 <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
                             </th>
                             <th style="width: 80px; text-align: center;">TT</th>
-                            <th style="text-align: left;width: 400px; ">Họ và tên</th>
-                            <th style="text-align: center;width: 100px; ">Chủ tịch</th>
+                            <th style="text-align: center;width: 400px; ">Họ và tên</th>
+                            <th style="text-align: center;width: 50px; ">Chủ tịch</th>
                         </tr>
                     </ng-template>
                     <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
@@ -193,15 +192,15 @@
                                 <p-tableCheckbox [value]="row"></p-tableCheckbox>
                             </td>
                             <td style="width: 80px; text-align: center;">{{rowIndex + 1}}</td>
-                            <td>
+                            <td style="text-align: left">
                                 <div>
                                     <strong> {{row['display_name']}}</strong>
                                 </div>
                                 <div>{{row['email']}}</div>
                             </td>
-                            <th (click)="chooseChutich(row)">
+                            <th (click)="chooseChutich(row)" style="font-size: 18px; text-align: center;">
                                 @if (row['display_chutich']) {
-                                    <span style="font-size: 18px;">
+                                    <span>
                                         @if (!row['chutich']) {
                                             <i style="color:#BDBDBD" class="fa fa-square-o"></i>
                                         } @else {

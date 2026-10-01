@@ -3843,6 +3843,28 @@ body .question-content .p-dropdown-label {
     width: auto !important;
 }
 
+.template-monhoc-list .mat-mdc-list-option:not(:last-child),
+.template-pms-giangvien-list .mat-mdc-list-option:not(:last-child) {
+    position: relative;
+}
+
+.template-monhoc-list .mat-mdc-list-option:not(:last-child)::after,
+.template-pms-giangvien-list .mat-mdc-list-option:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    bottom: 0;
+    left: 10px;
+    border-bottom: 1px solid #dee2e6;
+    pointer-events: none;
+}
+
+.template-monhoc-list .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background,
+.template-pms-giangvien-list .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background {
+    background-color: #198754 !important;
+    border-color: #198754 !important;
+}
+
 .test-question-dialog .p-dialog-content {
     display: flex;
     max-height: calc(100% - 30px);
