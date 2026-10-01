@@ -130,6 +130,7 @@ export class KetquaNghiemthuCauhoiKthpComponent implements OnInit, OnChanges {
 
 
     initData() {
+        this.noitifi.isProcessing(true);
         const condition_group_namhoc = this.httpHelper.paramsConditionBuilder(
             [
                 { conditionName: 'status', condition: OvicQueryCondition.notEqual, value: '-1', orWhere: 'and' },
@@ -201,7 +202,7 @@ export class KetquaNghiemthuCauhoiKthpComponent implements OnInit, OnChanges {
 
     loadData() {
         //Load khoá học
-        // this.noitifi.isProcessing(true);
+        this.noitifi.isProcessing(true);
         this.displayModal = true;
         this.waitting_title = "Đang tải dữ liệu, vui lòng không tắt trình duyệt";
 
@@ -239,6 +240,7 @@ export class KetquaNghiemthuCauhoiKthpComponent implements OnInit, OnChanges {
 
                     this.progressValue = 100;
                     this.displayModal = false;
+                    this.noitifi.isProcessing(false);
                 },
                 error: () => {
                     this.list_cdr = [];

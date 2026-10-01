@@ -1,1 +1,117 @@
-﻿<div class="p-3">hd-thamdinh-thanhvien.component works!</div>
+<div class="layout_component_container">
+    <div class="document-type-a4-vertical">
+        <p-table #dt1 styleClass="table-reBorder" [(selection)]="selectedlist" [value]="list_thanhvien" dataKey="id"
+            [paginator]="true" [rows]="20" [rowsPerPageOptions]="[20,50,100]"
+            [globalFilterFields]="['display_name','email']">
+            <ng-template pTemplate="caption">
+                <div style="display:flex" class="flex align-items-center justify-content-between">
+                    Danh sách thành viên
+                    <div style="display:flex">
+                        <input style="width: 250px;" (input)="dt1.filterGlobal($event.target['value'], 'contains')"
+                            class="class-layout-top-option-search" type="text" pInputText placeholder="Tìm kiếm">
+                        @if (isManager || isLanhdaokhoa) {
+                            <button (click)="loadGiangVien()"
+                                style="line-height: 1.4; margin-left: 5px;" class="btn btn-success">
+                                <i class="fa fa-plus"></i>
+                                Thêm thành viên
+                            </button>
+                            <button (click)="deleteSelectItem()"
+                                style="margin-left: 5px;" class="btn btn-danger btn-icon">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        }
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 4rem;text-align: center;">
+                        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                    </th>
+                    <th style="width: 80px; text-align: center;">TT</th>
+                    <th style="text-align: left;">Họ và tên</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+                <tr>
+                    <td style="text-align: center;">
+                        <p-tableCheckbox [value]="row"></p-tableCheckbox>
+                    </td>
+                    <td style="width: 80px; text-align: center;">{{rowIndex + 1}}</td>
+                    <td>
+                        <div style="display: flex; align-items: center;">
+                            <div style="flex:1">
+                                <div>
+                                    <strong>{{row['display_name']}}</strong>
+                                </div>
+                                <div>
+                                    {{row['email']}}
+                                </div>
+                            </div>
+                            @if (isManager || isLanhdaokhoa) {
+                                <button (click)="deleteItem(row)"
+                                    class="btn btn-danger btn-icon btn-transparent">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<ng-template #templatePmsGiangvien let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section right-slide-class">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">Danh sách giảng viên</h3>
+            <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+                (click)="closeForm()"></button>
+        </div>
+        <div style="line-height: 1.25; padding: 5px; height: calc(100vh - 51px - 57px);"
+            class="ovic-over-right-section__body footer-no-hint">
+            <div style="height: 100%;" class="phanquyen-dulieu-content-left ovic-vertical__inputs">
+                <div class="form-row row">
+                    <div class="col-12">
+                        <input class="ovic-input-field" type="text" [(ngModel)]="searchUser" placeholder="Search">
+                    </div>
+                </div>
+                @if ((listGiangvien | filter: searchUser : ['display_name','email']).length > 0) {
+                    <mat-selection-list (selectionChange)="onSelectThanhVien($event)" [multiple]="true"
+                        class="selection-list-mat" #users>
+                        @for (user of listGiangvien | filter: searchUser : ['display_name','email']; track user.user_id) {
+                            <mat-list-option [(selected)]="user['check']" [value]="user">
+                                <div mat-line style="display: flex; align-items: center;">
+                                    <div mat-line style="flex: 1;">
+                                        <div mat-line><strong>{{user.display_name}}</strong></div>
+                                        <div mat-line style="font-size: 12px;">{{user.email}} </div>
+                                    </div>
+                                </div>
+                            </mat-list-option>
+                        }
+                    </mat-selection-list>
+                } @else {
+                    <div class="result-search-none">Không có cán bộ nào...</div>
+                }
+            </div>
+        </div>
+        <div class="ovic-dynamic-right-section__foot">
+            <p class="ovic-over-right-section__foot-wrap-buttons">
+                <button type="button" class="btn btn ovic-over-right-section__foot-btn btn-primary btn-primary"
+                    (click)="savePmsGiangVien()"><i class="fa fa-floppy-o"></i>Lưu lại
+                </button>
+            </p>
+        </div>
+    </div>
+</ng-template>
+
+<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+    [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+    <div class="popup-waiting-loading">
+        <label style="width: 100%;">{{waitting_title}}</label>
+        <div class="tn-import-student-progressbar">
+            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+        </div>
+    </div>
+</p-dialog>

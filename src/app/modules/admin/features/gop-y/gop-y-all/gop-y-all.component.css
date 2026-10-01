@@ -845,7 +845,22 @@
     height: 100%;
     background: #f1f3f5;
     color: #6b7280;
+    font-size: 13px;
     opacity: 1;
+    transition: none;
+}
+
+.attachment-media__error--image > b {
+    max-width: 100%;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.attachment-media__error--image .btn {
+    min-height: 30px;
+    border-radius: 4px;
+    font-size: 12px;
 }
 
 .attachment-media__actions {
@@ -965,8 +980,31 @@
 
 .feedback-paginator {
     display: block;
+    width: 100%;
+    min-width: 0;
     flex: 0 0 auto;
     margin-top: 10px;
+}
+
+:host ::ng-deep p-paginator.feedback-paginator.p-paginator {
+    box-sizing: border-box;
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    align-items: center;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 4px !important;
+    overflow-x: auto;
+}
+
+:host ::ng-deep .feedback-paginator .p-paginator-pages {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 2px;
 }
 
 .category-manager__body {
@@ -1129,6 +1167,11 @@
 
     .feedback-page__total {
         align-self: flex-start;
+    }
+
+    :host ::ng-deep p-paginator.feedback-paginator.p-paginator {
+        gap: 2px;
+        padding: 6px 2px !important;
     }
 
     .feedback-chart__content {

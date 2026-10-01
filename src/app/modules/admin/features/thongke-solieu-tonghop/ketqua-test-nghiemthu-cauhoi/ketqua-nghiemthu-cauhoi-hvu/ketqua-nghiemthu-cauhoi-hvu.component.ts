@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import {DialogModule} from "primeng/dialog";
 import {MatProgressBarModule} from "@angular/material/progress-bar";
 import {CommonModule} from "@angular/common";
@@ -66,8 +66,8 @@ export class KetquaNghiemthuCauhoiHvuComponent implements OnInit {
 
     ds_dotCapnhat: ElnKhoaHoc[];
 
-    listData: ElnKhoaHoc[];
-    listDataClone:ElnKhoaHoc[]
+    listData = signal<ElnKhoaHoc[]>([]);
+    listDataClone = signal<ElnKhoaHoc[]>([]);
 
     dataWeek: {label:string,value:number}[] = [
         {label:'Bài 1' , value:1},
@@ -195,7 +195,7 @@ export class KetquaNghiemthuCauhoiHvuComponent implements OnInit {
       this.noitifi.isProcessing(true);
         this.elnKhoaHocService.getTotalQuestion({dot_capnhat: this.objectFilter['dot_capnhat']}).subscribe({
             next:(a)=>{
-                this.listDataClone = a.length> 0 ? a.map(m=>{
+                this.listDataClone.set(a.length> 0 ? a.map(m=>{
                     m['__total'] =m['data_week'] ? Object.values(m['data_week']).reduce(
                         (sum: number, value: any) => sum + Number(value),
                         0
@@ -203,9 +203,9 @@ export class KetquaNghiemthuCauhoiHvuComponent implements OnInit {
 
                     m['__categoris_name'] = this.list_donvi_chuyenmon.find(f=>f.id == m.category_ids) ? this.list_donvi_chuyenmon.find(f=>f.id == m.category_ids).title : '';
                     return m;
-                }): [];
+                }): []);
 
-                this.listData = this.listDataClone
+                this.listData.set(this.listDataClone());
                 this.noitifi.isProcessing(false);
             },
             error:()=>{
@@ -222,10 +222,10 @@ export class KetquaNghiemthuCauhoiHvuComponent implements OnInit {
         // console.log(event);
         if (event) {
             this.objectFilter.category_id = event['id'];
-            this.listData = [...this.listDataClone.filter(f=>f.category_ids == event['id'])] ;
+            this.listData.set(this.listDataClone().filter(f=>f.category_ids == event['id'])) ;
         } else {
             this.objectFilter.category_id = null;
-            this.listData = [...this.listDataClone];
+            this.listData.set([...this.listDataClone()]);
         }
 
     }

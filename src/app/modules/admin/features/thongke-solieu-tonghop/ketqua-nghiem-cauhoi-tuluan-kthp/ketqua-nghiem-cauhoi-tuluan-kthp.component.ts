@@ -97,6 +97,7 @@ export class KetquaNghiemCauhoiTuluanKthpComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.noitifi.isProcessing(true);
         this.userId = this.auth.user.id;
         this.donviId = this.auth.user.donvi_id;
         this.isManager = this.auth.userHasRole(ROLES.manager) || this.auth.userHasRole(ROLES.admin);
@@ -126,6 +127,7 @@ export class KetquaNghiemCauhoiTuluanKthpComponent implements OnInit {
 
 
     initData() {
+        this.noitifi.isProcessing(true);
         const condition_group_namhoc = this.httpHelper.paramsConditionBuilder(
             [
                 { conditionName: 'status', condition: OvicQueryCondition.notEqual, value: '-1', orWhere: 'and' },
@@ -205,7 +207,7 @@ export class KetquaNghiemCauhoiTuluanKthpComponent implements OnInit {
 
     loadData() {
         //Load khoá học
-        // this.noitifi.isProcessing(true);
+        this.noitifi.isProcessing(true);
         this.displayModal = true;
         this.waitting_title = "Đang tải dữ liệu, vui lòng không tắt trình duyệt";
 
@@ -266,17 +268,16 @@ export class KetquaNghiemCauhoiTuluanKthpComponent implements OnInit {
                                     return m;
                                 });
 
-                                this.noitifi.isProcessing(false);
                                 this.displayModal = false;
 
                                 this.list_cdr_clone = this.list_cdr;
+                                this.noitifi.isProcessing(false);
 
                             }, error: () => {
-                                this.noitifi.isProcessing(false);
                                 this.displayModal = false;
                                 this.list_cdr = []
                                 this.list_cdr_clone = [];
-
+                                this.noitifi.isProcessing(false);
                             }
                         })
                     } else {

@@ -1,1 +1,880 @@
-﻿<div class="p-3">duyet-cauhoi.component works!</div>
+<div class="duyet-cauhoi-layout">
+  <p-table [value]="list_cdr"
+    styleClass="tbl-danhSachUser table-scroll-able table-able-dropdown-p-table ovic-ui-table table-reBorder th-td-padding-5px">
+    <ng-template pTemplate="caption">
+      <div class="flex"
+        style="font-weight: 500; justify-content: end; align-items: center; padding: 5px; display: flex;">
+        <div>
+          <p-checkbox [binary]="true" (onChange)="checkValue($event,'_chuaduyet')" name="_chuaduyet"
+          label="Lọc chưa duyệt"></p-checkbox>
+        </div>
+        @if (kd_uyvien) {
+          <div style="margin-left: 20px;">
+            <p-checkbox [binary]="true" (onChange)="checkValue($event,'_chuanhanxet')" name="_chuanhanxet"
+            label="Lọc câu hỏi bạn chưa nhận xét"></p-checkbox>
+          </div>
+        }
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th rowspan="2" style="text-align: center; width: 160px;">Câu hỏi</th>
+        <th rowspan="2" style="text-align: center; width: 100px;">Mã câu hỏi</th>
+        <th rowspan="2" style="text-align: center; width: 120px;">Kết quả test</th>
+        <th rowspan="2" style="text-align: center; width: 96px;">Kết quả cấp khoa</th>
+        <th rowspan="2" style="text-align: center; width: 96px;">Kết quả cấp trường</th>
+        <th [colSpan]="hoidong().length" style="text-align: center;">Nhận xét</th>
+      </tr>
+      <tr>
+        @for (thanhvien of hoidong(); track thanhvien.user_id ?? $index; let i = $index) {
+          <th style="text-align: center; width: 100px;">
+            @if (thanhvien.vaitro === 'CHUTICH') {
+              <span>
+                Chủ tịch<br>
+                ({{thanhvien['display_name']}})
+              </span>
+            }
+            @if (thanhvien.vaitro !== 'CHUTICH') {
+              <span>
+                Ủy viên {{i}}<br>
+                ({{thanhvien['display_name']}})
+              </span>
+            }
+          </th>
+        }
+      </tr>
+      @if (activity() && activity().week !== 100) {
+        <tr>
+          <th [colSpan]="5 + hoidong().length" style="background-color: #eaeaea;"><span
+          innerHTML="Bài {{selectedActivity.week+' '+selectedActivity['count_question']}}"></span></th>
+        </tr>
+      }
+    </ng-template>
+    <ng-template pTemplate="body" let-cdr>
+      <tr>
+        <td [colSpan]="5 + hoidong().length" style="font-weight: 600; background-color: #cae1fc;">
+        {{cdr.kyhieu+'('+cdr['cdr_cauhoi_label']+')'}}</td>
+      </tr>
+
+
+      @for (question of cdr['question_cdr'] | filter : _chuanhanxet : ['_chuanhanxet'] | filter : _chuaduyet : ['_chuaduyet'] ; track question.id ?? $index; let i = $index) {
+        <tr style="cursor: pointer;"
+          [ngClass]="selectedQuestion && selectedQuestion.id === question.id?'question-activity':''"
+          (click)="chooseQuestion(question, i + 1)">
+          <td>
+            <div style="display: flex; align-items: center;">
+              <span style="flex:1">
+                - {{courseSelected().av ?'No.':'Câu: '}}{{question['index_question']}} @if (courseSelected().av) {
+                <span
+                >({{question['children'].length}})</span>
+              }
+              -
+              {{object_chuandaura[question.cdr]}}
+            </span>
+            <!-- <span *ngIf="rejectRole">
+            <span container="body" ngbTooltip="Mở khóa, cho phép sửa" placement="top"
+              *ngIf="question.status === 1" (click)="reDoAction($event, question,0)"
+              style="font-size: 14px;" class="action-icon-redo red"><i class="pi pi-lock"></i></span>
+              <span (click)="reDoAction($event,question,1)" ngbTooltip="Khóa, không cho phép sửa"
+                placement="top" container="body" *ngIf="question.status !== 1" style="font-size: 14px;"
+                class="action-icon-redo gray"><i style="font-size: 16px;"
+              class="pi pi-lock-open"></i></span>
+            </span> -->
+          </div>
+        </td>
+        <td style="text-align: center;">#{{question.id}}</td>
+        <td style="text-align: center;">
+          @if (question['old_status'] === 1) {
+            <div>
+              Đang rà soát
+            </div>
+          }
+          @if (question['old_status'] !== 1) {
+            <div>
+              @if (question['question_root_id'] === 0) {
+                <div>
+                  @if (selectedCourse.av !== 1 ) {
+                    <span>{{question[ 'count_answer_true' ]+' - '+question[
+                      'count_answer_false' ]+' - '+question.count_answer_later+' | '+question[ 'count_teacher'
+                      ]}}
+                    </span>
+                  }
+                </div>
+              }
+              @if (question['question_root_id'] !== 0) {
+                <div>
+                  Đã test
+                </div>
+              }
+            </div>
+          }
+        </td>
+        <td style="text-align: center;">
+          <div>
+            @switch (question['status']) {
+              @case (0) {
+                <span class="action-icon status-is-deactive">
+                  Chờ duyệt
+                </span>
+              }
+              @case (1) {
+                <span class="action-icon status-is-active">
+                  Đạt
+                </span>
+              }
+              @case (-1) {
+                <span class="action-icon status-is-redo">
+                  Chưa đạt
+                </span>
+              }
+              @case (-2) {
+                <span class="action-icon status-is-require">
+                  Đã sửa
+                </span>
+              }
+            }
+          </div>
+        </td>
+        <td style="text-align: center;">
+          <div>
+            @switch (question['status_captruong']) {
+              @case (0) {
+                <span class="action-icon status-is-deactive">
+                  Chờ duyệt
+                </span>
+              }
+              @case (1) {
+                <span class="action-icon status-is-active">
+                  Đạt
+                </span>
+              }
+              @case (-1) {
+                <span class="action-icon status-is-redo">
+                  Chưa đạt
+                </span>
+              }
+              @case (-2) {
+                <span class="action-icon status-is-require">
+                  Đã sửa
+                </span>
+              }
+            }
+          </div>
+        </td>
+        @for (thanhvien of hoidong(); track thanhvien.user_id ?? $index; let k = $index) {
+          <td style="text-align: center;">
+            @if (question['hoidong_comment'][thanhvien.user_id]) {
+              <span class="danhanxet">Đã nhận
+              xét</span>
+            }
+            @if (!question['hoidong_comment'][thanhvien.user_id]) {
+              <span class="chuanhanxet">Chưa nhận
+              xét</span>
+            }
+          </td>
+        }
+      </tr>
+    }
+  </ng-template>
+</p-table>
+</div>
+
+<ng-template #templateQuestionView>
+  <div class="ovic-over-right-section" style="height: 100%;">
+    <div class="ovic-over-right-section__head" style="display: flex; align-items: center;">
+      <h3 class="ovic-over-right-section__header" style="flex: 1;">Nhận xét câu hỏi</h3>
+      <div class="action-button-next-back">
+        <button (click)="openNewQuestion('back')" class="btn btn-success btn-angle"><i
+        class="pi pi-angle-double-left"></i>Câu trước</button>
+        <button (click)="openNewQuestion('next')" class="btn btn-success btn-angle">Câu sau<i
+        class="pi pi-angle-double-right" style="margin-left: 5px; margin-right: 0px;"></i></button>
+      </div>
+      <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
+    </div>
+    <div class="ovic-over-right-section__body footer-no-hint no-footer"
+      style="padding: 0px; height: calc(100% - 58px);">
+      <div class="list-questions__contents d-flex flex-fill">
+        <ul class="list-questions__contents__list">
+          @if (courseSelected().av === 1) {
+            <ng-container>
+              <li class="list-questions__contents__list__elements">
+                <div
+                  class="list-questions__contents__block list-questions__contents__block--head d-flex align-items-center flex-wrap">
+                  <small class="list-questions__contents__block__code">{{selectedQuestion['in_cdr']}}
+                    |
+                    {{courseSelected().av ?'No.':'Câu '}}{{selectedQuestion['index_question']}} |
+                    #{{ selectedQuestion.id}} | {{object_chuandaura[selectedQuestion.cdr]}} |
+                    <span>
+                      @switch (selectedQuestion['status_captruong']) {
+                        @case (0) {
+                          <span class="action-icon status-is-deactive">
+                            Chờ duyệt
+                          </span>
+                        }
+                        @case (1) {
+                          <span class="action-icon status-is-active">
+                            Đạt
+                          </span>
+                        }
+                        @case (-1) {
+                          <span class="action-icon status-is-redo">
+                            Chưa đạt
+                          </span>
+                        }
+                        @case (-2) {
+                          <span class="action-icon status-is-require">
+                            Đã sửa
+                          </span>
+                        }
+                      }
+                    </span>
+                  </small>
+                  <span class="list-questions__contents__block__q-info__separator">|</span>
+                  <small class="list-questions__contents__block__code">#{{ selectedQuestion.code
+                  }}</small>
+                  <div
+                    class="list-questions__contents__block__q-info ml-auto d-inline-flex align-items-center">
+                    @if (['group-input','group-radio','checkbox','radio'].includes(selectedQuestion.question_type)) {
+                      <p class="list-questions__contents__block__q-info__inverted-answer">
+                        <i class="pi"
+                        [ngClass]="selectedQuestion.config['invertedAnswer'] ? 'pi-check':'pi-times'"></i>
+                        Đảo vị trí của phương án trả lời
+                      </p>
+                      <span class="list-questions__contents__block__q-info__separator">|</span>
+                    }
+                  </div>
+                </div>
+                <div class="list-questions__contents__block">
+                  <div class="lqc-present-single-question__direction"
+                    [appLoadMediaOnText]="selectedQuestion.id"
+                  [innerHTML]="selectedQuestion.question_direction | safeHtmlSingle"></div>
+                  @if (selectedQuestion.media) {
+                    <div class="lqc-present-single-question__direction__media mt-3"
+                      >
+                      <audio controls>
+                        <source
+                          [src]="selectedQuestion.media.path | ictuMediaLink : selectedQuestion.media.source : token | ovicSafeUrl">
+                        </audio>
+                      </div>
+                    }
+                  </div>
+                </li>
+                @if (selectedQuestion.question_type ==='drag_drop') {
+                  <li class="list-questions__contents__list__elements"
+                    >
+                    <div class="list-questions__contents__block">
+                      @for (child of selectedQuestion.children; track child.id ?? $index) {
+                        <div class="list-questions__contents__list__elements__av_drag_and_drop"
+                          >
+                          <div class="list-questions__contents__list__elements__av_drag_and_drop__index">
+                            {{
+                          child.question_number }}</div>
+                          <div class="list-questions__contents__list__elements__av_drag_and_drop__direction lqc-present-single-question__direction"
+                            [appLoadMediaOnText]="child.id"
+                            [innerHTML]="child.question_direction | safeHtmlSingle">
+                          </div>
+                          <div class="list-questions__contents__list__elements__av_drag_and_drop__answer">
+                            {{
+                          child.answer_correct | extractCorrectAnswer }}</div>
+                        </div>
+                      }
+                    </div>
+                  </li>
+                }
+                @if (selectedQuestion.question_type !=='drag_drop') {
+                  @for (child of selectedQuestion.children; track child.id ?? $index) {
+                    <li class="list-questions__contents__list__elements"
+                      >
+                      <div
+                        class="list-questions__contents__block list-questions__contents__block--head d-flex align-items-center flex-wrap">
+                        <small class="list-questions__contents__block__code">#{{ child.id }}</small>
+                        <div
+                          class="list-questions__contents__block__q-info ml-auto d-inline-flex align-items-center">
+                          @if (['group-input','group-radio','checkbox','radio'].includes(child.question_type)) {
+                            <p class="list-questions__contents__block__q-info__inverted-answer">
+                              <i class="pi"
+                              [ngClass]="child.config['invertedAnswer'] ? 'pi-check':'pi-times'"></i>
+                              Đảo
+                              vị trí của phương án trả lời
+                            </p>
+                            <span
+                            class="list-questions__contents__block__q-info__separator">|</span>
+                          }
+                        </div>
+                      </div>
+                      <div class="list-questions__contents__block">
+                        <div class="lqc-present-single-question__direction"
+                          [appLoadMediaOnText]="child.id"
+                          [innerHTML]="child.question_direction | safeHtmlSingle">
+                        </div>
+                      </div>
+                      <div class="list-questions__contents__block list-questions__contents__block--body"
+                        >
+                      @switch (child.question_type) {
+                        @case ('group-input') {
+                          <group-input-question
+                          [present]="child"></group-input-question>
+                        }
+                        @case ('group-radio') {
+                          <group-radio-question
+                          [present]="child"></group-radio-question>
+                        }
+                        @case ('checkbox') {
+                          <question-type-radio-editor [multiple]="true"
+                          [present]="child"></question-type-radio-editor>
+                        }
+                        @case ('drag_drop') {
+                        }
+                        @case ('radio') {
+                          <div class="question-type-radio">
+                            <ul class="question-type-radio__list">
+                              @for (o of child.answer_option; track o.id ?? $index; let i = $index) {
+                                <li class="question-type-radio__list__element"
+                                  [ngClass]="'question-type-radio__list__element--size-'+child.config?.cols"
+                                  >
+                                  <!--                                            <span class="question-type-radio__radio-button" [class.question-type-radio__radio-button&#45;&#45;highlight]="o.id | isAnswerCorrect : child.answer_correct"></span>-->
+                                  <span class="question-type-radio__radio-button__index"
+                                    [class.question-type-radio__radio-button__index--highlight]="o.id | isAnswerCorrect : child.answer_correct">{{
+                                  i | questionPrefix }}</span>
+                                  <div class="question-type-radio__option"
+                                    [appLoadMediaOnText]="o.id"
+                                  [innerHTML]="o.value | safeHtmlSingle"></div>
+                                </li>
+                              }
+                            </ul>
+                          </div>
+                        }
+                        @case ('grouping') {
+                          <div
+                            class="list-questions__contents__block__grouping d-flex justify-content-center align-items-center flex-wrap">
+                            @for (o of child.answer_option; track o.id ?? $index) {
+                              <span class="list-questions__contents__block__grouping__choice"
+                              >{{ o.value }}</span>
+                            }
+                          </div>
+                          <div
+                            class="list-questions__contents__block__grouping__pairs d-flex align-items-start flex-wrap">
+                            @for (c of child['children']; track c) {
+                              <div class="list-questions__contents__block__grouping__pairs__elm"
+                                >
+                                <b
+                                  class="list-questions__contents__block__grouping__pairs__elm__heading">{{
+                                c.question_direction }}</b>
+                                <textarea [rows]="5" [cols]="30" [disabled]="true"
+                                  placeholder="Các đáp án..."
+                                  class="list-questions__contents__block__grouping__pairs__elm__body"
+                                pTextarea>{{ c.answer_correct | answerLabel : child.answer_option }}</textarea>
+                              </div>
+                            }
+                          </div>
+                        }
+                        @case ('inputbox') {
+                          @if (!child['children'] || child['children'].length === 0) {
+                            <div>
+                              <mat-chip-listbox class="example-chip">
+                                @for (ansc of child.answer_correct | stringToArrayPipe : '|'; track ansc) {
+                                  <mat-chip class="example-box"
+                                    >
+                                    {{ansc}}
+                                  </mat-chip>
+                                }
+                              </mat-chip-listbox>
+                            </div>
+                          }
+                          @if (child['children'] && child['children'].length) {
+                            <div>
+                              @for (c of child['children']; track c) {
+                                <span class="list-questions__contents__block__separator"></span>
+                                <div
+                                  class="list-questions__contents__block list-questions__contents__input-box">
+                                  @if (c.question_number ) {
+                                    <span class="list-questions__contents__input-box__number"
+                                      >{{ c.question_number
+                                    }}</span>
+                                  }
+                                  @if (c.question_direction) {
+                                    <div class="list-questions__contents__input-box__direction lqc-present-single-question__direction"
+                                      [appLoadMediaOnText]="c.id"
+                                    [innerHTML]="c.question_direction | safeHtmlSingle"></div>
+                                  }
+                                  <div
+                                    class="list-questions__contents__input-box__correct-answer">
+                                    {{
+                                  c.answer_correct | json }}</div>
+                                </div>
+                              }
+                            </div>
+                          }
+                        }
+                        @case ('reorder_words') {
+                          <div
+                            class="list-questions__contents__block__drag_drop__pairs d-flex align-items-start flex-wrap">
+                            <div
+                              class="list-questions__contents__block__drag_drop__pairs__elm m-0 w-100">
+                              <input [disabled]="true"
+                                class="list-questions__contents__block__drag_drop__pairs__elm__answer-correct w-100"
+                                type="text" pInputText
+                                [value]="child.answer_correct | extractCorrectAnswer"
+                                placeholder="Đáp án...">
+                              </div>
+                            </div>
+                          }
+                          @case ('matching') {
+                          }
+                          @default {
+                            <div
+                              class="d-flex flex-fill w-100 h-100 justify-content-center align-items-center">
+                              <p class="alert alert-secondary m-0 primary-font --fs-14">Vui lòng chọn loại
+                                câu hỏi
+                              </p>
+                            </div>
+                          }
+                        }
+                      </div>
+                    </li>
+                  }
+                }
+              </ng-container>
+            } @else {
+              <li class="list-questions__contents__list__elements">
+                <div
+                  class="list-questions__contents__block list-questions__contents__block--head d-flex align-items-center flex-wrap">
+                  <small class="list-questions__contents__block__code">{{selectedQuestion['in_cdr']}} |
+                    {{courseSelected().av ?'No.':'Câu '}}{{selectedQuestion['index_question']}} |
+                    #{{ selectedQuestion.id}} | {{object_chuandaura[selectedQuestion.cdr]}} | {{
+                    selectedQuestion[ 'count_answer_true']+' - '+selectedQuestion['count_answer_false'
+                    ]+' - '+selectedQuestion.count_answer_later+' ('+selectedQuestion[
+                    'count_teacher']+')'}} | <span>
+                    @switch (selectedQuestion['status_captruong']) {
+                      @case (0) {
+                        <span class="action-icon status-is-deactive">
+                          Chờ duyệt
+                        </span>
+                      }
+                      @case (1) {
+                        <span class="action-icon status-is-active">
+                          Đạt
+                        </span>
+                      }
+                      @case (-1) {
+                        <span class="action-icon status-is-redo">
+                          Chưa đạt
+                        </span>
+                      }
+                      @case (-2) {
+                        <span class="action-icon status-is-require">
+                          Đã sửa
+                        </span>
+                      }
+                    }
+                  </span>
+                </small>
+                <div
+                  class="list-questions__contents__block__q-info ml-auto d-inline-flex align-items-center">
+                  @if (['group-input','group-radio','checkbox','radio'].includes(selectedQuestion.question_type)) {
+                    <!--<p-checkbox [disabled]="true" [(ngModel)]="q.config['invertedAnswer']" [binary]="true" label="Đảo vị trí của phương án trả lời"></p-checkbox>-->
+                    <p class="list-questions__contents__block__q-info__inverted-answer">
+                      <i class="pi"
+                      [ngClass]="selectedQuestion.config['invertedAnswer'] ? 'pi-check':'pi-times'"></i>
+                      Đảo vị
+                      trí của phương án trả lời
+                    </p>
+                    <span class="list-questions__contents__block__q-info__separator">|</span>
+                  }
+                </div>
+              </div>
+              <div class="list-questions__contents__block list-questions__contents__block--body">
+                <div class="lqc-present-single-question__direction"
+                  [appLoadMediaOnText]="selectedQuestion.id"
+                [innerHTML]="selectedQuestion.question_direction | safeHtmlSingle"></div>
+              </div>
+              <div class="list-questions__contents__block">
+                @switch (selectedQuestion.question_type) {
+                  @case ('group-input') {
+                    <group-input-question
+                    [present]="selectedQuestion"></group-input-question>
+                  }
+                  @case ('group-radio') {
+                    <group-radio-question
+                    [present]="selectedQuestion"></group-radio-question>
+                  }
+                  @case ('checkbox') {
+                    <question-type-radio-editor [multiple]="true"
+                    [present]="selectedQuestion"></question-type-radio-editor>
+                  }
+                  @case ('drag_drop') {
+                    <div
+                      class="list-questions__contents__block__grouping d-flex justify-content-center align-items-center flex-wrap">
+                      @for (o of selectedQuestion.answer_option; track o.id ?? $index) {
+                        <span class="list-questions__contents__block__grouping__choice"
+                        >{{ o.value }}</span>
+                      }
+                    </div>
+                    <div
+                      class="list-questions__contents__block__drag_drop__pairs d-flex align-items-start flex-wrap">
+                      @for (c of selectedQuestion.children; track c) {
+                        <div class="list-questions__contents__block__drag_drop__pairs__elm"
+                          >
+                          <b
+                            class="list-questions__contents__block__drag_drop__pairs__elm__heading">{{
+                          c.question_direction }}</b>
+                          <input [disabled]="true"
+                            class="list-questions__contents__block__drag_drop__pairs__elm__answer-correct"
+                            type="text" pInputText
+                            [value]="c.answer_correct | answerLabel : selectedQuestion.answer_option"
+                            placeholder="Đáp án...">
+                          </div>
+                        }
+                      </div>
+                    }
+                    @case ('radio') {
+                      <div class="question-type-radio">
+                        <ul class="question-type-radio__list">
+                          @for (o of selectedQuestion.answer_option; track o.id ?? $index; let i = $index) {
+                            <li class="question-type-radio__list__element"
+                              [ngClass]="'question-type-radio__list__element--size-'+selectedQuestion.config?.cols"
+                              >
+                              <!--                                            <span class="question-type-radio__radio-button" [class.question-type-radio__radio-button&#45;&#45;highlight]="o.id | isAnswerCorrect : q.answer_correct"></span>-->
+                              <span class="question-type-radio__radio-button__index"
+                                [class.question-type-radio__radio-button__index--highlight]="o.id | isAnswerCorrect : selectedQuestion.answer_correct">{{
+                              i | questionPrefix }}</span>
+                              <div class="question-type-radio__option" [appLoadMediaOnText]="o.id"
+                              [innerHTML]="o.value | safeHtmlSingle"></div>
+                            </li>
+                          }
+                        </ul>
+                      </div>
+                    }
+                    @case ('grouping') {
+                      <div
+                        class="list-questions__contents__block__grouping d-flex justify-content-center align-items-center flex-wrap">
+                        @for (o of selectedQuestion.answer_option; track o.id ?? $index) {
+                          <span class="list-questions__contents__block__grouping__choice"
+                          >{{ o.value }}</span>
+                        }
+                      </div>
+                      <div
+                        class="list-questions__contents__block__grouping__pairs d-flex align-items-start flex-wrap">
+                        @for (c of selectedQuestion.children; track c) {
+                          <div class="list-questions__contents__block__grouping__pairs__elm"
+                            >
+                            <b
+                              class="list-questions__contents__block__grouping__pairs__elm__heading">{{
+                            c.question_direction }}</b>
+                            <textarea [rows]="5" [cols]="30" [disabled]="true"
+                              placeholder="Các đáp án..."
+                              class="list-questions__contents__block__grouping__pairs__elm__body"
+                              pTextarea
+                            [autoResize]="true">{{ c.answer_correct | answerLabel : selectedQuestion.answer_option }}</textarea>
+                          </div>
+                        }
+                      </div>
+                    }
+                    @case ('inputbox') {
+                      @for (child of selectedQuestion.children; track child.id ?? $index) {
+                        <span class="list-questions__contents__block__separator"></span>
+                        <div
+                          class="list-questions__contents__block list-questions__contents__input-box">
+                          @if (child.question_number ) {
+                            <span class="list-questions__contents__input-box__number"
+                              >{{
+                            child.question_number }}</span>
+                          }
+                          @if (child.question_direction) {
+                            <div class="list-questions__contents__input-box__direction lqc-present-single-question__direction"
+                              [appLoadMediaOnText]="child.id"
+                            [innerHTML]="child.question_direction | safeHtmlSingle"></div>
+                          }
+                          <div class="list-questions__contents__input-box__correct-answer">{{
+                          child.answer_correct | json }}</div>
+                        </div>
+                      }
+                    }
+                    @case ('reorder_words') {
+                    }
+                    @case ('matching') {
+                    }
+                    @default {
+                      <div
+                        class="d-flex flex-fill w-100 h-100 justify-content-center align-items-center">
+                        <p class="alert alert-secondary m-0 primary-font --fs-14">Vui lòng chọn loại câu
+                        hỏi</p>
+                      </div>
+                    }
+                  }
+                </div>
+                <ng-template #showMultipleRadioCaptruong>
+                  @for (child of selectedQuestion.children; track child.id ?? $index) {
+                    <span class="list-questions__contents__block__separator"></span>
+                    <div class="list-questions__contents__block">
+                      <div class="lqc-present-single-question__direction"
+                        [appLoadMediaOnText]="child.id"
+                      [innerHTML]="child.question_direction | safeHtmlSingle"></div>
+                    </div>
+                    <div class="list-questions__contents__block">
+                      @switch (child.question_type) {
+                        @case ('group-input') {
+                        }
+                        @case ('group-radio') {
+                          <group-radio-question
+                          [present]="child"></group-radio-question>
+                        }
+                        @case ('checkbox') {
+                          <question-type-radio-editor [multiple]="true"
+                          [present]="child"></question-type-radio-editor>
+                        }
+                        @case ('drag_drop') {
+                        }
+                        @case ('radio') {
+                        }
+                        @case ('grouping') {
+                        }
+                        @case ('inputbox') {
+                        }
+                        @case ('reorder_words') {
+                        }
+                        @case ('matching') {
+                        }
+                        @default {
+                          <div
+                            class="d-flex flex-fill w-100 h-100 justify-content-center align-items-center">
+                            <p class="alert alert-secondary m-0 primary-font --fs-14">Vui lòng chọn
+                              loại câu
+                              hỏi
+                            </p>
+                          </div>
+                        }
+                      }
+                    </div>
+                  }
+                </ng-template>
+              </li>
+            }
+          </ul>
+        </div>
+        <ng-container [ngTemplateOutlet]="templateDuyet" [ngTemplateOutletContext]="{ activity: selectedQuestion}">
+        </ng-container>
+      </div>
+    </div>
+  </ng-template>
+
+
+  <ng-template #templateDuyet let-activity="activity">
+    <div class="class-duyet-layout"
+      [ngClass]="(!activity['comments'] || !activity['comments'].length) && !kd_hoidong && !kd_hoidong?'no-border-top':''">
+      @if (activity['comments'] && activity['comments'].length) {
+        <div style="width: 100%; padding: 15px;"
+          class="list-comment-layout">
+          <div class="ketqua-duyet-hoidong row">
+            <div class="ketqua-duyet-hoidong-left col-6"
+              style="border-right: 1px solid #c8c8c8; margin-bottom: 10px;">
+              <label style="font-weight: 600; margin-bottom: 10px;">
+                KẾT QUẢ DUYỆT CỦA HỘI ĐỒNG KHOA:
+              </label>
+              @if (activity['status'] === 1 || activity['status'] === -1) {
+                <div class="ketquaduyet-hoidong row"
+                  style="padding-bottom: 10px; ">
+                  <div class="ketquaduyet-hoidong-left col-6">
+                    <div class="ketquaduyet-hoidong-left-status" style="text-align: center;"
+                      >
+                    @switch (activity['status']) {
+                      @case (1) {
+                        <span class="true-blue status-duyet-hoidong">Đạt</span>
+                      }
+                      @case (-1) {
+                        <span class="red status-duyet-hoidong">Yêu cầu sửa</span>
+                      }
+                    }
+                  </div>
+                </div>
+                <div class="ketquaduyet-hoidong-right col-6">
+                  <div>Duyệt lúc:</div>
+                  <div>{{activity['approved_at'] | ovicDateTime}}</div>
+                </div>
+              </div>
+            } @else {
+              <div class="ketquaduyet-hoidong" style="padding-bottom: 10px; ">
+                <div style="text-align: center;">
+                  @switch (activity['status']) {
+                    @case (0) {
+                      <span class="gray status-duyet-hoidong">Chờ duyệt</span>
+                    }
+                    @case (-2) {
+                      <span class="blue status-duyet-hoidong">Đã sửa, chờ duyệt</span>
+                    }
+                  }
+                </div>
+              </div>
+            }
+          </div>
+          <div class="ketqua-duyet-hoidong-right col-6">
+            <label style="font-weight: 600; margin-bottom: 10px;">
+              KẾT QUẢ DUYỆT CỦA HỘI ĐỒNG TRƯỜNG:
+            </label>
+            @if (activity['status_captruong'] === 1 || activity['status_captruong'] === -1) {
+              <div class="ketquaduyet-hoidong row"
+                style="padding-bottom: 10px; ">
+                <div class="ketquaduyet-hoidong-left col-6">
+                  <div class="ketquaduyet-hoidong-left-status" style="text-align: center;"
+                    >
+                    @switch (activity['status_captruong']) {
+                      @case (1) {
+                        <span class="true-blue status-duyet-hoidong">Đạt</span>
+                      }
+                      @case (-1) {
+                        <span class="red status-duyet-hoidong">Yêu cầu sửa</span>
+                      }
+                    }
+                  </div>
+                </div>
+                <div class="ketquaduyet-hoidong-right col-6">
+                  <div>Duyệt lúc:</div>
+                  <div>{{activity['approved_captruong_at'] | ovicDateTime}}</div>
+                </div>
+              </div>
+            } @else {
+              <div class="ketquaduyet-hoidong" style="padding-bottom: 10px; ">
+                <div style="text-align: center;">
+                  @switch (activity['status_captruong']) {
+                    @case (0) {
+                      <span class="gray status-duyet-hoidong">Chờ duyệt</span>
+                    }
+                    @case (-2) {
+                      <span class="blue status-duyet-hoidong">Đã sửa, chờ duyệt</span>
+                    }
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+        <div style="border-bottom: 1px solid #c8c8c8; margin-bottom: 10px;"></div>
+        @for (comment of activity['comments']; track comment.user_id ? (comment.user_id + '_' + comment.cap_hoidong) : $index; let index = $index) {
+          <div class="comment-box">
+            <div class="inner-comment">
+              <div class="inner-comment-header">
+                <div style="flex: 1;">
+                  <span [ngClass]="comment['user_id'] === userId ? 'blue':''"
+                    style="font-weight: 600; margin-right: 10px; text-decoration: underline;">
+                    {{comment['display_name'] + ' ('+HOIDONGDUYET[comment['cap_hoidong']]+')' + ':'}}
+                  </span>
+                </div>
+              </div>
+              @if (comment['children'] && comment['children'].length) {
+                <div>
+                  @for (children of comment['children']; track children.id ?? $index) {
+                    <div style="margin-bottom: 15px; ">
+                      <div [ngClass]="children['status'] === 1?'duyet-comment':'yeucausua-comment'"
+                        class="conten-comment-box">
+                        <div class="conten-comment-inner-box" [innerHTML]="children.comment">
+                        </div>
+                      </div>
+                      <div style="margin-left: 20px; margin-top: 5px;">
+                        <span
+                          style="font-size: 12px; color: #898989; margin-right: 20px; font-style: italic;">{{children.created_at
+                        | ovicDateTime}}</span>
+                        <span style="color: #898989; cursor: pointer;" (click)="openReply(children,index)">Phản
+                        hồi ({{children['count_reply']}})</span>
+                      </div>
+                      @if (children['reply_open'] === true) {
+                        <div class="reply-layout">
+                          <div class="list_reply_comments">
+                            @for (reply_comment of children['reply_comments']; track reply_comment.id ?? $index) {
+                              <div style="margin-bottom: 15px;"
+                                >
+                                <div style="text-align: right; margin-bottom: 5px;">
+                                  <span [ngClass]="reply_comment['my_reply_comment']?'blue':''">
+                                    {{reply_comment['display_name'] }}
+                                    {{' ('+HOIDONGDUYET[reply_comment['cap_hoidong']]+')'}}
+                                  </span>
+                                </div>
+                                <div class="conten-comment-box-left"
+                                  [ngClass]="reply_comment['my_reply_comment']?'my-reply-comment':''">
+                                  <div class="conten-comment-inner-box-left"
+                                    [innerHTML]="reply_comment.comment">
+                                  </div>
+                                </div>
+                                <div style="margin-right: 20px; margin-top: 5px; text-align: right;">
+                                  <span
+                                    style="font-size: 12px; color: #898989; font-style: italic;">{{reply_comment.created_at
+                                  | ovicDateTime}}</span>
+                                </div>
+                              </div>
+                            }
+                          </div>
+                          @if (canReply() || kd_hoidong || kd_uyvien || (courseSelected() && userId === courseSelected().creator_plan_id)) {
+                            <div style="display: flex; position: relative;"
+                              >
+                              <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;"><img
+                              style="width: 100%;" src="../../../assets/images/a_none.jpg"></div>
+                              <textarea style="height: 40px; margin-left: 10px; flex: 1; padding-right: 130px;"
+                                placeholder="Nhập phản hồi... "
+                              [(ngModel)]="children['textarea_comment']"></textarea>
+                              <button (click)="saveCommentReply(children , activity, index)"
+                                style="position: absolute; bottom: 5px; right:5px" class="btn btn-primary"><i
+                              class="fa fa-paper-plane" ></i>Gửi
+                            phản hồi</button>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+  @if ((kd_uyvien || kd_hoidong) && activity['status'] === 1 && activity['status_captruong'] !== 1) {
+    <div [ngClass]="(!activity['comments'] || !activity['comments'].length) ? 'padding-top-15px':''"
+      class="comment-edit-layout"
+      >
+      <textarea placeholder="Nhập nội dung nhận xét trước khi duyệt hoặc yêu cầu sửa... "
+      [(ngModel)]="activity['textarea_comment']"></textarea>
+      <div class="action-edit-layout">
+        <button (click)="saveComment(1,activity)" style="line-height: 1; margin-bottom: 10px;"
+          class="btn-primary">Đồng ý duyệt
+        </button>
+        <button (click)="saveComment(-1,activity)" style="line-height: 1;" class="btn-danger">Yêu cầu
+        sửa</button>
+      </div>
+    </div>
+  }
+  @if (activity['status'] === 1 && kd_hoidong && activity['status_captruong'] !== -1 && activity['status_captruong'] !== 1 && activity['comments'] && activity['comments'].length) {
+    <div
+      style="padding: 0px 15px 15px 15px">
+      <div class="hozion-lay" style="position: relative;">
+        <label
+          style="font-weight: 600; z-index: 1; position: relative; background: whitesmoke; padding-right: 5px;">KẾT
+        LUẬN CỦA CHỦ TỊCH HỘI ĐỒNG: </label>
+      </div>
+      <div style="display: flex; justify-content: space-evenly;">
+        @if (kd_hoidong) {
+          <button style="margin-right: 5px; width: 150px; line-height: 1;" (click)="duyetNoidung(activity, 1)"
+          class="btn btn-primary">Đồng ý duyệt</button>
+        }
+        @if (kd_hoidong) {
+          <button style="margin-left: 5px; width: 150px;line-height: 1;" (click)="duyetNoidung(activity, -1)"
+          class="btn btn-danger">Yêu cầu sửa</button>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- <div *ngIf="rejectRole && (activity['status'] === -1 || activity['status'] === 1)"
+  style="padding: 0px 15px 15px 15px">
+  <div class="hozion-lay" style="position: relative;">
+    <label
+      style="font-weight: 600; z-index: 1; position: relative; background: whitesmoke; padding-right: 5px;">KẾT
+    LUẬN CỦA CHỦ TỊCH HỘI ĐỒNG: </label>
+  </div>
+  <div style="display: flex; justify-content: space-evenly;">
+    <button style="margin: 0px 5px; width: 200px; line-height: 1;" (click)="huyTrangThai(activity)"
+      *ngIf="rejectRole" class="btn btn-secondary">
+    {{activity['status'] === -1?'Huỷ trạng thái yêu cầu sửa': 'Huỷ trạng thái đã duyệt'}}</button>
+  </div>
+</div> -->
+</div>
+</ng-template>

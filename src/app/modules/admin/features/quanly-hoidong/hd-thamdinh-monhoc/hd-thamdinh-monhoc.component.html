@@ -1,1 +1,219 @@
-﻿<div class="p-3">hd-thamdinh-monhoc.component works!</div>
+<div class="layout_component_container">
+    <p-table #dt1
+        styleClass="table-reBorder table-scroll-able table-able-dropdown-p-table table-has-caption table-has-paginator"
+        [(selection)]="selectedListMonhoc" [value]="list_hoidong_monhoc | filter: search_bomon_id : ['nganh_bomon_id']"
+        dataKey="id" [paginator]="true" [rows]="50" [rowsPerPageOptions]="[50,100]"
+        [globalFilterFields]="['course_title','course_maso']">
+        <ng-template pTemplate="caption">
+            <div style="display:flex" class="flex align-items-center justify-content-between">
+                Danh sách môn học
+                <div style="display:flex">
+                    <div style="width:250px; margin-left: 5px;">
+                        <ovic-dropdown [disabled]="isLanhDaoBomon && !isLanhdaokhoa && !isManager? true: false"
+                            (onChange)="onBomonChange($event)" [filter]="true" [placeholder]="'---Chọn bộ môn---'"
+                            [options]="list_bomon" optionId="id" optionLabel="title" [defaultValue]="search_bomon_id"
+                            filterBy="title">
+                        </ovic-dropdown>
+                    </div>
+                    <input style="width: 250px;margin-left: 5px;"
+                        (input)="dt1.filterGlobal($event.target['value'], 'contains')"
+                        class="class-layout-top-option-search" type="text" pInputText placeholder="Tìm kiếm">
+                    <button (click)="loadMonhoc()" style="line-height: 1.4; margin-left: 5px;" class="btn btn-success">
+                        <i class="fa fa-plus"></i>
+                        Thêm môn học
+                    </button>
+                    <button (click)="deleteSelectItem()" style="margin-left: 5px;" class="btn btn-danger btn-icon">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 4rem;text-align: center;">
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                <th style="width: 80px; text-align: center;">TT</th>
+                <th style="text-align: left;width: 400px;">Tên môn</th>
+                @for (i of [].constructor(maxThanhvien); track $index) {
+                    <th style="text-align: left; width: 200px;">
+                        {{$index === 0 ? 'Chủ tịch' : 'Ủy viên ' + $index}}
+                    </th>
+                }
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+            <tr>
+                <td style="text-align: center;">
+                    <p-tableCheckbox [value]="row"></p-tableCheckbox>
+                </td>
+                <td style="width: 80px; text-align: center;">{{rowIndex + 1}}</td>
+                <td>
+                    <div style="display: flex; align-items: center;">
+                        <div style="flex:1">
+                            <div>
+                                <strong>{{row['course_title'].concat(" - [",row['course_maso'],"]")}}</strong>
+                            </div>
+                            <div style="font-size: 13px;">{{row['created_plan_name'] + row['info_']}}
+                            </div>
+                        </div>
+                        <div>
+                            <button (click)="openLoadThanhVien(row)" ngbTooltip="Chọn thành viên" placement="top"
+                                container="body" style="margin-left: 5px;"
+                                class="btn btn-success btn-icon btn-transparent">
+                                <i class="fa fa-ellipsis-v"></i>
+                            </button>
+                            <button style="margin-left: 5px;" (click)="deleteItem(row)"
+                                class="btn btn-danger btn-icon  btn-transparent">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </td>
+                @for (i of [].constructor(maxThanhvien); track $index; let idx = $index) {
+                    <td>
+                        <div style="display:flex; align-items: center;">
+                            <div style="flex:1">
+                                @if (row['thanhvien'][idx] && row['thanhvien'][idx].user) {
+                                    <div>
+                                        <div><strong>{{row['thanhvien'][idx].user.display_name}}</strong></div>
+                                        <div>{{row['thanhvien'][idx].user.email}}</div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </td>
+                }
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<ng-template #templateMonhoc let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section right-slide-class">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">Danh sách môn học</h3>
+            <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
+                (click)="closeForm()"></button>
+        </div>
+        <div style="line-height: 1.25; padding: 5px; height: calc(100vh - 51px - 57px);"
+            class="ovic-over-right-section__body footer-no-hint">
+            <div style="height: 100%;" class="phanquyen-dulieu-content-left ovic-vertical__inputs">
+                <div class="form-row row">
+                    <div class="col-12">
+                        <input class="ovic-input-field" type="text" [(ngModel)]="searchMonhoc" placeholder="Search">
+                    </div>
+                </div>
+                @if ((list_monhoc | filter: searchMonhoc : ['title','maso']).length > 0) {
+                    <mat-selection-list (selectionChange)="onSelectMonhocForHd($event)" [multiple]="true"
+                        class="selection-list-mat" #courses>
+                        @for (course of list_monhoc | filter: searchMonhoc : ['title','maso']; track course.id) {
+                            <mat-list-option [(selected)]="course['check']" [value]="course">
+                                <div mat-line style="display: flex; align-items: center;">
+                                    <div mat-line style="flex: 1;">
+                                        <div mat-line>
+                                            <strong>{{course.title.concat(" - [",course.maso,"]")}}</strong>
+                                        </div>
+                                        <div mat-line style="font-size: 13px;">{{course['created_plan_name'] + course['info_']}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-list-option>
+                        }
+                    </mat-selection-list>
+                } @else {
+                    <div class="result-search-none">Không có môn học nào...</div>
+                }
+            </div>
+        </div>
+        <div class="ovic-dynamic-right-section__foot">
+            <p class="ovic-over-right-section__foot-wrap-buttons">
+                <button type="button" class="btn btn ovic-over-right-section__foot-btn btn-primary btn-primary"
+                    (click)="saveMonhoc()"><i class="fa fa-floppy-o"></i>Lưu lại
+                </button>
+            </p>
+        </div>
+    </div>
+</ng-template>
+
+<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
+    [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
+    <div class="popup-waiting-loading">
+        <label style="width: 100%;">{{waitting_title}}</label>
+        <div class="tn-import-student-progressbar">
+            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+        </div>
+    </div>
+</p-dialog>
+
+<ng-template #templateThanhvien let-c="close" let-d="dismiss">
+    <div class="ovic-over-right-section">
+        <div class="ovic-over-right-section__head">
+            <h3 class="ovic-over-right-section__header">Chọn thành viên</h3>
+            <button class="btn ovic-over-right-section__close-button" (click)="d(true)"></button>
+        </div>
+        <div class="ovic-over-right-section__body footer-no-hint no-footer"
+            style="padding: 0px; max-height: calc(100vh - 58px - 60px); overflow: hidden;">
+            <div class="ovic-vertical__inputs" style="height: 100%; padding: 10px;">
+                <p-table #dt2 (onHeaderCheckboxToggle)="onHeaderCheckboxToggle($event)"
+                    (onRowSelect)="onRowSelect($event)" (onRowUnselect)="onRowUnselect($event)"
+                    styleClass="table-reBorder table-scroll-able table-able-dropdown-p-table table-has-caption"
+                    [(selection)]="selectedListThanhvien" [value]="list_thanhvien"
+                    [globalFilterFields]="['display_name','email']">
+                    <ng-template pTemplate="caption">
+                        <div style="display:flex" class="flex align-items-center justify-content-between">
+                            Danh sách thành viên -
+                            Đã chọn: {{selectedListThanhvien?selectedListThanhvien.length:0}}
+                            <div style="display:flex">
+                                <input style="width: 250px;"
+                                    (input)="dt2.filterGlobal($event.target['value'], 'contains')"
+                                    class="class-layout-top-option-search" type="text" pInputText
+                                    placeholder="Tìm kiếm">
+                                <button (click)="saveThanhvienHoidongMonhoc(d)"
+                                    style="line-height: 1.25; margin-left: 5px;" class="btn btn-primary">
+                                    <i class="fa fa-floppy-o"></i>
+                                    Lưu lại
+                                </button>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width: 4rem;text-align: center;">
+                                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                            </th>
+                            <th style="width: 80px; text-align: center;">TT</th>
+                            <th style="text-align: left;width: 400px; ">Họ và tên</th>
+                            <th style="text-align: center;width: 100px; ">Chủ tịch</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+                        <tr>
+                            <td style="text-align: center;">
+                                <p-tableCheckbox [value]="row"></p-tableCheckbox>
+                            </td>
+                            <td style="width: 80px; text-align: center;">{{rowIndex + 1}}</td>
+                            <td>
+                                <div>
+                                    <strong> {{row['display_name']}}</strong>
+                                </div>
+                                <div>{{row['email']}}</div>
+                            </td>
+                            <th (click)="chooseChutich(row)">
+                                @if (row['display_chutich']) {
+                                    <span style="font-size: 18px;">
+                                        @if (!row['chutich']) {
+                                            <i style="color:#BDBDBD" class="fa fa-square-o"></i>
+                                        } @else {
+                                            <i class="fa fa-check-square-o blue"></i>
+                                        }
+                                    </span>
+                                }
+                            </th>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+</ng-template>

@@ -1,1 +1,281 @@
-﻿<div class="p-3">sao-chep-hoidong.component works!</div>
+<div class="ovic-over-right-section copy-council-panel">
+    <div class="ovic-over-right-section__head">
+        <h3 class="ovic-over-right-section__header">{{title}}</h3>
+        <button class="btn ovic-over-right-section__close-button" type="button" aria-label="Đóng"
+            [disabled]="state === 'jobCreating' || state === 'jobRunning'" (click)="closePanel()"></button>
+    </div>
+
+    <div class="ovic-over-right-section__body copy-council-panel__body">
+        @if (isSelecting) {
+            <div class="copy-council-toolbar">
+                <div class="copy-council-search">
+                    <input class="ovic-input-field" type="text" [(ngModel)]="searchValue" (keyup)="search($event)"
+                        placeholder="Tìm theo tên hội đồng" aria-label="Tìm theo tên hội đồng">
+                    @if (searchValue) {
+                        <button type="button" class="btn btn-light btn-sm" (click)="clearSearch()">Xóa</button>
+                    }
+                </div>
+                @if (showCategoryFilter) {
+                    <ovic-dropdown styleClass="dropdown-250" (onChange)="changeCategory($event)"
+                        placeholder="---chọn khoa---" [options]="categories" optionId="id" optionLabel="title"
+                        [filter]="true" filterBy="title">
+                    </ovic-dropdown>
+                }
+            </div>
+
+            <div class="copy-council-selection-card">
+                <div class="copy-council-selection-card__left">
+                    <span class="copy-council-selection-card__icon" aria-hidden="true">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 11 12 14 22 4"></polyline>
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                        </svg>
+                    </span>
+                    <span class="copy-council-selection-card__count">Đã chọn <strong>{{selectedCount}}</strong> hội đồng</span>
+                </div>
+                <span class="copy-council-selection-card__hint">Chỉ hội đồng được chọn mới được sao chép</span>
+            </div>
+
+            @if (state === 'candidateLoading') {
+                <div class="copy-council-message">
+                    <span class="copy-council-spinner" aria-hidden="true"></span>
+                    Đang tải danh sách hội đồng...
+                </div>
+            }
+
+            @if (state === 'error' && !preview) {
+                <div class="copy-council-message copy-council-message--error">
+                    <span>{{errorMessage}}</span>
+                    <button type="button" class="btn btn-primary btn-sm" (click)="retryCurrentStep()">Thử lại</button>
+                </div>
+            }
+
+            @if (state !== 'candidateLoading') {
+                <div class="copy-council-table-wrapper">
+                    <p-table [value]="candidates" styleClass="table-reBorder copy-council-table">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th style="text-align: center;" class="copy-council-checkbox-cell">
+                                    <input type="checkbox" [checked]="isCurrentPageSelected()"
+                                        (change)="toggleCurrentPage(checkboxValue($event))" aria-label="Chọn trang hiện tại">
+                                </th>
+                                <th style="text-align: center;" class="copy-council-index-cell">TT</th>
+                                <th>Tên hội đồng</th>
+                                <th class="copy-council-category-cell">Đơn vị</th>
+                                <th style="text-align: center;" class="copy-council-date-cell">Thời gian</th>
+                                <th style="text-align: center;" class="copy-council-number-cell">TV</th>
+                                <th style="text-align: center;" class="copy-council-number-cell">MH</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-row>
+                            <tr [class.copy-council-row--selected]="isSelected(row.id)" [class.copy-council-row--hover]="true">
+                                <td style="text-align: center;" class="copy-council-checkbox-cell">
+                                    <input type="checkbox" [checked]="isSelected(row.id)"
+                                        (change)="toggleSelected(row, checkboxValue($event))"
+                                        [attr.aria-label]="'Chọn hội đồng ' + row.title">
+                                </td>
+                                <td style="text-align: center;" class="copy-council-index-cell">{{row.index_}}</td>
+                                <td>
+                                    <div class="copy-council-title-cell">
+                                        <strong>{{row.title}}</strong>
+                                        <span class="copy-council-badge"
+                                            [ngClass]="statusBadgeClass(row.status)">{{statusLabel(row.status)}}</span>
+                                    </div>
+                                </td>
+                                <td class="copy-council-category-cell">
+                                    {{row.category_id | showlabel : categories : 'id' : 'title'}}
+                                </td>
+                                <td style="text-align: center;" class="copy-council-date-cell">
+                                    {{row.date_start | date : 'dd/MM/yyyy' : 'UTC+7'}}
+                                    <span class="copy-council-date-sep">-</span>
+                                    {{row.date_end | date : 'dd/MM/yyyy' : 'UTC+7'}}
+                                </td>
+                                <td style="text-align: center;" class="copy-council-number-cell">{{row.countthanhviens || 0}}
+                                </td>
+                                <td style="text-align: center;" class="copy-council-number-cell">{{row.countcourses || 0}}</td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <td colspan="7" class="copy-council-empty">
+                                    <span class="copy-council-empty__icon" aria-hidden="true">—</span>
+                                    Không có hội đồng phù hợp để sao chép.
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            }
+        }
+
+        @if (state === 'previewLoading') {
+            <div class="copy-council-message">
+                <span class="copy-council-spinner" aria-hidden="true"></span>
+                Đang kiểm tra các hội đồng đã chọn...
+            </div>
+        }
+
+        @if (preview && (state === 'ready' || (state === 'error' && !job))) {
+            <div class="copy-council-notice">
+                Sao chép theo dữ liệu nguồn; hội đồng đã có bản sao sẽ bị bỏ qua.
+            </div>
+
+            <div class="copy-council-stat-grid">
+                <div class="copy-council-stat">
+                    <span>Đã chọn</span>
+                    <strong>{{preview.selected_total}}</strong>
+                </div>
+                <div class="copy-council-stat">
+                    <span>Đủ điều kiện</span>
+                    <strong>{{preview.eligible_total}}</strong>
+                </div>
+                <div class="copy-council-stat">
+                    <span>Bỏ qua</span>
+                    <strong>{{preview.skipped_total}}</strong>
+                </div>
+                <div class="copy-council-stat">
+                    <span>Thành viên</span>
+                    <strong>{{preview.council_members}}</strong>
+                </div>
+                <div class="copy-council-stat">
+                    <span>Môn học</span>
+                    <strong>{{preview.council_courses}}</strong>
+                </div>
+                <div class="copy-council-stat">
+                    <span>Thành viên theo môn</span>
+                    <strong>{{preview.course_members}}</strong>
+                </div>
+            </div>
+
+            @if (preview.skipped && preview.skipped.length) {
+                <div class="copy-council-skipped">
+                    <h4 class="copy-council-skipped__heading">Bị bỏ qua</h4>
+                    <div class="copy-council-skipped__list">
+                        @for (item of preview.skipped; track item.source_hoidong_id) {
+                            <div class="copy-council-skipped__item">
+                                <strong>#{{item.source_hoidong_id}} - {{item.code}}</strong>
+                                <span>{{item.message}}</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (preview.warnings && preview.warnings.length) {
+                <div class="copy-council-notice copy-council-notice--warning">
+                    @for (w of preview.warnings; track w) {
+                        <div>{{w}}</div>
+                    }
+                </div>
+            }
+
+            @if (state === 'error') {
+                <div class="copy-council-message copy-council-message--error">
+                    {{errorMessage}}
+                </div>
+            }
+        }
+
+        @if (state === 'jobCreating') {
+            <div class="copy-council-message">
+                <span class="copy-council-spinner" aria-hidden="true"></span>
+                Đang tạo tác vụ sao chép...
+            </div>
+        }
+
+        @if (state === 'jobRunning' && job) {
+            <div class="copy-council-message">
+                <div class="copy-council-running">
+                    <span>Đang sao chép {{job.processed_total}}/{{job.selected_total}} hội đồng...</span>
+                    <span class="copy-council-running__percent">{{progressPercent}}%</span>
+                </div>
+                <div class="copy-council-progress" role="progressbar" [attr.aria-valuenow]="progressPercent"
+                    aria-valuemin="0" aria-valuemax="100">
+                    <span [style.width.%]="progressPercent"></span>
+                </div>
+                <span class="copy-council-running__status">Vui lòng không đóng panel trong quá trình sao chép</span>
+            </div>
+        }
+
+        @if (state === 'error' && job) {
+            <div class="copy-council-message copy-council-message--error">
+                <span>{{errorMessage}}</span>
+                <button type="button" class="btn btn-primary btn-sm" (click)="retryCurrentStep()">Tải lại trạng
+                    thái</button>
+            </div>
+        }
+
+        @if (job && (state === 'success' || state === 'partialSuccess' || state === 'error')) {
+            <div class="copy-council-result-heading" [class.copy-council-result-heading--warning]="state !== 'success'">
+                {{state === 'success' ? 'Sao chép hoàn tất' : state === 'partialSuccess' ? 'Hoàn tất một phần' : 'Sao chép thất bại'}}
+            </div>
+
+            <div class="copy-council-stat-grid">
+                <div class="copy-council-stat">
+                    <span>Đã chọn</span>
+                    <strong>{{job.selected_total}}</strong>
+                </div>
+                <div class="copy-council-stat">
+                    <span>Đã xử lý</span>
+                    <strong>{{job.processed_total}}</strong>
+                </div>
+                <div class="copy-council-stat">
+                    <span>Đã tạo</span>
+                    <strong>{{job.created_total}}</strong>
+                </div>
+                <div class="copy-council-stat">
+                    <span>Bỏ qua</span>
+                    <strong>{{job.skipped_total}}</strong>
+                </div>
+                <div class="copy-council-stat">
+                    <span>Thất bại</span>
+                    <strong>{{job.failed_total}}</strong>
+                </div>
+            </div>
+
+            @if (job.created) {
+                <div class="copy-council-created-counts">
+                    <span>Hội đồng: {{job.created.hoidong}}</span>
+                    <span>Thành viên: {{job.created.thanhvien}}</span>
+                    <span>Môn học: {{job.created.monhoc}}</span>
+                    <span>Thành viên theo môn: {{job.created.monhoc_thanhvien}}</span>
+                </div>
+            }
+
+            @if (job.failures && job.failures.length) {
+                <div class="copy-council-result-list">
+                    <h4 class="copy-council-result-list__heading">Danh sách lỗi</h4>
+                    @for (failure of job.failures; track failure.title || failure.source_hoidong_id) {
+                        <div class="copy-council-result-list__item">
+                            <strong>{{failure.title || ('Hội đồng #' + failure.source_hoidong_id)}} - {{failure.code}}</strong>
+                            <span>{{failure.message}}</span>
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+
+    <div class="ovic-dynamic-right-section__foot copy-council-panel__footer">
+        @if (isSelecting) {
+            <button type="button" class="btn btn-light btn-sm" (click)="closePanel()">Hủy</button>
+            <button type="button" class="btn btn-primary btn-sm"
+                [disabled]="!selectedCount || state === 'candidateLoading'" (click)="previewSelection()">Tiếp
+                tục</button>
+        }
+
+        @if (preview && (state === 'ready' || (state === 'error' && !job))) {
+            <button type="button" class="btn btn-light btn-sm" (click)="backToSelection()">Quay lại</button>
+            <button type="button" class="btn btn-primary btn-sm" [disabled]="!canStartJob" (click)="startJob()">
+                Bắt đầu sao chép
+            </button>
+        }
+
+        @if (state === 'success' || state === 'partialSuccess' || (state === 'error' && job)) {
+            @if (job && job.failures && job.failures.length) {
+                <button type="button" class="btn btn-warning btn-sm" (click)="retryFailures()">Thử lại phần thất bại</button>
+            }
+            <button type="button" class="btn btn-primary btn-sm" (click)="closePanel()">Đóng</button>
+        }
+    </div>
+</div>
