@@ -130,6 +130,8 @@ export class MonhocThongtinComponent implements OnInit {
 
     selectedCtdtsId: number[] = [];
 
+    activeDescTab: 'desc' | 'yeucau' = 'desc';
+
     /** Inserted by Angular inject() migration for backwards compatibility */
     constructor(...args: unknown[]);
 
@@ -347,6 +349,11 @@ export class MonhocThongtinComponent implements OnInit {
                 this.f['exam_format'].setValue(this.EXAMFORMAT[index].key);
             }
         }
+    }
+
+    selectDescTab(tab: 'desc' | 'yeucau', tabElement?: HTMLButtonElement) {
+        this.activeDescTab = tab;
+        tabElement?.focus();
     }
 
     resetForm() {
