@@ -1,11 +1,866 @@
-.layout_component_container {
-    background-color: #f2f2f2;
+:host {
+    display: block;
+    width: 100%;
 }
 
-.ovic-vertical__inputs .form-row+.form-row {
-    margin-top: 20px;
+.mh-page {
+    height: calc(100vh - 60px);
+    min-height: 100%;
+    padding: 24px 20px 48px;
+    overflow-y: auto;
+    background-color: #f1f5f9;
+    color: #1e293b;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.mh-container {
+    max-width: 1240px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.mh-form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.mh-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.mh-field--title {
+    grid-column: 1 / -1;
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+.mh-save-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
+    cursor: pointer;
+    transition: all 180ms ease;
+    line-height: 1;
+}
+
+.mh-save-button:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1d4ed8 100%);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.38);
+    transform: translateY(-1px);
+}
+
+.mh-save-button:active {
+    transform: translateY(0);
+}
+
+.mh-save-button:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Section Cards
+   ========================================================================== */
+.mh-section {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+    overflow: hidden;
+}
+
+.mh-section__header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 22px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.mh-section__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    font-size: 15px;
+    color: #ffffff;
+    background: #2563eb;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+}
+
+.mh-section__icon--teal {
+    background: #0d9488;
+    box-shadow: 0 2px 6px rgba(13, 148, 136, 0.2);
+}
+
+.mh-section__icon--violet {
+    background: #7c3aed;
+    box-shadow: 0 2px 6px rgba(124, 58, 237, 0.2);
+}
+
+.mh-section__icon--indigo {
+    background: #4f46e5;
+    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.2);
+}
+
+.mh-section__icon--blue {
+    background: #0284c7;
+    box-shadow: 0 2px 6px rgba(2, 132, 199, 0.2);
+}
+
+.mh-section__icon--amber {
+    background: #d97706;
+    box-shadow: 0 2px 6px rgba(217, 119, 6, 0.2);
+}
+
+.mh-section__heading {
+    flex: 1;
+    min-width: 0;
+}
+
+.mh-section__eyebrow {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+    margin-bottom: 1px;
+}
+
+.mh-section__heading h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.3;
+}
+
+.mh-section__heading p {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.mh-section__required {
+    font-size: 11px;
+    font-weight: 600;
+    color: #dc2626;
+    background: #fef2f2;
+    padding: 3px 8px;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.mh-section__body {
+    padding: 22px;
+}
+
+/* ==========================================================================
+   Form Fields & Grid
+   ========================================================================== */
+.mh-form-row {
+    margin-bottom: 18px;
+}
+
+.mh-form-row:last-child {
+    margin-bottom: 0;
+}
+
+.mh-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.mh-field label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+}
+
+.mh-field label i {
+    color: #64748b;
+    font-size: 12px;
+    width: 14px;
+    text-align: center;
+}
+
+.mh-field label .ovic-mark {
+    color: #dc2626;
+    margin-left: 2px;
+}
+
+.mh-field .ovic-input-field {
+    height: 38px;
+    padding: 7px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #0f172a;
+    font-size: 13.5px;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.mh-field .ovic-input-field:hover:not([disabled]) {
+    border-color: #94a3b8;
+}
+
+.mh-field .ovic-input-field:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    outline: none;
+}
+
+.mh-field .ovic-input-field[disabled] {
+    background-color: #f1f5f9;
+    color: #64748b;
+    cursor: not-allowed;
+    border-color: #e2e8f0;
+}
+
+.mh-field.field-err .ovic-input-field {
+    border-color: #ef4444;
+    background-color: #fffaf0;
+}
+
+/* ==========================================================================
+   Section 2: Time Allocation Grid
+   ========================================================================== */
+.mh-time-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.mh-time-field {
+    display: flex;
+    flex-direction: column;
+    padding: 14px 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    transition: all 180ms ease;
+}
+
+.mh-time-field:hover {
+    border-color: #cbd5e1;
+    background: #f1f5f9;
+}
+
+.mh-time-field--primary {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.mh-time-field--primary:hover {
+    background: #dbeafe;
+    border-color: #93c5fd;
+}
+
+.mh-time-field label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 8px;
+    min-height: 24px;
+}
+
+.mh-time-field__icon {
+    font-size: 13px;
+    color: #2563eb;
+    flex-shrink: 0;
+}
+
+.mh-time-field--primary label {
+    color: #1e40af;
+}
+
+.mh-time-field .ovic-input-field {
+    height: 38px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #ffffff;
+    box-sizing: border-box;
+}
+
+.mh-time-field--primary .ovic-input-field {
+    border-color: #93c5fd;
+    color: #1e40af;
+}
+
+.mh-time-field__hint {
+    margin-top: 6px;
+    font-size: 10.5px;
+    color: #64748b;
+    text-align: center;
+    display: block;
+}
+
+/* ==========================================================================
+   Section 3: Assessment Choices
+   ========================================================================== */
+.mh-assessment-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+.mh-choice-card {
+    padding: 16px 18px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+
+.mh-choice-card__heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.mh-choice-card__number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.mh-choice-card--outcomes .mh-choice-card__number {
+    background: #7c3aed;
+}
+
+.mh-choice-card__heading h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.3;
+}
+
+.mh-choice-card__heading h3 .ovic-mark {
+    color: #dc2626;
+    margin-left: 2px;
+}
+
+.mh-choice-card__heading p {
+    margin: 2px 0 0;
+    font-size: 11.5px;
+    color: #64748b;
+}
+
+/* ==========================================================================
+   Section 4: Program Table & MultiSelect
+   ========================================================================== */
+.mh-field--program {
+    margin-bottom: 18px;
+}
+
+.mh-field__hint {
+    margin: 0 0 8px;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.mh-table-wrapper {
+    overflow-x: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.mh-program-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+}
+
+.mh-program-table th {
+    background: #f8fafc;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 700;
+    color: #334155;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+}
+
+.mh-program-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #1e293b;
+    vertical-align: middle;
+}
+
+.mh-program-table tr:last-child td {
+    border-bottom: none;
+}
+
+.mh-program-table tr:hover td {
+    background-color: #f8fafc;
+}
+
+.mh-program-table__index {
+    width: 48px;
+    text-align: center !important;
+    font-weight: 600;
+    color: #64748b !important;
+}
+
+.mh-empty-programs {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 10px;
+    color: #64748b;
+}
+
+.mh-empty-programs__icon {
+    font-size: 22px;
+    color: #94a3b8;
+    flex-shrink: 0;
+}
+
+.mh-empty-programs strong {
+    display: block;
+    color: #334155;
+    font-size: 13.5px;
+    margin-bottom: 2px;
+}
+
+.mh-empty-programs p {
+    margin: 0;
+    font-size: 12px;
+}
+
+/* ==========================================================================
+   Section 5: Editors
+   ========================================================================== */
+.mh-editor-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.mh-editor-card {
+    padding: 16px 18px;
+    background: #ffffff;
+}
+
+.mh-editor-card__heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.mh-editor-card__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: #dbeafe;
+    color: #1e40af;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.mh-editor-card__icon--teal {
+    background: #ccfbf1;
+    color: #0f766e;
+}
+
+.mh-editor-card__heading h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.3;
+}
+
+.mh-editor-card__heading p {
+    margin: 2px 0 0;
+    font-size: 11.5px;
+    color: #64748b;
+}
+
+/* ==========================================================================
+   Section 6: Document Uploads
+   ========================================================================== */
+.mh-documents-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+.mh-document-card {
+    padding: 16px 18px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+
+.mh-document-card__heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.mh-document-card__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: #fef3c7;
+    color: #b45309;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.mh-document-card--reference .mh-document-card__icon {
+    background: #e0e7ff;
+    color: #4338ca;
+}
+
+.mh-document-card__heading h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.3;
+}
+
+.mh-document-card__heading p {
+    margin: 2px 0 0;
+    font-size: 11.5px;
+    color: #64748b;
+}
+
+/* ==========================================================================
+   Bottom Action
+   ========================================================================== */
+.mh-action-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 16px 18px;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    background: linear-gradient(110deg, #eff6ff 0%, #ffffff 72%);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.07);
+}
+
+.mh-action-card__content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.mh-action-card__icon {
+    display: inline-flex;
+    flex: 0 0 34px;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: #dbeafe;
+    color: #1e40af;
+    font-size: 16px;
+}
+
+.mh-action-card__title {
+    margin: 0 0 2px;
+    color: #1e3a8a;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.mh-action-card__desc {
+    margin: 0;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.mh-save-button--large {
+    flex: 0 0 auto;
+    min-height: 42px;
+    padding: 11px 24px;
+}
+
+/* ==========================================================================
+   PrimeNG and Ovic Deep Customization
+   ========================================================================== */
+:host ::ng-deep .p-multiselect {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+}
+
+:host ::ng-deep .p-multiselect:not(.p-disabled):hover {
+    border-color: #94a3b8;
+}
+
+:host ::ng-deep .p-multiselect:not(.p-disabled).p-focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+:host ::ng-deep .p-multiselect-token {
+    background: #eff6ff;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    padding: 2px 8px;
 }
 
 :host ::ng-deep .p-multiselect-token-label {
-    line-height: 1.2;
+    line-height: 1.3;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+:host ::ng-deep .p-select {
+    width: 100%;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+}
+
+:host ::ng-deep .p-select:not(.p-disabled):hover {
+    border-color: #94a3b8;
+}
+
+:host ::ng-deep .p-select:not(.p-disabled).p-focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+:host ::ng-deep ovic-dropdown {
+    display: block;
+    width: 100%;
+}
+
+:host ::ng-deep ovic-dropdown .p-select {
+    width: 100%;
+    min-height: 38px;
+    border-radius: 8px;
+    border-color: #cbd5e1;
+}
+
+:host ::ng-deep .group-radio-v2 {
+    width: 100%;
+}
+
+:host ::ng-deep .group-radio-v2 .radio-item-v2 {
+    border-radius: 8px;
+    transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+:host ::ng-deep .group-radio-v2 .radio-item-item-v2 {
+    min-height: 38px;
+    padding: 8px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+:host ::ng-deep .group-radio-v2 .radio-item-item-v2:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+:host ::ng-deep .group-radio-v2 .radio-item-item-v2:focus-within {
+    outline: 2px solid rgba(37, 99, 235, 0.25);
+    outline-offset: 2px;
+}
+
+:host ::ng-deep .ovic-editor-wrapper,
+:host ::ng-deep .ovic-editor-wrapper .p-editor,
+:host ::ng-deep .ovic-editor-wrapper .p-editor-container,
+:host ::ng-deep .ovic-editor-wrapper .ql-container,
+:host ::ng-deep .ovic-editor-wrapper .ql-editor {
+    background: #ffffff;
+}
+
+:host ::ng-deep .ovic-editor-wrapper {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+:host ::ng-deep .mh-choice-card .radio-item-item-v2,
+:host ::ng-deep .mh-choice-card .radio-item-v2 {
+    background: #ffffff;
+}
+
+:host ::ng-deep .mh-document-card .files-list-view .single-file {
+    min-width: 0;
+}
+
+:host ::ng-deep .mh-document-card .files-list-view .single-file .info {
+    min-width: 0;
+}
+
+:host ::ng-deep .mh-document-card .files-list-view .single-file .name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ==========================================================================
+   Responsive Adaptations
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .mh-time-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .mh-assessment-grid,
+    .mh-documents-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .mh-page {
+        padding: 16px 12px 32px;
+    }
+
+    .mh-grid-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .mh-field--title {
+        grid-column: 1 / -1;
+    }
+
+    .mh-section__header {
+        padding: 14px 16px;
+        flex-wrap: wrap;
+    }
+
+    .mh-section__body {
+        padding: 16px;
+    }
+
+    .mh-time-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .mh-action-card {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .mh-save-button--large {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 640px) {
+    :host ::ng-deep .group-radio-v2 .radio-item-v2[class*='hoziron-radio-'] {
+        display: block;
+        width: 100% !important;
+        padding-right: 0 !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .mh-grid-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .mh-field--title {
+        grid-column: 1 / -1;
+    }
+
+    .mh-time-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .mh-section__required {
+        width: 100%;
+        text-align: center;
+    }
+
+    .mh-action-card {
+        padding: 14px;
+    }
+
+    .mh-action-card__content {
+        align-items: flex-start;
+    }
+
+    :host ::ng-deep .mh-document-card .row > [class*='col-'] {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 8px;
+    }
+
+    :host ::ng-deep .mh-document-card .ql-toolbar {
+        padding: 5px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mh-save-button,
+    .mh-time-field,
+    :host ::ng-deep .group-radio-v2 .radio-item-v2 {
+        transition: none;
+    }
+
+    .mh-save-button:hover {
+        transform: none;
+    }
 }

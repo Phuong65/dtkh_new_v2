@@ -1,205 +1,372 @@
-<div class="layout_component_container">
-    <div class="document-type-a4-vertical" style="position: relative;">
-        <button ngbTooltip="Lưu lại" placement="top" container="body"
-            style="position: sticky; top: 20px; margin-top: -65px; margin-left: 1048px; z-index: 10;"
-            class="btn btn-primary btn-icon" (click)="saveCourse()">
-            <i class="fa fa-floppy-o"></i>
-        </button>
-        <div class="ovic-vertical__inputs" style="line-height: 1.5;">
-            <form [formGroup]="formKhoaHoc" class="formKhoaHoc">
-                <div class="row form-row form-row-flex-row">
-                    <div class="col-12 flex-div" [ngClass]="{ 'field-err' : !slugIsValid }">
-                        <label for="title">Tên học phần:<span class="ovic-mark">*</span></label>
-                        <input
-                            [attr.disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa || routerLanhdaobomon? null : true"
-                            type="text" id="title" class="ovic-input-field" formControlName="title" autocomplete="off">
+<main class="layout_component_container mh-page">
+    <div class="mh-container">
+        <form [formGroup]="formKhoaHoc" class="formKhoaHoc mh-form" novalidate>
+            <section class="mh-section mh-section--overview" aria-labelledby="mh-general-title">
+                <div class="mh-section__header">
+                    <span class="mh-section__icon fa fa-info-circle" aria-hidden="true"></span>
+                    <div class="mh-section__heading">
+                        <span class="mh-section__eyebrow">Thông tin học phần</span>
+                        <p>
+                            @if (f['maso'].value) {
+                            Mã: <strong>{{ f['maso'].value }}</strong> &bull;
+                            }
+                            Số tín chỉ: <strong>{{ f['sotinchi'].value || 0 }}</strong>
+                            @if (f['sotinchi_th'].value) {
+                            (Thực hành: {{ f['sotinchi_th'].value }})
+                            }
+                        </p>
                     </div>
                 </div>
 
-                <div class="row form-row form-row-flex-row">
-                    <div class="col-4 flex-div">
-                        <label for="maso">Mã học phần:<span class="ovic-mark">*</span></label>
-                        <input
-                            [attr.disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa || routerLanhdaobomon? null: true"
-                            type="text" id="maso" formControlName="maso" class="ovic-input-field">
-                    </div>
-                    <div class="col-4 flex-div">
-                        <label for="sotinchi">Số tín chỉ:<span class="ovic-mark">*</span></label>
-                        <input
-                            [attr.disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa || routerLanhdaobomon? null : true"
-                            type="number" id="sotinchi" formControlName="sotinchi" class="ovic-input-field">
-                    </div>
-                    <div class="col-4 flex-div">
-                        <label for="sotinchi_th">Số tín chỉ thực hành:<span class="ovic-mark">*</span></label>
-                        <input
-                            [attr.disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa || routerLanhdaobomon? null: true"
-                            type="number" id="sotinchi_th" formControlName="sotinchi_th" class="ovic-input-field">
-                    </div>
-                </div>
-                <div class="row form-row form-row-flex-row">
-                    <div class="col-4 flex-div">
-                        <label for="keywords">Khoa quản lý:<span class="ovic-mark">*</span></label>
-                        <ovic-dropdown [disabled]="routerDaotao || routerAdmin ? false : true"
-                            placeholder="---chọn khoa---" [options]="list_donvi_chuyenmon"
-                            [defaultValue]="f['category_ids'].value" optionId="id" optionLabel="title"
-                            [formField]="f['category_ids']" [filter]="true" filterBy="title"></ovic-dropdown>
-                    </div>
-                    <div class="col-4 flex-div">
-                        <label for="keywords">Bộ môn:<span class="ovic-mark"></span></label>
-                        <ovic-dropdown [disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa? false : true"
-                            placeholder="---chọn bộ môn---"
-                            [options]="list_nganh_bomon | filter:  f['category_ids'].value : ['donvi_chuyenmon_id'] "
-                            [defaultValue]="f['nganh_bomon_id'].value" optionId="id" optionLabel="title"
-                            [formField]="f['nganh_bomon_id']" [filter]="true" filterBy="title"></ovic-dropdown>
-                    </div>
+                <div class="mh-section__body">
+                    <div class="mh-grid-3">
+                        <div class="mh-field mh-field--title" [ngClass]="{ 'field-err': !slugIsValid }">
+                            <label for="title">
+                                <i class="fa fa-bookmark-o" aria-hidden="true"></i>
+                                Tên học phần<span class="ovic-mark">*</span>
+                            </label>
+                            <input
+                                [attr.disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa || routerLanhdaobomon ? null : true"
+                                type="text" id="title" class="ovic-input-field" formControlName="title"
+                                autocomplete="off" placeholder="Nhập tên học phần">
+                        </div>
 
-                    <div class="col-4 flex-div">
-                        <label>Định dạng bài kiểm tra trắc nghiệm:<span class="ovic-mark">*</span></label>
-                        <ovic-dropdown placeholder="-------" [options]="DINHDANG_BAITRACNGHIEM"
-                            [defaultValue]="f['av'].value" optionId="key" optionLabel="label"
-                            [formField]="f['av']"></ovic-dropdown>
-                    </div>
+                        <div class="mh-field">
+                            <label for="maso">
+                                <i class="fa fa-barcode" aria-hidden="true"></i>
+                                Mã học phần<span class="ovic-mark">*</span>
+                            </label>
+                            <input
+                                [attr.disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa || routerLanhdaobomon ? null : true"
+                                type="text" id="maso" formControlName="maso" class="ovic-input-field"
+                                autocomplete="off" placeholder="Ví dụ: MH101">
+                        </div>
 
-                </div>
-                <div class="row form-row form-row-flex-row" style="margin-top: 25px;">
-                    <div class="col-12 flex-div">
-                        <label style="position: relative;">
-                            Phân bổ thời gian (tiết)
-                            <hr
-                                style="position: absolute; width: calc(100% - 150px); margin: 0px; top: 9px; left: 150px;border-top: 1px dashed rgba(0, 0, 0, .1);">
-                        </label>
+                        <div class="mh-field">
+                            <label for="sotinchi">
+                                <i class="fa fa-certificate" aria-hidden="true"></i>
+                                Số tín chỉ<span class="ovic-mark">*</span>
+                            </label>
+                            <input
+                                [attr.disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa || routerLanhdaobomon ? null : true"
+                                type="number" id="sotinchi" formControlName="sotinchi" class="ovic-input-field"
+                                inputmode="numeric">
+                        </div>
+
+                        <div class="mh-field">
+                            <label for="sotinchi_th">
+                                <i class="fa fa-flask" aria-hidden="true"></i>
+                                Số tín chỉ thực hành<span class="ovic-mark">*</span>
+                            </label>
+                            <input
+                                [attr.disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa || routerLanhdaobomon ? null : true"
+                                type="number" id="sotinchi_th" formControlName="sotinchi_th" class="ovic-input-field"
+                                inputmode="numeric">
+                        </div>
+
+                        <div class="mh-field" role="group" aria-labelledby="category-ids-label">
+                            <label id="category-ids-label">
+                                <i class="fa fa-university" aria-hidden="true"></i>
+                                Khoa quản lý<span class="ovic-mark">*</span>
+                            </label>
+                            <ovic-dropdown [disabled]="routerDaotao || routerAdmin ? false : true"
+                                placeholder="Chọn khoa quản lý" [options]="list_donvi_chuyenmon"
+                                [defaultValue]="f['category_ids'].value" optionId="id" optionLabel="title"
+                                [formField]="f['category_ids']" [filter]="true" filterBy="title">
+                            </ovic-dropdown>
+                        </div>
+
+                        <div class="mh-field" role="group" aria-labelledby="department-label">
+                            <label id="department-label">
+                                <i class="fa fa-sitemap" aria-hidden="true"></i>
+                                Bộ môn
+                            </label>
+                            <ovic-dropdown [disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa ? false : true"
+                                placeholder="Chọn bộ môn"
+                                [options]="list_nganh_bomon | filter: f['category_ids'].value : ['donvi_chuyenmon_id']"
+                                [defaultValue]="f['nganh_bomon_id'].value" optionId="id" optionLabel="title"
+                                [formField]="f['nganh_bomon_id']" [filter]="true" filterBy="title">
+                            </ovic-dropdown>
+                        </div>
+
+                        <div class="mh-field" role="group" aria-labelledby="exam-format-label">
+                            <label id="exam-format-label">
+                                <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                Định dạng bài kiểm tra trắc nghiệm
+                            </label>
+                            <ovic-dropdown placeholder="Chọn định dạng" [options]="DINHDANG_BAITRACNGHIEM"
+                                [defaultValue]="f['av'].value" optionId="key" optionLabel="label"
+                                [formField]="f['av']">
+                            </ovic-dropdown>
+                        </div>
                     </div>
                 </div>
-                <div class="row form-row form-row-flex-row" style="margin-top: 15px;">
-                    <div class="col-4 flex-div">
-                        <label>Tổng số:</label>
-                        <input type="text" formControlName="tongsogio" class="ovic-input-field">
-                    </div>
-                    <div class="col-4 flex-div">
-                        <label>Lý thuyết:</label>
-                        <input type="number" formControlName="lythuyet" class="ovic-input-field">
-                    </div>
-                    <div class="col-4 flex-div">
-                        <label>Thảo luận/bài tập:</label>
-                        <input type="number" formControlName="thaoluan_baitap" class="ovic-input-field">
+            </section>
+
+            <section class="mh-section mh-section--time" aria-labelledby="mh-time-title">
+                <div class="mh-section__header">
+                    <span class="mh-section__icon mh-section__icon--teal fa fa-clock-o" aria-hidden="true"></span>
+                    <div class="mh-section__heading">
+                        <span class="mh-section__eyebrow">Khối lượng học tập</span>
+                        <p>Nhập số tiết cho từng hình thức tổ chức giảng dạy và tự học.</p>
                     </div>
                 </div>
-                <div class="row form-row form-row-flex-row">
-                    <div class="col-4 flex-div">
-                        <label>Thực hành/thí nghiệm:</label>
-                        <input type="text" formControlName="th_thinghiem" class="ovic-input-field">
-                    </div>
-                    <div class="col-4 flex-div">
-                        <label>Kiểm tra định kỳ:</label>
-                        <input type="number" formControlName="kiemtra_dinhky" class="ovic-input-field">
-                    </div>
-                    <div class="col-4 flex-div">
-                        <label>Tự học:</label>
-                        <input type="number" formControlName="tuhoc" class="ovic-input-field">
+
+                <div class="mh-section__body">
+                    <div class="mh-time-grid">
+                        <div class="mh-time-field">
+                            <label for="tongsogio">
+                                <span class="mh-time-field__icon fa fa-calendar" aria-hidden="true"></span>
+                                <span>Tổng số tiết</span>
+                            </label>
+                            <input type="text" id="tongsogio" formControlName="tongsogio" class="ovic-input-field"
+                                inputmode="numeric" aria-describedby="tongsogio-hint">
+                        </div>
+
+                        <div class="mh-time-field">
+                            <label for="lythuyet">
+                                <span class="mh-time-field__icon fa fa-graduation-cap" aria-hidden="true"></span>
+                                <span>Lý thuyết</span>
+                            </label>
+                            <input type="number" id="lythuyet" formControlName="lythuyet" class="ovic-input-field"
+                                inputmode="numeric">
+                        </div>
+
+                        <div class="mh-time-field">
+                            <label for="thaoluan_baitap">
+                                <span class="mh-time-field__icon fa fa-comments-o" aria-hidden="true"></span>
+                                <span>Thảo luận / bài tập</span>
+                            </label>
+                            <input type="number" id="thaoluan_baitap" formControlName="thaoluan_baitap"
+                                class="ovic-input-field" inputmode="numeric">
+                        </div>
+
+                        <div class="mh-time-field">
+                            <label for="th_thinghiem">
+                                <span class="mh-time-field__icon fa fa-flask" aria-hidden="true"></span>
+                                <span>Thực hành / thí nghiệm</span>
+                            </label>
+                            <input type="text" id="th_thinghiem" formControlName="th_thinghiem"
+                                class="ovic-input-field" inputmode="numeric">
+                        </div>
+
+                        <div class="mh-time-field">
+                            <label for="kiemtra_dinhky">
+                                <span class="mh-time-field__icon fa fa-check-square-o" aria-hidden="true"></span>
+                                <span>Kiểm tra định kỳ</span>
+                            </label>
+                            <input type="number" id="kiemtra_dinhky" formControlName="kiemtra_dinhky"
+                                class="ovic-input-field" inputmode="numeric">
+                        </div>
+
+                        <div class="mh-time-field">
+                            <label for="tuhoc">
+                                <span class="mh-time-field__icon fa fa-home" aria-hidden="true"></span>
+                                <span>Tự học</span>
+                            </label>
+                            <input type="number" id="tuhoc" formControlName="tuhoc" class="ovic-input-field"
+                                inputmode="numeric">
+                        </div>
                     </div>
                 </div>
-                <hr style="border-top: 1px dashed rgba(0, 0, 0, .1);margin-left: 5px; margin-right: 5px;">
-                <div class="row form-row form-row-flex-row">
-                    <div class="col-12 flex-div">
-                        <label for="keywords">Hình thức thi KTHP:<span class="ovic-mark">*</span></label>
+            </section>
+
+            <section class="mh-section mh-section--assessment" aria-labelledby="mh-assessment-title">
+                <div class="mh-section__header">
+                    <span class="mh-section__icon mh-section__icon--violet fa fa-check-square-o" aria-hidden="true"></span>
+                    <div class="mh-section__heading">
+                        <span class="mh-section__eyebrow">Kiểm tra & năng lực</span>
+                        <p>Xác định hình thức đánh giá kết thúc học phần và mức độ yêu cầu CĐR.</p>
+                    </div>
+                </div>
+
+                <div class="mh-section__body mh-assessment-grid">
+                    <div class="mh-choice-card" role="group" aria-labelledby="exam-type-label">
+                        <div class="mh-choice-card__heading">
+                            <span class="mh-choice-card__number">01</span>
+                            <div>
+                                <h3 id="exam-type-label">Hình thức thi KTHP<span class="ovic-mark">*</span></h3>
+                                <p>Chọn phương thức đánh giá cuối học phần.</p>
+                            </div>
+                        </div>
                         <ovic-groups-radio-v2 (onChange)="onChangeExam($event)" [formField]="f['exam_type']"
                             group_name="EXAMFORMAT" [columns]="3" [verticalMode]="false" [options]="EXAMFORMAT"
                             optionLabel="label" optionId="id"
-                            [defaultValue]="f['exam_type'].value ? f['exam_type'].value:null">
+                            [defaultValue]="f['exam_type'].value ? f['exam_type'].value : null">
                         </ovic-groups-radio-v2>
                     </div>
-                </div>
-                <div class="row form-row form-row-flex-row">
-                    <div class="col-12 flex-div">
-                        <label>Mức độ yêu cầu CDR:<span class="ovic-mark">*</span></label>
+
+                    <div class="mh-choice-card mh-choice-card--outcomes" role="group" aria-labelledby="cdr-label">
+                        <div class="mh-choice-card__heading">
+                            <span class="mh-choice-card__number">02</span>
+                            <div>
+                                <h3 id="cdr-label">Mức độ yêu cầu CĐR<span class="ovic-mark">*</span></h3>
+                                <p>Chọn cấp độ năng lực cần đạt của học phần.</p>
+                            </div>
+                        </div>
                         <ovic-groups-radio-v2 [disabled_item]="true" group_name="CHUAN_DAU_RA" optionLabel="label"
                             [columns]="3" [options]="chuandaura" [defaultValue]="f['cdr']['value']"
                             [formField]="f['cdr']" optionId="id">
                         </ovic-groups-radio-v2>
                     </div>
                 </div>
+            </section>
 
-                <div class="row form-row form-row-flex-row">
-                    <div class="col-12 flex-div">
-                        <label>Mô tả môn học:<span class="ovic-mark"></span></label>
-                        <ovic-editor height="auto" [formField]="f['desc']" [default]="f['desc'].value">
-                        </ovic-editor>
+            <ng-container [ngTemplateOutlet]="ctdtListTemplate"></ng-container>
+
+            <section class="mh-section mh-section--description" aria-labelledby="mh-description-title">
+                <div class="mh-section__header">
+                    <span class="mh-section__icon mh-section__icon--blue fa fa-file-text-o" aria-hidden="true"></span>
+                    <div class="mh-section__heading">
+                        <span class="mh-section__eyebrow">Đề cương học phần</span>
+                        <p>Cung cấp thông tin định hướng để sinh viên chuẩn bị và theo học hiệu quả.</p>
                     </div>
                 </div>
-                <div class="row form-row form-row-flex-row">
-                    <div class="col-12 flex-div">
-                        <label>Yêu cầu đối với sinh viên:<span class="ovic-mark"></span></label>
+
+                <div class="mh-section__body mh-editor-stack">
+                    <div class="mh-editor-card">
+                        <div class="mh-editor-card__heading">
+                            <span class="mh-editor-card__icon fa fa-align-left" aria-hidden="true"></span>
+                            <div>
+                                <h3>Mô tả môn học</h3>
+                                <p>Khái quát nội dung, quy định điểm và điều kiện dự thi.</p>
+                            </div>
+                        </div>
+                        <ovic-editor height="auto" [formField]="f['desc']" [default]="f['desc'].value"></ovic-editor>
+                    </div>
+
+                    <div class="mh-editor-card">
+                        <div class="mh-editor-card__heading">
+                            <span class="mh-editor-card__icon mh-editor-card__icon--teal fa fa-user" aria-hidden="true"></span>
+                            <div>
+                                <h3>Yêu cầu đối với sinh viên</h3>
+                                <p>Nêu kiến thức nền, thiết bị và các yêu cầu cần chuẩn bị.</p>
+                            </div>
+                        </div>
                         <ovic-editor height="auto" [formField]="f['yeucau_sinhvien']"
                             [default]="f['yeucau_sinhvien'].value">
                         </ovic-editor>
                     </div>
                 </div>
-                <ng-container [ngTemplateOutlet]="ctdtListTemplate">
-                </ng-container>
-                <div class="row form-row form-row-flex-row">
-                    <div class="col-12 flex-div">
-                        <label>Tài liệu chính:<span class="ovic-mark"></span></label>
+            </section>
+
+            <section class="mh-section mh-section--documents" aria-labelledby="mh-documents-title">
+                <div class="mh-section__header">
+                    <span class="mh-section__icon mh-section__icon--amber fa fa-folder-open-o" aria-hidden="true"></span>
+                    <div class="mh-section__heading">
+                        <span class="mh-section__eyebrow">Học liệu</span>
+                        <p>Đính kèm hoặc liên kết tới các nguồn học liệu phục vụ giảng dạy và học tập.</p>
+                    </div>
+                </div>
+
+                <div class="mh-section__body mh-documents-grid">
+                    <div class="mh-document-card">
+                        <div class="mh-document-card__heading">
+                            <span class="mh-document-card__icon fa fa-book" aria-hidden="true"></span>
+                            <div>
+                                <h3>Tài liệu chính</h3>
+                                <p>Giáo trình, bài giảng và nguồn học liệu cốt lõi.</p>
+                            </div>
+                        </div>
                         <form-document-file-and-link [formField]="f['tailieu_chinh']"
                             [docDefault]="f['tailieu_chinh'].value">
                         </form-document-file-and-link>
-                        <!-- <open-file-manager-v2 [filesDefault]="f['files'].value"
-                            [formField]="f['files']"></open-file-manager-v2> -->
                     </div>
-                </div>
-                <div class="row form-row form-row-flex-row">
-                    <div class="col-12 flex-div">
-                        <label>Tài liệu tham khảo:<span class="ovic-mark"></span></label>
-                        <form-document-file-and-link [formField]="f['tailieu_thamkhao']"
-                            [docDefault]="f['tailieu_thamkhao'].value">
-                        </form-document-file-and-link>
-                    </div>
-                </div>
-                <!-- <div class="row form-row form-row-flex-row">
-                    <div class="col-12 flex-div">
-                        <label>Tài liệu tham khảo:<span class="ovic-mark"></span></label>
-                        <form-document-file-and-link [formField]="f['tailieu_thamkhao']"
-                            [docDefault]="f['tailieu_thamkhao'].value">
-                        </form-document-file-and-link>
-                    </div>
-                </div> -->
-            </form>
-        </div>
-    </div>
-</div>
 
-<ng-template #ctdtListTemplate>
-    <div class="row form-row form-row-flex-row">
-        <div class="col-12 flex-div">
-            <label>Chọn Chương Trình Đào Tạo:<span class="ovic-mark"></span></label>
-            <p-multiSelect (onChange)="onChangeSelectCtdt()" [options]="group_ctdt" [(ngModel)]="selectedCtdtsId"
-                [ngModelOptions]="{standalone: true}" defaultLabel="------" scrollHeight="300px" display="chip">
-            </p-multiSelect>
-        </div>
+                    <div class="mh-document-card mh-document-card--reference">
+                        <div class="mh-document-card__heading">
+                            <span class="mh-document-card__icon fa fa-external-link" aria-hidden="true"></span>
+                            <div>
+                                <h3>Tài liệu tham khảo</h3>
+                                <p>Nguồn đọc thêm và học liệu mở rộng theo môn học.</p>
+                            </div>
+                        </div>
+                        <form-document-file-and-link [formField]="f['tailieu_thamkhao']"
+                            [docDefault]="f['tailieu_thamkhao'].value">
+                        </form-document-file-and-link>
+                    </div>
+                </div>
+            </section>
+
+            <div class="mh-action-card">
+                <div class="mh-action-card__content">
+                    <span class="mh-action-card__icon fa fa-check-circle-o" aria-hidden="true"></span>
+                    <div>
+                        <h3 class="mh-action-card__title">Hoàn tất chỉnh sửa học phần</h3>
+                        <p class="mh-action-card__desc">Kiểm tra thông tin và nhấn nút bên cạnh để lưu dữ liệu vào hệ thống.</p>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary mh-save-button mh-save-button--large" (click)="saveCourse()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    <span>Lưu lại toàn bộ thông tin</span>
+                </button>
+            </div>
+        </form>
+
+        <ng-template #ctdtListTemplate>
+            <section class="mh-section mh-section--programs" aria-labelledby="mh-programs-title">
+                <div class="mh-section__header">
+                    <span class="mh-section__icon mh-section__icon--indigo fa fa-sitemap" aria-hidden="true"></span>
+                    <div class="mh-section__heading">
+                        <span class="mh-section__eyebrow">Liên kết chương trình</span>
+                        
+                        <p>Gán học phần vào chương trình đào tạo và xác định khối kiến thức tương ứng.</p>
+                    </div>
+                </div>
+
+                <div class="mh-section__body">
+                    <div class="mh-field mh-field--program" role="group" aria-labelledby="ctdt-label">
+                        <label id="ctdt-label">
+                            <i class="fa fa-list-ul" aria-hidden="true"></i>
+                            Chọn chương trình đào tạo
+                        </label>
+                        <p class="mh-field__hint">Có thể chọn nhiều chương trình đào tạo cho cùng một học phần.</p>
+                        <p-multiSelect appendTo="body" ariaLabelledBy="ctdt-label"
+                            (onChange)="onChangeSelectCtdt()" [options]="group_ctdt"
+                            [(ngModel)]="selectedCtdtsId" [ngModelOptions]="{ standalone: true }"
+                            defaultLabel="Chọn chương trình đào tạo" scrollHeight="300px" display="chip">
+                        </p-multiSelect>
+                    </div>
+
+                    @if (selectCtdts && selectCtdts.length) {
+                    <div class="mh-table-wrapper" aria-label="Khối kiến thức theo chương trình đào tạo">
+                        <table class="mh-program-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="mh-program-table__index">TT</th>
+                                    <th scope="col">Chương trình đào tạo</th>
+                                    <th scope="col">Khối kiến thức</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (ctdt of selectCtdts; track ctdt; let i = $index) {
+                                <tr>
+                                    <td class="mh-program-table__index">{{ i + 1 }}</td>
+                                    <td>
+                                        <strong>{{ ctdt.label }}</strong>
+                                    </td>
+                                    <td>
+                                        <p-select appendTo="body" [showClear]="true" placeholder="Chọn khối kiến thức"
+                                            [options]="ctdt.items" [(ngModel)]="ctdt['select_item']"
+                                            [ngModelOptions]="{ standalone: true }">
+                                        </p-select>
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    } @else {
+                    <div class="mh-empty-programs">
+                        <span class="mh-empty-programs__icon fa fa-sitemap" aria-hidden="true"></span>
+                        <div>
+                            <strong>Chưa chọn chương trình đào tạo</strong>
+                            <p>Chọn ít nhất một chương trình ở phía trên để thiết lập khối kiến thức.</p>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </section>
+        </ng-template>
     </div>
-    @if (selectCtdts && selectCtdts.length) {
-<div class="row form-row form-row-flex-row">
-        <div class="col-12 flex-div table-reBorder">
-            <table>
-                <tr>
-                    <th style="text-align: center; width: 50px;">TT</th>
-                    <th style="width: 400px;">Chương trình đào tạo</th>
-                    <th>Khối kiến thức</th>
-                </tr>
-                @for (ctdt of selectCtdts; track ctdt; let i = $index) {
-<tr>
-                    <td style="text-align: center; width: 50px;">
-                        {{i + 1}}
-                    </td>
-                    <td style="text-align: left;">{{ctdt.label}}</td>
-                    <td style="text-align: left;">
-                        <p-select [showClear]="true" placeholder="------" [options]="ctdt.items"
-                            [(ngModel)]="ctdt['select_item']" [ngModelOptions]="{standalone: true}">
-                        </p-select>
-                    </td>
-                </tr>
-}
-            </table>
-        </div>
-    </div>
-}
-</ng-template>
+</main>
