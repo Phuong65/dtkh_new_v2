@@ -2,3 +2,15 @@
     background-color: #FFF;
     padding: 5px;
 }
+
+:host ::ng-deep .council-course-table .p-paginator {
+    padding: 7px 0 !important;
+    border: 1px solid #dee2e6;
+    border-top: 0;
+}
+
+:host ::ng-deep .council-course-table .p-paginator-rpp-dropdown {
+    width: auto;
+    min-width: 5rem;
+    flex: 0 0 auto;
+}

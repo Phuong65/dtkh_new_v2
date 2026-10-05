@@ -2,9 +2,7 @@
     <div class="document-type-a4-vertical">
         <div class="box-panel-setting">
             <p-panel header="{{isDttx?'Kiểm tra giữa kỳ':'Kiểm tra thường xuyên'}}">
-                @if (plan_kiemtra && plan_kiemtra.children) {
-<p-table [value]="plan_kiemtra.children"
-                    styleClass="list-test-table-border">
+                <p-table [value]="plan_kiemtra?.children ?? []" styleClass="list-test-table-border">
                     <ng-template pTemplate="header">
                         <tr>
                             <th style="width: 50px;text-align: center;">#</th>
@@ -28,22 +26,20 @@
                             </td>
                             <td style="width: 180px; text-align:center">
                                 @if (!test.id) {
-<span class="box-span cho-duyet-box">Chưa lưu</span>
-}
+                                <span class="box-span cho-duyet-box">Chưa lưu</span>
+                                }
                                 @if (test.id) {
-<span class="box-span dat-box">Đã lưu</span>
-}
+                                <span class="box-span dat-box">Đã lưu</span>
+                                }
                             </td>
                             <td style="width: 120px; text-align: center;">
                                 @if (checkDeletePlan(test.ordering) || test.ordering === 0 || test.ordering === 100) {
-<button
-                                   
-                                    (click)="deleteItemKynang(test,rowIndex)"
+                                <button (click)="deleteItemKynang(test,rowIndex)"
                                     [disabled]="((!test.id && test.ordering !== 0 && test.ordering !== 100 ) || isManager || canAdded) ? false: true"
                                     ngbTooltip="Xóa" placement="top" container="body" class="btn btn-danger btn-icon">
                                     <i class="fa fa-trash"></i>
                                 </button>
-}
+                                }
                             </td>
                         </tr>
                     </ng-template>
@@ -59,7 +55,6 @@
                         </div>
                     </ng-template>
                 </p-table>
-}
             </p-panel>
         </div>
         <div class="box-panel-setting">
@@ -71,13 +66,12 @@
                                 <div style="width: 100%;">
                                     <label>Tỉ lệ điểm thành phần khi tính điểm trung bình (%)</label>
                                     @for (item of course_config_object['PERCENT_SCORE_SUMMARY']; track item) {
-<div
-                                        class="item-child">
+                                    <div class="item-child">
                                         <span class="item-child-title">{{item['title']}}</span>
                                         <input (keydown)="pointQuestionKeyDown($event)" [(ngModel)]="item['value']"
                                             type="text" id="title" class="ovic-input-field text-align-center">
                                     </div>
-}
+                                    }
                                     <!-- <div class="item-child">
                                         <span class="item-child-title">Kiểm tra 15 phút</span>
                                         <input type="text" id="title" class="ovic-input-field text-align-center">
@@ -93,13 +87,12 @@
                                 <div style="width: 100%;">
                                     <label>Số lượng đề kiểm tra trắc nghiệm mỗi lần tạo đề</label>
                                     @for (item of course_config_object['NUMOF_TEST_CCTX']; track item) {
-<div
-                                        class="item-child">
+                                    <div class="item-child">
                                         <span class="item-child-title">{{item['title']}}</span>
                                         <input (keydown)="pointQuestionKeyDown($event)" [(ngModel)]="item['value']"
                                             type="text" id="title" class="ovic-input-field text-align-center">
                                     </div>
-}
+                                    }
                                 </div>
                             </div>
 
@@ -107,18 +100,17 @@
                                 <div style="width: 100%;">
                                     <label>Luyện tập tại nhà</label>
                                     @for (item of course_config_object['PRACTICE_TIME_FOR_A_TEST']; track item) {
-<div
-                                        style="margin-top: 15px;">
+                                    <div style="margin-top: 15px;">
                                         @if (item['key'] !== 'EXCEPT') {
-<div class="item-child">
+                                        <div class="item-child">
                                             <span class="item-child-title">{{item['title']}}</span>
                                             <input (keyup)="onChangeValueInput(item)"
                                                 (keydown)="pointQuestionKeyDown($event)" [(ngModel)]="item['value']"
                                                 type="text" id="title" class="ovic-input-field text-align-center">
                                         </div>
-}
+                                        }
                                         @if (item['key'] === 'EXCEPT') {
-<div class=" box-time-for-weeks">
+                                        <div class=" box-time-for-weeks">
                                             <div class="item-child" style="justify-content: flex-start;">
                                                 <span style="font-weight: 600;">
                                                     {{item['title']}}:
@@ -127,7 +119,7 @@
                                             <div class="row"
                                                 style="margin: 0px; width:100%; padding: 0px; border:0px;justify-content: unset;">
                                                 @for (plan of list_plan; track plan) {
-<div style="margin-top: 10px; height: -webkit-fill-available; "
+                                                <div style="margin-top: 10px; height: -webkit-fill-available; "
                                                     class="col-4 flex">
                                                     <span class="span-box-input no-border-right width-60px">
                                                         Bài {{plan.week}}
@@ -136,25 +128,24 @@
                                                         [(ngModel)]="item['params'][plan.week]" type="text" id="title"
                                                         class="ovic-input-field input-group-span text-align-center">
                                                 </div>
-}
+                                                }
                                             </div>
                                         </div>
-}
+                                        }
                                     </div>
-}
+                                    }
                                 </div>
                             </div>
                             <div class="row">
                                 <div style="width: 100%;">
                                     <label>Điểm danh</label>
                                     @for (item of course_config_object['PERCENT_OF_LEAVE_ALLOWED']; track item) {
-<div
-                                        class="item-child">
+                                    <div class="item-child">
                                         <span class="item-child-title">{{item['title']}}</span>
                                         <input (keydown)="pointQuestionKeyDown($event)" [(ngModel)]="item['value']"
                                             type="text" id="title" class="ovic-input-field text-align-center">
                                     </div>
-}
+                                    }
                                 </div>
                             </div>
                             <div class="actions">

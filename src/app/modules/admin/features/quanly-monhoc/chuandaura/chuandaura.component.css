@@ -812,3 +812,351 @@
         transform: none;
     }
 }
+
+.chuandaura-layout {
+    padding: 0;
+    color: inherit;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.cdr-page-header,
+.cdr-guidance,
+.cdr-create-workspace {
+    border: 0;
+    border-radius: 0;
+    background: var(--indigo-500);
+    box-shadow: none;
+}
+
+.cdr-page-header {
+    align-items: center;
+    flex-direction: column;
+    gap: 0;
+    margin: 0;
+    padding: 15px 15px 0;
+    text-align: center;
+}
+
+.cdr-page-header::before,
+.cdr-page-header__icon,
+.cdr-page-header__eyebrow,
+.cdr-page-header__hint,
+.cdr-guidance__icon,
+.cdr-guidance__title,
+.cdr-form-heading,
+.cdr-form-section__header,
+.cdr-list-overview,
+.cdr-empty-state {
+    display: none;
+}
+
+.cdr-page-header__main {
+    justify-content: center;
+    gap: 0;
+}
+
+.cdr-page-header__identity {
+    text-align: center;
+}
+
+.cdr-page-header__title {
+    margin: 0;
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.cdr-page-header .cdr-add-button {
+    width: auto;
+    min-height: 0;
+    margin-top: 10px;
+    padding: 6px 12px !important;
+    border-color: #28a745;
+    border-radius: 4px;
+    background: #28a745;
+    box-shadow: none;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.cdr-page-header .cdr-add-button:hover {
+    border-color: #218838;
+    background: #218838;
+    box-shadow: none;
+    transform: none;
+}
+
+.cdr-guidance {
+    justify-content: center;
+    margin: 0;
+    padding: 10px 15px 15px;
+    color: #ffffff;
+    text-align: center;
+}
+
+.cdr-guidance__text {
+    color: #ffffff;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.cdr-create-workspace,
+.cdr-create-workspace--open {
+    overflow: visible;
+    margin: 0 0 5px;
+    background: var(--indigo-500);
+    box-shadow: none;
+}
+
+::ng-deep .chuandaura-layout .cdr-form-panel.ui-panel,
+::ng-deep .chuandaura-layout .cdr-form-panel.p-panel {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+::ng-deep .chuandaura-layout .cdr-form-panel .ui-panel-content,
+::ng-deep .chuandaura-layout .cdr-form-panel .p-panel-content {
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent;
+}
+
+.cdr-form-shell {
+    padding: 15px 5px;
+    margin-top: 15px;
+}
+
+.cdr-form,
+.cdr-edit-workspace {
+    display: block;
+    padding: 0;
+    background: transparent;
+}
+
+.cdr-form-section {
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.cdr-form-section__body {
+    padding: 0;
+}
+
+.cdr-form-grid {
+    display: grid;
+    gap: 10px 0;
+}
+
+.cdr-form-grid--identity,
+.cdr-form-grid--teaching {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+}
+
+.cdr-form-field {
+    padding: 0 7.5px;
+    gap: 5px;
+}
+
+.cdr-form-field > label {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.cdr-form-field .ovic-input-field {
+    min-height: 34px;
+}
+
+.cdr-form-field .ovic-input-field::placeholder {
+    color: transparent;
+}
+
+.cdr-code-prefix {
+    min-width: 60px;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    font-weight: 400;
+}
+
+::ng-deep .chuandaura-layout .cdr-content-editor .layout-list-editor-value {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+.cdr-form-footer,
+.cdr-edit-actions {
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 5px 5px 5px 0;
+}
+
+.cdr-form-footer {
+    justify-content: space-between;
+}
+
+.cdr-form-actions {
+    flex-direction: row-reverse;
+}
+
+.cdr-secondary-button,
+.cdr-save-button,
+.cdr-review-button {
+    min-height: 0;
+    padding: 6px 12px !important;
+    border-radius: 4px;
+    box-shadow: none;
+    font-size: 14px;
+    font-weight: 400;
+    transform: none;
+}
+
+.cdr-save-button {
+    border-color: #007bff;
+    background: #007bff;
+}
+
+.cdr-save-button:hover {
+    border-color: #0069d9;
+    background: #0069d9;
+    box-shadow: none;
+    transform: none;
+}
+
+.cdr-secondary-button {
+    border-color: #6c757d;
+    color: #ffffff;
+    background: #6c757d;
+}
+
+.cdr-list {
+    gap: 20px;
+}
+
+::ng-deep .chuandaura-layout .cdr-card-panel.ui-panel,
+::ng-deep .chuandaura-layout .cdr-card-panel.p-panel {
+    overflow: visible;
+    border: 1px solid #c8c8c8;
+    border-radius: 3px;
+    box-shadow: none;
+}
+
+::ng-deep .chuandaura-layout .cdr-card-panel > .ui-panel-titlebar,
+::ng-deep .chuandaura-layout .cdr-card-panel > .p-panel-header {
+    padding: 0.5em 1em !important;
+    border: 0;
+    background: transparent;
+}
+
+.cdr-card-heading__icon {
+    display: none;
+}
+
+.cdr-card-heading__title {
+    color: inherit;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.cdr-info-tag {
+    gap: 0;
+    margin-top: 10px;
+}
+
+.cdr-info-tag .value-info {
+    padding: 5px 8px;
+    margin-right: 5px;
+    border-radius: 6px;
+    color: inherit;
+    background: transparent;
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+.cdr-card-toolbar .box-span {
+    margin: 0 0 0 5px;
+}
+
+.box-span {
+    font-size: inherit;
+}
+
+.add-chuandaura-box.cdr-card-body {
+    width: 100%;
+    margin: 0 auto;
+    padding: 0;
+    background: #ffffff;
+}
+
+.cdr-card-body.activity {
+    box-shadow: none;
+}
+
+.cdr-read-content {
+    padding: 0;
+    border-top: 0;
+    background: transparent;
+}
+
+.cdr-read-content__title {
+    margin-bottom: 1em;
+    color: inherit;
+}
+
+.cdr-read-content__title .fa {
+    display: none;
+}
+
+.cdr-read-content__description {
+    line-height: 1.25;
+}
+
+.cdr-outcome-list {
+    color: inherit;
+}
+
+@media (max-width: 767px) {
+    .chuandaura-layout {
+        padding: 0;
+    }
+
+    .cdr-page-header {
+        align-items: center;
+        padding: 15px 15px 0;
+    }
+
+    .cdr-page-header .cdr-add-button {
+        width: auto;
+    }
+
+    .cdr-form-grid--identity,
+    .cdr-form-grid--teaching {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .cdr-form-field--full {
+        grid-column: auto;
+    }
+
+    .cdr-form-actions,
+    .cdr-edit-actions__main {
+        width: auto;
+        flex-direction: row-reverse;
+    }
+
+    .cdr-form-actions .btn,
+    .cdr-edit-actions .btn,
+    .cdr-edit-actions__main .btn {
+        width: auto;
+    }
+}

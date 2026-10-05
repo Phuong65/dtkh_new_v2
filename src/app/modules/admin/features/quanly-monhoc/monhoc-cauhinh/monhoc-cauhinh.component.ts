@@ -306,6 +306,7 @@ export class MonhocCauhinhComponent implements OnInit {
             },
             error: () => {
                 this.notificationService.isProcessing(false);
+                this.notificationService.toastError('Không tải được danh sách kiểm tra, vui lòng thử lại');
             }
         })
     }

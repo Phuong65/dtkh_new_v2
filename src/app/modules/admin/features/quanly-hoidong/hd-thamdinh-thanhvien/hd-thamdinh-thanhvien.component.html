@@ -1,6 +1,8 @@
 <div class="layout_component_container">
     <div class="document-type-a4-vertical">
-        <p-table #dt1 styleClass="table-reBorder" [(selection)]="selectedlist" [value]="list_thanhvien" dataKey="id"
+        <p-table #dt1
+            styleClass="member-table table-reBorder table-scroll-able table-able-dropdown-p-table table-has-caption table-has-paginator"
+            [(selection)]="selectedlist" [value]="list_thanhvien" dataKey="id"
             [paginator]="true" [rows]="20" [rowsPerPageOptions]="[20,50,100]"
             [globalFilterFields]="['display_name','email']">
             <ng-template pTemplate="caption">
@@ -29,7 +31,7 @@
                         <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
                     </th>
                     <th style="width: 80px; text-align: center;">TT</th>
-                    <th style="text-align: left;">Họ và tên</th>
+                    <th style="text-align: center;">Họ và tên</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
@@ -39,8 +41,8 @@
                     </td>
                     <td style="width: 80px; text-align: center;">{{rowIndex + 1}}</td>
                     <td>
-                        <div style="display: flex; align-items: center;">
-                            <div style="flex:1">
+                        <div style="display: flex;">
+                            <div style="flex:1; text-align: left;">
                                 <div>
                                     <strong>{{row['display_name']}}</strong>
                                 </div>
@@ -63,7 +65,7 @@
 </div>
 
 <ng-template #templatePmsGiangvien let-c="close" let-d="dismiss">
-    <div class="ovic-over-right-section right-slide-class">
+    <div class="ovic-over-right-section right-slide-class template-pms-giangvien-list">
         <div class="ovic-over-right-section__head">
             <h3 class="ovic-over-right-section__header">Danh sách giảng viên</h3>
             <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
@@ -84,7 +86,7 @@
                             <mat-list-option [(selected)]="user['check']" [value]="user">
                                 <div mat-line style="display: flex; align-items: center;">
                                     <div mat-line style="flex: 1;">
-                                        <div mat-line><strong>{{user.display_name}}</strong></div>
+                                        <div mat-line style="font-size: 14px; font-weight: 500;">{{user.display_name}}</div>
                                         <div mat-line style="font-size: 12px;">{{user.email}} </div>
                                     </div>
                                 </div>
