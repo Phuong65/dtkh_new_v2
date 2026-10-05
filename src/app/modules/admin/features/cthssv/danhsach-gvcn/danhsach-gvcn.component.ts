@@ -21,7 +21,7 @@ import {
     OvicSelectClassmanagementComponent
 } from "@modules/admin/features/cthssv/danhsach-gvcn/ovic-select-classmanagement/ovic-select-classmanagement.component";
 import {SplitterModule} from "primeng/splitter";
-import {CalendarModule} from "primeng/calendar";
+import {DatePickerModule} from "primeng/datepicker";
 import {NgbTooltipModule} from "@ng-bootstrap/ng-bootstrap";
 import {HelperService} from "@core/services/helper.service";
 import {TableModule} from "primeng/table";
@@ -34,7 +34,7 @@ import {ElngUserProfile} from "@shared/models/elng-user-profile";
 @Component({
     selector: 'app-danhsach-gvcn',
     standalone: true,
-    imports: [CommonModule, PaginatorModule, ButtonModule, RippleModule, RadioButtonModule, ReactiveFormsModule, SharedModule, OvicSelectClassmanagementComponent, SplitterModule, CalendarModule, NgbTooltipModule, TableModule, TooltipModule, MatMenuModule],
+    imports: [CommonModule, PaginatorModule, ButtonModule, RippleModule, RadioButtonModule, ReactiveFormsModule, SharedModule, OvicSelectClassmanagementComponent, SplitterModule, DatePickerModule, NgbTooltipModule, TableModule, TooltipModule, MatMenuModule],
     templateUrl: './danhsach-gvcn.component.html',
     styleUrls: ['./danhsach-gvcn.component.css']
 })

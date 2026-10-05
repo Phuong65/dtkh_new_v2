@@ -1,7 +1,9 @@
 import { Component, OnInit, ViewChild, Input, Output, EventEmitter, SimpleChanges, OnChanges } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
-@Component( {standalone: true, 
+import { DatePickerModule } from 'primeng/datepicker';
+@Component( {standalone: true,
     selector: 'ovic-date-picker',
+    imports: [DatePickerModule],
     templateUrl: './ovic-date-picker.component.html',
     styleUrls: [ './ovic-date-picker.component.css' ]
 } )

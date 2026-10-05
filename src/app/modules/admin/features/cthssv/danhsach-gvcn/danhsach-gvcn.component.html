@@ -152,10 +152,10 @@
                                         <div class="col-4">
                                             <div class="form-row">
                                                 <label>Thời gian bắt đầu <span class="ovic-mark">*</span> </label>
-                                                <p-calendar appendTo="body" formControlName="date_start"
-                                                            [maxDate]="f['date_end'].value"
-                                                            dateFormat="dd/mm/yy" [showIcon]="true" [showTime]="false"
-                                                            placeholder="Chọn ngày ...."></p-calendar>
+                                                <p-datepicker appendTo="body" formControlName="date_start"
+                                                             [maxDate]="f['date_end'].value"
+                                                             dateFormat="dd/mm/yy" [showIcon]="true" [showTime]="false"
+                                                             placeholder="Chọn ngày ...."></p-datepicker>
 
 
                                             </div>
@@ -163,10 +163,10 @@
                                         <div class="col-4">
                                             <div class="form-row">
                                                 <label>Thời gian kết thúc</label>
-                                                <p-calendar appendTo="body" formControlName="date_end"
-                                                            [minDate]="f['date_start'].value"
-                                                            dateFormat="dd/mm/yy" [showIcon]="true" [showTime]="false"
-                                                            placeholder="Chọn ngày ...."></p-calendar>
+                                                <p-datepicker appendTo="body" formControlName="date_end"
+                                                             [minDate]="f['date_start'].value"
+                                                             dateFormat="dd/mm/yy" [showIcon]="true" [showTime]="false"
+                                                             placeholder="Chọn ngày ...."></p-datepicker>
                                             </div>
                                         </div>
 

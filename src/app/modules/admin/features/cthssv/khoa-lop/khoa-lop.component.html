@@ -170,10 +170,10 @@
                                         <div>
                                             <p-radioButton formControlName="taotudong"
                                                            [inputId]="item.value.toString()"
-                                                           [label]="item.title"
                                                            [value]="item.value"
                                                            (onClick)="btnChangeRadioInput($event)"
                                             ></p-radioButton>
+                                            <label [for]="item.value.toString()" class="mb-0 ml-2">{{ item.title }}</label>
                                         </div>
                                     }
                                 </div>
