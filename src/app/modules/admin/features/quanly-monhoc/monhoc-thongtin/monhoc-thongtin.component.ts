@@ -132,6 +132,13 @@ export class MonhocThongtinComponent implements OnInit {
 
     activeDescTab: 'desc' | 'yeucau' = 'desc';
 
+    activeSection = 'sec-info';
+
+    scrollToSection(sectionId: string) {
+        this.activeSection = sectionId;
+        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     /** Inserted by Angular inject() migration for backwards compatibility */
     constructor(...args: unknown[]);
 

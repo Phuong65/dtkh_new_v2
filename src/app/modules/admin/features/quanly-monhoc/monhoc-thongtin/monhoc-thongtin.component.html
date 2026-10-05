@@ -1,77 +1,141 @@
 <main class="layout_component_container mh-page">
-    <div class="mh-container">
+    <div class="mh-ambient mh-ambient--one" aria-hidden="true"></div>
+    <div class="mh-ambient mh-ambient--two" aria-hidden="true"></div>
+
+    <div class="mh-shell">
         <form [formGroup]="formKhoaHoc" class="formKhoaHoc mh-form" novalidate>
-            <header class="mh-hero" aria-labelledby="mh-page-title">
-                <div class="mh-hero__identity">
-                    <div class="mh-hero__mark" aria-hidden="true"><i class="fa fa-book"></i></div>
-                    <div class="mh-hero__copy">
-                        <span class="mh-hero__eyebrow">QUẢN LÝ HỌC PHẦN / CHỈNH SỬA</span>
+            <header class="mh-command" aria-labelledby="mh-page-title">
+                <div class="mh-command__identity">
+                    <span class="mh-command__logo" aria-hidden="true"><i class="fa fa-graduation-cap"></i></span>
+                    <div class="mh-command__copy">
+                        <span class="mh-command__eyebrow">Không gian biên tập học phần</span>
                         <h1 id="mh-page-title">{{ f['title'].value || 'Thông tin học phần' }}</h1>
-                        <div class="mh-hero__meta">
+                        <div class="mh-command__meta">
                             @if (f['maso'].value) {
-                            <span class="mh-badge mh-badge--code"><i class="fa fa-barcode" aria-hidden="true"></i>{{ f['maso'].value }}</span>
+                            <span><i class="fa fa-barcode" aria-hidden="true"></i>{{ f['maso'].value }}</span>
                             }
-                            <span class="mh-badge"><i class="fa fa-certificate" aria-hidden="true"></i>{{ f['sotinchi'].value || 0 }} tín chỉ</span>
-                            @if (f['sotinchi_th'].value) {
-                            <span class="mh-badge mh-badge--mint"><i class="fa fa-flask" aria-hidden="true"></i>{{ f['sotinchi_th'].value }} TC thực hành</span>
-                            }
+                            <span><i class="fa fa-certificate" aria-hidden="true"></i>{{ f['sotinchi'].value || 0 }} tín chỉ</span>
+                            <span><i class="fa fa-clock-o" aria-hidden="true"></i>{{ f['tongsogio'].value || 0 }} tiết</span>
                         </div>
                     </div>
                 </div>
-                <button type="button" class="btn mh-hero__save" (click)="saveCourse()">
-                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
-                    <span>Lưu thay đổi</span>
-                </button>
+                <div class="mh-command__actions">
+                    <span class="mh-command__status"><span aria-hidden="true"></span>Sẵn sàng chỉnh sửa</span>
+                    <button type="button" class="btn mh-primary-action" (click)="saveCourse()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        <span>Lưu học phần</span>
+                    </button>
+                </div>
             </header>
 
-            <div class="mh-layout">
-                <div class="mh-main-column">
-                    <section class="mh-section mh-section--overview" aria-labelledby="mh-general-title">
-                        <div class="mh-section__header">
-                            <span class="mh-section__step">01</span>
-                            <div class="mh-section__heading">
-                                <span class="mh-section__eyebrow">HỒ SƠ HỌC PHẦN</span>
-                                <h2 id="mh-general-title">Thông tin cốt lõi</h2>
-                                <p>Định danh học phần và đơn vị phụ trách.</p>
-                            </div>
+            <div class="mh-workspace">
+                <aside class="mh-rail" aria-label="Điều hướng biểu mẫu học phần">
+                    <div class="mh-rail__inner">
+                        <div class="mh-rail__intro">
+                            <span class="mh-rail__caption">Mục lục nội dung</span>
+                            <strong>Thiết lập học phần</strong>
+                            <p>Chọn một mục để chuyển nhanh đến vùng chỉnh sửa.</p>
                         </div>
-                        <div class="mh-section__body">
-                            <div class="mh-grid-2 mh-grid-2--course">
-                                <div class="mh-field mh-field--title" [ngClass]="{ 'field-err': !slugIsValid }">
-                                    <label for="title"><i class="fa fa-bookmark-o" aria-hidden="true"></i>Tên học phần<span class="ovic-mark">*</span></label>
+
+                        <nav class="mh-nav">
+                            <button type="button" [class.is-active]="activeSection === 'sec-info'" (click)="scrollToSection('sec-info')">
+                                <span class="mh-nav__icon mh-nav__icon--blue"><i class="fa fa-id-card-o" aria-hidden="true"></i></span>
+                                <span><strong>Thông tin cơ bản</strong><small>Định danh & đơn vị</small></span>
+                                <i class="fa fa-angle-right mh-nav__arrow" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" [class.is-active]="activeSection === 'sec-ctdt'" (click)="scrollToSection('sec-ctdt')">
+                                <span class="mh-nav__icon mh-nav__icon--indigo"><i class="fa fa-sitemap" aria-hidden="true"></i></span>
+                                <span><strong>Chương trình đào tạo</strong><small>CTĐT & khối kiến thức</small></span>
+                                <i class="fa fa-angle-right mh-nav__arrow" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" [class.is-active]="activeSection === 'sec-time'" (click)="scrollToSection('sec-time')">
+                                <span class="mh-nav__icon mh-nav__icon--teal"><i class="fa fa-clock-o" aria-hidden="true"></i></span>
+                                <span><strong>Khối lượng học tập</strong><small>Phân bổ thời lượng</small></span>
+                                <i class="fa fa-angle-right mh-nav__arrow" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" [class.is-active]="activeSection === 'sec-eval'" (click)="scrollToSection('sec-eval')">
+                                <span class="mh-nav__icon mh-nav__icon--violet"><i class="fa fa-check-square-o" aria-hidden="true"></i></span>
+                                <span><strong>Đánh giá & CĐR</strong><small>Thi kết thúc học phần</small></span>
+                                <i class="fa fa-angle-right mh-nav__arrow" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" [class.is-active]="activeSection === 'sec-desc'" (click)="scrollToSection('sec-desc')">
+                                <span class="mh-nav__icon mh-nav__icon--cyan"><i class="fa fa-file-text-o" aria-hidden="true"></i></span>
+                                <span><strong>Đề cương chi tiết</strong><small>Mô tả & yêu cầu</small></span>
+                                <i class="fa fa-angle-right mh-nav__arrow" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" [class.is-active]="activeSection === 'sec-docs'" (click)="scrollToSection('sec-docs')">
+                                <span class="mh-nav__icon mh-nav__icon--amber"><i class="fa fa-folder-open-o" aria-hidden="true"></i></span>
+                                <span><strong>Tài nguyên học liệu</strong><small>Tệp tin & liên kết</small></span>
+                                <i class="fa fa-angle-right mh-nav__arrow" aria-hidden="true"></i>
+                            </button>
+                        </nav>
+
+                        <div class="mh-summary" aria-label="Tóm tắt học phần">
+                            <div class="mh-summary__top">
+                                <span>Tóm tắt nhanh</span>
+                                <i class="fa fa-line-chart" aria-hidden="true"></i>
+                            </div>
+                            <div class="mh-summary__metrics">
+                                <div><strong>{{ f['sotinchi'].value || 0 }}</strong><span>Tổng tín chỉ</span></div>
+                                <div><strong>{{ f['sotinchi_th'].value || 0 }}</strong><span>TC thực hành</span></div>
+                                <div><strong>{{ f['tongsogio'].value || 0 }}</strong><span>Tổng số tiết</span></div>
+                            </div>
+                            <div class="mh-summary__note"><i class="fa fa-info-circle" aria-hidden="true"></i>Thay đổi được lưu khi nhấn “Lưu học phần”.</div>
+                        </div>
+                    </div>
+                </aside>
+
+                <div class="mh-canvas">
+                    <section id="sec-info" class="mh-studio-card mh-studio-card--blue" aria-labelledby="mh-general-title">
+                        <div class="mh-card-head">
+                            <span class="mh-card-head__icon"><i class="fa fa-id-card-o" aria-hidden="true"></i></span>
+                            <div>
+                                <span class="mh-card-head__eyebrow">01 · Hồ sơ học phần</span>
+                                <h2 id="mh-general-title">Thông tin cơ bản</h2>
+                                <p>Thiết lập định danh, tín chỉ và đơn vị chuyên môn phụ trách.</p>
+                            </div>
+                            <span class="mh-card-head__required"><i class="fa fa-asterisk" aria-hidden="true"></i>Trường bắt buộc</span>
+                        </div>
+                        <div class="mh-card-body">
+                            <div class="mh-info-grid">
+                                <div class="mh-field mh-field--hero" [ngClass]="{ 'field-err': !slugIsValid }">
+                                    <label for="title"><span class="mh-field__label-icon"><i class="fa fa-bookmark-o" aria-hidden="true"></i></span>Tên học phần<span class="ovic-mark">*</span></label>
                                     <input [attr.disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa || routerLanhdaobomon ? null : true"
                                         type="text" id="title" class="ovic-input-field" formControlName="title" autocomplete="off" placeholder="Nhập tên học phần">
+                                    <small>Tên chính thức hiển thị trong chương trình đào tạo.</small>
                                 </div>
                                 <div class="mh-field">
-                                    <label for="maso"><i class="fa fa-barcode" aria-hidden="true"></i>Mã học phần<span class="ovic-mark">*</span></label>
+                                    <label for="maso"><span class="mh-field__label-icon"><i class="fa fa-barcode" aria-hidden="true"></i></span>Mã học phần<span class="ovic-mark">*</span></label>
                                     <input [attr.disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa || routerLanhdaobomon ? null : true"
                                         type="text" id="maso" formControlName="maso" class="ovic-input-field" autocomplete="off" placeholder="Ví dụ: MH101">
                                 </div>
-                                <div class="mh-field">
-                                    <label for="sotinchi"><i class="fa fa-certificate" aria-hidden="true"></i>Số tín chỉ<span class="ovic-mark">*</span></label>
-                                    <input [attr.disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa || routerLanhdaobomon ? null : true"
-                                        type="number" id="sotinchi" formControlName="sotinchi" class="ovic-input-field" inputmode="numeric">
-                                </div>
-                                <div class="mh-field">
-                                    <label for="sotinchi_th"><i class="fa fa-flask" aria-hidden="true"></i>Số tín chỉ thực hành<span class="ovic-mark">*</span></label>
-                                    <input [attr.disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa || routerLanhdaobomon ? null : true"
-                                        type="number" id="sotinchi_th" formControlName="sotinchi_th" class="ovic-input-field" inputmode="numeric">
+                                <div class="mh-credit-pair">
+                                    <div class="mh-field mh-field--compact">
+                                        <label for="sotinchi"><i class="fa fa-certificate" aria-hidden="true"></i>Tín chỉ<span class="ovic-mark">*</span></label>
+                                        <input [attr.disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa || routerLanhdaobomon ? null : true"
+                                            type="number" id="sotinchi" formControlName="sotinchi" class="ovic-input-field" inputmode="numeric">
+                                    </div>
+                                    <div class="mh-field mh-field--compact mh-field--emerald">
+                                        <label for="sotinchi_th"><i class="fa fa-flask" aria-hidden="true"></i>TC thực hành<span class="ovic-mark">*</span></label>
+                                        <input [attr.disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa || routerLanhdaobomon ? null : true"
+                                            type="number" id="sotinchi_th" formControlName="sotinchi_th" class="ovic-input-field" inputmode="numeric">
+                                    </div>
                                 </div>
                                 <div class="mh-field" role="group" aria-labelledby="category-ids-label">
-                                    <label id="category-ids-label"><i class="fa fa-university" aria-hidden="true"></i>Khoa quản lý<span class="ovic-mark">*</span></label>
+                                    <label id="category-ids-label"><span class="mh-field__label-icon"><i class="fa fa-university" aria-hidden="true"></i></span>Khoa quản lý<span class="ovic-mark">*</span></label>
                                     <ovic-dropdown [disabled]="routerDaotao || routerAdmin ? false : true" placeholder="Chọn khoa quản lý"
                                         [options]="list_donvi_chuyenmon" [defaultValue]="f['category_ids'].value" optionId="id" optionLabel="title"
                                         [formField]="f['category_ids']" [filter]="true" filterBy="title"></ovic-dropdown>
                                 </div>
                                 <div class="mh-field" role="group" aria-labelledby="department-label">
-                                    <label id="department-label"><i class="fa fa-sitemap" aria-hidden="true"></i>Bộ môn</label>
+                                    <label id="department-label"><span class="mh-field__label-icon"><i class="fa fa-sitemap" aria-hidden="true"></i></span>Bộ môn phụ trách</label>
                                     <ovic-dropdown [disabled]="routerDaotao || routerAdmin || routerLanhdaokhoa ? false : true" placeholder="Chọn bộ môn"
                                         [options]="list_nganh_bomon | filter: f['category_ids'].value : ['donvi_chuyenmon_id']" [defaultValue]="f['nganh_bomon_id'].value"
                                         optionId="id" optionLabel="title" [formField]="f['nganh_bomon_id']" [filter]="true" filterBy="title"></ovic-dropdown>
                                 </div>
                                 <div class="mh-field mh-field--wide" role="group" aria-labelledby="exam-format-label">
-                                    <label id="exam-format-label"><i class="fa fa-list-alt" aria-hidden="true"></i>Định dạng bài kiểm tra trắc nghiệm</label>
-                                    <ovic-dropdown placeholder="Chọn định dạng" [options]="DINHDANG_BAITRACNGHIEM" [defaultValue]="f['av'].value"
+                                    <label id="exam-format-label"><span class="mh-field__label-icon"><i class="fa fa-list-alt" aria-hidden="true"></i></span>Định dạng bài kiểm tra trắc nghiệm</label>
+                                    <ovic-dropdown placeholder="Chọn định dạng bài kiểm tra" [options]="DINHDANG_BAITRACNGHIEM" [defaultValue]="f['av'].value"
                                         optionId="key" optionLabel="label" [formField]="f['av']"></ovic-dropdown>
                                 </div>
                             </div>
@@ -80,128 +144,79 @@
 
                     <ng-container [ngTemplateOutlet]="ctdtListTemplate"></ng-container>
 
-                    <section class="mh-section mh-section--description" aria-labelledby="mh-description-title">
-                        <div class="mh-section__header">
-                            <span class="mh-section__step mh-section__step--blue">03</span>
-                            <div class="mh-section__heading">
-                                <span class="mh-section__eyebrow">NỘI DUNG ĐỀ CƯƠNG</span>
-                                <h2 id="mh-description-title">Định hướng học tập</h2>
-                                <p>Thông tin giúp sinh viên chuẩn bị và theo học hiệu quả.</p>
-                            </div>
+                    <section id="sec-time" class="mh-studio-card mh-studio-card--teal" aria-labelledby="mh-time-title">
+                        <div class="mh-card-head">
+                            <span class="mh-card-head__icon"><i class="fa fa-clock-o" aria-hidden="true"></i></span>
+                            <div><span class="mh-card-head__eyebrow">03 · Phân bổ thời lượng</span><h2 id="mh-time-title">Khối lượng học tập</h2><p>Điều chỉnh nhanh số tiết cho từng hình thức tổ chức giảng dạy.</p></div>
+                            <span class="mh-total-pill"><strong>{{ f['tongsogio'].value || 0 }}</strong> tiết tổng</span>
                         </div>
-                        <div class="mh-section__body mh-editor-body">
-                            <div class="mh-segmented" role="tablist" aria-label="Nội dung đề cương">
-                                <button #descTab type="button" id="tab-desc" role="tab" aria-controls="panel-desc"
-                                    [attr.aria-selected]="activeDescTab === 'desc'" [attr.tabindex]="activeDescTab === 'desc' ? 0 : -1"
-                                    [class.is-active]="activeDescTab === 'desc'" (click)="selectDescTab('desc', descTab)"
-                                    (keydown.arrowright)="selectDescTab('yeucau', yeucauTab)" (keydown.arrowleft)="selectDescTab('yeucau', yeucauTab)"
-                                    (keydown.home)="selectDescTab('desc', descTab)" (keydown.end)="selectDescTab('yeucau', yeucauTab)">
-                                    <i class="fa fa-align-left" aria-hidden="true"></i>Mô tả môn học
-                                </button>
-                                <button #yeucauTab type="button" id="tab-yeucau" role="tab" aria-controls="panel-yeucau"
-                                    [attr.aria-selected]="activeDescTab === 'yeucau'" [attr.tabindex]="activeDescTab === 'yeucau' ? 0 : -1"
-                                    [class.is-active]="activeDescTab === 'yeucau'" (click)="selectDescTab('yeucau', yeucauTab)"
-                                    (keydown.arrowright)="selectDescTab('desc', descTab)" (keydown.arrowleft)="selectDescTab('desc', descTab)"
-                                    (keydown.home)="selectDescTab('desc', descTab)" (keydown.end)="selectDescTab('yeucau', yeucauTab)">
-                                    <i class="fa fa-user" aria-hidden="true"></i>Yêu cầu sinh viên
-                                </button>
-                            </div>
-                            <div class="mh-editor-pane" id="panel-desc" role="tabpanel" aria-labelledby="tab-desc"
-                                [class.is-hidden]="activeDescTab !== 'desc'" [attr.aria-hidden]="activeDescTab !== 'desc'">
-                                <div class="mh-editor-intro"><strong>Mô tả môn học</strong><span>Khái quát nội dung, quy định điểm và điều kiện dự thi.</span></div>
-                                <ovic-editor height="auto" [formField]="f['desc']" [default]="f['desc'].value"></ovic-editor>
-                            </div>
-                            <div class="mh-editor-pane" id="panel-yeucau" role="tabpanel" aria-labelledby="tab-yeucau"
-                                [class.is-hidden]="activeDescTab !== 'yeucau'" [attr.aria-hidden]="activeDescTab !== 'yeucau'">
-                                <div class="mh-editor-intro"><strong>Yêu cầu đối với sinh viên</strong><span>Nêu kiến thức nền, thiết bị và các yêu cầu cần chuẩn bị.</span></div>
-                                <ovic-editor height="auto" [formField]="f['yeucau_sinhvien']" [default]="f['yeucau_sinhvien'].value"></ovic-editor>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-
-                <aside class="mh-side-column">
-                    <section class="mh-section mh-section--time" aria-labelledby="mh-time-title">
-                        <div class="mh-section__header">
-                            <span class="mh-section__step mh-section__step--teal">04</span>
-                            <div class="mh-section__heading">
-                                <span class="mh-section__eyebrow">PHÂN BỔ THỜI LƯỢNG</span>
-                                <h2 id="mh-time-title">Khối lượng học tập</h2>
-                                <p>Nhập số tiết theo từng hình thức.</p>
-                            </div>
-                        </div>
-                        <div class="mh-section__body">
-                            <div class="mh-hours-highlight">
-                                <div><span>Tổng số tiết hiện tại</span><strong>{{ f['tongsogio'].value || 0 }}</strong></div>
-                                <i class="fa fa-clock-o" aria-hidden="true"></i>
-                            </div>
-                            <div class="mh-time-grid">
-                                <div class="mh-time-field mh-time-field--primary"><label for="tongsogio"><span class="mh-time-field__icon fa fa-calendar" aria-hidden="true"></span><span>Tổng số tiết</span></label><input type="text" id="tongsogio" formControlName="tongsogio" class="ovic-input-field" inputmode="numeric"></div>
-                                <div class="mh-time-field"><label for="lythuyet"><span class="mh-time-field__icon fa fa-graduation-cap" aria-hidden="true"></span><span>Lý thuyết</span></label><input type="number" id="lythuyet" formControlName="lythuyet" class="ovic-input-field" inputmode="numeric"></div>
-                                <div class="mh-time-field"><label for="thaoluan_baitap"><span class="mh-time-field__icon fa fa-comments-o" aria-hidden="true"></span><span>Thảo luận / bài tập</span></label><input type="number" id="thaoluan_baitap" formControlName="thaoluan_baitap" class="ovic-input-field" inputmode="numeric"></div>
-                                <div class="mh-time-field"><label for="th_thinghiem"><span class="mh-time-field__icon fa fa-flask" aria-hidden="true"></span><span>Thực hành / thí nghiệm</span></label><input type="text" id="th_thinghiem" formControlName="th_thinghiem" class="ovic-input-field" inputmode="numeric"></div>
-                                <div class="mh-time-field"><label for="kiemtra_dinhky"><span class="mh-time-field__icon fa fa-check-square-o" aria-hidden="true"></span><span>Kiểm tra định kỳ</span></label><input type="number" id="kiemtra_dinhky" formControlName="kiemtra_dinhky" class="ovic-input-field" inputmode="numeric"></div>
-                                <div class="mh-time-field"><label for="tuhoc"><span class="mh-time-field__icon fa fa-home" aria-hidden="true"></span><span>Tự học</span></label><input type="number" id="tuhoc" formControlName="tuhoc" class="ovic-input-field" inputmode="numeric"></div>
+                        <div class="mh-card-body">
+                            <div class="mh-metric-grid">
+                                <div class="mh-metric mh-metric--total"><span class="mh-metric__icon"><i class="fa fa-calendar" aria-hidden="true"></i></span><label for="tongsogio">Tổng số tiết</label><input type="text" id="tongsogio" formControlName="tongsogio" class="ovic-input-field" inputmode="numeric"><small>Tổng thời lượng học phần</small></div>
+                                <div class="mh-metric mh-metric--blue"><span class="mh-metric__icon"><i class="fa fa-graduation-cap" aria-hidden="true"></i></span><label for="lythuyet">Lý thuyết</label><input type="number" id="lythuyet" formControlName="lythuyet" class="ovic-input-field" inputmode="numeric"><small>Giảng dạy trên lớp</small></div>
+                                <div class="mh-metric mh-metric--amber"><span class="mh-metric__icon"><i class="fa fa-comments-o" aria-hidden="true"></i></span><label for="thaoluan_baitap">Thảo luận / bài tập</label><input type="number" id="thaoluan_baitap" formControlName="thaoluan_baitap" class="ovic-input-field" inputmode="numeric"><small>Trao đổi và luyện tập</small></div>
+                                <div class="mh-metric mh-metric--emerald"><span class="mh-metric__icon"><i class="fa fa-flask" aria-hidden="true"></i></span><label for="th_thinghiem">Thực hành / thí nghiệm</label><input type="text" id="th_thinghiem" formControlName="th_thinghiem" class="ovic-input-field" inputmode="numeric"><small>Thực hành chuyên môn</small></div>
+                                <div class="mh-metric mh-metric--rose"><span class="mh-metric__icon"><i class="fa fa-check-square-o" aria-hidden="true"></i></span><label for="kiemtra_dinhky">Kiểm tra định kỳ</label><input type="number" id="kiemtra_dinhky" formControlName="kiemtra_dinhky" class="ovic-input-field" inputmode="numeric"><small>Đánh giá trong kỳ</small></div>
+                                <div class="mh-metric mh-metric--violet"><span class="mh-metric__icon"><i class="fa fa-home" aria-hidden="true"></i></span><label for="tuhoc">Tự học</label><input type="number" id="tuhoc" formControlName="tuhoc" class="ovic-input-field" inputmode="numeric"><small>Thời lượng tự nghiên cứu</small></div>
                             </div>
                         </div>
                     </section>
 
-                    <section class="mh-section mh-section--assessment" aria-labelledby="mh-assessment-title">
-                        <div class="mh-section__header">
-                            <span class="mh-section__step mh-section__step--violet">05</span>
-                            <div class="mh-section__heading">
-                                <span class="mh-section__eyebrow">ĐÁNH GIÁ NĂNG LỰC</span>
-                                <h2 id="mh-assessment-title">Kiểm tra & chuẩn đầu ra</h2>
-                                <p>Thiết lập hình thức đánh giá cuối kỳ.</p>
-                            </div>
-                        </div>
-                        <div class="mh-section__body mh-assessment-stack">
-                            <div class="mh-choice-card" role="group" aria-labelledby="exam-type-label">
-                                <div class="mh-choice-card__heading"><span class="mh-choice-card__number">01</span><div><h3 id="exam-type-label">Hình thức thi KTHP<span class="ovic-mark">*</span></h3><p>Phương thức đánh giá cuối học phần.</p></div></div>
+                    <section id="sec-eval" class="mh-studio-card mh-studio-card--violet" aria-labelledby="mh-assessment-title">
+                        <div class="mh-card-head"><span class="mh-card-head__icon"><i class="fa fa-check-square-o" aria-hidden="true"></i></span><div><span class="mh-card-head__eyebrow">04 · Đánh giá năng lực</span><h2 id="mh-assessment-title">Hình thức thi & chuẩn đầu ra</h2><p>Xác định phương thức đánh giá kết thúc và cấp độ năng lực cần đạt.</p></div></div>
+                        <div class="mh-card-body mh-evaluation-grid">
+                            <div class="mh-choice-panel" role="group" aria-labelledby="exam-type-label">
+                                <div class="mh-choice-panel__head"><span>01</span><div><h3 id="exam-type-label">Hình thức thi KTHP<span class="ovic-mark">*</span></h3><p>Chọn phương thức đánh giá cuối học phần.</p></div></div>
                                 <ovic-groups-radio-v2 (onChange)="onChangeExam($event)" [formField]="f['exam_type']" group_name="EXAMFORMAT" [columns]="3" [verticalMode]="false" [options]="EXAMFORMAT" optionLabel="label" optionId="id" [defaultValue]="f['exam_type'].value ? f['exam_type'].value : null"></ovic-groups-radio-v2>
                             </div>
-                            <div class="mh-choice-card mh-choice-card--outcomes" role="group" aria-labelledby="cdr-label">
-                                <div class="mh-choice-card__heading"><span class="mh-choice-card__number">02</span><div><h3 id="cdr-label">Mức độ yêu cầu CĐR<span class="ovic-mark">*</span></h3><p>Cấp độ năng lực cần đạt.</p></div></div>
+                            <div class="mh-choice-panel mh-choice-panel--violet" role="group" aria-labelledby="cdr-label">
+                                <div class="mh-choice-panel__head"><span>02</span><div><h3 id="cdr-label">Mức độ yêu cầu CĐR<span class="ovic-mark">*</span></h3><p>Chọn cấp độ năng lực cần đạt.</p></div></div>
                                 <ovic-groups-radio-v2 [disabled_item]="true" group_name="CHUAN_DAU_RA" optionLabel="label" [columns]="3" [options]="chuandaura" [defaultValue]="f['cdr']['value']" [formField]="f['cdr']" optionId="id"></ovic-groups-radio-v2>
                             </div>
                         </div>
                     </section>
 
-                    <section class="mh-section mh-section--documents" aria-labelledby="mh-documents-title">
-                        <div class="mh-section__header">
-                            <span class="mh-section__step mh-section__step--amber">06</span>
-                            <div class="mh-section__heading">
-                                <span class="mh-section__eyebrow">TÀI NGUYÊN</span>
-                                <h2 id="mh-documents-title">Học liệu</h2>
-                                <p>Đính kèm giáo trình và nguồn đọc thêm.</p>
+                    <section id="sec-desc" class="mh-studio-card mh-studio-card--cyan" aria-labelledby="mh-description-title">
+                        <div class="mh-card-head"><span class="mh-card-head__icon"><i class="fa fa-file-text-o" aria-hidden="true"></i></span><div><span class="mh-card-head__eyebrow">05 · Nội dung đề cương</span><h2 id="mh-description-title">Đề cương chi tiết</h2><p>Biên soạn nội dung định hướng để sinh viên chuẩn bị và theo học hiệu quả.</p></div></div>
+                        <div class="mh-card-body mh-editor-studio">
+                            <div class="mh-segmented" role="tablist" aria-label="Nội dung đề cương">
+                                <button #descTab type="button" id="tab-desc" role="tab" aria-controls="panel-desc" [attr.aria-selected]="activeDescTab === 'desc'" [attr.tabindex]="activeDescTab === 'desc' ? 0 : -1" [class.is-active]="activeDescTab === 'desc'" (click)="selectDescTab('desc', descTab)" (keydown.arrowright)="selectDescTab('yeucau', yeucauTab)" (keydown.arrowleft)="selectDescTab('yeucau', yeucauTab)" (keydown.home)="selectDescTab('desc', descTab)" (keydown.end)="selectDescTab('yeucau', yeucauTab)"><i class="fa fa-align-left" aria-hidden="true"></i><span><strong>Mô tả môn học</strong><small>Nội dung và quy định</small></span></button>
+                                <button #yeucauTab type="button" id="tab-yeucau" role="tab" aria-controls="panel-yeucau" [attr.aria-selected]="activeDescTab === 'yeucau'" [attr.tabindex]="activeDescTab === 'yeucau' ? 0 : -1" [class.is-active]="activeDescTab === 'yeucau'" (click)="selectDescTab('yeucau', yeucauTab)" (keydown.arrowright)="selectDescTab('desc', descTab)" (keydown.arrowleft)="selectDescTab('desc', descTab)" (keydown.home)="selectDescTab('desc', descTab)" (keydown.end)="selectDescTab('yeucau', yeucauTab)"><i class="fa fa-user" aria-hidden="true"></i><span><strong>Yêu cầu sinh viên</strong><small>Chuẩn bị trước khi học</small></span></button>
                             </div>
-                        </div>
-                        <div class="mh-section__body mh-documents-stack">
-                            <div class="mh-document-card"><div class="mh-document-card__heading"><span class="mh-document-card__icon fa fa-book" aria-hidden="true"></span><div><h3>Tài liệu chính</h3><p>Giáo trình và nguồn học liệu cốt lõi.</p></div></div><form-document-file-and-link [formField]="f['tailieu_chinh']" [docDefault]="f['tailieu_chinh'].value"></form-document-file-and-link></div>
-                            <div class="mh-document-card mh-document-card--reference"><div class="mh-document-card__heading"><span class="mh-document-card__icon fa fa-external-link" aria-hidden="true"></span><div><h3>Tài liệu tham khảo</h3><p>Nguồn đọc thêm mở rộng theo môn học.</p></div></div><form-document-file-and-link [formField]="f['tailieu_thamkhao']" [docDefault]="f['tailieu_thamkhao'].value"></form-document-file-and-link></div>
+                            <div class="mh-editor-pane" id="panel-desc" role="tabpanel" aria-labelledby="tab-desc" [class.is-hidden]="activeDescTab !== 'desc'" [attr.aria-hidden]="activeDescTab !== 'desc'"><div class="mh-editor-intro"><span class="mh-editor-intro__icon"><i class="fa fa-pencil" aria-hidden="true"></i></span><div><strong>Mô tả môn học</strong><p>Khái quát nội dung, quy định điểm và điều kiện dự thi.</p></div></div><ovic-editor height="auto" [formField]="f['desc']" [default]="f['desc'].value"></ovic-editor></div>
+                            <div class="mh-editor-pane" id="panel-yeucau" role="tabpanel" aria-labelledby="tab-yeucau" [class.is-hidden]="activeDescTab !== 'yeucau'" [attr.aria-hidden]="activeDescTab !== 'yeucau'"><div class="mh-editor-intro"><span class="mh-editor-intro__icon"><i class="fa fa-user" aria-hidden="true"></i></span><div><strong>Yêu cầu đối với sinh viên</strong><p>Nêu kiến thức nền, thiết bị và yêu cầu cần chuẩn bị.</p></div></div><ovic-editor height="auto" [formField]="f['yeucau_sinhvien']" [default]="f['yeucau_sinhvien'].value"></ovic-editor></div>
                         </div>
                     </section>
-                </aside>
-            </div>
 
-            <div class="mh-action-card">
-                <div class="mh-action-card__content"><span class="mh-action-card__icon fa fa-check-circle-o" aria-hidden="true"></span><div><h2 class="mh-action-card__title">Sẵn sàng lưu học phần?</h2><p class="mh-action-card__desc">Kiểm tra lại thông tin bắt buộc trước khi cập nhật dữ liệu.</p></div></div>
-                <button type="button" class="btn mh-save-button mh-save-button--large" (click)="saveCourse()"><i class="fa fa-floppy-o" aria-hidden="true"></i><span>Lưu lại toàn bộ thông tin</span></button>
-            </div>
-        </form>
+                    <section id="sec-docs" class="mh-studio-card mh-studio-card--amber" aria-labelledby="mh-documents-title">
+                        <div class="mh-card-head"><span class="mh-card-head__icon"><i class="fa fa-folder-open-o" aria-hidden="true"></i></span><div><span class="mh-card-head__eyebrow">06 · Tài nguyên học tập</span><h2 id="mh-documents-title">Tài liệu & học liệu</h2><p>Quản lý giáo trình, tệp tin và liên kết phục vụ giảng dạy.</p></div></div>
+                        <div class="mh-card-body mh-resource-grid">
+                            <div class="mh-resource-card"><div class="mh-resource-card__head"><span><i class="fa fa-book" aria-hidden="true"></i></span><div><h3>Tài liệu chính</h3><p>Giáo trình và học liệu cốt lõi.</p></div></div><form-document-file-and-link [formField]="f['tailieu_chinh']" [docDefault]="f['tailieu_chinh'].value"></form-document-file-and-link></div>
+                            <div class="mh-resource-card mh-resource-card--reference"><div class="mh-resource-card__head"><span><i class="fa fa-external-link" aria-hidden="true"></i></span><div><h3>Tài liệu tham khảo</h3><p>Nguồn đọc thêm và học liệu mở rộng.</p></div></div><form-document-file-and-link [formField]="f['tailieu_thamkhao']" [docDefault]="f['tailieu_thamkhao'].value"></form-document-file-and-link></div>
+                        </div>
+                    </section>
 
-        <ng-template #ctdtListTemplate>
-            <section class="mh-section mh-section--programs" aria-labelledby="mh-programs-title">
-                <div class="mh-section__header"><span class="mh-section__step mh-section__step--indigo">02</span><div class="mh-section__heading"><span class="mh-section__eyebrow">LIÊN KẾT CHƯƠNG TRÌNH</span><h2 id="mh-programs-title">Chương trình đào tạo</h2><p>Gán học phần vào CTĐT và xác định khối kiến thức.</p></div></div>
-                <div class="mh-section__body">
-                    <div class="mh-field mh-field--program" role="group" aria-labelledby="ctdt-label"><label id="ctdt-label"><i class="fa fa-list-ul" aria-hidden="true"></i>Chọn chương trình đào tạo</label><p class="mh-field__hint">Có thể chọn nhiều chương trình cho cùng một học phần.</p><p-multiSelect appendTo="body" ariaLabelledBy="ctdt-label" (onChange)="onChangeSelectCtdt()" [options]="group_ctdt" [(ngModel)]="selectedCtdtsId" [ngModelOptions]="{ standalone: true }" defaultLabel="Chọn chương trình đào tạo" scrollHeight="300px" display="chip"></p-multiSelect></div>
-                    @if (selectCtdts && selectCtdts.length) {
-                    <div class="mh-table-wrapper" aria-label="Khối kiến thức theo chương trình đào tạo"><table class="mh-program-table"><thead><tr><th scope="col" class="mh-program-table__index">TT</th><th scope="col">Chương trình đào tạo</th><th scope="col">Khối kiến thức</th></tr></thead><tbody>@for (ctdt of selectCtdts; track ctdt; let i = $index) {<tr><td class="mh-program-table__index">{{ i + 1 }}</td><td><strong>{{ ctdt.label }}</strong></td><td><p-select appendTo="body" [showClear]="true" placeholder="Chọn khối kiến thức" [options]="ctdt.items" [(ngModel)]="ctdt['select_item']" [ngModelOptions]="{ standalone: true }"></p-select></td></tr>}</tbody></table></div>
-                    } @else {
-                    <div class="mh-empty-programs"><span class="mh-empty-programs__icon fa fa-sitemap" aria-hidden="true"></span><div><strong>Chưa chọn chương trình đào tạo</strong><p>Chọn ít nhất một chương trình ở phía trên để thiết lập khối kiến thức.</p></div></div>
-                    }
+                    <div class="mh-complete">
+                        <div class="mh-complete__icon"><i class="fa fa-check" aria-hidden="true"></i></div>
+                        <div><span>Hoàn tất thiết lập</span><h2>Sẵn sàng lưu học phần?</h2><p>Kiểm tra lại các trường bắt buộc và liên kết chương trình đào tạo trước khi lưu.</p></div>
+                        <button type="button" class="btn mh-primary-action mh-primary-action--large" (click)="saveCourse()"><i class="fa fa-floppy-o" aria-hidden="true"></i><span>Lưu toàn bộ thông tin</span></button>
+                    </div>
                 </div>
-            </section>
-        </ng-template>
+            </div>
+
+            <ng-template #ctdtListTemplate>
+                <section id="sec-ctdt" class="mh-studio-card mh-studio-card--indigo" aria-labelledby="mh-programs-title">
+                    <div class="mh-card-head"><span class="mh-card-head__icon"><i class="fa fa-sitemap" aria-hidden="true"></i></span><div><span class="mh-card-head__eyebrow">02 · Liên kết đào tạo</span><h2 id="mh-programs-title">Chương trình đào tạo</h2><p>Gán học phần vào chương trình và xác định khối kiến thức tương ứng.</p></div>@if (selectCtdts?.length) {<span class="mh-count-pill">{{ selectCtdts.length }} chương trình</span>}</div>
+                    <div class="mh-card-body">
+                        <div class="mh-program-picker mh-field" role="group" aria-labelledby="ctdt-label"><div><label id="ctdt-label"><span class="mh-field__label-icon"><i class="fa fa-list-ul" aria-hidden="true"></i></span>Chọn chương trình đào tạo</label><p>Có thể chọn nhiều chương trình cho cùng một học phần.</p></div><p-multiSelect appendTo="body" ariaLabelledBy="ctdt-label" (onChange)="onChangeSelectCtdt()" [options]="group_ctdt" [(ngModel)]="selectedCtdtsId" [ngModelOptions]="{ standalone: true }" defaultLabel="Chọn chương trình đào tạo" scrollHeight="300px" display="chip"></p-multiSelect></div>
+                        @if (selectCtdts && selectCtdts.length) {
+                        <div class="mh-table-wrapper" aria-label="Khối kiến thức theo chương trình đào tạo"><table class="mh-program-table"><thead><tr><th scope="col" class="mh-program-table__index">TT</th><th scope="col">Chương trình đào tạo</th><th scope="col">Khối kiến thức</th></tr></thead><tbody>@for (ctdt of selectCtdts; track ctdt; let i = $index) {<tr><td class="mh-program-table__index"><span>{{ i + 1 }}</span></td><td><strong>{{ ctdt.label }}</strong></td><td><p-select appendTo="body" [showClear]="true" placeholder="Chọn khối kiến thức" [options]="ctdt.items" [(ngModel)]="ctdt['select_item']" [ngModelOptions]="{ standalone: true }"></p-select></td></tr>}</tbody></table></div>
+                        } @else {
+                        <div class="mh-empty"><span class="mh-empty__icon"><i class="fa fa-sitemap" aria-hidden="true"></i></span><div><strong>Chưa liên kết chương trình đào tạo</strong><p>Chọn một hoặc nhiều chương trình ở phía trên để bắt đầu thiết lập khối kiến thức.</p></div></div>
+                        }
+                    </div>
+                </section>
+            </ng-template>
+        </form>
     </div>
 </main>
