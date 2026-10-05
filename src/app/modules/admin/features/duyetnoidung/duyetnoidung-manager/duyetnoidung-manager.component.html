@@ -1,1 +1,236 @@
-﻿<div class="p-3">duyetnoidung-manager.component works!</div>
+<div class="layout_component_container">
+  <div class="hoidong-layout-top">
+    <div style="flex:1" class="layout-filter">
+      <input #inputfilter style="width: 250px;" class="class-layout-top-option-search" type="text"
+        placeholder="Nhập rồi nhấn enter để tìm môn học" (keyup)="filterCourseByname($event)">
+      </div>
+      <div class="top-layout-action">
+        @if (isKhaothi || isManager || isDaotao || isLanhdaokhoa) {
+          <div class="check-box-by-hoidong">
+            <p-checkbox (onChange)="loadHoidong()" [(ngModel)]="filterHoidong.hoidongShow" [binary]="true"
+              label="Hiển thị theo hội đồng của bạn">
+            </p-checkbox>
+          </div>
+        }
+        <p-popover #op appendTo="body">
+          <ng-template pTemplate>
+            <ng-container [ngTemplateOutlet]="templateFilterShift">
+            </ng-container>
+          </ng-template>
+        </p-popover>
+        <button (click)="op.toggle($event)" ngbTooltip="Tìm kiếm" placement="left" container="body"
+          class="btn btn-primary btn-icon">
+          <i class="fa fa-filter"></i>
+        </button>
+      </div>
+    </div>
+    <div class="hoidong-layout-bottom">
+      <p-table #dt1 styleClass="table-reBorder table-scroll-able table-able-dropdown-p-table"
+        [value]="list_hoidong | filterChild : 'courses' : searchCourse: ['course_title','course_maso'] | paginatorLocal : pageIndex: limit_hoidong"
+        dataKey="id" [rows]="limit_hoidong">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 80px; text-align: center;">TT</th>
+            <th style="text-align: left;">Môn học</th>
+            <th style="text-align: center; width: 120px;">Bài giảng</th>
+            <th style="text-align: center; width: 120px;">CPI/CDR</th>
+            <th style="text-align: center; width: 120px;">Trắc nghiệm</th>
+            <th style="text-align: center; width: 120px;">Thực hành</th>
+            <th style="text-align: center; width: 120px;">Dự án</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+          <tr style="background-color: #eeeeee;">
+            <td style="width: 80px; text-align: center;">
+              <strong>{{row['index']}}</strong>
+            </td>
+            <td colspan="6">
+              <div style="display:flex; align-items: center;">
+                <strong style="flex:1">
+                  {{row['title']}}
+                </strong>
+                <div style="font-style:italic; font-size: 13px; margin-left: 5px;">
+                  <span class="box-span-inline dat-box" style="margin-right: 5px;">
+                    {{'Duyệt '}}
+                    {{row['type'] | showlabel: type_hoidong:'value':'label'}}
+                  </span>
+                  <span class="box-span-inline da-sua-box" style="margin-right: 5px;">
+                    {{row['date_start'] | date : 'dd/MM/yyyy':'UTC+7'}} -
+                    {{row['date_end'] | date : 'dd/MM/yyyy':'UTC+7'}}
+                  </span>
+
+                  @if (row['ended']) {
+                    <span class="box-span-inline dat-box">
+                      Đã kết thúc
+                    </span>
+                  }
+                  @if (row['not_start']) {
+                    <span class="box-span-inline cho-duyet-box">
+                      Chưa bắt đầu
+                    </span>
+                  }
+
+                  @if (!row['ended'] && !row['not_start']) {
+                    <span>
+                      @switch (row['status']) {
+                        @case (0) {
+                          <span class="box-span-inline cho-duyet-box">
+                            Đang thiết lập
+                          </span>
+                        }
+                        @case (1) {
+                          <span class="box-span-inline dang-caidat">
+                            Đang thực hiện
+                          </span>
+                        }
+                        @case (2) {
+                          <span class="box-span-inline dat-box">
+                            Đã hoàn thành
+                          </span>
+                        }
+                      }
+                    </span>
+                  }
+                </div>
+              </div>
+            </td>
+          </tr>
+          @for (monhoc of row['courses']; track monhoc; let i = $index) {
+            <tr>
+              <td style="width: 80px; text-align: center;">
+                {{row['index']+'.'+(i + 1)}}
+              </td>
+              <td>
+                <div style="flex:1">
+                  <div>
+                    <a (click)="noitiRoute($event,row)"
+                      [routerLink]="!row['disabled_route']?[row['type']]:null"
+                      [queryParams]="!row['disabled_route']?{code: monhoc.id}:null"
+                      style="cursor: pointer; color: #333;">
+                      <strong>
+                        {{monhoc['course_title'].concat(" - [",monhoc['course_maso'],"]")}}
+                      </strong>
+                    </a>
+                  </div>
+                  <div style="font-size: 12px; font-style: italic; color:#757575">
+                    {{monhoc['created_plan_name'] + monhoc['info_']}}
+                  </div>
+                </div>
+              </td>
+              <td style="text-align: center; width: 120px;">
+                @if (!loadInfo) {
+                  <div>
+                    <span [ngClass]="monhoc['duyet_baigiang'] < monhoc['tong_baigiang']?'red':'blue'">
+                      {{monhoc['duyet_baigiang']}}
+                    </span> |
+                    <span>{{monhoc['tong_baigiang']}}</span>
+                  </div>
+                } @else {
+                  @if (loadInfo) {
+                    <p-skeleton></p-skeleton>
+                  }
+                }
+              </td>
+              <td style="text-align: center; width: 120px;">
+                @if (!loadInfo) {
+                  <div>
+                    <span [ngClass]="monhoc['duyet_cpi'] < monhoc['tong_cpi']?'red':'blue'">
+                      {{monhoc['duyet_cpi']}}
+                    </span> |
+                    <span>{{monhoc['tong_cpi']}}</span>
+                  </div>
+                } @else {
+                  @if (loadInfo) {
+                    <p-skeleton></p-skeleton>
+                  }
+                }
+              </td>
+              <td style="text-align: center; width: 120px;">
+                @if (!loadInfo) {
+                  <div>
+                    <span [ngClass]="monhoc['duyet_tn'] < monhoc['tong_tn']?'red':'blue'">
+                      {{monhoc['duyet_tn']}}
+                    </span> |
+                    <span>{{monhoc['tong_tn']}}</span>
+                  </div>
+                } @else {
+                  @if (loadInfo) {
+                    <p-skeleton></p-skeleton>
+                  }
+                }
+              </td>
+              <td style="text-align: center; width: 120px;">
+                @if (!loadInfo) {
+                  <div>
+                    <span [ngClass]="monhoc['duyet_th'] < monhoc['tong_th']?'red':'blue'">
+                      {{monhoc['duyet_th']}}
+                    </span> |
+                    <span>{{monhoc['tong_th']}}</span>
+                  </div>
+                } @else {
+                  @if (loadInfo) {
+                    <p-skeleton></p-skeleton>
+                  }
+                }
+              </td>
+              <td style="text-align: center; width: 120px;">
+                @if (!loadInfo) {
+                  <div>
+                    <span [ngClass]="monhoc['duyet_duan'] < monhoc['tong_duan']?'red':'blue'">
+                      {{monhoc['duyet_duan']}}
+                    </span> |
+                    <span>{{monhoc['tong_duan']}}</span>
+                  </div>
+                } @else {
+                  @if (loadInfo) {
+                    <p-skeleton></p-skeleton>
+                  }
+                }
+              </td>
+            </tr>
+          }
+        </ng-template>
+      </p-table>
+    </div>
+    <div class="page-layout-set">
+      <p-paginator #paginator (onPageChange)="changePage($event)" [rows]="limit_hoidong"
+        [totalRecords]="(list_hoidong | filterChild : 'courses' : searchCourse: ['course_title','course_maso']).length">
+      </p-paginator>
+    </div>
+  </div>
+
+
+  <ng-template #templateFilterShift>
+    <div class="layout-filter-shift" style="width: 600px;">
+      <div class="ovic-vertical__inputs" style="line-height: 1.5;">
+        <!-- <div class="row form-row form-row-flex-row">
+        <div class="col-12">
+
+        </div>
+      </div> -->
+      <div class="row form-row form-row-flex-row">
+        <div class="col-12">
+          <ovic-groups-radio-v2 [defaultValue]="filterHoidong.times_hoidong"
+            (onChange)="startFilter( $event, 'times_hoidong' )" [columns]="3" group_name="times_hoidong"
+            [options]="times_hoidong" optionId="key" optionLabel="label">
+          </ovic-groups-radio-v2>
+        </div>
+      </div>
+      <div class="row form-row form-row-flex-row">
+        <div class="col-12">
+          <ovic-groups-radio-v2 [defaultValue]="filterHoidong.types_hoidong"
+            (onChange)="startFilter( $event, 'types_hoidong' )" [columns]="3" group_name="types_hoidong"
+            [options]="types_hoidong" optionId="key" optionLabel="label">
+          </ovic-groups-radio-v2>
+        </div>
+      </div>
+      <div class="row form-row form-row-flex-row">
+        <div class="col-12" style="text-align: right;">
+          <button style="line-height: 1;" (click)="cancelFilter()" class="btn btn-secondary">
+            <i class="fa fa-refresh"></i>Hủy tìm kiếm
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

@@ -19,8 +19,12 @@
                 [ngClass]="activeIndex_class === 0?'btn btn-primary':'btn btn-secondary'">
                 <i style="margin-right: 0px;" class="pi pi-list"></i>
             </button>
-
-            <p-popover #op appendTo="body">
+            <button #filterBtn type="button" class="btn btn-icon btn-primary"
+                (click)="toggleFilterPopover($event)" ngbTooltip="Lọc" container="body">
+                <i class="pi pi-filter"></i>
+            </button>
+            <p-popover #op appendTo="body" (onShow)="trackFilterPopoverPanel()"
+                (onHide)="removeFilterPopoverPanel()">
                 <div class="layout-filter-shift" style="width: 500px;">
                     <div class="ovic-vertical__inputs" style="line-height: 1.5;">
 
@@ -76,14 +80,11 @@
                 </div>
             </p-popover>
 
-            <button type="button" class="btn btn-icon btn-primary" (click)="op.toggle($event)" ngbTooltip="Lọc"
-                container="body" placement="left">
-                <i class="pi pi-filter"></i>
-            </button>
+            
 
             @if (routerDaotao) {
-            <button class="btn btn-icon" (click)="openFormAddClass(false)" container="body" placement="left"
-                ngbTooltip="Thêm lớp học phần" class="btn btn-success">
+            <button class="btn btn-icon btn-success" (click)="openFormAddClass(false)" container="body"
+                placement="left" ngbTooltip="Thêm lớp học phần">
                 <i style="margin-right: 0px;" class="pi pi-plus"></i>
             </button>
             }

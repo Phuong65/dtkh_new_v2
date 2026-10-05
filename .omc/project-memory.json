@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1790751532817,
+  "lastScanned": 1790842193851,
   "projectRoot": "d:\\data\\project\\angular\\v21\\dtkh_new_v2",
   "techStack": {
     "languages": [
@@ -32,7 +32,7 @@
     "runtime": null
   },
   "build": {
-    "buildCommand": "npm run build",
+    "buildCommand": "npm run build -- --configuration=development-lowram",
     "testCommand": "npm test",
     "lintCommand": null,
     "devCommand": "npm run start",
@@ -65,18 +65,31 @@
   },
   "customNotes": [],
   "directoryMap": {
+    "backup-duyetnoidung": {
+      "path": "backup-duyetnoidung",
+      "purpose": null,
+      "fileCount": 6,
+      "lastAccessed": 1790842193820,
+      "keyFiles": [
+        "duyet-cauhoi-thuchanh-kthp.component.html",
+        "duyet-cauhoi.component.html",
+        "duyet-thuongxuyen-tuluan.component.html",
+        "ket-qua-tham-dinh.component.html",
+        "ketqua-duyet-all.component.html"
+      ]
+    },
     "dist": {
       "path": "dist",
       "purpose": "Distribution/build output",
       "fileCount": 0,
-      "lastAccessed": 1790751532766,
+      "lastAccessed": 1790842193820,
       "keyFiles": []
     },
     "docs": {
       "path": "docs",
       "purpose": "Documentation",
       "fileCount": 2,
-      "lastAccessed": 1790751532767,
+      "lastAccessed": 1790842193830,
       "keyFiles": [
         "FRONTEND_API_GUIDE.md",
         "_rules.md"
@@ -86,7 +99,7 @@
       "path": "plans",
       "purpose": null,
       "fileCount": 77,
-      "lastAccessed": 1790751532782,
+      "lastAccessed": 1790842193831,
       "keyFiles": [
         "arrange-paragraphs-editor.md",
         "cauhoi-tracnghiem-chitiet.md",
@@ -99,7 +112,7 @@
       "path": "src",
       "purpose": "Source code",
       "fileCount": 7,
-      "lastAccessed": 1790751532783,
+      "lastAccessed": 1790842193831,
       "keyFiles": [
         "custom-theme.scss",
         "favicon.ico",
@@ -112,7 +125,7 @@
       "path": "src\\app",
       "purpose": "Application code",
       "fileCount": 5,
-      "lastAccessed": 1790751532785,
+      "lastAccessed": 1790842193832,
       "keyFiles": [
         "app-routing.module.ts",
         "app.component.css",
@@ -123,40 +136,40 @@
       "path": "src\\assets",
       "purpose": "Static assets",
       "fileCount": 1,
-      "lastAccessed": 1790751532785,
+      "lastAccessed": 1790842193833,
       "keyFiles": []
     }
   },
   "hotPaths": [
     {
       "path": "src/app/modules/admin/features/lop-hoc-phan",
-      "accessCount": 74,
-      "lastAccessed": 1790667943151,
+      "accessCount": 75,
+      "lastAccessed": 1790842567825,
       "type": "directory"
     },
     {
       "path": "src/app",
-      "accessCount": 63,
-      "lastAccessed": 1790756320441,
+      "accessCount": 65,
+      "lastAccessed": 1790843290912,
       "type": "directory"
     },
     {
       "path": "src\\app\\modules\\admin\\features\\lop-hoc-phan\\quanly-lophocphan-v2\\quanly-lophocphan-v2.component.ts",
-      "accessCount": 32,
-      "lastAccessed": 1790656778500,
+      "accessCount": 33,
+      "lastAccessed": 1790910875019,
       "type": "file"
+    },
+    {
+      "path": "",
+      "accessCount": 22,
+      "lastAccessed": 1790845292367,
+      "type": "directory"
     },
     {
       "path": "src\\app\\modules\\admin\\features\\lop-hoc-phan\\class-details\\class-noidung-giangday-v2\\class-noidung-giangday-v2.component.html",
       "accessCount": 18,
       "lastAccessed": 1790646916278,
       "type": "file"
-    },
-    {
-      "path": "",
-      "accessCount": 18,
-      "lastAccessed": 1790840228047,
-      "type": "directory"
     },
     {
       "path": "src\\app\\modules\\admin\\features\\lop-hoc-phan\\class-details\\class-noidung-giangday\\class-noidung-giangday.component.ts",
@@ -207,6 +220,12 @@
       "type": "file"
     },
     {
+      "path": "package.json",
+      "accessCount": 10,
+      "lastAccessed": 1790910861096,
+      "type": "file"
+    },
+    {
       "path": "src\\app\\modules\\admin\\features\\lop-hoc-phan\\class-details\\thuongxuyen-duan-group\\thuongxuyen-duan-group.component.html",
       "accessCount": 8,
       "lastAccessed": 1790646057795,
@@ -222,6 +241,12 @@
       "path": "src\\app\\modules\\admin\\features\\lop-hoc-phan\\class-details\\class-noidung-giangday-v2\\class-noidung-giangday-v2.component.ts",
       "accessCount": 8,
       "lastAccessed": 1790646523460,
+      "type": "file"
+    },
+    {
+      "path": "angular.json",
+      "accessCount": 8,
+      "lastAccessed": 1790845364586,
       "type": "file"
     },
     {
@@ -243,16 +268,10 @@
       "type": "file"
     },
     {
-      "path": "package.json",
+      "path": "src\\app\\modules\\admin\\features\\lop-hoc-phan",
       "accessCount": 7,
-      "lastAccessed": 1790824160357,
-      "type": "file"
-    },
-    {
-      "path": "angular.json",
-      "accessCount": 6,
-      "lastAccessed": 1790824201092,
-      "type": "file"
+      "lastAccessed": 1790845953635,
+      "type": "directory"
     },
     {
       "path": "src\\app\\modules\\admin\\features\\lop-hoc-phan\\class-details\\diemdanh-lophoc-mer\\diemdanh-lophoc-mer.component.ts",
@@ -267,16 +286,16 @@
       "type": "file"
     },
     {
+      "path": "plans\\update21.md",
+      "accessCount": 5,
+      "lastAccessed": 1790845173700,
+      "type": "file"
+    },
+    {
       "path": "src\\app\\modules\\admin\\features\\lop-hoc-phan\\caidat-lophocphan\\caidat-lophocphan.component.html",
       "accessCount": 4,
       "lastAccessed": 1790581424300,
       "type": "file"
-    },
-    {
-      "path": "src\\app\\modules\\admin\\features\\lop-hoc-phan",
-      "accessCount": 4,
-      "lastAccessed": 1790654513194,
-      "type": "directory"
     },
     {
       "path": "src/app/modules/admin/features",
@@ -303,15 +322,9 @@
       "type": "file"
     },
     {
-      "path": "plans\\update21.md",
-      "accessCount": 3,
-      "lastAccessed": 1790753242891,
-      "type": "file"
-    },
-    {
       "path": "src/app/modules/admin",
-      "accessCount": 2,
-      "lastAccessed": 1790566939760,
+      "accessCount": 3,
+      "lastAccessed": 1790842511142,
       "type": "directory"
     },
     {
@@ -388,8 +401,8 @@
     },
     {
       "path": "src\\app\\modules\\admin\\features\\cauhoi-tracnghiem-v2\\cauhoi-tracnghiem-manager\\cauhoi-tracnghiem-manager.component.ts",
-      "accessCount": 1,
-      "lastAccessed": 1790566994551,
+      "accessCount": 2,
+      "lastAccessed": 1790911219714,
       "type": "file"
     },
     {

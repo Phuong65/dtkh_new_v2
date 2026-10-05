@@ -78,7 +78,7 @@
     color: #000000;
 }
 
-.activity-ticket-item:nth-child(event) {
+.activity-ticket-item:nth-child(even) {
     background: #f1faff;
 }
 

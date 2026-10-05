@@ -1,1 +1,64 @@
-﻿<div class="p-3">form-de-th-kthp.component works!</div>
+<div class="layout-form-th-kthp">
+  @if (list_form() && list_form().length > 0) {
+    <div style="padding: 5px;">
+      <p-table [reorderableColumns]="true" [value]="list_form()" styleClass="table-reBorder table-has-caption">
+        <ng-template pTemplate="caption">
+          <div style="display: flex;" class="flex align-items-center justify-content-between">
+            Cấu trúc đề thi
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width:3rem"></th>
+            <th style="text-align: center; width:120px">Nhóm câu hỏi</th>
+            <th style="text-align: center;">Chuẩn đầu ra học phần</th>
+            <th style="text-align: center;">Mức độ/trình độ năng lực</th>
+            <th style="text-align: center; width:120px">Số câu lấy</th>
+            <th style="text-align: center; width:100px">Điểm</th>
+            <th style="text-align: center; width:100px">Tổng điểm</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-form let-rowIndex="rowIndex">
+          <tr [pReorderableRow]="rowIndex">
+            <td style="text-align: center;">
+              <span class="pi pi-bars" pReorderableRowHandle></span>
+            </td>
+            <td style="text-align: center;">{{form.ordering}}</td>
+            <td style="text-align: center;">
+              {{form.course_clo_id | showlabel : list_clo() : 'id' : 'kyhieu'}}
+            </td>
+            <td style="text-align: center;">
+              {{form.cdr | showlabel : chuandaura : 'id' : 'label'}}
+            </td>
+            <td style="text-align: center;">
+              {{form.question_take}}
+            </td>
+            <td style="text-align: center;">
+              {{form.point}}
+            </td>
+            <td style="text-align: center;">
+              {{form.point * form.question_take}}
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td></td>
+            <td style="text-align:center">
+              Tổng
+            </td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center">{{ totalTake() }}</td>
+            <td style="text-align:center"></td>
+            <td style="text-align:center">{{ totalScore() }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  } @else {
+    <div class="text-align-center" style="padding: 20px;">Chưa tạo form</div>
+  }
+  <app-duyet-form-de (onChangeStatus)="changeStatusForm($event)" [selectedCourse]="selectedCourse()"
+  [listThamDInh]="listThamDInh()" [typeForm]="formType()"></app-duyet-form-de>
+</div>

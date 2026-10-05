@@ -1,1 +1,341 @@
-﻿<div class="p-3">duyet-cauhoi-thuchanh-kthp-detail.component works!</div>
+<div class="layout_component_container">
+  <div class="detail-shell">
+    <!-- Sticky Header -->
+    @if (selectedTuluan) {
+      <header class="detail-header">
+        <div class="header-left">
+          <div class="question-title">
+            <span class="question-code">#{{ selectedTuluan.id }}</span>
+            @if (selectedTuluan.title) {
+              <span class="question-name">{{ selectedTuluan.title }}</span>
+            }
+          </div>
+          <div class="question-meta">
+            <span>
+              @switch (selectedTuluan.status) {
+                @case (1) {
+                  <span class="stat-tag tag-approved">
+                    <i class="pi pi-check-circle"></i> Đạt
+                  </span>
+                }
+                @case (-1) {
+                  <span class="stat-tag tag-reject">
+                    <i class="pi pi-exclamation-triangle"></i> Yêu cầu sửa
+                  </span>
+                }
+                @case (-2) {
+                  <span class="stat-tag tag-require">
+                    <i class="pi pi-pencil"></i> Đã sửa
+                  </span>
+                }
+                @default {
+                  <span class="stat-tag tag-pending">
+                    <i class="pi pi-clock"></i> Chờ duyệt
+                  </span>
+                }
+              }
+            </span>
+            @if (selectedTuluan.status === 1) {
+              <span class="stat-tag tag-approved">
+                Duyệt lúc: {{ selectedTuluan['approved_at'] | ovicDateTime }}
+              </span>
+            }
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-sm btn-outline-secondary" (click)="openNewQuestion('back')">
+            <i class="pi pi-angle-double-left"></i> Đề trước
+          </button>
+          <button class="btn btn-sm btn-outline-secondary" (click)="openNewQuestion('next')">
+            Đề sau <i class="pi pi-angle-double-right"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-secondary" (click)="goBack()">
+            <i class="pi pi-arrow-left"></i> Quay lại
+          </button>
+        </div>
+      </header>
+    }
+
+    <!-- Loading state -->
+    @if (loading) {
+      <div class="loading-state">
+        <div class="spinner">
+          <i class="pi pi-spin pi-spinner" style="font-size: 2rem;"></i>
+          <p>Đang tải dữ liệu...</p>
+        </div>
+      </div>
+    }
+
+    <!-- Empty state -->
+    @if (!loading && !selectedTuluan) {
+      <div class="empty-state">
+        <h3>Không tìm thấy đề thực hành</h3>
+        <p>Không thể tải thông tin đề #{{ tuluanId }}</p>
+        <button class="btn btn-primary" (click)="goBack()">Quay lại danh sách</button>
+      </div>
+    }
+
+    <!-- Main 2-column body -->
+    @if (!loading && selectedTuluan) {
+      <div class="detail-body">
+        <!-- Left column: Nội dung đề -->
+        <div class="col-left">
+          <div class="card question-card">
+            <div class="card-header">
+              <h5 class="mb-0">Nội dung đề thực hành</h5>
+            </div>
+            <div class="card-body">
+              <app-view-thuongxuyen-tuluan hinhthuc="Thực hành" [courseSelected]="courseSelected"
+                [tuluan]="selectedTuluan" [hideNote]="true">
+              </app-view-thuongxuyen-tuluan>
+            </div>
+          </div>
+          <!-- Tiêu chí chấm -->
+          @if (list_plan_tieu_chi_cham && list_plan_tieu_chi_cham.length) {
+            <div class="card tieuchicham-card">
+              <div class="card-header">
+                <h5 class="mb-0">Hướng dẫn chấm theo tiêu chí</h5>
+              </div>
+              <div class="card-body">
+                @for (item of list_plan_tieu_chi_cham; track item; let i = $index) {
+                  <div class="tieuchicham-item">
+                    @if (item.title) {
+                      <div class="header-tieuchicham">
+                        <strong>{{ i + 1 }}</strong>.
+                        <strong>{{ item.title }} ({{ item.point }} điểm)</strong>
+                      </div>
+                    }
+                    @if (!item.title) {
+                      <div class="header-tieuchicham">
+                        <strong>{{ item.ordering }}</strong>. Chưa có tiêu đề cho tiêu chí
+                      </div>
+                    }
+                    @if (item.desc) {
+                      <div [appKatexImg]="item.id" [appLoadMediaOnText]="item.id"
+                        style="border:none"
+                        class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                        [innerHTML]="item.desc | safeHtml">
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          }
+          <!-- Tiêu chí chấm câu 1 -->
+          @if (list_tieuchi_cham_cau1 && list_tieuchi_cham_cau1.length) {
+            <div class="card tieuchicham-card">
+              <div class="card-header">
+                <h5 class="mb-0">Hướng dẫn chấm câu 1</h5>
+              </div>
+              <div class="card-body">
+                @for (item of list_tieuchi_cham_cau1; track item; let i = $index) {
+                  <div class="tieuchicham-item">
+                    @if (item.title) {
+                      <div class="header-tieuchicham">
+                        <strong>{{ i + 1 }}</strong>.
+                        <strong>{{ item.title }} ({{ item.point }} điểm)</strong>
+                      </div>
+                    }
+                    @if (!item.title) {
+                      <div class="header-tieuchicham">
+                        <strong>{{ item.ordering }}</strong>. Chưa có tiêu đề cho tiêu chí
+                      </div>
+                    }
+                    @if (item.desc) {
+                      <div [appKatexImg]="item.id" [appLoadMediaOnText]="item.id"
+                        style="border:none"
+                        class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                        [innerHTML]="item.desc | safeHtml">
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          }
+          <!-- Tiêu chí chấm câu 2 -->
+          @if (list_tieuchi_cham_cau2 && list_tieuchi_cham_cau2.length) {
+            <div class="card tieuchicham-card">
+              <div class="card-header">
+                <h5 class="mb-0">Hướng dẫn chấm câu 2</h5>
+              </div>
+              <div class="card-body">
+                @for (item of list_tieuchi_cham_cau2; track item; let i = $index) {
+                  <div class="tieuchicham-item">
+                    @if (item.title) {
+                      <div class="header-tieuchicham">
+                        <strong>{{ i + 1 }}</strong>.
+                        <strong>{{ item.title }} ({{ item.point }} điểm)</strong>
+                      </div>
+                    }
+                    @if (!item.title) {
+                      <div class="header-tieuchicham">
+                        <strong>{{ item.ordering }}</strong>. Chưa có tiêu đề cho tiêu chí
+                      </div>
+                    }
+                    @if (item.desc) {
+                      <div [appKatexImg]="item.id" [appLoadMediaOnText]="item.id"
+                        style="border:none"
+                        class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                        [innerHTML]="item.desc | safeHtml">
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+        <!-- Right column: Review actions -->
+        <div class="col-right">
+          <!-- Undo banner -->
+          @if (pendingUndoAction) {
+            <div class="undo-banner">
+              <div>
+                <strong>{{ pendingUndoAction.isLastQuestion ? 'Đã nhận xét xong tất cả các đề.' : 'Đã chuyển sang đề tiếp theo.' }}</strong>
+                Có thể khôi phục đề #{{ pendingUndoAction.tuluanId }} trong {{ undoRemainingSeconds }} giây.
+              </div>
+              <button class="btn btn-sm btn-warning" (click)="restorePreviousQuestion()">
+                <i class="pi pi-undo"></i>
+                {{ kd_uyvien ? 'Hủy nhận xét đề trước' : 'Hủy quyết định đề trước' }}
+              </button>
+            </div>
+          }
+          <!-- Comment form for ủy viên -->
+          @if (!kd_hoidong && kd_uyvien && selectedTuluan['status'] !== 1) {
+            <div class="card comment-card"
+              >
+              <div class="card-header">
+                <h6 class="mb-0">Nhận xét của bạn</h6>
+              </div>
+              <div class="card-body">
+                <div class="action-edit-layout">
+                  <button (click)="saveComment(1, selectedTuluan)" class="btn btn-success me-2">
+                    <i class="pi pi-check"></i> Đồng ý duyệt
+                  </button>
+                  <button (click)="saveComment(-1, selectedTuluan)" class="btn btn-danger">
+                    <i class="pi pi-pencil"></i> Yêu cầu sửa
+                  </button>
+                </div>
+                @if (showRequestChangeForm) {
+                  <div class="request-change-box">
+                    <label>Nội dung yêu cầu sửa</label>
+                    <textarea placeholder="Nhập nội dung yêu cầu sửa..."
+                      [(ngModel)]="selectedTuluan['textarea_comment']"
+                    class="form-control request-change-textarea"></textarea>
+                    <div style="text-align: right;">
+                      <button (click)="saveComment(-1, selectedTuluan)" class="btn btn-danger btn-sm mt-2">
+                        Gửi yêu cầu sửa
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+          <!-- Chủ tịch hội đồng actions -->
+          @if (kd_hoidong && selectedTuluan['status'] !== -1 && selectedTuluan['status'] !== 1) {
+            <div class="card chairman-card"
+              >
+              <div class="card-header">
+                <h6 class="mb-0">Kết luận của chủ tịch hội đồng</h6>
+              </div>
+              <div class="card-body text-center">
+                <button class="btn btn-primary me-2" (click)="duyetNoidung(selectedTuluan, 1)">
+                  <i class="pi pi-check"></i> Đồng ý duyệt
+                </button>
+                <button class="btn btn-danger" (click)="duyetNoidung(selectedTuluan, -1)">
+                  <i class="pi pi-pencil"></i> Yêu cầu sửa
+                </button>
+              </div>
+            </div>
+          }
+          <!-- Council comments list -->
+          @if (selectedTuluan) {
+            <div class="card comments-list-card">
+              <div class="card-header">
+                <h6 class="mb-0">Nhận xét hội đồng ({{ selectedTuluan['comments'] ?
+                selectedTuluan['comments'].length : 0 }})</h6>
+              </div>
+              <div class="card-body">
+                @if (!selectedTuluan['comments'] || !selectedTuluan['comments'].length) {
+                  <div
+                    class="text-muted text-center py-3">
+                    Không có nhận xét hội đồng
+                  </div>
+                }
+                @if (selectedTuluan['comments'] && selectedTuluan['comments'].length) {
+                  <div>
+                    @for (comment of selectedTuluan['comments']; track comment; let index = $index) {
+                      <div
+                        class="comment-box">
+                        <div class="comment-header">
+                          <span class="comment-author">{{ comment['display_name'] }}</span>
+                        </div>
+                        @if (comment['children'] && comment['children'].length) {
+                          <div>
+                            @for (children of comment['children']; track children) {
+                              <div class="comment-child">
+                                <div class="content-comment-box"
+                                  [ngClass]="children['status'] === 1 ? 'duyet-comment' : 'yeucausua-comment'">
+                                  <div class="content-comment-inner-box"
+                                  [innerHTML]="children.comment"></div>
+                                </div>
+                                <div class="comment-actions">
+                                  <span class="comment-date">{{ children.created_at | ovicDateTime }}</span>
+                                  <span class="comment-reply-btn" (click)="openReply(children, index)">
+                                    Phản hồi ({{ children['count_reply'] }})
+                                  </span>
+                                </div>
+                                <!-- Reply section -->
+                                @if (children['reply_open'] === true) {
+                                  <div class="reply-layout">
+                                    <div class="list-reply-comments">
+                                      @for (reply_comment of children['reply_comments']; track reply_comment) {
+                                        <div
+                                          class="reply-item">
+                                          <div class="reply-author">{{ reply_comment['display_name'] }}</div>
+                                          <div class="content-comment-box-left"
+                                            [ngClass]="reply_comment['my_reply_comment'] ? 'my-reply-comment' : ''">
+                                            <div class="content-comment-inner-box-left"
+                                            [innerHTML]="reply_comment.comment"></div>
+                                          </div>
+                                          <div class="reply-date">
+                                            <span>{{ reply_comment.created_at | ovicDateTime }}</span>
+                                          </div>
+                                        </div>
+                                      }
+                                    </div>
+                                    <!-- Reply form -->
+                                    @if (kd_hoidong || kd_uyvien || (courseSelected && userId === courseSelected['creator_plan_id'])) {
+                                      <div class="reply-form"
+                                        >
+                                        <textarea placeholder="Nhập phản hồi..."
+                                          [(ngModel)]="children['textarea_comment']"
+                                        class="form-control reply-textarea"></textarea>
+                                        <button
+                                          (click)="saveCommentReply(children, selectedTuluan, index)"
+                                          class="btn btn-primary btn-sm">
+                                          <i class="fa fa-paper-plane"></i> Gửi phản hồi
+                                        </button>
+                                      </div>
+                                    }
+                                  </div>
+                                }
+                              </div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

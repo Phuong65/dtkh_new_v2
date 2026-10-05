@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, TemplateRef, viewChild, inject } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, TemplateRef, viewChild, inject } from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {SharedModule} from '@modules/shared/shared.module';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
@@ -25,6 +25,8 @@ import {OvicQueryCondition} from '@core/models/dto';
 import {forkJoin, mergeMap, of} from 'rxjs';
 import {Classes} from '@modules/shared/models/classes';
 import {RoleService} from '@core/services/role.service';
+import {Role} from '@core/models/role';
+import {HttpErrorResponse} from '@angular/common/http';
 import {ConditionOption} from '@modules/shared/models/condition-option';
 import {DonViService} from '@modules/shared/services/don-vi.service';
 import {ElngUserProfileService} from '@modules/shared/services/elearning-user-profile.service';
@@ -36,7 +38,7 @@ import {ClassStudentService} from '@modules/shared/services/class-student.servic
 import {ElnChuyenMucService} from '@modules/shared/services/elearning-chuyen-muc.service';
 import {ElnChuyenMuc} from '@modules/shared/models/Elng';
 import {ElnKhoaHoc} from '@modules/shared/models/elng-khoa-hoc';
-import {PopoverModule} from 'primeng/popover';
+import {Popover, PopoverModule} from 'primeng/popover';
 import { ResizingImageComponent } from '@modules/shared/components/resizing-image/resizing-image.component';
 
 @Component({
@@ -66,6 +68,12 @@ export class QuanlyLophocphanV2Component implements OnInit, OnDestroy {
     paginator = viewChild<Paginator>('paginator');
 
     createClass = viewChild<TemplateRef<any>>('createClass');
+
+    filterPopover = viewChild<Popover>('op');
+
+    filterButton = viewChild<ElementRef<HTMLButtonElement>>('filterBtn');
+
+    private filterPopoverPanel: HTMLElement | null = null;
 
     canAdd: boolean = false;
 
@@ -154,10 +162,7 @@ export class QuanlyLophocphanV2Component implements OnInit, OnDestroy {
     constructor() {
 
         const url = this.router.url.substring(7).split('?')[0];
-        console.log(this.auth.hasRouter(ROUTERS.daotao));
-        console.log(this.auth.hasRouter(ROUTERS.admin));
         
-
         this.routerAdmin = this.auth.hasRouter(ROUTERS.admin);
 
         this.routerDaotao = this.auth.hasRouter(ROUTERS.daotao);
@@ -220,7 +225,7 @@ export class QuanlyLophocphanV2Component implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-
+        this.removeFilterPopoverPanel();
     }
 
     ngOnInit(): void {
@@ -231,8 +236,20 @@ export class QuanlyLophocphanV2Component implements OnInit, OnDestroy {
         return this.formClass.controls;
     }
 
+    /**
+     * Lấy danh sách nhóm quyền (role) của realm hiện tại.
+     *
+     * Lưu ý: response API `GET /{realm}/api/roles/` có thể trả `data: null`
+     * (khi 403 / 404 / không có quyền đọc resource `roles`). Nếu gọi thẳng
+     * `_role.data.forEach(...)` thì sẽ ném TypeError ngay trong callback `next`;
+     * RxJS 7 bắt lỗi đó bằng `handleUnhandledError` chứ KHÔNG truyền sang `error`,
+     * nên Promise sẽ không bao giờ resolve => `await this.getRolesPromise()` treo
+     * vĩnh viễn, `isProcessing(true)` không tắt, màn hình trống và không có toast.
+     *
+     * Vì vậy: luôn resolve (kể cả rỗng/lỗi) và có guard mảng trước khi forEach.
+     */
     getRolesPromise(): Promise<any> {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.objectRoles = {};
 
             const condition: ConditionOption = {
@@ -246,15 +263,28 @@ export class QuanlyLophocphanV2Component implements OnInit, OnDestroy {
             };
 
             this.roleService.getRolesByPageNew(condition).subscribe({
-                next: (_role) => {
+                next: (res) => {
+                    const list: Role[] = Array.isArray(res?.data) ? res.data : [];
 
-                    _role.data.forEach((f) => {
+                    console.log('[QLLHPv2] GET roles/ OK', {
+                        data: res?.data,
+                        recordsFiltered: res?.recordsFiltered,
+                        soRoleNhanDuoc: list.length,
+                    });
+
+                    list.forEach((f) => {
                         this.objectRoles[f.name] = f;
                     });
 
                     resolve(this.objectRoles);
                 },
-                error: () => {
+                error: (err: HttpErrorResponse) => {
+                    console.error('[QLLHPv2] GET roles/ LỖI', {
+                        status: err?.status,
+                        url: err?.url,
+                        body: err?.error,
+                    });
+
                     this.noitifi.isProcessing(false);
                     this.noitifi.toastError('Lỗi kết nối, vui lòng thử lại, hoặc liên hệ với kỹ thuật viên nếu thử lại không thành công');
                     resolve(null);
@@ -813,6 +843,46 @@ export class QuanlyLophocphanV2Component implements OnInit, OnDestroy {
 
     chooseStyleClass(index: number) {
         this.activeIndex_class = index;
+    }
+
+    /**
+     * Bấm nút Lọc: truyền rõ phần tử neo (nút Lọc) cho popover để panel luôn
+     * bám đúng nút, không phụ thuộc event.currentTarget.
+     */
+    toggleFilterPopover(event: Event): void {
+        this.filterPopover()?.toggle(event, this.filterButton()?.nativeElement);
+    }
+
+    /**
+     * Ghi nhận panel của popover khi mở (PrimeNG append panel vào <body>).
+     * Cần giữ tham chiếu để dọn panel khi popover đóng.
+     */
+    trackFilterPopoverPanel(): void {
+        const popover = this.filterPopover();
+        if (!popover?.overlayVisible) {
+            return;
+        }
+        let container: HTMLElement | null = popover.container;
+        if (!container) {
+            const host = popover.el?.nativeElement as HTMLElement | undefined;
+            container = (host?.querySelector('.p-popover') as HTMLElement | null) ?? null;
+        }
+        this.filterPopoverPanel = container ?? null;
+    }
+
+    /**
+     * onHide của popover: gỡ panel bị sót lại trong <body>.
+     * Workaround lỗi PrimeNG 21.1.1: popover đã đóng (overlayVisible = false,
+     * render = false) nhưng panel đã append ra <body> không bị gỡ khỏi DOM,
+     * nên hộp bộ lọc cứ nằm vĩnh viễn trên màn hình và lệch vị trí khi cuộn trang.
+     */
+    removeFilterPopoverPanel(): void {
+        const panel = this.filterPopoverPanel;
+        this.filterPopoverPanel = null;
+        if (panel?.parentElement) {
+            panel.remove();
+        }
+        document.querySelectorAll('body > .p-popover').forEach((el) => el.remove());
     }
 
     cancelFilter() {

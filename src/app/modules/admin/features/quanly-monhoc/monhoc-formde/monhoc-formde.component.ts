@@ -1,7 +1,7 @@
-import { CourseFormCommentService } from './../../../../shared/services/course-form-comment.service';
+import { CourseFormCommentService } from '@shared/services/course-form-comment.service';
 import { HoidongThamdinhService } from '@modules/shared/services/hoidong-thamdinh.service';
 import { HoidongThamdinhMonhocThanhvienService } from '@modules/shared/services/hoidong-thamdinh-monhoc-thanhvien.service';
-import { CourseFormDuyetService } from './../../../../shared/services/course-form-duyet.service';
+import { CourseFormDuyetService } from '@shared/services/course-form-duyet.service';
 import { AfterViewInit, Component, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from '@modules/shared/shared.module';
@@ -34,7 +34,6 @@ import { CoursePlanBankService } from '@modules/shared/services/course-plan-bank
 import { CourseQuestionsService } from '@modules/shared/services/course-questions.service';
 import { CourseQuestions } from '@modules/shared/models/course-questions';
 import { CourseFormDgService } from '@modules/shared/services/course-form-dg.service';
-import { CourseFormDuyet } from '@modules/shared/models/course-form-duyet';
 import { BadgeModule } from 'primeng/badge';
 import { HoidongThamdinhMonhocService } from '@modules/shared/services/hoidong-thamdinh-monhoc.service';
 import { HoidongThamdinhMonhocThanhvien } from '@modules/shared/models/hoidong-thamdinh-monhoc-thanhvien';

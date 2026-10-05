@@ -1,1 +1,229 @@
-﻿<div class="p-3">question-history.component works!</div>
+<div class="card history-card">
+  <button type="button" class="card-header history-header"
+    (click)="toggleExpand()"
+    [attr.aria-expanded]="isExpanded()"
+    aria-controls="question-history-content">
+    <span class="history-title">
+      <i class="pi pi-history" aria-hidden="true"></i>
+      <span class="history-heading">Lịch sử sửa@if (historyCountLoaded()) {
+        <span> ({{historyCount()}} lần)</span>
+      }</span>
+    </span>
+    <i class="pi toggle-icon" aria-hidden="true"
+    [ngClass]="isExpanded() ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+  </button>
+
+  @if (isExpanded()) {
+    <div id="question-history-content" class="card-body history-body">
+      <!-- Loading -->
+      @if (loadingHistory()) {
+        <div class="history-loading">
+          <i class="pi pi-spin pi-spinner"></i> Đang tải lịch sử...
+        </div>
+      }
+      <!-- Timeline -->
+      @if (!loadingHistory() && historyItems().length > 0) {
+        <div class="history-timeline">
+          @for (item of historyItems(); track item; let i = $index; let last = $last) {
+            <div class="timeline-item"
+              [class.timeline-item-current]="item.isCurrent">
+              <div class="timeline-marker">
+                <span class="marker-dot" [class.marker-current]="item.isCurrent"></span>
+                @if (!last) {
+                  <span class="marker-line"></span>
+                }
+              </div>
+              <div class="timeline-content">
+                <div class="timeline-header">
+                  <span class="version-label">
+                    v{{item.version}}
+                    @if (item.isCurrent) {
+                      <span class="badge-current">hiện tại</span>
+                    }
+                    @if (item.version === 1) {
+                      <span class="badge-origin">gốc</span>
+                    }
+                  </span>
+                  @if (item.question.created_at) {
+                    <span class="version-date">
+                      {{ (item.question.created_at) | date:'dd/MM/yy':'+0700' }}
+                    </span>
+                  }
+                  @if (!item.isCurrent) {
+                    <button type="button" class="btn-view-detail"
+                      (click)="toggleVersionDetail(item.version)"
+                      [class.active]="expandedVersion() === item.version"
+                      [attr.aria-expanded]="expandedVersion() === item.version"
+                      [attr.aria-controls]="'question-history-version-' + item.version">
+                      <i class="pi" aria-hidden="true"
+                      [ngClass]="expandedVersion() === item.version ? 'pi-eye-slash' : 'pi-eye'"></i>
+                      {{ expandedVersion() === item.version ? 'Ẩn' : 'Xem' }}
+                    </button>
+                  }
+                </div>
+                <!-- Expanded version detail -->
+                @if (expandedVersion() === item.version && !item.isCurrent) {
+                  <div class="version-detail" [id]="'question-history-version-' + item.version"
+                    >
+                    <!-- Question header info -->
+                    <div class="version-question-header">
+                      <div class="header-left">
+                        <div class="question-title">
+                          <span class="question-code">#{{ item.question.id }}</span>
+                          <span class="question-cdr">{{ item.question.cdr | showlabel : CHUAN_DAU_RA : 'id' : 'label' }}</span>
+                        </div>
+                        <div class="question-meta">
+                          <span>
+                            @switch (item.question.status) {
+                              @case (1) {
+                                <span class="stat-tag tag-approved">
+                                  <i class="pi pi-check-circle"></i> Đạt
+                                </span>
+                              }
+                              @case (-1) {
+                                <span class="stat-tag tag-reject">
+                                  <i class="pi pi-exclamation-triangle"></i> Chưa đạt
+                                </span>
+                              }
+                              @case (-2) {
+                                <span class="stat-tag tag-require">
+                                  <i class="pi pi-pencil"></i> Đã sửa
+                                </span>
+                              }
+                              @default {
+                                <span class="stat-tag tag-pending">
+                                  <i class="pi pi-clock"></i> Chờ duyệt
+                                </span>
+                              }
+                            }
+                          </span>
+                          @if (item.question.private === 0) {
+                            <span class="stat-tag tag-public">Public</span>
+                          }
+                          @if (item.question.private === 1) {
+                            <span class="stat-tag tag-private">Private</span>
+                          }
+                          <span class="stat-tag"
+                            [ngClass]="item.question.config && item.question.config.invertedAnswer ? 'sh-on' : 'sh-off'">
+                            <i [class]="item.question.config && item.question.config.invertedAnswer ? 'pi pi-sync' : 'pi pi-minus-circle'"></i>
+                            {{ item.question.config && item.question.config.invertedAnswer ? 'Đảo phương án: Bật' : 'Đảo phương án: Tắt' }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="question-item-type">
+                      @switch (item.question.question_type) {
+                        @case ('radio') {
+                          <div>
+                            <app-question-type-radio-and-checkbox [av]="av()" [isReadOnly]="true"
+                              [courseQuestion]="item.question">
+                            </app-question-type-radio-and-checkbox>
+                          </div>
+                        }
+                        @case ('checkbox') {
+                          <div>
+                            <app-question-type-radio-and-checkbox [av]="av()" [isReadOnly]="true"
+                              [courseQuestion]="item.question">
+                            </app-question-type-radio-and-checkbox>
+                          </div>
+                        }
+                        @case ('inputbox') {
+                          <div>
+                            <app-question-type-inputbox [av]="av()" [isReadOnly]="true"
+                              [courseQuestion]="item.question">
+                            </app-question-type-inputbox>
+                          </div>
+                        }
+                        @case ('reorder_words') {
+                          <div>
+                            <app-question-type-reorder-words [av]="av()" [isReadOnly]="true"
+                              [courseQuestion]="item.question">
+                            </app-question-type-reorder-words>
+                          </div>
+                        }
+                        @case ('arrange_paragraphs') {
+                          <div>
+                            <app-question-type-arrange-paragraphs [av]="av()" [isReadOnly]="true"
+                              [courseQuestion]="item.question">
+                            </app-question-type-arrange-paragraphs>
+                          </div>
+                        }
+                        @case ('drag_drop') {
+                          <div>
+                            <app-question-type-drag-drop [av]="av()" [isReadOnly]="true"
+                              [courseQuestion]="item.question">
+                            </app-question-type-drag-drop>
+                          </div>
+                        }
+                        @case ('group-input') {
+                          <div>
+                            <app-question-type-group-input [av]="av()" [isReadOnly]="true"
+                              [courseQuestion]="item.question">
+                            </app-question-type-group-input>
+                          </div>
+                        }
+                        @case ('group-radio') {
+                          <div>
+                            <app-question-type-group-radio [av]="av()" [isReadOnly]="true"
+                              [courseQuestion]="item.question">
+                            </app-question-type-group-radio>
+                          </div>
+                        }
+                        @case ('grouping') {
+                          <div>
+                            <app-question-type-grouping [av]="av()" [isReadOnly]="true"
+                              [courseQuestion]="item.question">
+                            </app-question-type-grouping>
+                          </div>
+                        }
+                      }
+                    </div>
+                    <!-- Comments for this version -->
+                    <div class="version-comments">
+                      <div class="comments-header">
+                        <i class="pi pi-comments"></i>
+                        <span>Nhận xét</span>
+                      </div>
+                      @if (item.loadingComments) {
+                        <div class="comments-loading">
+                          <i class="pi pi-spin pi-spinner"></i> Đang tải nhận xét...
+                        </div>
+                      }
+                      @if (!item.loadingComments && item.commentsLoaded) {
+                        <div class="comments-list">
+                          @for (c of item.comments; track c) {
+                            <div class="comment-item">
+                              <div class="comment-author">
+                                <i class="pi pi-user"></i>
+                                <span class="author-name">{{ c.display_name }}</span>
+                                @if (c.cap_hoidong) {
+                                  <span class="comment-cap">{{ c.cap_hoidong === 'cap_khoa' ? 'Cấp khoa' : 'Cấp trường' }}</span>
+                                }
+                              </div>
+                              <div class="comment-body">{{ c.comment }}</div>
+                            </div>
+                          }
+                          @if (item.comments.length === 0) {
+                            <div class="comments-empty">
+                              Không có nhận xét cho phiên bản này.
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+      <!-- Empty state -->
+      @if (!loadingHistory() && historyItems().length === 0) {
+        <div class="history-empty">
+          <i class="pi pi-info-circle"></i> Không tìm thấy lịch sử sửa.
+        </div>
+      }
+    </div>
+  }
+</div>

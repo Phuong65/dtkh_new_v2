@@ -1,1 +1,162 @@
-﻿<div class="p-3">duyet-cauhoi.component works!</div>
+<div class="layout_component_container">
+  <!-- Main layout -->
+  <div class="lesson-baihocv2" [ngClass]="closeLeft ? 'close-left-body' : ''">
+
+    <!-- Phase 3: Sidebar -->
+    <div class="menu-lesson-baihocv2">
+      <button class="button-close-left-body" (click)="closeLeftBody()" [attr.aria-label]="closeLeft ? 'Mở menu' : 'Đóng menu'">
+        <i [ngClass]="closeLeft ? 'pi pi-bars' : 'pi pi-times'"></i>
+      </button>
+
+      <div class="menu-list-lessonv2">
+        <!-- Loading skeleton -->
+        @if (isLoading) {
+          @for (s of [1,2,3,4,5]; track s) {
+            <div class="skeleton-item">
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line"></div>
+            </div>
+          }
+        }
+
+        <!-- Error state -->
+        @if (hasError && !isLoading) {
+          <div class="error-state">
+            <div class="error-state-icon">⚠️</div>
+            <div class="error-state-title">Không thể tải dữ liệu</div>
+            <div class="error-state-hint">Vui lòng kiểm tra kết nối và thử lại</div>
+            <button class="error-retry-btn" (click)="retryLoad()">
+              🔄 Thử lại
+            </button>
+          </div>
+        }
+
+        <!-- Empty state -->
+        @if (!isLoading && !hasError && (!list_plan || list_plan.length === 0)) {
+          <div class="sidebar-empty">
+            <div class="sidebar-empty-icon">📂</div>
+            <div class="sidebar-empty-title">Chưa có dữ liệu kế hoạch</div>
+            <div class="sidebar-empty-hint">Vui lòng kiểm tra cấu hình môn học</div>
+          </div>
+        }
+
+        <!-- Plan list -->
+        @if (!isLoading && !hasError && list_plan && list_plan.length > 0) {
+          @for (parent of list_plan; track trackByPlanId($index, parent)) {
+            <div class="parent-lesson-layout"
+              [class.active]="selectPlan && parent.id === selectPlan.id">
+              <div class="parent-name">
+                <div (click)="onChangePlan(parent)" class="parent-name-layout">
+                  <div class="plan-item-icon">{{ planVm[parent.id]?.icon || '📝' }}</div>
+                  <div class="plan-item-content">
+                    @if (parent.week > 0 && parent.week < 100) {
+                      <span class="parent-title">
+                        {{ label_parent_kehoach }} {{ parent.week }}
+                      </span>
+                    }
+                    @if (parent.week <= 0 || parent.week >= 100) {
+                      <span class="parent-title">
+                        {{ parent.title }}
+                      </span>
+                    }
+                    <!-- Progress bar -->
+                    @if (planVm[parent.id]?.progressPercent !== undefined) {
+                      <div class="plan-item-progress">
+                        <div class="progress-bar-track">
+                          <div class="progress-bar-fill"
+                            [class.complete]="planVm[parent.id]?.progressPercent === 100"
+                            [class.partial]="planVm[parent.id]?.progressPercent > 0 && planVm[parent.id]?.progressPercent < 100"
+                            [class.empty]="planVm[parent.id]?.progressPercent === 0"
+                            [style.width.%]="planVm[parent.id]?.progressPercent || 0">
+                          </div>
+                        </div>
+                        <span class="progress-text">
+                          {{ parent['questions_duyet'] }}/{{ parent['questions_tong'] }}
+                        </span>
+                      </div>
+                    }
+                  </div>
+                  <!-- Status badge -->
+                  @if (planVm[parent.id]?.statusLabel) {
+                    <span class="status-badge"
+                      [ngClass]="planVm[parent.id]?.statusClass">
+                      {{ planVm[parent.id]?.statusLabel }}
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Phase 4: Content Area -->
+    <div class="lesson-content-right-monhoc-v2 content-form-lesson-right-top">
+
+      <!-- Content empty state -->
+      @if (!selectPlan || !selectedMonhocThamdinh) {
+        <div class="content-empty">
+          <div class="content-empty-icon">👈</div>
+          <div class="content-empty-title">Chọn một mục ở danh sách bên trái để bắt đầu duyệt</div>
+          <div class="content-empty-hint">Chọn bài học hoặc nội dung cần duyệt từ menu bên trái</div>
+          @if (list_plan && list_plan.length > 0) {
+            <button class="content-empty-btn" (click)="selectNextPending()">
+              ➡️ Mục cần duyệt tiếp theo
+            </button>
+          }
+        </div>
+      }
+
+      <!-- Active content -->
+      @if (selectPlan && selectedMonhocThamdinh) {
+        <!-- Child component -->
+        <div class="content-body">
+          <container-element>
+            @switch (selectPlan.week) {
+              @default {
+                <app-duyet-cauhoi-tn [hoidong]="list_thanhvien" [courseSelected]="courseSelected"
+                [activity]="selectPlan"></app-duyet-cauhoi-tn>
+              }
+              @case (1000) {
+                <container-element>
+                  @switch (selectPlan.type) {
+                    @default {
+                      <app-duyet-thuongxuyen-tuluan [listThamDInh]="list_thanhvien"
+                        [selectedCourse]="courseSelected"
+                      [planTuluan]="selectPlan"></app-duyet-thuongxuyen-tuluan>
+                    }
+                    @case ('THUONGXUYEN_DUAN') {
+                      <app-duyet-thuongxuyen-duan [listThamDInh]="list_thanhvien"
+                        [selectedCourse]="courseSelected"
+                      [planTuluan]="selectPlan"></app-duyet-thuongxuyen-duan>
+                    }
+                  }
+                </container-element>
+              }
+              @case (100) {
+                <container-element>
+                  @switch (selectPlan.id) {
+                    @default {
+                      <app-duyet-cauhoi-tn [hoidong]="list_thanhvien" [courseSelected]="courseSelected"
+                      [activity]="selectPlan"></app-duyet-cauhoi-tn>
+                    }
+                    @case (0) {
+                      <app-duyet-cauhoi-thuchanh-kthp [listThamDInh]="list_thanhvien"
+                        [selectedCourse]="courseSelected" [planTuluan]="selectPlan">
+                      </app-duyet-cauhoi-thuchanh-kthp>
+                    }
+                    @case (-1000) {
+                      <app-form-de-manager [listThamDInh]="list_thanhvien" [selectedCourse]="courseSelected">
+                      </app-form-de-manager>
+                    }
+                  }
+                </container-element>
+              }
+            }
+          </container-element>
+        </div>
+      }
+    </div>
+  </div>
+</div>

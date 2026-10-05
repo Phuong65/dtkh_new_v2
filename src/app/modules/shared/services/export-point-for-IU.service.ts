@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import * as FileSaver from 'file-saver';
 import * as exceljs from 'exceljs';
-import * as XLSX from 'xlsx';
-import { count } from 'rxjs/operators';
-import * as JSZip from 'jszip';
+
+import JSZip from 'jszip';
 
 @Injectable( {
     providedIn: 'root'

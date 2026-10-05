@@ -8,7 +8,7 @@ describe('DuyetCauhoiThuchanhKthpComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DuyetCauhoiThuchanhKthpComponent ]
+      imports: [ DuyetCauhoiThuchanhKthpComponent ]
     })
     .compileComponents();
 

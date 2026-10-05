@@ -1,0 +1,58 @@
+[33m>[39m Building...
+[32m√[39m Building...
+[1mInitial chunk files[22m                                [2m | [22m[1mNames[22m                                  [2m | [22m [1mRaw size[22m
+[32mscripts.js[39m                                         [2m | [22m[2mscripts[22m                                [2m | [22m  [36m2.65 MB[39m[2m | [22m
+[32mstyles.css[39m                                         [2m | [22m[2mstyles[22m                                 [2m | [22m[36m929.35 kB[39m[2m | [22m
+[32mchunk-A5RAL5KV.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m[36m184.32 kB[39m[2m | [22m
+[32mchunk-UQZADBS2.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m[36m120.37 kB[39m[2m | [22m
+[32mmain.js[39m                                            [2m | [22m[2mmain[22m                                   [2m | [22m [36m49.68 kB[39m[2m | [22m
+[32mchunk-XIPT5G53.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m [36m23.50 kB[39m[2m | [22m
+[32mchunk-5YJKE4CX.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m [36m23.26 kB[39m[2m | [22m
+[32mchunk-X676XJPF.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m [36m20.89 kB[39m[2m | [22m
+[32mchunk-BPAKXF2N.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m [36m19.30 kB[39m[2m | [22m
+[32mchunk-P5RBYGEH.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m [36m16.55 kB[39m[2m | [22m
+[32mchunk-ZPYK57F2.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m [36m11.17 kB[39m[2m | [22m
+[32mchunk-QM4LVK5M.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m [36m10.36 kB[39m[2m | [22m
+[32mchunk-XLY4GLNV.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m  [36m5.27 kB[39m[2m | [22m
+[32mchunk-AUQRCDGT.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m  [36m5.02 kB[39m[2m | [22m
+[32mchunk-KOOWESPV.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m  [36m4.47 kB[39m[2m | [22m
+[32mchunk-RXC2SSJB.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m  [36m4.03 kB[39m[2m | [22m
+[32mchunk-WZHAZL3J.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m  [36m3.32 kB[39m[2m | [22m
+[32mchunk-6JSSJUVA.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m  [36m3.24 kB[39m[2m | [22m
+[32mchunk-TRIFMZ3E.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m  [36m2.05 kB[39m[2m | [22m
+[32mchunk-XPC4IEDW.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m  [36m1.75 kB[39m[2m | [22m
+[32mchunk-GDL6JTGF.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m  [36m1.70 kB[39m[2m | [22m
+[32mchunk-CADVT2VF.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m  [36m1.49 kB[39m[2m | [22m
+[32mchunk-KGUVAWHL.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m  [36m1.25 kB[39m[2m | [22m
+[32mchunk-NHXHSWY3.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m[36m948 bytes[39m[2m | [22m
+[32mpolyfills.js[39m                                       [2m | [22m[2mpolyfills[22m                              [2m | [22m [36m95 bytes[39m[2m | [22m
+
+[1m [22m                                                  [2m | [22m[1mInitial total[22m                          [2m | [22m  [1m4.10 MB[22m
+
+[1mLazy chunk files[22m                                   [2m | [22m[1mNames[22m                                  [2m | [22m [1mRaw size[22m
+[32mmanage-class-details.component-IAMTHLCG.js[39m         [2m | [22m[2mmanage-class-details-component[22m         [2m | [22m  [36m2.19 MB[39m[2m | [22m
+[32mchunk-6CGMCSBY.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m  [36m1.87 MB[39m[2m | [22m
+[32mpublic.module-7P4GHHHQ.js[39m                          [2m | [22m[2mpublic-module[22m                          [2m | [22m  [36m1.28 MB[39m[2m | [22m
+[32mdongbo-dulieu-main.component-XUHPYJYO.js[39m           [2m | [22m[2mdongbo-dulieu-main-component[22m           [2m | [22m  [36m1.05 MB[39m[2m | [22m
+[32mquanly-duyetnoidung-hoctap-v2.component-GB4DWAGP.js[39m[2m | [22m[2mquanly-duyetnoidung-hoctap-v2-component[22m[2m | [22m[36m967.66 kB[39m[2m | [22m
+[32mkehoach.component-UEQHU57G.js[39m                      [2m | [22m[2mkehoach-component[22m                      [2m | [22m[36m857.37 kB[39m[2m | [22m
+[32mduyet-cauhoi.component-ORUUBM6D.js[39m                 [2m | [22m[2mduyet-cauhoi-component[22m                 [2m | [22m[36m827.43 kB[39m[2m | [22m
+[32mmonhoc-kiemtra-danhgia.component-5ASJ32CB.js[39m       [2m | [22m[2mmonhoc-kiemtra-danhgia-component[22m       [2m | [22m[36m801.78 kB[39m[2m | [22m
+[32mcauhoi-tracnghiem-chitiet.component-6TY4TEBT.js[39m    [2m | [22m[2mcauhoi-tracnghiem-chitiet-component[22m    [2m | [22m[36m791.50 kB[39m[2m | [22m
+[32mquanly-duyetnoidung-hoctap-v2.component-VQ2JOKS7.js[39m[2m | [22m[2mquanly-duyetnoidung-hoctap-v2-component[22m[2m | [22m[36m651.24 kB[39m[2m | [22m
+[32mtopical-question-bank-v2.component-XQPTWKTI.js[39m     [2m | [22m[2mtopical-question-bank-v2-component[22m     [2m | [22m[36m622.69 kB[39m[2m | [22m
+[32mtao-cathi.component-Q2INWG3F.js[39m                    [2m | [22m[2mtao-cathi-component[22m                    [2m | [22m[36m481.11 kB[39m[2m | [22m
+[32mmonhoc-formde.component-3V2LLRBZ.js[39m                [2m | [22m[2mmonhoc-formde-component[22m                [2m | [22m[36m477.26 kB[39m[2m | [22m
+[32mmonhoc-noidung.component-2VTHVTNE.js[39m               [2m | [22m[2mmonhoc-noidung-component[22m               [2m | [22m[36m457.42 kB[39m[2m | [22m
+[32mchunk-4BTGOWKG.js[39m                                  [2m | [22m[2m-[22m                                      [2m | [22m[36m452.38 kB[39m[2m | [22m
+[2m...and 234 more lazy chunks files. Use "--verbose" to show all the files.[22m
+
+Application bundle generation complete. [36.881 seconds] - 2026-10-03T16:13:58.299Z
+
+Watch mode enabled. Watching for file changes...
+NOTE: Raw file sizes do not reflect development server per-request transformations.
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m8008[22m/[39m
+[33m>[39m Changes detected. Rebuilding...
+[32m√[39m Changes detected. Rebuilding...
+Application bundle generation failed. [26.350 seconds] - 2026-10-03T16:25:34.587Z
+

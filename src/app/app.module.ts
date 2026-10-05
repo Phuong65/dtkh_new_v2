@@ -10,9 +10,7 @@ import { PopupComponent } from '@core/components/popup/popup.component';
 import { AppSafeHtmlPipe } from '@core/pipes/app-safe-html.pipe';
 import { InterceptorsService } from '@core/services/interceptors.service';
 import { NgApexchartsModule } from 'ng-apexcharts';
-import { NgbActiveOffcanvas , NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { ButtonModule } from 'primeng/button';
-import { RippleModule } from 'primeng/ripple';
+import { NgbActiveOffcanvas  } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmRoundedComponent } from '@core/components/confirm-rounded/confirm-rounded.component';
 import { ConfirmDeleteComponent } from '@core/components/confirm-delete/confirm-delete.component';
 import { TranslateLoader , TranslateModule } from '@ngx-translate/core';
@@ -21,11 +19,7 @@ import { getSaver , SAVER } from '@core/providers/saver.provider';
 import { AlertComponent } from '@core/components/alert/alert.component';
 import { providePrimeNG } from 'primeng/config';
 import Lara from '@primeuix/themes/lara';
-
-import { OverlayModule } from '@angular/cdk/overlay';
-import { FormBuilder } from '@angular/forms';
 import { AppTranslateButtonPipe } from '@core/pipes/app-translate-button.pipe';
-
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory( httpClient : HttpClient ) {
@@ -38,15 +32,11 @@ export function HttpLoaderFactory( httpClient : HttpClient ) {
 	] ,
 	imports      : [
 		BrowserModule ,
-		
 		ToastModule ,
-		
 		AppRoutingModule ,
 		NgApexchartsModule ,
-		OverlayModule ,
-		NgbModule ,
-		ButtonModule ,
-		RippleModule ,
+
+
 		ConfirmComponent ,
 		PopupComponent ,
 		AppSafeHtmlPipe ,
@@ -63,7 +53,6 @@ export function HttpLoaderFactory( httpClient : HttpClient ) {
 		} )
 	] ,
 	providers    : [
-		FormBuilder ,
 		NgbActiveOffcanvas ,
 		MessageService ,
 		{ provide : SAVER , useFactory : getSaver } ,

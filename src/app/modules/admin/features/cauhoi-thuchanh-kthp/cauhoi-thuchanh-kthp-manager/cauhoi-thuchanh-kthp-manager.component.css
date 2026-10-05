@@ -8,4 +8,6 @@
 .layout_component_container-bottom {
     height: calc(100% - 81px);
     padding: 5px;
+    overflow: hidden;
+    overflow-y: auto;
 }

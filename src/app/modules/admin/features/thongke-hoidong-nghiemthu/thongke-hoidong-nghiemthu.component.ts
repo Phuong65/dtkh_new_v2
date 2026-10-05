@@ -23,7 +23,6 @@ import { SharedModule } from '@modules/shared/shared.module';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import { DatePickerModule } from 'primeng/datepicker';
-import { ButtonDirective } from 'primeng/button';
 import { PanelModule } from 'primeng/panel';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TableModule } from 'primeng/table';
@@ -46,7 +45,7 @@ import type {
         PanelModule,
         ProgressBarModule,
         DatePickerModule,
-        ButtonDirective
+
     ],
     templateUrl: './thongke-hoidong-nghiemthu.component.html',
     styleUrls: ['./thongke-hoidong-nghiemthu.component.css']

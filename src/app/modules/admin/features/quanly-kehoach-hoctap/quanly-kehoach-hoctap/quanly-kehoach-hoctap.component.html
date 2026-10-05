@@ -38,10 +38,11 @@
                     @if (col['key'] !== 'title' && col['key'] !== 'editor_name') {
                       <span>{{row[col['key']]}}</span>
                     }
+                    
                     @if (col['key'] === 'title') {
                       <div class="title-col-flex">
                         <span (click)="actionsEvent({key:'moveToLesson'},row)"
-                        class="title-col-flex-text">{{row[col['key']]}}</span>
+                        class="title-col-flex-text text-left">{{row[col['key']]}}</span>
                         @if (!readonly) {
                           <button [matMenuTriggerFor]="menuAction"
                             class="btn btn-success btn-icon btn-transparent">

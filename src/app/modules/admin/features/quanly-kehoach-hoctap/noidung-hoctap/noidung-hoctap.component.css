@@ -149,3 +149,8 @@
     overflow: auto;
     padding: 5px;
 }
+
+.tbl-danhSachUser{
+    overflow: hidden;
+    overflow-y: auto;
+}

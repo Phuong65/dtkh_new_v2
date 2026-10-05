@@ -1,1 +1,494 @@
-﻿<div class="p-3">duyet-baigiang.component works!</div>
+<div class="layout_component_container">
+  <div class="lesson-baihocv2" [ngClass]="closeLeft?'close-left-body':''" style="transition: all 0.3s;">
+    <div class="menu-lesson-baihocv2">
+      <button style="margin-left: 5px; padding: 0px; min-width: 0px; z-index: 50;" (click)="closeLeftBody()"
+        class="btn btn-success button-close-left-body">
+        <i style="margin: 0px;vertical-align: middle; font-size: 13px;"
+        [ngClass]="closeLeft?'pi pi-angle-double-right':'pi pi-angle-double-left'"></i>
+      </button>
+      <div class="menu-list-lessonv2">
+        @for (parent of list_plan; track parent; let keyParent = $index) {
+          <div class="parent-lesson-layout">
+            <div class="parent-name" [ngClass]="selectPlan && parent.id === selectPlan.id ?'activity':''">
+              <div (click)="onChangePlan(parent)" class="parent-name-layout">
+                @if(parent.week !== 0 && parent.week < 1000){ <span class="parent-title">
+                  {{label_parent_kehoach}}
+                {{parent.week}}</span>
+              }
+              @if(parent.week === 0 || parent.week >= 1000){
+                <span class="parent-title">{{parent.title}}</span>
+              }
+            </div>
+          </div>
+          @if(parent['desc']) {
+            <div class="parent-desc" style="padding: 5px;">
+              <div class="parent-desc-content" style="padding: 10px; font-size: 14px;"
+                [innerHtml]="parent['desc'] | safeHtmlDecode">
+              </div>
+            </div>
+          }
+          @for (children of parent['children']; track children.id; let index = $index) {
+            @if (children.type !== 'ACTIVITY_TEST') {
+                    <div [class.activity]="
+                selectedPlanActivity &&
+                children.id === selectedPlanActivity.id
+            " class="child-lesson-layout">
+                <div (click)="onChangePlan(parent, children, index)" class="child-lesson-layout-title">
+                  <span class="child-title">
+                    {{ children.title }}
+                  </span>
+                </div>
+                <div class="action-menu">
+                  @if (children.files && children.files.length) {
+                    <span class="action-icon">
+                      <i style="color: #007bff;" class="fa fa-paperclip"></i>
+                    </span>
+                  }
+                  @if (children.course_lesson_id) {
+                    <span class="action-icon">
+                      <i class="fa fa-book"></i>
+                    </span>
+                  }
+                  @if (parent.week !== 0) {
+                    @switch (children['status']) {
+                      @case (0) {
+                        <span class="action-icon status-is-deactive">
+                          Chờ duyệt
+                        </span>
+                      }
+                      @case (1) {
+                        <span class="action-icon status-is-active">
+                          Đạt
+                        </span>
+                      }
+                      @case (-1) {
+                        <span class="action-icon status-is-redo">
+                          Chưa đạt
+                        </span>
+                      }
+                      @case (-2) {
+                        <span class="action-icon status-is-require">
+                          Yêu cầu duyệt
+                        </span>
+                      }
+                    }
+                  }
+                </div>
+              </div>
+            }
+          }
+          @if (!parent['children'] || !parent['children'].length) {
+            <div class="child-lesson-layout">
+              <div style="justify-content: center; height: 100%; cursor:default;"
+              class="child-lesson-layout-title">Không có {{label_parent_kehoach}} nào</div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+  <div class="lesson-content-right-monhoc-v2 content-form-lesson-right-top">
+    @if(selectPlan && selectedMonhocThamdinh) {
+      <div>
+        <ng-container [ngTemplateOutlet]="baiTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="activityTemplate"></ng-container>
+      </div>
+    }
+  </div>
+</div>
+</div>
+
+<ng-template #baiTemplate>
+  <div class="layout-panel" id="plan" #planElm style="padding-top: 10px;">
+    <p-panel header="{{selectPlan?label_parent_kehoach +' '+selectPlan.week:''}}">
+      <table class="table-thamdinh">
+        <tr class="table_header">
+          <th style="width:150px">Tiêu đề</th>
+          <th style="width:180px">Kết quả</th>
+          @for (user of list_thanhvien; track user.user.id) {
+            <th>
+              {{ user.user.display_name }}<br>
+              {{ user.chutich ? '(Chủ tịch)' : '(Ủy viên)' }}
+            </th>
+          }
+        </tr>
+        @if (selectPlan.children?.length > 0) {
+
+          @for (cdr of selectPlan.children; track cdr.id) {
+
+            <tr class="table_body-item">
+
+              <td style="text-align: left;">
+                {{ cdr.title }}
+              </td>
+
+              <td style="position: relative;"
+                [class.dat_dangsua]=" cdr['old_status'] === 1 && cdr['status'] === 0"
+                [class]=" cdr['old_status'] === 1 && cdr['status'] === 0 ? 'dat_dangsua' : cdr['_status_class']">
+                <div style="display: flex; flex-direction: column;">
+                  <span>
+                    {{ cdr['_status_label'] }}
+                  </span>
+
+                  <span class="date_duyet">{{cdr['approved_at'] | date: 'dd/MM/yyyy HH:mm ':'UTC+7'}}
+                  </span>
+                </div>
+              </td>
+
+              @for (user of list_thanhvien; track user.user?.id ?? $index) {
+
+                    <td [class.danhanxet]="user['checkComment']?.[cdr.id]" [class.chuanhanxet]="
+                        !user['checkComment']?.[cdr.id]">
+
+                  @if (user['checkComment']) {
+                    {{user['checkComment'][cdr.id] ? 'Đã nhận xét' : 'Chưa nhận xét'}}
+                  }
+
+                </td>
+
+              }
+
+            </tr>
+
+          }
+
+        }
+        @if(this.selectPlan.children.length === 0){
+          <tr>
+            <td colspan="20"> Chưa có dữ liệu</td>
+          </tr>
+        }
+      </table>
+    </p-panel>
+  </div>
+</ng-template>
+
+
+
+
+<ng-template #activityTemplate>
+
+  @for (child of this.selectPlan.children; track child.id) {
+    <div id="{{'cdr_'+child.id}}" class="layout-panel" style="padding-top: 10px;">
+      <p-panel header="{{child.title}}">
+        <ng-template pTemplate="icons">
+          <div style="display: flex; align-items: center;">
+
+            @switch (child.status) {
+              @case(0) {
+                <span class="box-span cho-duyet-box">Chờ duyệt</span>
+              }
+              @case(1) {
+                <span class="box-span dat-box">Đạt</span>
+              }
+              @case(-1) {
+                <span class="box-span yeu-cau-sua-box">Yêu cầu sửa</span>
+              }
+              @case(-2) {
+                <span class="box-span da-sua-box">Đã sửa</span>
+              }
+            }
+
+          </div>
+        </ng-template>
+
+        @switch(child.type) {
+          @case('MUCTIEU') {
+            <ng-container [ngTemplateOutlet]="muctieuTemplate" [ngTemplateOutletContext]="{ activity: child}"></ng-container>
+          }
+          @case('ACTIVITY') {
+            <ng-container [ngTemplateOutlet]="templateTailieuGiangday" [ngTemplateOutletContext]="{ activity: child}"></ng-container>
+          }
+        }
+
+      </p-panel>
+    </div>
+  }
+  @for (child of this.selectPlan.children; track child) {
+    <div id="{{'cdr_'+child.id}}" class="layout-panel" style="padding-top: 10px;"
+      >
+      <p-panel header="{{child.title}}">
+        <ng-template pTemplate="icons">
+          <div style="display: flex; align-items: center;">
+            <div>
+              @switch (child.status) {
+                @case (0) {
+                  <span class="box-span cho-duyet-box">Chờ duyệt</span>
+                }
+                @case (1) {
+                  <span class="box-span dat-box">Đạt</span>
+                }
+                @case (-1) {
+                  <span class="box-span yeu-cau-sua-box">Yêu cầu sửa</span>
+                }
+                @case (-2) {
+                  <span class="box-span da-sua-box">Đã sửa</span>
+                }
+              }
+            </div>
+            @if (child.status === 1) {
+              <div style="margin-right: 5px;">
+                <span style="margin-left: 5px;" class="box-span dat-box">
+                  Duyệt lúc: {{child['approved_at'] | ovicDateTime}}
+                </span>
+              </div>
+            }
+          </div>
+        </ng-template>
+        <div>
+          @switch (child.type) {
+            @case ('MUCTIEU') {
+              <ng-container [ngTemplateOutlet]="muctieuTemplate"
+              [ngTemplateOutletContext]="{ activity: child}"></ng-container>
+            }
+            @case ('ACTIVITY') {
+              <ng-container [ngTemplateOutlet]="templateTailieuGiangday"
+              [ngTemplateOutletContext]="{ activity: child}"></ng-container>
+            }
+          }
+        </div>
+      </p-panel>
+    </div>
+  }
+</ng-template>
+
+<ng-template #muctieuTemplate let-activity="activity">
+  <div class="ovic-vertical__inputs" style="line-height: 1.5;">
+    <div class="row form-row">
+      <div class="col-12 flex-div">
+        <label>Về kiến thức:</label>
+        <div class="info-desc ql-editor" [innerHtml]="activity['kienthuc'] | safeHtmlDecode"></div>
+      </div>
+    </div>
+    <div class="row form-row">
+      <div class="col-12 flex-div">
+        <label>Về kỹ năng:</label>
+        <div class="info-desc ql-editor" [innerHtml]="activity['kynang'] | safeHtmlDecode"></div>
+      </div>
+    </div>
+  </div>
+  <ng-container [ngTemplateOutlet]="templateDuyet" [ngTemplateOutletContext]="{ activity: activity}">
+  </ng-container>
+</ng-template>
+
+<ng-template #templateTailieuGiangday let-activity="activity">
+  <div class="ovic-vertical__inputs back-ground-info" style="line-height: 1.5;">
+    @if (activity['files']) {
+      <div class="row form-row form-row-flex-row">
+        <div class="col-12 flex-div">
+          <div class="files-list-view">
+            @for (file of activity['files']; track file; let i = $index) {
+              <div class="single-file" (click)="onSelectFileReview(file)">
+                <i class="icon-in-open-download-file" [class]="file | ovicFileIcon"></i>
+                <div class="info">
+                  <h4 class="name">
+                    {{ file.title }}
+                  </h4>
+                  <p class="size">
+                    {{ file['file_size'] }}
+                  </p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (activity['slides']) {
+      <div class="row form-row form-row-flex-row">
+        <div class="col-12 flex-div">
+          <div class="files-list-view">
+            @for (slide of activity['slides']; track slide; let i = $index) {
+              <div class="single-file" (click)="onSelectFileReview(slide)"
+                >
+                <i class="icon-in-open-download-file" [ngClass]="slide | ovicFileIcon"></i>
+                <div class="info">
+                  <h4 class="name">{{slide.title}}</h4>
+                  <p class="size">{{slide['file_size']}}</p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (activity['desc']) {
+      <div class="row form-row">
+        <div class="col-12">
+          <div id="editor" class="document-editor__editable">
+            <div class="ck ck-editor__main" role="presentation">
+              <div style="border:none"
+                class="ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred"
+                [innerHtml]="activity['desc'] | safeHtml">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (activity['video']) {
+      <div class="row form-row">
+        <div class="col-12">
+          <audio-viewer [type]="activity['video'].type" [path]="activity['video'].path"
+            [source]="activity['video'].source">
+          </audio-viewer>
+        </div>
+      </div>
+    }
+  </div>
+  <ng-container [ngTemplateOutlet]="templateDuyet" [ngTemplateOutletContext]="{ activity: activity}">
+  </ng-container>
+</ng-template>
+
+<ng-template #filesLessonReview let-c="close" let-d="dismiss">
+  <div class="ovic-over-right-section" style="height: 100vh;">
+    <div class="ovic-over-right-section__head">
+      <h3 class="ovic-over-right-section__header">View</h3>
+      <button class="btn ovic-over-right-section__close-button" (click)="d(true)"></button>
+    </div>
+    <div class="ovic-over-right-section__body footer-no-hint no-footer" style="padding: 0px;">
+      <div class="ovic-vertical__inputs back-ground-info" style="height: 100%;">
+        <view-document [file]="selectedFileReview?selectedFileReview:null">
+        </view-document>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #templateDuyet let-activity="activity">
+  <div class="class-duyet-layout"
+    [ngClass]="(!activity['comments'] || !activity['comments'].length) && !kd_hoidong && !kd_hoidong?'no-border-top':''">
+    <div style="width: 100%;" class="list-comment-layout">
+      @if ((kd_uyvien || kd_hoidong) && activity['status'] !== 1) {
+        <div [ngClass]="(!activity['comments'] || !activity['comments'].length) ? 'padding-top-15px':''"
+          class="comment-edit-layout">
+          <textarea placeholder="Nhập nội dung nhận xét trước khi duyệt hoặc yêu cầu sửa... "
+          [(ngModel)]="activity['textarea_comment']"></textarea>
+          <div class="action-edit-layout">
+            <button (click)="saveComment(1,activity)" style="line-height: 1; margin-bottom: 10px;"
+              class="btn btn-primary">Đồng ý duyệt
+            </button>
+            <button (click)="saveComment(-1,activity)" style="line-height: 1;" class="btn btn-danger">Yêu cầu
+            sửa</button>
+          </div>
+        </div>
+      }
+      @if (kd_hoidong && activity['status'] !== -1 && activity['status'] !== 1) {
+        <div style="padding: 15px 0px">
+          <div class="hozion-lay" style="position: relative;">
+            <label
+              style="font-weight: 600; z-index: 1; position: relative; background: whitesmoke; padding-right: 5px;">KẾT
+            LUẬN CỦA CHỦ TỊCH HỘI ĐỒNG: </label>
+          </div>
+          <div class="row">
+            <div class="col-6" style="text-align: center;">
+              @if (kd_hoidong) {
+                <button style="margin-right: 5px;line-height: 1; width: 50%;"
+                  (click)="duyetNoidung(activity, 1)" class="btn btn-primary">
+                  Đồng ý duyệt
+                </button>
+              }
+            </div>
+            <div class="col-6" style="text-align: center;">
+              @if (kd_hoidong) {
+                <button style="margin-left: 5px;line-height: 1;width: 50%;" (click)="duyetNoidung(activity, -1)"
+                  class="btn btn-danger">
+                  Yêu cầu sửa
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+      @if (activity.status === 1) {
+        <div class="view-comment-action">
+          <span (click)="actionViewComment(activity)">
+            {{activity['expandView']?'Ẩn nhận xét':'Hiển thị nhận xét'}}
+          </span>
+        </div>
+      }
+      <div class="view-comment-layout" [ngClass]="activity['expandView']?'':'close-view-comment'">
+        @for (comment of activity['comments']; track comment; let index = $index) {
+          <div class="comment-box">
+            <div class="inner-comment">
+              <div class="inner-comment-header">
+                <div style="flex: 1;">
+                  <span style="font-weight: 600; margin-right: 10px; text-decoration: underline;">
+                    {{comment['display_name'] +':'}}
+                  </span>
+                </div>
+              </div>
+              @if (comment['children'] && comment['children'].length) {
+                <div>
+                  @for (children of comment['children']; track children) {
+                    <div style="margin-bottom: 15px; ">
+                      <div [ngClass]="children['status'] === 1?'duyet-comment':'yeucausua-comment'"
+                        class="conten-comment-box">
+                        <div class="conten-comment-inner-box" [innerHTML]="children.comment">
+                        </div>
+                      </div>
+                      <div style="margin-left: 20px; margin-top: 5px;">
+                        <span
+                          style="font-size: 12px; color: #898989; margin-right: 20px; font-style: italic;">
+                          {{children.created_at | ovicDateTime}}
+                        </span>
+                        <span style="color: #898989; cursor: pointer;" (click)="openReply(children,index)">
+                          Phản hồi ({{children['count_reply']}})
+                        </span>
+                      </div>
+                      @if (children['reply_open'] === true) {
+                        <div class="reply-layout">
+                          <div class="list_reply_comments">
+                            @for (reply_comment of children['reply_comments']; track reply_comment) {
+                              <div style="margin-bottom: 15px;"
+                                >
+                                <div style="text-align: right; margin-bottom: 5px;">
+                                  <span>{{reply_comment['display_name']}}</span>
+                                </div>
+                                <div class="conten-comment-box-left"
+                                  [ngClass]="reply_comment['my_reply_comment']?'my-reply-comment':''">
+                                  <div class="conten-comment-inner-box-left"
+                                    [innerHTML]="reply_comment.comment">
+                                  </div>
+                                </div>
+                                <div style="margin-right: 20px; margin-top: 5px; text-align: right;">
+                                  <span style="font-size: 12px; color: #898989; font-style: italic;">
+                                    {{reply_comment.created_at | ovicDateTime}}
+                                  </span>
+                                </div>
+                              </div>
+                            }
+                          </div>
+                          @if (kd_hoidong || kd_uyvien || (selectedMonhocThamdinh && selectedMonhocThamdinh.course && userId === selectedMonhocThamdinh.course.creator_plan_id)) {
+                            <div style="display: flex; position: relative;"
+                              >
+                              <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
+                                <img style="width: 100%;" src="../../../assets/images/a_none.jpg">
+                              </div>
+                              <textarea
+                                style="height: 40px; margin-left: 10px; flex: 1; padding-right: 130px;"
+                                placeholder="Nhập phản hồi... "
+                              [(ngModel)]="children['textarea_comment']"></textarea>
+                              <button (click)="saveCommentReply(children , activity, index)"
+                                style="position: absolute; bottom: 5px; right:5px"
+                                class="btn btn-primary"><i class="fa fa-paper-plane"></i>
+                                Gửi phản hồi
+                              </button>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</ng-template>

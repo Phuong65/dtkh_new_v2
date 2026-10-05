@@ -862,8 +862,11 @@ export class QuanlyKehoachHoctapComponent implements OnInit {
     }
 
     onGetFileImport() {
-        inputImport.nativeElement.value = null;
-        inputImport.nativeElement.click();
+        const input = this.inputImport()?.nativeElement;
+        if (input) {
+            input.value = null;
+            input.click();
+        }
     }
 
     changeInputImport(event) {

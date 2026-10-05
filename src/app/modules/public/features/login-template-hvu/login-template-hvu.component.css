@@ -1,3 +1,6 @@
+/* Google font thường dùng là Roboto */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
+
 .form {
     position: relative;
     z-index: 1;
@@ -1011,9 +1014,6 @@ select:-webkit-autofill:focus {
     }
 }
 
-
-/* Google font thường dùng là Roboto */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
 
 .g-sign-in-button {
     display: inline-block;

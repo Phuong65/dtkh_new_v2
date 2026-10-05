@@ -1,1 +1,416 @@
-﻿<div class="p-3">duyet-cauhoi-tn-detail.component works!</div>
+<div class="layout_component_container">
+  <div class="detail-shell">
+    <!-- Sticky Header -->
+    @if (selectedQuestion) {
+      <header class="detail-header">
+        <div class="header-left">
+          <div class="question-title">
+            <span class="question-code">#{{ selectedQuestion.id }}</span>
+            <span class="question-cdr">{{ selectedQuestion.cdr | showlabel : CHUAN_DAU_RA : 'id' : 'label'
+            }}</span>
+          </div>
+          <div class="question-meta">
+            <span>
+              @switch (selectedQuestion.status) {
+                @case (1) {
+                  <span class="stat-tag tag-approved">
+                    <i class="pi pi-check-circle"></i> Đạt
+                  </span>
+                }
+                @case (-1) {
+                  <span class="stat-tag tag-reject">
+                    <i class="pi pi-exclamation-triangle"></i> Chưa đạt
+                  </span>
+                }
+                @case (-2) {
+                  <span class="stat-tag tag-require">
+                    <i class="pi pi-pencil"></i> Đã sửa
+                  </span>
+                }
+                @default {
+                  <span class="stat-tag tag-pending">
+                    <i class="pi pi-clock"></i> Chờ duyệt
+                  </span>
+                }
+              }
+            </span>
+            @if (selectedQuestion.private === 0) {
+              <span class="stat-tag tag-public">Public</span>
+            }
+            @if (selectedQuestion.private === 1) {
+              <span class="stat-tag tag-private">Private</span>
+            }
+            <span class="stat-tag"
+              [ngClass]="selectedQuestion.config && selectedQuestion.config.invertedAnswer ? 'sh-on' : 'sh-off'">
+              <i
+              [class]="selectedQuestion.config && selectedQuestion.config.invertedAnswer ? 'pi pi-sync pi-spin-hover' : 'pi pi-minus-circle'"></i>
+              {{ selectedQuestion.config && selectedQuestion.config.invertedAnswer ? 'Đảo phương án: Bật' :
+              'Đảo phương án: Tắt' }}
+            </span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-sm btn-outline-secondary" (click)="openNewQuestion('back')">
+            <i class="pi pi-angle-double-left"></i> Câu trước
+          </button>
+          <button class="btn btn-sm btn-outline-secondary" (click)="openNewQuestion('next')">
+            Câu sau <i class="pi pi-angle-double-right"></i>
+          </button>
+          <button class="btn btn-sm" [ngClass]="testMode ? 'btn-primary' : 'btn-outline-primary'"
+            (click)="toggleTestMode()">
+            <i class="pi" [ngClass]="testMode ? 'pi-stop-circle' : 'pi-play-circle'"></i>
+            {{ testMode ? 'Tắt thử nghiệm' : 'Chạy thử nghiệm' }}
+          </button>
+        </div>
+      </header>
+    }
+
+    <!-- Loading state -->
+    @if (loading) {
+      <div class="loading-state">
+        <div class="spinner">
+          <i class="pi pi-spin pi-spinner" style="font-size: 2rem;"></i>
+          <p>Đang tải dữ liệu...</p>
+        </div>
+      </div>
+    }
+
+    <!-- Empty state -->
+    @if (!loading && !selectedQuestion) {
+      <div class="empty-state">
+        <h3>Không tìm thấy câu hỏi</h3>
+        <p>Không thể tải thông tin câu hỏi #{{ questionId }}</p>
+        <button class="btn btn-primary" (click)="goBack()">Quay lại danh sách</button>
+      </div>
+    }
+
+    <!-- Main 2-column body -->
+    @if (!loading && selectedQuestion) {
+      <div class="detail-body">
+        <!-- Left column: Question preview -->
+        <div class="col-left">
+          <div class="card question-card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+              <h5 class="mb-0">Nội dung câu hỏi</h5>
+              @if (testMode) {
+                <span class="stat-tag tag-test-mode">
+                  <i class="pi pi-bolt"></i> Đang thử nghiệm
+                </span>
+              }
+            </div>
+            <div class="card-body" [class.test-mode-body]="testMode">
+              <div class="question-item-type">
+                @switch (selectedQuestion.question_type) {
+                  @case ('radio') {
+                    <div class="question-item-type-radio-and-checkbox">
+                      <app-question-type-radio-and-checkbox [av]="courseSelected?.av" [isReadOnly]="!testMode"
+                        [courseQuestion]="selectedQuestion">
+                      </app-question-type-radio-and-checkbox>
+                    </div>
+                  }
+                  @case ('checkbox') {
+                    <div class="question-item-type-radio-and-checkbox">
+                      <app-question-type-radio-and-checkbox [av]="courseSelected?.av" [isReadOnly]="!testMode"
+                        [courseQuestion]="selectedQuestion">
+                      </app-question-type-radio-and-checkbox>
+                    </div>
+                  }
+                  @case ('inputbox') {
+                    <div class="question-item-type-radio-and-checkbox">
+                      <app-question-type-inputbox [av]="courseSelected?.av" [isReadOnly]="!testMode"
+                        [courseQuestion]="selectedQuestion">
+                      </app-question-type-inputbox>
+                    </div>
+                  }
+                  @case ('reorder_words') {
+                    <div class="question-item-type-radio-and-checkbox">
+                      <app-question-type-reorder-words [av]="courseSelected?.av" [isReadOnly]="!testMode"
+                        [courseQuestion]="selectedQuestion">
+                      </app-question-type-reorder-words>
+                    </div>
+                  }
+                  @case ('arrange_paragraphs') {
+                    <div class="question-item-type-radio-and-checkbox">
+                      <app-question-type-arrange-paragraphs [av]="courseSelected?.av" [isReadOnly]="!testMode"
+                        [courseQuestion]="selectedQuestion">
+                      </app-question-type-arrange-paragraphs>
+                    </div>
+                  }
+                  @case ('drag_drop') {
+                    <div class="question-item-type-radio-and-checkbox">
+                      <app-question-type-drag-drop [av]="courseSelected?.av" [isReadOnly]="!testMode"
+                        [courseQuestion]="selectedQuestion">
+                      </app-question-type-drag-drop>
+                    </div>
+                  }
+                  @case ('group-input') {
+                    <div class="question-item-type-radio-and-checkbox">
+                      <app-question-type-group-input [av]="courseSelected?.av" [isReadOnly]="!testMode"
+                        [courseQuestion]="selectedQuestion">
+                      </app-question-type-group-input>
+                    </div>
+                  }
+                  @case ('group-radio') {
+                    <div class="question-item-type-radio-and-checkbox">
+                      <app-question-type-group-radio [av]="courseSelected?.av" [isReadOnly]="!testMode"
+                        [courseQuestion]="selectedQuestion">
+                      </app-question-type-group-radio>
+                    </div>
+                  }
+                  @case ('grouping') {
+                    <div class="question-item-type-radio-and-checkbox">
+                      <app-question-type-grouping [av]="courseSelected?.av" [isReadOnly]="!testMode"
+                        [courseQuestion]="selectedQuestion">
+                      </app-question-type-grouping>
+                    </div>
+                  }
+                }
+              </div>
+              <!-- Test mode result + actions -->
+              @if (testMode && previewChecked) {
+                <div class="test-preview-result">
+                  <div class="result-badge" [ngClass]="previewIsCorrect ? 'result-correct' : 'result-wrong'">
+                    <i class="fa" [ngClass]="previewIsCorrect ? 'fa-check-circle' : 'fa-times-circle'"></i>
+                    @if (previewIsCorrect) {
+                      <span>Kết quả: Đúng</span>
+                    }
+                    @if (!previewIsCorrect) {
+                      <span>Kết quả: Sai</span>
+                    }
+                    @if (hasChildResultSummary) {
+                      <span>({{ previewChildCorrectCount }} / {{
+                      previewChildTotal }} câu hỏi đúng)</span>
+                    }
+                  </div>
+                </div>
+              }
+              @if (testMode) {
+                <div class="test-preview-footer">
+                  @if (previewChecked) {
+                    <button (click)="retryPreview()"
+                      class="btn btn-outline-primary btn-sm">
+                      <i class="pi pi-refresh"></i> Thử lại
+                    </button>
+                  }
+                  <button (click)="checkAnswers()" class="btn btn-primary btn-sm" [disabled]="previewChecked">
+                    <i class="pi pi-check"></i> Kiểm tra đáp án
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+          <!-- History card: chỉ hiện khi câu hỏi đã từng được sửa -->
+          @if (selectedQuestion.question_root_id && selectedQuestion.question_root_id > 0) {
+            <app-question-history
+              [currentQuestion]="selectedQuestion"
+              [av]="courseSelected?.av || 0"
+              [courseId]="courseSelected?.id || 0">
+            </app-question-history>
+          }
+        </div>
+        <!-- Right column: Review actions -->
+        <div class="col-right">
+          <!-- Test report summary -->
+          @if (selectedQuestion['_reportQuestions'] && selectedQuestion['_reportQuestions'].length > 0) {
+            <div class="card report-card"
+              >
+              <div class="card-header">
+                <h6 class="mb-0 text-uppercase">Nhận xét của giảng viên test</h6>
+              </div>
+              <div class="card-body">
+                <table class="table-border w-100 table-hover tb-question-rp">
+                  @for (item of selectedQuestion['_reportQuestions']; track item) {
+                    <tr>
+                      <th class="">{{item['header'] == REPORT_HEADER_OTHER ? 'V. ' + item['header'] :
+                      item['header']}}</th>
+                      @for (itemchild of item['stats']; track itemchild) {
+                        <td class="ovic-w-150px text-center">
+                          <div [ngClass]="'rp-view-' + checkItemByReport(itemchild)">
+                            {{ itemchild.title + ' [' + itemchild.checkedCount + '/' +
+                            itemchild.total + ']' }}
+                          </div>
+                        </td>
+                      }
+                    </tr>
+                    <tr>
+                      @if (item['header'] == 'Nhận xét khác') {
+                        @if (item['others'].length > 0) {
+                          <td [colSpan]="5">
+                            <ul>
+                              @for (itemchild of item['others']; track itemchild) {
+                                <li>
+                                  {{itemchild.value}}
+                                </li>
+                              }
+                            </ul>
+                          </td>
+                        }
+                      } @else {
+                        @if (item['others'].length > 0) {
+                          <td [colSpan]="5">
+                            <p style="font-size: 14px;font-weight: 500;margin: 0;">Ý kiến khác:</p>
+                            <ul>
+                              @for (itemchild of item['others']; track itemchild) {
+                                <li>
+                                  {{itemchild.value}}
+                                </li>
+                              }
+                            </ul>
+                          </td>
+                        } @else {
+                          <td [colSpan]="5">Ý Kiến Khác:</td>
+                        }
+                      }
+                    </tr>
+                  }
+                </table>
+              </div>
+            </div>
+          }
+          @if (pendingUndoAction) {
+            <div class="undo-banner">
+              <div>
+                <strong>{{ pendingUndoAction.isLastQuestion ? 'Đã nhận xét xong tất cả các câu.' : 'Đã chuyển sang câu tiếp theo.' }}</strong>
+                Có thể khôi phục câu #{{ pendingUndoAction.questionId }} trong {{ undoRemainingSeconds }} giây.
+              </div>
+              <button class="btn btn-sm btn-warning" (click)="restorePreviousQuestion()">
+                <i class="pi pi-undo"></i>
+                {{kd_uyvien ? 'Hủy nhận xét câu trước' : 'Hủy quyết định câu trước'}}
+              </button>
+            </div>
+          }
+          <!-- Comment form for ủy viên -->
+          @if (!kd_hoidong && kd_uyvien && selectedQuestion['status'] !== 1 && canCommentQuestion(selectedQuestion)) {
+            <div class="card comment-card"
+              >
+              <div class="card-header">
+                <h6 class="mb-0">Nhận xét của bạn</h6>
+              </div>
+              <div class="card-body">
+                <div class="action-edit-layout">
+                  <button (click)="saveComment(1, selectedQuestion)" class="btn btn-success me-2">
+                    <i class="pi pi-check"></i> Đồng ý duyệt
+                  </button>
+                  <button (click)="saveComment(-1, selectedQuestion)" class="btn btn-danger">
+                    <i class="pi pi-pencil"></i> Yêu cầu sửa
+                  </button>
+                </div>
+                @if (showRequestChangeForm) {
+                  <div class="request-change-box">
+                    <label>Nội dung yêu cầu sửa</label>
+                    <textarea placeholder="Nhập nội dung yêu cầu sửa..."
+                      [(ngModel)]="selectedQuestion['textarea_comment']"
+                    class="form-control request-change-textarea"></textarea>
+                    <div style="text-align: right;">
+                      <button (click)="saveComment(-1, selectedQuestion)" class="btn btn-danger btn-sm mt-2">
+                        Gửi yêu cầu sửa
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+          <!-- Chủ tịch hội đồng actions -->
+          @if (kd_hoidong && selectedQuestion['status'] !== -1 && selectedQuestion['status'] !== 1) {
+            <div class="card chairman-card"
+              >
+              <div class="card-header">
+                <h6 class="mb-0">Kết luận của chủ tịch hội đồng</h6>
+              </div>
+              <div class="card-body text-center">
+                <button class="btn btn-primary me-2" (click)="duyetNoidung(selectedQuestion, 1)">
+                  <i class="pi pi-check"></i> Đồng ý duyệt
+                </button>
+                <button class="btn btn-danger" (click)="duyetNoidung(selectedQuestion, -1)">
+                  <i class="pi pi-pencil"></i> Yêu cầu sửa
+                </button>
+              </div>
+            </div>
+          }
+          <!-- Council comments list -->
+          @if (selectedQuestion) {
+            <div class="card comments-list-card">
+              <div class="card-header">
+                <h6 class="mb-0">Nhận xét hội đồng ({{ selectedQuestion['comments'] ?
+                selectedQuestion['comments'].length : 0 }})</h6>
+              </div>
+              <div class="card-body">
+                @if (!selectedQuestion['comments'] || !selectedQuestion['comments'].length) {
+                  <div
+                    class="text-muted text-center py-3">
+                    Không có nhận xét hội đồng
+                  </div>
+                }
+                @if (selectedQuestion['comments'] && selectedQuestion['comments'].length) {
+                  <div>
+                    @for (comment of selectedQuestion['comments']; track comment; let index = $index) {
+                      <div
+                        class="comment-box">
+                        <div class="comment-header">
+                          <span class="comment-author">{{ comment['display_name'] }}</span>
+                        </div>
+                        @if (comment['children'] && comment['children'].length) {
+                          <div>
+                            @for (children of comment['children']; track children) {
+                              <div class="comment-child">
+                                <div class="content-comment-box"
+                                  [ngClass]="children['status'] === 1 ? 'duyet-comment' : 'yeucausua-comment'">
+                                  <div class="content-comment-inner-box"
+                                  [innerHTML]="sanitizeHtml(children.comment)"></div>
+                                </div>
+                                <div class="comment-actions">
+                                  <span class="comment-date">{{ children.created_at | ovicDateTime }}</span>
+                                  <span class="comment-reply-btn" (click)="openReply(children, index)">
+                                    Phản hồi ({{ children['count_reply'] }})
+                                  </span>
+                                </div>
+                                <!-- Reply section -->
+                                @if (children['reply_open'] === true) {
+                                  <div class="reply-layout">
+                                    <div class="list-reply-comments">
+                                      @for (reply_comment of children['reply_comments']; track reply_comment) {
+                                        <div
+                                          class="reply-item">
+                                          <div class="reply-author">{{ reply_comment['display_name'] }}</div>
+                                          <div class="content-comment-box-left"
+                                            [ngClass]="reply_comment['my_reply_comment'] ? 'my-reply-comment' : ''">
+                                            <div class="content-comment-inner-box-left"
+                                            [innerHTML]="reply_comment.comment"></div>
+                                          </div>
+                                          <div class="reply-date">{{ reply_comment.created_at | ovicDateTime
+                                          }}</div>
+                                        </div>
+                                      }
+                                    </div>
+                                    @if (kd_hoidong || kd_uyvien || (courseSelected && userId === courseSelected.creator_plan_id)) {
+                                      <div class="reply-input"
+                                        >
+                                        <img src="assets/images/a_none.jpg" class="reply-avatar">
+                                        <textarea placeholder="Nhập phản hồi..."
+                                          [(ngModel)]="children['textarea_comment']"
+                                        class="reply-textarea"></textarea>
+                                        <button (click)="saveCommentReply(children, selectedQuestion, index)"
+                                          class="btn btn-primary btn-sm reply-send-btn">
+                                          <i class="fa fa-paper-plane"></i> Gửi
+                                        </button>
+                                      </div>
+                                    }
+                                  </div>
+                                }
+                              </div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

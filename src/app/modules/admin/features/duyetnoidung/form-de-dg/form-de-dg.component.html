@@ -1,1 +1,252 @@
-﻿<div class="p-3">form-de-dg.component works!</div>
+<div class="form-tracnghiem-panel-content" style="min-width: 100%;">
+  @if (list_test_dg?.length) {
+    <div class="form-tracnghiem-panel-content-table">
+      @switch (selectedCourse().av) {
+        @default {
+          <div class="content-table-cauhoi">
+            <p-table [value]="list_test_dg" styleClass="tbl-danhSachUser table-reBorder table-scroll-able">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th style="width: 150px; text-align: center;"></th>
+                  <th style="width: 200px; text-align: center;">Tổng câu lấy / Tổng câu hỏi
+                  </th>
+                  @for (cdr of chuandaura; track cdr) {
+                    <th [ngClass]="cdr.disabled ? 'display-none':''"
+                      style="text-align: center;">
+                      {{cdr.label}}
+                    </th>
+                  }
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-row>
+                <tr [ngClass]="!row['children'] || row['children'].length === 0?'require-cdr-backgroud-color':''">
+                  <th style="text-align: left; background-color: #f8f9fa;">
+                    <div style="display: flex;">
+                      <span style="flex: 1;">{{label_week +' '+row['week']}}</span>
+                    </div>
+                  </th>
+                  <th style="background-color: #f8f9fa;">
+                    (<span>
+                    {{row['question_take_total']}}
+                  </span>
+                  +
+                  <span style="color: orange;">
+                    {{row['question_take_total_private']}}
+                  </span>)
+                  / {{row['total_question']}}
+                </th>
+                <th style="background-color: #f8f9fa;" [colSpan]="6">
+                </th>
+              </tr>
+              @for (child of row['children']; track child) {
+                <tr
+                  [ngClass]="child['require_cdr']?'background-color-red':''">
+                  <td style="text-align: left; color: #3B82F6;">
+                    {{child['kyhieu']+' - '+child['cdr_name']}}
+                  </td>
+                  <td style="text-align: center;">
+                    <div style="height: 71px">
+                      <div class="question_take_total question_take_total_tag">
+                        <span class="public-class-question">
+                          Public
+                        </span>
+                        <span style="flex:1; min-width: 80px;">
+                          {{child['question_take_total']}} / {{child['total_question_cdr']}}
+                        </span>
+                      </div>
+                      <hr style="margin: 5px 0px;" />
+                      <div class="question_take_total question_take_total_tag">
+                        <span class="private-class-question">
+                          Private
+                        </span>
+                        <span style="flex:1;min-width: 80px;">
+                          {{child['question_take_total_private']}} /
+                          {{child['total_question_cdr_private']}}
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+                  @for (cdr of chuandaura; track cdr) {
+                    <td [ngClass]="cdr.disabled?'display-none':''" style="text-align: center;"
+                      >
+                      @if ((child.cdr_cauhoi || child['cdr_cauhoi_private'] ) && !cdr.disabled && ((child.cdr_cauhoi && child.cdr_cauhoi[cdr.id]) || (child.cdr_cauhoi_private && child.cdr_cauhoi_private[cdr.id]))) {
+                        <div
+                          >
+                          @if (child.cdr_cauhoi[cdr.id]) {
+                            <div class="p-inputgroup">
+                              <span class="cant-edit-question">
+                                {{child['question_take'][cdr.id]}}
+                              </span>
+                              <span class="p-inputgroup-addon tag-cdr-cauhoi-percent">
+                                / {{child.cdr_cauhoi[cdr.id]}}
+                              </span>
+                            </div>
+                          }
+                          @if (!child.cdr_cauhoi[cdr.id]) {
+                            <span class="no-question-input">
+                              -
+                            </span>
+                          }
+                          <hr style="margin: 5px 0px;" />
+                          @if (child.cdr_cauhoi_private[cdr.id]) {
+                            <div class="p-inputgroup">
+                              <span class="cant-edit-question">
+                                {{child['question_take_private'][cdr.id]}}
+                              </span>
+                              <span class="p-inputgroup-addon tag-cdr-cauhoi-percent private-color">
+                                / {{child.cdr_cauhoi_private[cdr.id]}}
+                              </span>
+                            </div>
+                          }
+                          @if (!child.cdr_cauhoi_private[cdr.id]) {
+                            <span class="no-question-input">
+                              -
+                            </span>
+                          }
+                        </div>
+                      }
+                      @if ((!child.cdr_cauhoi && !child.total_question_cdr_private)|| cdr.disabled || (!child.cdr_cauhoi[cdr.id] && !child.total_question_cdr_private[cdr.id])) {
+                        <span
+                          >
+                          -
+                        </span>
+                      }
+                    </td>
+                  }
+                </tr>
+              }
+            </ng-template>
+          </p-table>
+        </div>
+      }
+      @case (1) {
+        <div class="content-table-cauhoi">
+          <p-table [value]="list_test_dg" styleClass="tbl-danhSachUser table-reBorder table-scroll-able">
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 150px; text-align: center;"></th>
+                <th style="width: 200px; text-align: center;">Tổng câu lấy / Tổng
+                câu hỏi</th>
+                @for (part of list_part; track part) {
+                  <th style="text-align: center; width: 200px;">
+                    {{part}}
+                  </th>
+                }
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+              <tr [ngClass]="!row['children'] || row['children'].length === 0?'require-cdr-backgroud-color':''">
+                <th style="text-align: left; background-color: #f8f9fa;">
+                  <div style="display: flex;">
+                    <span style="flex: 1;">{{label_week +' '+row['week']}}</span>
+                    @if (row['has_test']) {
+                      <span style="margin-left: 10px; font-weight: normal;" class="blue"
+                        >
+                        Đã có đề
+                      </span>
+                    }
+                  </div>
+                </th>
+                <th style="background-color: #f8f9fa;">
+                  (<span>
+                  {{row['question_take_total']}}
+                </span>
+                +
+                <span style="color: orange;">
+                  {{row['question_take_total_private']}}
+                </span>)
+                / {{row['total_question']}}
+              </th>
+              <th style="background-color: #f8f9fa;" [colSpan]="list_part.length">
+              </th>
+            </tr>
+            @for (child of row['children']; track child) {
+              <tr
+                [ngClass]="child['require_part']?'background-color-red':''">
+                <td style="text-align: left; color: #3B82F6;">
+                  {{child['kyhieu']+' - '+child['cdr_name']}}
+                </td>
+                <td style="text-align: center;">
+                  <div style="height: 71px">
+                    <div class="question_take_total question_take_total_tag">
+                      <span class="public-class-question">
+                        Public
+                      </span>
+                      <span style="flex:1; min-width: 80px;">
+                        {{child['question_take_total']}} / {{child['total_question_cdr']}}
+                      </span>
+                    </div>
+                    <hr style="margin: 5px 0px;" />
+                    <div class="question_take_total question_take_total_tag">
+                      <span class="private-class-question">
+                        Private
+                      </span>
+                      <span style="flex:1;min-width: 80px;">
+                        {{child['question_take_total_private']}} /
+                        {{child['total_question_cdr_private']}}
+                      </span>
+                    </div>
+                  </div>
+                </td>
+                @for (part of list_part; track part; let i = $index) {
+                  <td style="text-align: center;">
+                    @if (child['parts'][part] || child['parts_private'][part]) {
+                      <div>
+                        @if (child['parts'][part] && child['parts'][part]['max_question']) {
+                          <div
+                            class="p-inputgroup">
+                            <span class="cant-edit-question">
+                              {{child['parts'][part]['question_take']}}
+                            </span>
+                            <span class="p-inputgroup-addon tag-cdr-cauhoi-percent">
+                              / {{child['parts'][part]['max_question']}}
+                            </span>
+                          </div>
+                        }
+                        @if (!child['parts'][part] || !child['parts'][part]['max_question']) {
+                          <span
+                            class="no-question-input">
+                            -
+                          </span>
+                        }
+                        <hr style="margin: 5px 0px;" />
+                        @if (child['parts_private'][part] && child['parts_private'][part]['max_question']) {
+                          <div
+                            class="p-inputgroup">
+                            <span class="cant-edit-question">
+                              {{child['parts_private'][part]['question_take']}}
+                            </span>
+                            <span class="p-inputgroup-addon tag-cdr-cauhoi-percent private-color">
+                              / {{child['parts_private'][part]['max_question']}}
+                            </span>
+                          </div>
+                        }
+                        @if (!child['parts_private'][part] || !child['parts_private'][part]['max_question']) {
+                          <span
+                            class="no-question-input">
+                            -
+                          </span>
+                        }
+                      </div>
+                    }
+                    @if (!child['parts'][part] && !child['parts_private'][part]) {
+                      <span>
+                        -
+                      </span>
+                    }
+                  </td>
+                }
+              </tr>
+            }
+          </ng-template>
+        </p-table>
+      </div>
+    }
+  }
+</div>
+} @else {
+  <div style="text-align: center; padding: 20px; color: #999;">Chưa tạo form</div>
+}
+<app-duyet-form-de (onChangeStatus)="changeStatusForm($event)" [selectedCourse]="selectedCourse()"
+[listThamDInh]="listThamDInh()" [typeForm]="formType()"></app-duyet-form-de>
+</div>

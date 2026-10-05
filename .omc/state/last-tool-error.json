@@ -1,7 +1,7 @@
 {
-  "tool_name": "mcp__plugin_everything-claude-code_playwright__browser_tabs",
-  "tool_input_preview": "{\"action\":\"list\",\"index\":0}",
-  "error": "### Error\nError: Extension connection timeout. Make sure the \"Playwright MCP Bridge\" extension is installed. See https://github.com/microsoft/playwright-mcp/blob/main/packages/extension/README.md for installation instructions.",
-  "timestamp": "2026-10-01T03:28:14.686Z",
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"gh search repos angular router --limit 1; gh search code 'router.parseUrl(router.url)' --language TypeScript --limit 1\",\"timeout\":20000,\"description\":\"Check existing Angular router example...",
+  "error": "Exit code 127\n/usr/bin/bash: line 1: gh: command not found\n/usr/bin/bash: line 1: gh: command not found",
+  "timestamp": "2026-10-02T03:34:02.267Z",
   "retry_count": 1
 }

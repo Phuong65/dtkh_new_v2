@@ -1,1 +1,236 @@
-﻿<div class="p-3">duyet-cauhoi-thuchanh-kthp.component works!</div>
+<div class="duyet-thuchanh-container">
+  <!-- ═══ Header Label ═══ -->
+  @if (planTuluan(); as currentPlanTuluan) {
+    <div class="duyet-thuchanh-header-label">
+      <span class="duyet-thuchanh-header-label__text">
+        <i class="pi pi-file-edit"></i>
+        {{ currentPlanTuluan.week > 0 && currentPlanTuluan.week < 100 ? ('Bài ' + currentPlanTuluan.week) : currentPlanTuluan.title }}
+      </span>
+    </div>
+  }
+
+  <!-- ═══ Toolbar ═══ -->
+  <div class="duyet-thuchanh-toolbar">
+    <!-- Filter Chips -->
+    <div class="filter-chips">
+      <span class="filter-chip" [class.filter-chip--active]="activeFilter === 100"
+        (click)="onFilterChipClick(100)">
+        Tất cả
+        <span class="filter-chip__count">{{ stats.total }}</span>
+      </span>
+      <span class="filter-chip" [class.filter-chip--active]="activeFilter === 0"
+        (click)="onFilterChipClick(0)">
+        Chờ duyệt
+        <span class="filter-chip__count">{{ stats.pending }}</span>
+      </span>
+      <span class="filter-chip" [class.filter-chip--active]="activeFilter === 1"
+        (click)="onFilterChipClick(1)">
+        Đã duyệt
+        <span class="filter-chip__count">{{ stats.approved }}</span>
+      </span>
+      <span class="filter-chip" [class.filter-chip--active]="activeFilter === -1"
+        (click)="onFilterChipClick(-1)">
+        Chưa đạt
+        <span class="filter-chip__count">{{ stats.rejected }}</span>
+      </span>
+
+      <!-- Divider + Chưa nhận xét chip -->
+      @if (kd_uyvien) {
+        <span class="filter-divider"></span>
+        <span class="filter-checkbox-chip" [class.filter-checkbox-chip--active]="_chuanhanxet === 1"
+          (click)="toggleChuaNhanXet()">
+          <i class="pi pi-comment" style="font-size: 11px;"></i> Chưa nhận xét
+        </span>
+      }
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="toolbar-actions">
+      @if (rejectRole && list_de_tuluan?.length) {
+        <button class="btn-action btn-action--primary-filled" (click)="approvedAll()" [disabled]="isLoading"
+          >
+          <i class="pi pi-check-circle"></i> Duyệt tất cả
+        </button>
+      }
+      @if (rejectRole) {
+        <button class="btn-action btn-action--danger" (click)="btnUpdateLockByActivityTuLuan(1)"
+          [disabled]="isLoading">
+          <i class="pi pi-lock"></i> Khóa
+        </button>
+      }
+      @if (rejectRole) {
+        <button class="btn-action btn-action--primary" (click)="btnUpdateLockByActivityTuLuan(0)"
+          [disabled]="isLoading">
+          <i class="pi pi-lock-open"></i> Mở khóa
+        </button>
+      }
+      <button class="btn-action btn-action--success" (click)="loadKynangTuluan(planTuluan())"
+        [disabled]="isLoading">
+        <i class="pi pi-refresh"></i> Làm mới
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ Loading Skeleton ═══ -->
+  @if (isLoading && !list_de_tuluan) {
+    <div class="skeleton-wrapper">
+      @for (i of [1,2,3,4,5]; track i) {
+        <div class="skeleton-row">
+          <div class="skeleton-cell skeleton-cell--medium"></div>
+          <div class="skeleton-cell skeleton-cell--medium"></div>
+          @for (h of hoidong; track h) {
+            <div class="skeleton-cell skeleton-cell--medium"></div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ═══ Empty State ═══ -->
+  @if (!isLoading && list_de_tuluan && list_de_tuluan.length === 0) {
+    <div class="empty-state">
+      <i class="pi pi-inbox empty-state__icon"></i>
+      <h4>Không có đề thực hành</h4>
+      <p>Chưa có đề thực hành KTHP nào trong môn học này</p>
+    </div>
+  }
+
+  <!-- ═══ Table ═══ -->
+  @if (!isLoading && list_de_tuluan && list_de_tuluan.length > 0) {
+    <div class="duyet-thuchanh-table-wrapper">
+      <p-table [value]="list_de_tuluan | filter : _chuanhanxet : ['_chuanhanxet'] | filter : _daduyet : ['_daduyet']"
+        styleClass="duyet-thuchanh-table">
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="col-code">Mã đề</th>
+            <th class="col-status">Kết quả duyệt</th>
+            @for (thanhvien of hoidong; track thanhvien; let i = $index) {
+              <th class="col-comment">
+                @if (thanhvien.chutich === 1) {
+                  <span>
+                    Chủ tịch<br>
+                    ({{thanhvien.user['display_name']}})
+                  </span>
+                }
+                @if (thanhvien.chutich !== 1) {
+                  <span>
+                    Ủy viên {{i}}<br>
+                    ({{thanhvien.user['display_name']}})
+                  </span>
+                }
+              </th>
+            }
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-question>
+          <tr class="question-row" (click)="onSelectDeTuluan(question)">
+            <!-- Cột mã đề + lock -->
+            <td class="col-code">
+              <div class="question-cell">
+                <span class="question-cell__code">#{{question.id}}</span>
+                @if (rejectRole) {
+                  <span>
+                    @if (question.status === 1) {
+                      <button
+                        class="question-cell__lock question-cell__lock--locked"
+                        pTooltip="Mở khóa, cho phép sửa" tooltipPosition="top"
+                        (click)="reDoAction($event, question, 0)">
+                        <i class="pi pi-lock"></i>
+                      </button>
+                    }
+                    @if (question.status !== 1) {
+                      <button
+                        class="question-cell__lock question-cell__lock--unlocked"
+                        pTooltip="Khóa, không cho phép sửa" tooltipPosition="top"
+                        (click)="reDoAction($event, question, 1)">
+                        <i class="pi pi-lock-open"></i>
+                      </button>
+                    }
+                  </span>
+                }
+              </div>
+            </td>
+            <!-- Cột kết quả duyệt -->
+            <td class="col-status">
+              @if (question['old_status'] === 1 && question['status'] === 0) {
+                <div class="status-badge--dual">
+                  <span class="status-badge-new status-badge--approved">
+                    <i class="pi pi-check"></i> Đạt
+                  </span>
+                  <span class="status-badge-new status-badge--pending">
+                    <i class="pi pi-pencil"></i> Đang sửa
+                  </span>
+                </div>
+              } @else {
+                @if (question['status'] === 0) {
+                  <span class="status-badge-new status-badge--pending">
+                    <i class="pi pi-clock"></i> Chờ duyệt
+                  </span>
+                }
+                @if (question['status'] === 1) {
+                  <span class="status-badge-new status-badge--approved">
+                    <i class="pi pi-check"></i> Đạt
+                  </span>
+                }
+                @if (question['status'] === -1) {
+                  <span class="status-badge-new status-badge--rejected">
+                    <i class="pi pi-times"></i> Chưa đạt
+                  </span>
+                }
+                @if (question['status'] === -2) {
+                  <span class="status-badge-new status-badge--revised">
+                    <i class="pi pi-replay"></i> Đã sửa
+                  </span>
+                }
+              }
+            </td>
+            <!-- Cột nhận xét -->
+            @for (thanhvien of hoidong; track thanhvien) {
+              <td>
+                @if (question['hoidong_comment'][thanhvien.user_id]) {
+                  <span class="comment-chip comment-chip--done"
+                    >
+                    <i class="pi pi-check"></i> Đã nhận xét
+                  </span>
+                }
+                @if (!question['hoidong_comment'][thanhvien.user_id]) {
+                  <span class="comment-chip comment-chip--pending"
+                    >
+                    <i class="pi pi-circle"></i> Chưa nhận xét
+                  </span>
+                }
+              </td>
+            }
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td [attr.colspan]="2 + hoidong.length" style="text-align: center; padding: 30px;">
+              <i class="pi pi-filter-slash" style="font-size: 24px; color: var(--gray-300); display: block; margin-bottom: 8px;"></i>
+              <span style="color: var(--gray-500);">Không có kết quả phù hợp với bộ lọc</span>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  }
+</div>
+
+<!-- ═══ Dialog Progress ═══ -->
+<p-dialog styleClass="dialog-duyet-thuchanh" appendTo="body" [showHeader]="false" [closable]="false"
+  [(visible)]="displayModal" [modal]="true" [style]="{width: '400px'}" [baseZIndex]="1099"
+  [draggable]="false" [resizable]="false">
+  <div class="dialog-content">
+    <div class="dialog-header">
+      <i class="pi pi-spin pi-spinner dialog-header__icon"></i>
+      <span class="dialog-header__text">Đang duyệt tất cả...</span>
+    </div>
+    <div class="dialog-body">
+      <p class="dialog-body__label">Đang đồng bộ dữ liệu, vui lòng chờ</p>
+      <div class="dialog-body__progress">
+        <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+      </div>
+      <p class="dialog-body__progress-text">{{ progressValue | number:'1.0-0' }}%</p>
+    </div>
+  </div>
+</p-dialog>

@@ -86,7 +86,7 @@
                 }
                 @if (col['key'] === 'title') {
                   <div class="title-col-flex">
-                    <span class="title-col-flex-text">{{row[col['key']]}}</span>
+                    <span class="title-col-flex-text text-left">{{row[col['key']]}}</span>
                     @if (canAdd && canUpdate) {
                       <button [matMenuTriggerFor]="menuAction"
                         class="btn btn-success btn-icon btn-transparent">

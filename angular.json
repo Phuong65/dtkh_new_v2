@@ -55,7 +55,8 @@
                             "quill", "crypto-js", "pdfjs-dist/web/pdf_viewer", "pdfjs-dist/build/pdf",
                             "viewerjs", "apexcharts", "plyr", "file-saver", "mic-recorder-to-mp3",
                             "mammoth/mammoth.browser.js", "exceljs", "html-docx-js-typescript", "jszip",
-                            "mammoth-plus", "mathml-to-latex"
+                            "mammoth-plus", "mathml-to-latex",
+                            "mathjax-full", "buffer", "flickity", "moment", "moment-timezone"
                         ]
                     },
                     "configurations": {

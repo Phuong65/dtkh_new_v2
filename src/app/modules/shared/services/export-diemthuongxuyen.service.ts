@@ -1,6 +1,6 @@
 
 import { Injectable } from '@angular/core';
-import * as FileSaver from 'file-saver';
+import { saveAs } from 'file-saver';
 import * as exceljs from 'exceljs';
 import { Classes } from "@shared/models/classes";
 import { CoursePlanActivities } from "@shared/models/course-plan-activities";
@@ -40,7 +40,7 @@ export class ExportDiemthuongxuyenService {
 
     private saveExcelFile(buffer: any, fileName: string): void {
         const data: Blob = new Blob([buffer], { type: this.fileType });
-        FileSaver.saveAs(data, fileName + this.fileExtension);
+        saveAs(data, fileName + this.fileExtension);
     }
 
     exportExcel(data1: any[], data2: any[], clases: any, fileName: string, weekUse: number, header1: any[], header2: any[]) {
@@ -1656,7 +1656,7 @@ export class ExportDiemthuongxuyenService {
         //     fs.writeFileSync("My Document.docx", buffer);
         // });
         Packer.toBlob(doc).then((blob) => {
-            FileSaver(blob, (fileName ? fileName : cl.name) + '.docx');
+            saveAs(blob, (fileName ? fileName : cl.name) + '.docx');
         });
 
     }

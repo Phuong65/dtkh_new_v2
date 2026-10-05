@@ -1,1 +1,123 @@
-﻿<div class="p-3">form-de-manager.component works!</div>
+<!-- Loading Skeleton -->
+@if (isLoading()) {
+  <div class="loading-container">
+    <div class="skeleton-tab"></div>
+    <div class="skeleton-tab"></div>
+    <div class="skeleton-tab"></div>
+    <div class="skeleton-tab"></div>
+  </div>
+}
+
+<!-- Empty State -->
+@if (!isLoading() && list_tab().length === 0) {
+  <div class="empty-state">
+    <span class="empty-state-icon">📋</span>
+    <span class="empty-state-title">Chưa có cấu hình đề thi</span>
+    <span class="empty-state-hint">Vui lòng kiểm tra cài đặt khóa học</span>
+  </div>
+}
+
+<!-- Main TabView -->
+@if (!isLoading() && list_tab().length > 0) {
+  <div class="form-layout-manager">
+    @if (selectedCourse()) {
+      <p-tabs (valueChange)="activeIndexTab = +$event; changeTabView()" [value]="activeIndexTab.toString()"
+        styleClass="tab-lesson-view no-padding-content-panel height-tab-panel-100 layout-tab-form-duyet-panel">
+        <p-tablist>
+          @for (panel of list_tab(); track trackByKey($index, panel); let index = $index) {
+            <p-tab [value]="index.toString()">
+              <div class="header-panel" [ngClass]="getStatusDotClass(panel.status)">
+                <span class="name-tab-panel">
+                  {{panel['label']}}
+                </span>
+                <span class="date-tab-panel">
+                  @if (panel.status === 0) {
+                    <span class="status-badge status-is-deactive">
+                      Chờ duyệt
+                    </span>
+                  }
+                  @if (panel.status === 1) {
+                    <span class="status-badge status-is-active">
+                      Duyệt lúc: {{panel['approved_at'] | date : 'dd/MM/yyyy HH:mm ':'UTC+7'}}
+                    </span>
+                  }
+                  @if (panel.status === -1) {
+                    <span class="status-badge status-is-redo">
+                      Chưa đạt
+                    </span>
+                  }
+                  @if (panel.status === -2) {
+                    <span class="status-badge status-is-require">
+                      Đã sửa
+                    </span>
+                  }
+                </span>
+                @if (rejectRole() && panel.id) {
+                  <span class="lock-form">
+                    @if (panel.status === 1) {
+                      <span class="lock-icon lock-danger"
+                        container="body" ngbTooltip="Mở khóa, cho phép sửa" placement="top"
+                        (click)="reDoAction($event, panel, 0)">
+                        <i class="pi pi-lock"></i>
+                      </span>
+                    }
+                    @if (panel.status === 0) {
+                      <span class="lock-icon lock-gray"
+                        container="body" ngbTooltip="Khóa, không cho phép sửa" placement="top"
+                        (click)="reDoAction($event, panel, 1)">
+                        <i class="pi pi-lock-open"></i>
+                      </span>
+                    }
+                  </span>
+                }
+              </div>
+            </p-tab>
+          }
+        </p-tablist>
+        <p-tabpanels>
+          @for (panel of list_tab(); track trackByKey($index, panel); let index = $index) {
+            <p-tabpanel [value]="index.toString()">
+              <ng-container [ngTemplateOutlet]="panel['component']"
+              [ngTemplateOutletContext]="{ key: panel.key}"></ng-container>
+            </p-tabpanel>
+          }
+        </p-tabpanels>
+      </p-tabs>
+    }
+  </div>
+}
+
+<ng-template #cc let-key="key">
+  @if (selectTab?.key === key) {
+    <app-form-de-luyentap [selectedCourse]="selectedCourse()" [listThamDInh]="listThamDInh()"
+    [formType]="this.selectTab.key" (onChangeStatus)="onChangeStatus($event)"></app-form-de-luyentap>
+  }
+</ng-template>
+
+<ng-template #dg let-key="key">
+  @if (selectTab?.key === key) {
+    <app-form-de-dg [selectedCourse]="selectedCourse()" [listThamDInh]="listThamDInh()"
+    [formType]="this.selectTab.key" (onChangeStatus)="onChangeStatus($event)"></app-form-de-dg>
+  }
+</ng-template>
+
+<ng-template #tntx let-key="key">
+  @if (selectTab?.key === key) {
+    <app-form-de-tn-tx [selectedCourse]="selectedCourse()" [listThamDInh]="listThamDInh()"
+    [formType]="this.selectTab.key" (onChangeStatus)="onChangeStatus($event)"></app-form-de-tn-tx>
+  }
+</ng-template>
+
+<ng-template #kthptn let-key="key">
+  @if (selectTab?.key === key) {
+    <app-form-de-tn-kthp [selectedCourse]="selectedCourse()" [listThamDInh]="listThamDInh()"
+    [formType]="this.selectTab.key" (onChangeStatus)="onChangeStatus($event)"></app-form-de-tn-kthp>
+  }
+</ng-template>
+
+<ng-template #kthpth let-key="key">
+  @if (selectTab?.key === key) {
+    <app-form-de-th-kthp [selectedCourse]="selectedCourse()" [listThamDInh]="listThamDInh()"
+    [formType]="this.selectTab.key" (onChangeStatus)="onChangeStatus($event)"></app-form-de-th-kthp>
+  }
+</ng-template>

@@ -78,7 +78,6 @@ import { PickListModule } from 'primeng/picklist';
 import { PanelModule } from 'primeng/panel';
 import { DialogModule } from 'primeng/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { ThuongxuyenTuluanComponent } from '../thuongxuyen-tuluan/thuongxuyen-tuluan.component';
 import { APP_CONFIGS, key_server } from '@env';
 import { ThuongxuyenTuluanV2Component } from '../thuongxuyen-tuluan-v2/thuongxuyen-tuluan-v2.component';
 import { ButtonModule } from "primeng/button";
@@ -111,7 +110,6 @@ import {
         PanelModule,
         DialogModule,
         MatProgressBarModule,
-        ThuongxuyenTuluanComponent,
         ChuandauraComponent,
         ThuongxuyenTuluanV2Component,
         ButtonModule,
