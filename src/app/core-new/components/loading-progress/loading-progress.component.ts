@@ -1,5 +1,5 @@
 import { Component , ElementRef , inject , input , InputSignal , OnInit } from '@angular/core';
-import { appendElementStyle } from "@utilities/helper";
+import { appendElementStyle } from '../../utils/helper';
 import { MatProgressBar } from "@angular/material/progress-bar";
 import { NgClass } from "@angular/common";
 

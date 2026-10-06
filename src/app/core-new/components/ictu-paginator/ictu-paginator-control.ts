@@ -1,5 +1,5 @@
 import { computed , Signal , signal , WritableSignal } from '@angular/core';
-import { DtoObject , IctuPaginator } from '@models/dto';
+import { DtoObject , IctuPaginator } from '../../models/dto';
 import { Observable } from 'rxjs';
 import { toObservable } from '@angular/core/rxjs-interop';
 

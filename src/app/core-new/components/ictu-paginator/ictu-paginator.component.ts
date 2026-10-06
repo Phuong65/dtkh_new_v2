@@ -1,7 +1,7 @@
 import { Component , computed , input , InputSignal , output , OutputEmitterRef , Signal } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { MatButton } from '@angular/material/button';
-import { IctuPaginatorControl } from '@theme/components/ictu-paginator/ictu-paginator-control';
+import { IctuPaginatorControl } from './ictu-paginator-control';
 
 @Component( {
     selector    : 'ictu-paginator' ,

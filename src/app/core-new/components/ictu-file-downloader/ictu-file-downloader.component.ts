@@ -1,8 +1,8 @@
 import { Component , Inject , inject , model , ModelSignal , OnDestroy , signal , WritableSignal } from '@angular/core';
-import { FileIconPipe } from '@pipes/file-icon.pipe';
-import { FormatBytesPipe } from '@pipes/format-bytes.pipe';
+import { FileIconPipe } from '@core-new/pipes/file-icon.pipe';
+import { FormatBytesPipe } from '@core-new/pipes/format-bytes.pipe';
 import { MatProgressBar } from '@angular/material/progress-bar';
-import { SafeHtmlPipe } from '@pipes/safe-html.pipe';
+import { SafeHtmlPipe } from '@shared/pipes/safe-html.pipe';
 import { Download , IctuBasicFile , ICTUStandardFile } from '@models/file';
 import { IctuFileService } from '@services/ictu-file.service';
 import { MAT_DIALOG_DATA , MatDialogRef } from '@angular/material/dialog';

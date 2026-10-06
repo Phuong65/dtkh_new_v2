@@ -1,6 +1,6 @@
 import { Component , Inject , signal , Signal } from '@angular/core';
 import { MAT_DIALOG_DATA , MatDialogRef } from '@angular/material/dialog';
-import { SafeHtmlPipe } from '@pipes/safe-html.pipe';
+import { SafeHtmlPipe } from '@shared/pipes/safe-html.pipe';
 import { MatButton } from '@angular/material/button';
 
 export interface ConfirmDelete2Data {
