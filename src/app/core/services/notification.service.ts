@@ -175,6 +175,12 @@ export class NotificationService {
 		});
 	}
 
+	clearToast(): void {
+		this.ngZone.run(() => {
+			this.OBSERVE_TOAST_MESSAGE.next({ head: '', body: '', type: '' });
+		});
+	}
+
 	toastError(body: string, heading = '', sound = APP_CONFIGS.soundAlert) {
 		const type = 'error';
 		const head = heading || this.messCaution;

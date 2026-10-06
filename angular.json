@@ -39,7 +39,8 @@
                             "src/assets/css/flickity.min.css",
                             "node_modules/latex.js/dist/css/katex.css",
                             "src/assets/css/ngan-hang-cau-hoi.css",
-                            "src/assets/css/secondary.css"
+                            "src/assets/css/secondary.css",
+                            "src/app/core-new/styles/ictu-admin-form.css"
                         ],
                         "scripts": [
                             "node_modules/quill/dist/quill.js",

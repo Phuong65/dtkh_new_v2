@@ -14,6 +14,10 @@ const routes: Routes = [
     //     loadComponent: () => import('@modules/admin/features/chuongtrinh-daotao/chuongtrinh-daotao-manager/chuongtrinh-daotao-manager.component').then(c => c.ChuongtrinhDaotaoManagerComponent),
     // },
     {
+        path: 'subject-management',
+        loadComponent: () => import('@modules/admin/features/subject-management/subject-management.component').then(c => c.SubjectManagementComponent),
+    },
+    {
         path: 'chuongtrinh-daotao',
         loadChildren: () => import('@modules/admin/features/chuongtrinh-daotao/ctdt.module').then(m => m.CtdtModule)
     },

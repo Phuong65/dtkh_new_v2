@@ -1,6 +1,6 @@
 import { Component , Input , OnInit } from '@angular/core';
 
-import { CreateQuestionInfo } from '@modules/admin/features/nganhang-cauhoi/questions/create-question/create-question.component';
+import { CreateQuestionInfo } from '@modules/admin/features/cauhoi-tracnghiem/questions/create-question/create-question.component';
 
 @Component( {
 	selector    : 'app-edit-question' ,

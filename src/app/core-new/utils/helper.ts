@@ -9,6 +9,12 @@ export const linkStaticResource = (path: string): string => {
     return window.location.origin + '/' + path;
 };
 
+export const getPublicResource = (path: string): string => {
+    const url = new URL(window.location.href);
+    url.pathname = path;
+    return url.toString();
+};
+
 export const staticResource = (path: string): Signal<string> => {
     return signal<string>(linkStaticResource(path));
 };
