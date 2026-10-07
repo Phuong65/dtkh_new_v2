@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject, signal, viewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MatCheckbox } from '@angular/material/checkbox';
 import { MatButton } from '@angular/material/button';
 import { Drawer } from 'primeng/drawer';
 import { InputText } from 'primeng/inputtext';
@@ -18,6 +17,8 @@ import { OvicConditionParam, OvicQueryCondition } from '@core/models/dto';
 import { AuthService } from '@core/services/auth.service';
 import { BoCtdt } from '@modules/shared/models/bo-ctdt';
 import { BoCtdtService } from '@modules/shared/services/bo-ctdt.service';
+import { Ctdt } from '@modules/shared/models/ctdt';
+import { CtdtService } from '@modules/shared/services/ctdt.service';
 
 @Component({
     selector: 'app-bo-ctdt-management',
@@ -25,7 +26,6 @@ import { BoCtdtService } from '@modules/shared/services/bo-ctdt.service';
     imports: [
         CommonModule,
         ReactiveFormsModule,
-        MatCheckbox,
         Drawer,
         InputText,
         IctuPaginatorComponent,
@@ -38,20 +38,35 @@ import { BoCtdtService } from '@modules/shared/services/bo-ctdt.service';
 export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     private readonly fb = inject(FormBuilder);
     private readonly boCtdtService = inject(BoCtdtService);
+    private readonly ctdtService = inject(CtdtService);
+    private readonly cancelCtdtLoad$ = new RxSubject<void>();
+    private readonly cancelBoLoad$ = new RxSubject<void>();
     private readonly notificationService = inject(NotificationService);
     private readonly auth = inject(AuthService);
     private readonly router = inject(Router);
 
     readonly drawer = viewChild<Drawer>('boCtdtDrawer');
     readonly destroy$ = new RxSubject<void>();
-    readonly table = new IctuDataTable2<BoCtdt>({ rows: 20, pageLinkSize: 5 });
+    readonly boTable = new IctuDataTable2<BoCtdt>({ rows: 20, pageLinkSize: 5 });
+    readonly ctdtTable = new IctuDataTable2<Ctdt>({ rows: 10, pageLinkSize: 5 });
     readonly state = signal<AppState>('loading');
+    readonly ctdtState = signal<AppState>('success');
     readonly isSaving = signal<boolean>(false);
     readonly searchValue = signal<string>('');
+    readonly selectedBo = signal<BoCtdt | null>(null);
+    readonly ctdtSearchValue = signal<string>('');
 
     canAdd = true;
     canUpdate = true;
     canDelete = true;
+    canAddCtdt = false;
+    ctdtDrawerVisible = false;
+    private creatingForBo: BoCtdt | null = null;
+
+    readonly ctdtForm = this.fb.group({
+        ten: ['', [Validators.required, Validators.maxLength(255)]],
+        madt: ['', [Validators.required, Validators.maxLength(50)]]
+    });
 
     readonly boCtdtForm: FormGroup = this.fb.group({
         name: ['', [Validators.required, Validators.maxLength(255)]],
@@ -77,13 +92,15 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.checkPermissions();
-        this.observeEvents.pipe(takeUntil(this.destroy$)).subscribe(({ name, data }) => {
-            this.handelEvent[name](data);
-        });
-        this.loadData(1, true);
+        this.observeEvents.pipe(takeUntil(this.destroy$)).subscribe(({ name, data }) => this.handelEvent[name](data));
+        this.loadBoCtdt(1, true);
     }
 
     ngOnDestroy(): void {
+        this.cancelCtdtLoad$.next();
+        this.cancelCtdtLoad$.complete();
+        this.cancelBoLoad$.next();
+        this.cancelBoLoad$.complete();
         this.destroy$.next();
         this.destroy$.complete();
     }
@@ -91,16 +108,14 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     private checkPermissions(): void {
         const rawUrl = this.router.url.split('?')[0];
         const routePath = rawUrl.startsWith('/admin/') ? rawUrl.substring(7) : rawUrl.replace(/^\//, '');
+        if (this.auth?.userCanAdd) this.canAdd = this.auth.userCanAdd(routePath) || this.auth.userCanAdd('bo-ctdt');
+        if (this.auth?.userCanEdit) this.canUpdate = this.auth.userCanEdit(routePath) || this.auth.userCanEdit('bo-ctdt');
+        if (this.auth?.userCanDelete) this.canDelete = this.auth.userCanDelete(routePath) || this.auth.userCanDelete('bo-ctdt');
+        if (this.auth?.userCanAdd) this.canAddCtdt = this.auth.userCanAdd('chuongtrinh-daotao');
+    }
 
-        if (this.auth?.userCanAdd) {
-            this.canAdd = this.auth.userCanAdd(routePath) || this.auth.userCanAdd('bo-ctdt');
-        }
-        if (this.auth?.userCanEdit) {
-            this.canUpdate = this.auth.userCanEdit(routePath) || this.auth.userCanEdit('bo-ctdt');
-        }
-        if (this.auth?.userCanDelete) {
-            this.canDelete = this.auth.userCanDelete(routePath) || this.auth.userCanDelete('bo-ctdt');
-        }
+    emitEvent(name: DataTableEventName, data: BoCtdt = null): void {
+        this.observeEvents.next({ name, data });
     }
 
     onSearchChange(event: Event): void {
@@ -109,57 +124,103 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
 
     onSearchData(): void {
         this.searchValue.set(this.searchValue().trim());
-        this.loadData(1, true);
+        this.loadBoCtdt(1, true);
     }
 
-    onChangePage(page: number): void {
-        this.loadData(page, false);
+    onCtdtSearchChange(event: Event): void {
+        this.ctdtSearchValue.set((event.target as HTMLInputElement).value || '');
     }
 
-    loadData(page = 1, resetPaginator = false): void {
+    onCtdtSearchData(): void {
+        this.ctdtSearchValue.set(this.ctdtSearchValue().trim());
+        this.loadCtdt(1, true);
+    }
+
+    onBoPageChange(page: number): void {
+        this.loadBoCtdt(page, false);
+    }
+
+    onCtdtPageChange(page: number): void {
+        this.loadCtdt(page, false);
+    }
+
+    loadBoCtdt(page = 1, resetPaginator = false): void {
         this.state.set('loading');
         const conditions: OvicConditionParam[] = [];
         const query = this.searchValue();
         if (query) {
-            conditions.push({
-                conditionName: 'name',
-                condition: OvicQueryCondition.like,
-                value: `%${query}%`,
-                orWhere: 'or'
-            });
-            conditions.push({
-                conditionName: 'code',
-                condition: OvicQueryCondition.like,
-                value: `%${query}%`,
-                orWhere: 'or'
-            });
+            conditions.push({ conditionName: 'name', condition: OvicQueryCondition.like, value: `%${query}%`, orWhere: 'or' });
+            conditions.push({ conditionName: 'code', condition: OvicQueryCondition.like, value: `%${query}%`, orWhere: 'or' });
         }
 
+        this.cancelBoLoad$.next();
         this.boCtdtService.get(conditions, {
-            limit: this.table.paginator.rows(),
-            paged: page,
-            orderby: 'created_at',
-            order: 'DESC'
-        }).pipe(takeUntil(this.destroy$)).subscribe({
+            limit: this.boTable.paginator.rows(), paged: page, orderby: 'created_at', order: 'DESC'
+        }).pipe(takeUntil(this.destroy$), takeUntil(this.cancelBoLoad$)).subscribe({
             next: response => {
                 const total = Number(response.totalRecords) || 0;
-                this.table.fillRawData({
-                    data: Array.isArray(response.data) ? response.data : [],
-                    recordsFiltered: total,
-                    recordsTotal: total,
-                    draw: 1
-                }, { paged: page, resetPaginator });
+                const rows = Array.isArray(response.data) ? response.data : [];
+                this.boTable.fillRawData({ data: rows, recordsFiltered: total, recordsTotal: total, draw: 1 }, { paged: page, resetPaginator });
                 this.state.set('success');
+                const current = this.selectedBo();
+                const next = current && rows.some((item: BoCtdt) => item.id === current.id) ? current : rows[0] || null;
+                if (this.selectedBo()?.id === next?.id) {
+                    this.loadCtdt(1, true);
+                } else {
+                    this.selectBo(next);
+                }
             },
             error: () => {
                 this.state.set('error');
-                this.notificationService.toastError('Không thể tải dữ liệu bộ chương trình đào tạo', 'Lỗi kết nối');
+                this.notificationService.toastError('Không thể tải danh sách bộ chương trình đào tạo', 'Lỗi kết nối');
             }
         });
     }
 
-    emitEvent(name: DataTableEventName, data: BoCtdt = null): void {
-        this.observeEvents.next({ name, data });
+    selectBo(bo: BoCtdt | null): void {
+        if (this.selectedBo()?.id === bo?.id) return;
+        this.selectedBo.set(bo);
+        this.ctdtSearchValue.set('');
+        this.loadCtdt(1, true);
+    }
+
+    loadCtdt(page = 1, resetPaginator = false): void {
+        const bo = this.selectedBo();
+        if (!bo) {
+            this.ctdtTable.fillRawData({ data: [], recordsFiltered: 0, recordsTotal: 0, draw: 1 }, { paged: 1, resetPaginator: true });
+            this.ctdtState.set('success');
+            return;
+        }
+
+        this.ctdtState.set('loading');
+        const conditions: OvicConditionParam[] = [
+            { conditionName: 'ctdt_bo_id', condition: OvicQueryCondition.equal, value: String(bo.id), orWhere: 'and' }
+        ];
+        const query = this.ctdtSearchValue();
+        if (query) {
+            conditions.push({ conditionName: 'ten', condition: OvicQueryCondition.like, value: `%${query}%`, orWhere: 'and' });
+        }
+
+        this.cancelCtdtLoad$.next();
+        this.ctdtService.getCtdtByPageNew({
+            condition: conditions,
+            set: [
+                { label: 'limit', value: String(this.ctdtTable.paginator.rows()) },
+                { label: 'orderby', value: 'id' },
+                { label: 'order', value: 'DESC' }
+            ],
+            page: String(page)
+        }).pipe(takeUntil(this.destroy$), takeUntil(this.cancelCtdtLoad$)).subscribe({
+            next: response => {
+                const total = Number(response.recordsFiltered) || 0;
+                this.ctdtTable.fillRawData({ data: response.data || [], recordsFiltered: total, recordsTotal: total, draw: 1 }, { paged: page, resetPaginator });
+                this.ctdtState.set('success');
+            },
+            error: () => {
+                this.ctdtState.set('error');
+                this.notificationService.toastError('Không thể tải danh sách chương trình đào tạo', 'Lỗi kết nối');
+            }
+        });
     }
 
     openCreateDrawer(): void {
@@ -180,116 +241,112 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
         this.formControl.openFormEdit(item);
     }
 
-    requestCloseDrawer(): void {
-        if (this.formControl.state() === 'SUBMITTING') {
+    openCreateCtdt(): void {
+        const bo = this.selectedBo();
+        if (!bo) {
+            this.notificationService.toastWarning('Vui lòng chọn một bộ chương trình đào tạo');
             return;
         }
+        if (!this.canAddCtdt) {
+            this.notificationService.toastWarning('Bạn không có quyền thêm mới chương trình đào tạo');
+            return;
+        }
+        this.creatingForBo = bo;
+        this.ctdtForm.reset({ ten: '', madt: '' });
+        this.ctdtDrawerVisible = true;
+    }
+
+    submitCtdtForm(): void {
+        if (!this.creatingForBo) {
+            this.notificationService.toastWarning('Vui lòng chọn một bộ chương trình đào tạo');
+            return;
+        }
+        this.ctdtForm.markAllAsTouched();
+        if (this.ctdtForm.invalid) {
+            this.notificationService.toastWarning('Vui lòng kiểm tra lại các trường bắt buộc');
+            return;
+        }
+
+        const value = this.ctdtForm.getRawValue();
+        const payload: Partial<Ctdt> = {
+            ten: (value.ten || '').trim(),
+            madt: (value.madt || '').trim(),
+            ctdt_bo_id: this.creatingForBo.id
+        };
+
+        this.isSaving.set(true);
+        this.ctdtDrawerVisible = false;
+        this.ctdtService.addCtdt(payload).pipe(takeUntil(this.destroy$)).subscribe({
+            next: () => {
+                this.isSaving.set(false);
+                this.notificationService.toastSuccess('Thêm mới chương trình đào tạo thành công', 'Thành công');
+                this.loadCtdt(this.ctdtTable.paginator.paged(), false);
+            },
+            error: () => {
+                this.isSaving.set(false);
+                this.notificationService.toastError('Thêm mới chương trình đào tạo thất bại', 'Lỗi thao tác');
+            }
+        });
+    }
+
+    requestCloseDrawer(): void {
+        if (this.formControl.state() === 'SUBMITTING') return;
         this.formControl.visible = false;
     }
 
     submitForm(): void {
-        if (this.formControl.state() === 'SUBMITTING' || this.isSaving()) {
-            return;
-        }
+        if (this.formControl.state() === 'SUBMITTING' || this.isSaving()) return;
         this.boCtdtForm.markAllAsTouched();
         if (this.boCtdtForm.invalid) {
             this.notificationService.toastWarning('Vui lòng kiểm tra lại các trường bắt buộc');
             return;
         }
-
         const value = this.boCtdtForm.getRawValue();
-        const payload: Partial<BoCtdt> = {
-            name: (value.name || '').trim(),
-            code: (value.code || '').trim()
-        };
+        const payload: Partial<BoCtdt> = { name: (value.name || '').trim(), code: (value.code || '').trim() };
         const isAdd = this.formControl.isFormAdd;
-        const request$ = isAdd
-            ? this.boCtdtService.create(payload)
-            : this.boCtdtService.update(this.formControl.object.id, payload);
-
+        const request$ = isAdd ? this.boCtdtService.create(payload) : this.boCtdtService.update(this.formControl.object.id, payload);
         this.isSaving.set(true);
         this.formControl.visible = false;
         request$.pipe(takeUntil(this.destroy$)).subscribe({
             next: () => {
                 this.isSaving.set(false);
-                this.notificationService.toastSuccess(
-                    isAdd ? 'Thêm mới bộ chương trình đào tạo thành công' : 'Cập nhật bộ chương trình đào tạo thành công',
-                    'Thành công'
-                );
-                this.loadData(this.table.paginator.paged(), false);
+                this.notificationService.toastSuccess(isAdd ? 'Thêm mới bộ chương trình đào tạo thành công' : 'Cập nhật bộ chương trình đào tạo thành công', 'Thành công');
+                this.loadBoCtdt(this.boTable.paginator.paged(), false);
             },
             error: () => {
                 this.isSaving.set(false);
-                this.notificationService.toastError(
-                    isAdd ? 'Thêm mới bộ chương trình đào tạo thất bại' : 'Cập nhật bộ chương trình đào tạo thất bại',
-                    'Lỗi thao tác'
-                );
+                this.notificationService.toastError(isAdd ? 'Thêm mới bộ chương trình đào tạo thất bại' : 'Cập nhật bộ chương trình đào tạo thất bại', 'Lỗi thao tác');
             }
         });
     }
 
     deleteBoCtdt(item: BoCtdt): void {
-        if (!this.canDelete) {
-            this.notificationService.toastWarning('Bạn không có quyền xóa bộ chương trình đào tạo');
-            return;
-        }
+        if (!this.canDelete) { this.notificationService.toastWarning('Bạn không có quyền xóa bộ chương trình đào tạo'); return; }
         const safeTitle = (item.name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         this.requestDeletingData([item.id], `Bạn có chắc muốn xóa bộ chương trình đào tạo "${safeTitle}"?`);
     }
 
     deleteSelectedBoCtdt(): void {
-        if (!this.canDelete) {
-            this.notificationService.toastWarning('Bạn không có quyền xóa bộ chương trình đào tạo');
-            return;
-        }
-        const selected = this.table.getSelectedData();
-        if (!selected.length) {
-            return;
-        }
-        this.requestDeletingData(
-            selected.map(item => item.id),
-            `Bạn có chắc muốn xóa ${selected.length} bộ chương trình đào tạo đã chọn?`
-        );
+        if (!this.canDelete) { this.notificationService.toastWarning('Bạn không có quyền xóa bộ chương trình đào tạo'); return; }
+        const selected = this.boTable.getSelectedData();
+        if (selected.length) this.requestDeletingData(selected.map(item => item.id), `Bạn có chắc muốn xóa ${selected.length} bộ chương trình đào tạo đã chọn?`);
     }
 
     private requestDeletingData(ids: number[], message: string): void {
-        const currentPage = this.table.paginator.paged();
-        const nextPage = ids.length === this.table.data().length && currentPage > 1 ? currentPage - 1 : currentPage;
-
-        this.notificationService.confirmDelete2({
-            heading: 'Xác nhận xóa',
-            htmlMessage: message
-        }).pipe(
-            filter((confirmed: boolean): boolean => confirmed),
-            map(() => new IctuDeletingAnimationControl(ids, this.boCtdtService)),
-            switchMap((deleteController: IctuDeletingAnimationControl): Observable<boolean> => {
-                deleteController.run();
-                return this.notificationService.startDeleting(deleteController.progress);
-            }),
+        const currentPage = this.boTable.paginator.paged();
+        const nextPage = ids.length === this.boTable.data().length && currentPage > 1 ? currentPage - 1 : currentPage;
+        this.notificationService.confirmDelete2({ heading: 'Xác nhận xóa', htmlMessage: message }).pipe(
+            filter(Boolean), map(() => new IctuDeletingAnimationControl(ids, this.boCtdtService)),
+            switchMap((controller: IctuDeletingAnimationControl): Observable<boolean> => { controller.run(); return this.notificationService.startDeleting(controller.progress); }),
             takeUntil(this.destroy$)
         ).subscribe({
-            next: success => {
-                if (success) {
-                    this.notificationService.toastSuccess('Xóa bộ chương trình đào tạo thành công', 'Thành công');
-                }
-                this.loadData(nextPage, false);
-            },
-            error: () => {
-                this.notificationService.toastError('Xóa một hoặc nhiều bộ chương trình đào tạo thất bại', 'Lỗi thao tác');
-                this.loadData(currentPage, false);
-            }
+            next: success => { if (success) this.notificationService.toastSuccess('Xóa bộ chương trình đào tạo thành công', 'Thành công'); this.loadBoCtdt(nextPage, false); },
+            error: () => { this.notificationService.toastError('Xóa một hoặc nhiều bộ chương trình đào tạo thất bại', 'Lỗi thao tác'); this.loadBoCtdt(currentPage, false); }
         });
     }
 
-    toggleCheckAll(checked: boolean): void {
-        this.table.selectRow(checked);
-    }
-
-    toggleCheckRow(checked: boolean, index: number): void {
-        this.table.selectRow(checked, index);
-    }
-
-    trackById(_index: number, item: BoCtdt): number {
-        return item.id;
-    }
+    toggleBoCheckAll(checked: boolean): void { this.boTable.selectRow(checked); }
+    toggleBoCheckRow(checked: boolean, index: number): void { this.boTable.selectRow(checked, index); }
+    trackByBoId(_index: number, item: BoCtdt): number { return item.id; }
+    trackByCtdtId(_index: number, item: Ctdt): number { return item.id || _index; }
 }

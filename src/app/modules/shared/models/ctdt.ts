@@ -18,4 +18,5 @@ export interface Ctdt {
     cohoihoctap_sautotnghiep: string;
     muctieu: string;
     madt: string;
+    ctdt_bo_id?: number;
 }
