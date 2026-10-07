@@ -317,6 +317,27 @@
     background: #f8fafc !important;
 }
 
+.bo-ctdt-program-name {
+    max-width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: color .15s ease;
+}
+
+.bo-ctdt-program-name:hover,
+.bo-ctdt-program-name:focus-visible {
+    color: #2563eb;
+}
+
+.bo-ctdt-program-name:focus-visible {
+    outline: 2px solid #93c5fd;
+    outline-offset: 2px;
+}
+
 .bo-ctdt-code {
     display: inline-block;
     padding: 3px 8px;
@@ -333,6 +354,10 @@
     color: #64748b;
     text-align: center;
     font-size: 14px;
+}
+
+.bo-ctdt-program-table .bo-ctdt-empty {
+    padding: 14px 12px !important;
 }
 
 .bo-ctdt-detail-footer {

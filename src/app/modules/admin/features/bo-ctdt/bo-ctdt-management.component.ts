@@ -62,6 +62,7 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     canUpdate = true;
     canDelete = true;
     canAddCtdt = false;
+    canDeleteCtdt = true;
     ctdtDrawerVisible = false;
     private creatingForBo: BoCtdt | null = null;
 
@@ -116,10 +117,27 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
         }
         if (this.auth?.userCanEdit) this.canUpdate = this.auth.userCanEdit(routePath) || this.auth.userCanEdit('bo-ctdt');
         if (this.auth?.userCanDelete) this.canDelete = this.auth.userCanDelete(routePath) || this.auth.userCanDelete('bo-ctdt');
+        if (this.auth?.userCanDelete) this.canDeleteCtdt = this.canDelete || this.auth.userCanDelete('chuongtrinh-daotao');
     }
 
     emitEvent(name: DataTableEventName, data: BoCtdt = null): void {
         this.observeEvents.next({ name, data });
+    }
+
+    uppercaseCodeInput(event: Event, form: FormGroup, controlName: string): void {
+        const input = event.target as HTMLInputElement;
+        const originalValue = input.value;
+        const uppercaseValue = originalValue.toUpperCase();
+        if (originalValue === uppercaseValue) return;
+
+        const selectionStart = input.selectionStart ?? originalValue.length;
+        const selectionEnd = input.selectionEnd ?? selectionStart;
+        const uppercaseSelectionStart = originalValue.slice(0, selectionStart).toUpperCase().length;
+        const uppercaseSelectionEnd = originalValue.slice(0, selectionEnd).toUpperCase().length;
+
+        input.value = uppercaseValue;
+        form.get(controlName)?.setValue(uppercaseValue);
+        input.setSelectionRange(uppercaseSelectionStart, uppercaseSelectionEnd);
     }
 
     onSearchChange(event: Event): void {
@@ -260,6 +278,12 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
         this.ctdtDrawerVisible = true;
     }
 
+    openCtdt(item: Ctdt): void {
+        this.router.navigate(['/admin/dao-tao/chuongtrinh-daotao/ctdt-thongtin'], {
+            queryParams: { code: item.id }
+        });
+    }
+
     submitCtdtForm(): void {
         if (!this.creatingForBo) {
             this.notificationService.toastWarning('Vui lòng chọn một bộ chương trình đào tạo');
@@ -289,6 +313,34 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
             error: () => {
                 this.isSaving.set(false);
                 this.notificationService.toastError('Thêm mới chương trình đào tạo thất bại', 'Lỗi thao tác');
+            }
+        });
+    }
+
+    deleteCtdt(item: Ctdt): void {
+        if (!this.canDeleteCtdt) {
+            this.notificationService.toastWarning('Bạn không có quyền xóa chương trình đào tạo');
+            return;
+        }
+
+        const currentPage = this.ctdtTable.paginator.paged();
+        const nextPage = this.ctdtTable.data().length === 1 && currentPage > 1 ? currentPage - 1 : currentPage;
+        const safeTitle = (item.ten || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        this.notificationService.confirmDelete2({
+            heading: 'Xác nhận xóa',
+            htmlMessage: `Bạn có chắc muốn xóa chương trình đào tạo "${safeTitle}"?`
+        }).pipe(
+            filter(Boolean),
+            switchMap(() => this.ctdtService.deleteCtdt(item.id)),
+            takeUntil(this.destroy$)
+        ).subscribe({
+            next: () => {
+                this.notificationService.toastSuccess('Xóa chương trình đào tạo thành công', 'Thành công');
+                this.loadCtdt(nextPage, false);
+            },
+            error: () => {
+                this.notificationService.toastError('Xóa chương trình đào tạo thất bại', 'Lỗi thao tác');
+                this.loadCtdt(currentPage, false);
             }
         });
     }
