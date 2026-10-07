@@ -1,0 +1,347 @@
+:host {
+    --ctdt-header-side: 64px;
+    --ctdt-navy: #172230;
+    --ctdt-navy-deep: #101923;
+    --ctdt-navy-raised: #263548;
+    --ctdt-blue: #3b82f6;
+    --ctdt-blue-bright: #60a5fa;
+    --ctdt-ink: #0f172a;
+    --ctdt-muted: #64748b;
+    display: block;
+    height: 100%;
+    background: #f5f7fb;
+}
+
+.ctdt-shell {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    background: #f5f7fb;
+}
+
+/* Header tối toàn chiều ngang, cùng tinh thần ảnh tham chiếu. */
+.ctdt-header {
+    position: relative;
+    display: flex;
+    flex: 0 0 64px;
+    height: 64px;
+    align-items: stretch;
+    gap: 12px;
+    padding: 0 18px;
+    border-bottom: 1px solid rgb(255 255 255 / 6%);
+    background:
+        linear-gradient(90deg, rgb(59 130 246 / 5%), transparent 26%),
+        var(--ctdt-navy);
+    box-shadow: 0 5px 16px rgb(15 23 42 / 14%);
+}
+
+.ctdt-header__left {
+    display: flex;
+    flex: 0 1 360px;
+    min-width: 0;
+    align-items: center;
+    gap: 12px;
+}
+
+.ctdt-header__right {
+    flex: 0 0 var(--ctdt-header-side);
+}
+
+.ctdt-program-name {
+    min-width: 0;
+    overflow: hidden;
+    color: #f8fafc;
+    font-size: 14px;
+    font-weight: 650;
+    letter-spacing: -.01em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ctdt-back-btn {
+    display: inline-flex;
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid rgb(255 255 255 / 12%);
+    border-radius: 10px;
+    background: rgb(255 255 255 / 5%);
+    color: #cbd5e1;
+    font-size: 19px;
+    cursor: pointer;
+    transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
+}
+
+.ctdt-back-btn:hover {
+    border-color: rgb(96 165 250 / 45%);
+    background: rgb(59 130 246 / 13%);
+    color: #ffffff;
+    transform: translateX(-2px);
+}
+
+.ctdt-back-btn:focus-visible,
+.ctdt-tab:focus-visible,
+.ctdt-placeholder:focus-visible {
+    outline: 2px solid var(--ctdt-blue-bright);
+    outline-offset: 2px;
+}
+
+.ctdt-header-divider {
+    width: 1px;
+    height: 28px;
+    background: rgb(255 255 255 / 10%);
+}
+
+/* Tabs phẳng, rõ, tab active có nền nâng và indicator xanh. */
+.ctdt-tabs {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.ctdt-tabs__track {
+    display: flex;
+    width: max-content;
+    max-width: 100%;
+    align-items: stretch;
+    justify-content: center;
+    gap: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.ctdt-tabs__track::-webkit-scrollbar {
+    display: none;
+}
+
+.ctdt-tab {
+    position: relative;
+    display: inline-flex;
+    min-width: 114px;
+    height: 64px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 18px;
+    border: 0;
+    background: transparent;
+    color: #b8c4d4;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color .2s ease, color .2s ease;
+}
+
+.ctdt-tab::before {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    content: '';
+    transition: background-color .2s ease, box-shadow .2s ease;
+}
+
+.ctdt-tab:hover {
+    color: #f8fafc;
+}
+
+.ctdt-tab:hover::before {
+    background: rgb(255 255 255 / 5%);
+}
+
+.ctdt-tab--active {
+    color: #ffffff;
+    font-weight: 650;
+}
+
+.ctdt-tab--active::before {
+    background: linear-gradient(180deg, #2b3b4f 0%, #243244 100%);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 5%);
+}
+
+.ctdt-tab__icon,
+.ctdt-tab__label {
+    position: relative;
+    z-index: 1;
+}
+
+.ctdt-tab__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #8191a6;
+    font-size: 16px;
+    transition: color .2s ease, transform .2s ease;
+}
+
+.ctdt-tab:hover .ctdt-tab__icon {
+    color: #bfdbfe;
+}
+
+.ctdt-tab--active .ctdt-tab__icon {
+    color: var(--ctdt-blue-bright);
+    transform: translateY(-1px);
+}
+
+.ctdt-tab__line {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    height: 3px;
+    border-radius: 0;
+    background: linear-gradient(90deg, #2563eb, #60a5fa);
+    opacity: 0;
+    transform: scaleX(.3);
+    transition: opacity .18s ease, transform .24s cubic-bezier(.4, 0, .2, 1);
+}
+
+.ctdt-tab--active .ctdt-tab__line {
+    opacity: 1;
+    transform: scaleX(1);
+}
+
+/* Thân trang: panel nội dung hoặc placeholder */
+.ctdt-body {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px 20px;
+    background: #f5f7fb;
+    overflow-y: auto;
+}
+
+.ctdt-tab-panel {
+    width: 100%;
+}
+
+.ctdt-tab-panel--form {
+    display: flex;
+    justify-content: center;
+}
+
+.ctdt-tab-panel--form app-ctdt-thongtin {
+    display: block;
+    width: 100%;
+}
+
+.ctdt-placeholder {
+    display: flex;
+    width: 100%;
+    max-width: 460px;
+    margin: auto;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 32px;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: #ffffff;
+    text-align: center;
+    box-shadow: 0 8px 28px rgb(15 23 42 / 5%);
+}
+
+.ctdt-placeholder__icon {
+    display: grid;
+    width: 62px;
+    height: 62px;
+    margin-bottom: 18px;
+    place-items: center;
+    border: 1px solid #dbeafe;
+    border-radius: 16px;
+    background: linear-gradient(145deg, #eff6ff, #dbeafe);
+    color: var(--ctdt-blue);
+    font-size: 27px;
+    box-shadow: 0 5px 14px rgb(37 99 235 / 10%);
+}
+
+.ctdt-placeholder__title {
+    margin: 0;
+    color: var(--ctdt-ink);
+    font-size: 18px;
+    font-weight: 650;
+    letter-spacing: -.02em;
+}
+
+.ctdt-placeholder__desc {
+    margin: 7px 0 0;
+    color: var(--ctdt-muted);
+    font-size: 14px;
+}
+
+@media (max-width: 960px) {
+    .ctdt-header__right {
+        display: none;
+    }
+
+    .ctdt-tabs {
+        justify-content: flex-start;
+    }
+
+    .ctdt-tabs__track {
+        justify-content: flex-start;
+    }
+
+    .ctdt-tab {
+        min-width: auto;
+        padding: 0 14px;
+    }
+}
+
+@media (max-width: 560px) {
+    .ctdt-header {
+        gap: 8px;
+        padding: 0 10px;
+    }
+
+    .ctdt-header__left {
+        flex-basis: min(260px, 42vw);
+    }
+
+    .ctdt-program-name {
+        font-size: 12.5px;
+    }
+
+    .ctdt-header-divider {
+        display: none;
+    }
+
+    .ctdt-tab {
+        height: 64px;
+        padding: 0 12px;
+        font-size: 12px;
+    }
+
+    .ctdt-tab__icon {
+        font-size: 14px;
+    }
+
+    .ctdt-body {
+        padding: 16px;
+    }
+
+    .ctdt-placeholder {
+        padding: 36px 20px;
+        border-radius: 14px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ctdt-back-btn,
+    .ctdt-tab,
+    .ctdt-tab::before,
+    .ctdt-tab__icon,
+    .ctdt-tab__line {
+        transition: none;
+    }
+}

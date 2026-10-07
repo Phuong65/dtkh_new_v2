@@ -279,7 +279,7 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     }
 
     openCtdt(item: Ctdt): void {
-        this.router.navigate(['/admin/dao-tao/chuongtrinh-daotao/ctdt-thongtin'], {
+        this.router.navigate(['/chuong-trinh-dao-tao'], {
             queryParams: { code: item.id }
         });
     }

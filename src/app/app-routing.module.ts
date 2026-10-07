@@ -18,6 +18,10 @@ const routes: Routes = [
             ).then((m) => m.default),
     },
     {
+         path: 'chuong-trinh-dao-tao',
+         loadComponent: () => import('@modules/admin/features/bo-ctdt/ctdt-detail/ctdt-detail').then(c => c.CtdtDetail)
+    },
+    {
         path: '',
         loadChildren: () =>
             import('@modules/public/public.module').then((m) => m.PublicModule),

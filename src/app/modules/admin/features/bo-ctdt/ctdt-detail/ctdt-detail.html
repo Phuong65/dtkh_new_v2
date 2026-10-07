@@ -1,0 +1,59 @@
+<section class="ctdt-shell" aria-label="Chi tiết chương trình đào tạo">
+    <!-- Header: Nút back và thanh 6 tab cùng 1 hàng -->
+    <header class="ctdt-header">
+        <div class="ctdt-header__left">
+            <button type="button" class="ctdt-back-btn" (click)="goBack()"
+                pTooltip="Quay lại danh sách" tooltipPosition="bottom" aria-label="Quay lại danh sách">
+                <i class="ti ti-arrow-left" aria-hidden="true"></i>
+            </button>
+            <div class="ctdt-program-name" [title]="programName()">{{ programName() }}</div>
+            <div class="ctdt-header-divider" aria-hidden="true"></div>
+        </div>
+
+        <nav class="ctdt-tabs" role="tablist" aria-label="Thanh điều hướng phân mục">
+            <div class="ctdt-tabs__track">
+                @for (tab of tabs; track tab.id; let i = $index) {
+                    <button #tabButton type="button" class="ctdt-tab"
+                        role="tab"
+                        [id]="'tab-' + tab.id"
+                        [class.ctdt-tab--active]="activeTabId() === tab.id"
+                        [attr.aria-selected]="activeTabId() === tab.id"
+                        [attr.aria-controls]="'panel-' + tab.id"
+                        [attr.tabindex]="activeTabId() === tab.id ? 0 : -1"
+                        (click)="selectTab(tab.id)"
+                        (keydown)="onTabKeydown($event, i)">
+                        <span class="ctdt-tab__icon" aria-hidden="true"><i [class]="tab.icon"></i></span>
+                        <span class="ctdt-tab__label">{{ tab.label }}</span>
+                        <span class="ctdt-tab__line" aria-hidden="true"></span>
+                    </button>
+                }
+            </div>
+        </nav>
+
+        <div class="ctdt-header__right" aria-hidden="true"></div>
+    </header>
+
+    <!-- Nội dung tab -->
+    <main class="ctdt-body">
+        @if (activeTabId() === 'thong-tin') {
+            <section class="ctdt-tab-panel ctdt-tab-panel--form"
+                role="tabpanel"
+                [id]="'panel-' + activeTab.id"
+                [attr.aria-labelledby]="'tab-' + activeTab.id">
+                <app-ctdt-thongtin></app-ctdt-thongtin>
+            </section>
+        } @else {
+            <section class="ctdt-placeholder"
+                role="tabpanel"
+                [id]="'panel-' + activeTab.id"
+                [attr.aria-labelledby]="'tab-' + activeTab.id"
+                tabindex="0">
+                <div class="ctdt-placeholder__icon" aria-hidden="true">
+                    <i [class]="activeTab.icon"></i>
+                </div>
+                <h2 class="ctdt-placeholder__title">{{ activeTab.label }}</h2>
+                <p class="ctdt-placeholder__desc">Nội dung đang được cập nhật</p>
+            </section>
+        }
+    </main>
+</section>
