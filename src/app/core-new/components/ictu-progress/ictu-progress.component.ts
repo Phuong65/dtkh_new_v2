@@ -1,6 +1,6 @@
 import { Component , computed , inject , Signal , signal , WritableSignal } from '@angular/core';
 import { MAT_DIALOG_DATA , MatDialogRef } from '@angular/material/dialog';
-import { ProgressAnimationConfig , ProgressAnimationControl } from '@services/notification.service';
+import { ProgressAnimationConfig , ProgressAnimationControl } from '@core-new/service/notification.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export interface IctuProgressComponentConfig {

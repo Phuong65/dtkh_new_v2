@@ -1,53 +1,54 @@
-<section class="admin-section--table position-relative" aria-labelledby="subject-list-title">
+<section class="admin-section--table ictu-admin-page position-relative" aria-labelledby="subject-list-title">
     @if (state() === 'loading') {
     <app-loading-progress heading="Đang tải danh sách môn học..." backdropFilter="none"></app-loading-progress>
     }
+    @if (isSaving()) {
+    <app-loading-progress heading="Đang lưu dữ liệu..."></app-loading-progress>
+    }
 
-    <div class="admin-wrap-table">
+    <div class="admin-wrap-table ictu-admin-table-shell">
         @if (state() !== 'error') {
         <div class="admin-wrap-table__head d-flex">
             <h4 id="subject-list-title" class="admin-wrap-table__heading">
-                <i class="fa fa-book" aria-hidden="true"></i>
-                Danh sách môn học
+                <!-- <i class="fa fa-book"></i>
+                Danh sách môn học -->
             </h4>
 
-            <div class="admin-wrap-table__head-actions">
-                <div class="subject-search">
-                    <input type="search" class="ictu-form__input-field" placeholder="Tìm kiếm..."
-                        [value]="searchValue()" (input)="onSearchChange($event)"
-                        aria-label="Tìm theo tên hoặc mã môn học">
-                    @if (searchValue()) {
-                    <button type="button" class="subject-search__clear" (click)="onClearSearch()"
-                        aria-label="Xóa từ khóa">
-                        <i class="ti ti-x" aria-hidden="true"></i>
-                    </button>
-                    }
-                </div>
-
-                <button mat-flat-button class="btn ictu-badge-btn--primary-reverse subject-add-button"
-                    (click)="openCreateDrawer()" [disabled]="!canAdd" pTooltip="Chế độ hiển thị" tooltipPosition="left">
-                    <i class="fa fa-plus" aria-hidden="true"></i>
+            <div class="admin-wrap-table__head-actions subject-toolbar-actions">
+                <input type="text" class="admin-wrap-table__head-actions__search" placeholder="Tìm kiếm..." pInputText
+                    [value]="searchValue()" (input)="onSearchChange($event)" (keyup.enter)="onSearchData()"
+                    aria-label="Tìm theo tên hoặc mã môn học">
+                <button (click)="emitEvent('DELETE_SELECTED_ROWS')" [disabled]="!canDelete || !table.someItemsChecked()"
+                    class="btn ictu-button-danger-gradient ictu-admin-icon-button subject-toolbar-actions__btn" mat-flat-button
+                    aria-label="Xóa môn học đã chọn" title="Xóa mục đã chọn">
+                    <i class="ti ti-trash" aria-hidden="true"></i>
+                </button>
+                <button (click)="emitEvent('OPEN_FORM_ADD')" [disabled]="!canAdd" mat-flat-button
+                    class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button subject-toolbar-actions__btn" aria-label="Thêm môn học"
+                    title="Thêm môn học">
+                    <i class="ti ti-plus" aria-hidden="true"></i>
                 </button>
             </div>
         </div>
 
-        <div class="admin-wrap-table__body">
-            <div class="subject-table-scroll">
+        <div class="admin-wrap-table__body ictu-admin-table-shell__body">
+            <div class="subject-table-scroll ictu-admin-table-scroll">
                 <table class="tbl admin-table table-hover">
                     <thead>
                         <tr>
                             <th scope="col" class="col-checkbox">
-                                <input type="checkbox" [checked]="table.totalChecked()"
+                                <mat-checkbox [checked]="table.totalChecked()"
                                     [indeterminate]="table.partiallyChecked()"
-                                    (change)="toggleCheckAll($any($event.target).checked)"
+                                    (change)="toggleCheckAll($event.checked)"
                                     [disabled]="!table.data().length" aria-label="Chọn tất cả môn học trên trang">
+                                </mat-checkbox>
                             </th>
                             <th scope="col" class="col-index text-center">#</th>
-                            <th scope="col" class="wid-120">Mã môn</th>
-                            <th scope="col">Tên môn học</th>
-                            <th scope="col" class="subject-col-desc">Mô tả</th>
-                            <th scope="col" class="wid-90 text-center">Tổng TC</th>
-                            <th scope="col" class="wid-90 text-center">TC TH</th>
+                            <th scope="col" class="wid-120 text-center">Mã môn</th>
+                            <th scope="col" class="text-center">Tên môn học</th>
+                            <th scope="col" class="text-center">Mô tả</th>
+                            <th scope="col" class="wid-90 text-center">Số tín chỉ</th>
+                            <th scope="col" class="wid-100 text-center">TC thực hành</th>
                             <th scope="col" class="wid-90 text-center px-0">Hành động</th>
                         </tr>
                     </thead>
@@ -55,26 +56,27 @@
                         @for (row of table.data(); track trackById($index, row); let i = $index) {
                         <tr [class.subject-row--selected]="row._ictuDataTableRowChecked">
                             <td class="col-checkbox">
-                                <input type="checkbox" [checked]="row._ictuDataTableRowChecked"
-                                    (change)="toggleCheckRow($any($event.target).checked, i)"
+                                <mat-checkbox [checked]="row._ictuDataTableRowChecked"
+                                    (change)="toggleCheckRow($event.checked, i)"
                                     [attr.aria-label]="'Chọn môn học ' + row.name">
+                                </mat-checkbox>
                             </td>
                             <td class="col-index text-center">{{ table.paginator.startIndex() + i }}</td>
-                            <td><span class="subject-code">{{ row.code }}</span></td>
+                            <td>{{ row.code }}</td>
                             <td class="text-left"><strong>{{ row.name }}</strong></td>
                             <td class="subject-col-desc text-left" [title]="row.desc || ''">{{ row.desc || '—' }}</td>
                             <td class="text-center">{{ row.sotinchi || 0 }}</td>
                             <td class="text-center">{{ row.sotinchi_th || 0 }}</td>
                             <td class="p-0 wid-90">
-                                <div class="admin-table__btn-actions">
-                                    <button type="button" class="btn ictu-button-info-light"
-                                        (click)="openEditDrawer(row)" [disabled]="!canUpdate"
-                                        [attr.aria-label]="'Sửa môn học ' + row.name">
+                                <div class="admin-table__btn-actions ictu-admin-table-actions">
+                                    <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
+                                        (click)="emitEvent('OPEN_FORM_UPDATE', row)" [disabled]="!canUpdate"
+                                        [attr.aria-label]="'Sửa môn học ' + row.name" title="Sửa môn học">
                                         <i class="ti ti-edit" aria-hidden="true"></i>
                                     </button>
-                                    <button type="button" class="btn ictu-button-danger-light"
-                                        (click)="deleteSubject(row)" [disabled]="!canDelete"
-                                        [attr.aria-label]="'Xóa môn học ' + row.name">
+                                    <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
+                                        (click)="emitEvent('DELETE_SINGLE_ROW', row)" [disabled]="!canDelete"
+                                        [attr.aria-label]="'Xóa môn học ' + row.name" title="Xóa môn học">
                                         <i class="ti ti-trash" aria-hidden="true"></i>
                                     </button>
                                 </div>
@@ -105,21 +107,17 @@
 </section>
 
 <p-drawer #subjectDrawer [(visible)]="formControl.visible" [dismissible]="false" [header]="formControl.heading()"
-    [style]="{ width: '500px', 'max-width': '100%' }" appendTo="body" position="right" styleClass="ictu-p-drawer">
+    [style]="{ width: '400px', 'max-width': '100%' }" appendTo="body" position="right" styleClass="ictu-p-drawer">
     <div class="ictu-p-drawer__content position-relative">
-        @if (formControl.enableLoading()) {
-        <app-loading-progress [heading]="formControl.loadingLabel()" backdropFilter="none"></app-loading-progress>
-        }
-
         <div class="ictu-p-drawer__content__body position-relative">
-            <form [formGroup]="subjectForm" class="subject-form" (ngSubmit)="submitForm()" novalidate>
+            <form [formGroup]="subjectForm" class="subject-form">
                 <div class="ictu-form ictu-form--label-on-top">
                     <div class="ictu-form__row">
                         <label class="ictu-form__label ictu-form__label--required" for="subject-code">Mã môn học</label>
                         <input id="subject-code" type="text" formControlName="code" class="ictu-form__input-field"
                             pInputText placeholder="VD: CNTT101" autocomplete="off">
                         @if (subjectForm.get('code')?.touched && subjectForm.get('code')?.invalid) {
-                        <span class="subject-form__error">Mã môn học là bắt buộc, tối đa 50 ký tự.</span>
+                        <span class="subject-form__error ictu-admin-form-error">Mã môn học là bắt buộc, tối đa 50 ký tự.</span>
                         }
                     </div>
 
@@ -129,11 +127,11 @@
                         <input id="subject-name" type="text" formControlName="name" class="ictu-form__input-field"
                             pInputText placeholder="Nhập tên môn học" autocomplete="off">
                         @if (subjectForm.get('name')?.touched && subjectForm.get('name')?.invalid) {
-                        <span class="subject-form__error">Tên môn học là bắt buộc, tối đa 255 ký tự.</span>
+                        <span class="subject-form__error ictu-admin-form-error">Tên môn học là bắt buộc, tối đa 255 ký tự.</span>
                         }
                     </div>
 
-                    <div class="subject-form__credits">
+                    <div class="subject-form__credits ictu-admin-form-credits">
                         <div class="ictu-form__row">
                             <label class="ictu-form__label ictu-form__label--required" for="subject-credits">Tổng tín
                                 chỉ</label>
@@ -148,32 +146,28 @@
                         </div>
                     </div>
                     @if (subjectForm.errors?.['practiceExceedsTotal']) {
-                    <span class="subject-form__error">Tín chỉ thực hành không được lớn hơn tổng tín chỉ.</span>
+                    <span class="subject-form__error ictu-admin-form-error">Tín chỉ thực hành không được lớn hơn tổng tín chỉ.</span>
                     }
 
                     <div class="ictu-form__row">
                         <label class="ictu-form__label" for="subject-desc">Mô tả</label>
                         <textarea id="subject-desc" rows="5" formControlName="desc"
-                            class="ictu-form__input-field subject-form__textarea" pTextarea
+                            class="ictu-form__input-field subject-form__textarea ictu-admin-form-textarea" pTextarea
                             placeholder="Nhập mô tả môn học"></textarea>
                         @if (subjectForm.get('desc')?.touched && subjectForm.get('desc')?.invalid) {
-                        <span class="subject-form__error">Mô tả tối đa 1000 ký tự.</span>
+                        <span class="subject-form__error ictu-admin-form-error">Mô tả tối đa 1000 ký tự.</span>
                         }
                     </div>
                 </div>
             </form>
         </div>
 
-        <div class="ictu-p-drawer__content__footer subject-drawer__footer">
-            <button type="button" class="btn ictu-button-secondary-light" (click)="requestCloseDrawer()"
-                [disabled]="formControl.state() === 'SUBMITTING'">Hủy</button>
-            <button type="button" class="btn ictu-badge-btn--primary-reverse" (click)="submitForm()"
-                [disabled]="formControl.state() === 'SUBMITTING'">
-                @if (formControl.state() === 'SUBMITTING') {
-                <i class="ti ti-loader-2 ti-spin" aria-hidden="true"></i> Đang lưu
-                } @else {
+        <div class="ictu-p-drawer__content__footer ictu-admin-drawer-footer">
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button"
+                (click)="requestCloseDrawer()">Hủy</button>
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button"
+                (click)="emitEvent('SUBMIT_FORM')">
                 <i class="ti ti-device-floppy" aria-hidden="true"></i> Lưu lại
-                }
             </button>
         </div>
     </div>

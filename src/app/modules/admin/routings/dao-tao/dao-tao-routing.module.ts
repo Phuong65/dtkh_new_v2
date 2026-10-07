@@ -18,6 +18,10 @@ const routes: Routes = [
         loadComponent: () => import('@modules/admin/features/subject-management/subject-management.component').then(c => c.SubjectManagementComponent),
     },
     {
+        path: 'bo-ctdt',
+        loadComponent: () => import('@modules/admin/features/bo-ctdt/bo-ctdt-management.component').then(c => c.BoCtdtManagementComponent),
+    },
+    {
         path: 'chuongtrinh-daotao',
         loadChildren: () => import('@modules/admin/features/chuongtrinh-daotao/ctdt.module').then(m => m.CtdtModule)
     },

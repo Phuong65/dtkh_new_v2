@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA , MatDialogModule , MatDialogRef } from '@angular/material/dialog';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
-import { Button , BUTTON_CLOSE , ButtonBase } from "@models/button";
-import { SafeHtmlPipe } from "@app/pipes/safe-html.pipe";
+import { Button , BUTTON_CLOSE , ButtonBase } from '@core-new/models/button';
+import { SafeHtmlPipe } from '@shared/pipes/safe-html.pipe';
 
 export interface ConfirmDialogData {
 	heading? : string;

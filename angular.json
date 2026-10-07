@@ -29,6 +29,7 @@
                             "src/assets/css/gradient-bg.css",
                             "src/assets/css/uicon.css",
                             "src/assets/css/uil-icon.css",
+                            "src/app/core-new/styles/fonts/tabler-icons.min.css",
                             "src/assets/css/font-awesome.min.css",
                             "src/assets/css/fontawesomev6.min.css",
                             "node_modules/primeicons/primeicons.css",
@@ -40,7 +41,9 @@
                             "node_modules/latex.js/dist/css/katex.css",
                             "src/assets/css/ngan-hang-cau-hoi.css",
                             "src/assets/css/secondary.css",
-                            "src/app/core-new/styles/ictu-admin-form.css"
+                            "src/app/core-new/styles/ictu-admin-form.css",
+                            "src/app/core-new/styles/ictu-buttons.css",
+                            "src/app/core-new/styles/ictu-notification.css"
                         ],
                         "scripts": [
                             "node_modules/quill/dist/quill.js",

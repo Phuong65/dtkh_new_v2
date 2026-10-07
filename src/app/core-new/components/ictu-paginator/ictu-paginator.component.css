@@ -1,40 +1,96 @@
+:host {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    --ictu-paginator-radius: 99px;
+    --ictu-paginator-size: 35px;
+    --ictu-paginator-text-color: #334155;
+    --ictu-paginator-text-hover-color: #1e293b;
+    --ictu-paginator-text-muted-color: #64748b;
+    --ictu-paginator-gap: 0px;
+}
+
 .ictu-paginator {
     display: flex;
     width: 100%;
     align-items: center;
     justify-content: center;
-    gap: var(--ictu-paginator-gap);
+    gap: var(--ictu-paginator-gap, 0px);
 }
 
 .ictu-paginator__node {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
     line-height: 0;
-    min-width: var(--ictu-paginator-size);
-    width: var(--ictu-paginator-size);
-    max-width: var(--ictu-paginator-size);
-    min-height: var(--ictu-paginator-size);
-    height: var(--ictu-paginator-size);
-    max-height: var(--ictu-paginator-size);
-    padding: 0;
-    border-radius: var(--ictu-paginator-size);
-    --mat-button-filled-label-text-color: var(--ictu-paginator-text-color);
-    --mat-button-filled-disabled-label-text-color: var(--ictu-paginator-text-muted-color);
+    min-width: var(--ictu-paginator-size, 35px) !important;
+    width: var(--ictu-paginator-size, 35px) !important;
+    max-width: var(--ictu-paginator-size, 35px) !important;
+    min-height: var(--ictu-paginator-size, 35px) !important;
+    height: var(--ictu-paginator-size, 35px) !important;
+    max-height: var(--ictu-paginator-size, 35px) !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: var(--ictu-paginator-radius, 99px) !important;
+    --mat-button-filled-container-shape: 99px;
+    --mdc-filled-button-container-shape: 99px;
+    --mat-button-filled-label-text-color: var(--ictu-paginator-text-color, #334155);
+    --mat-button-filled-disabled-label-text-color: var(--ictu-paginator-text-muted-color, #64748b);
     --mat-button-filled-disabled-container-color: transparent;
+    color: var(--ictu-paginator-text-color, #334155);
+    background: transparent;
+    cursor: pointer;
+}
+
+.ictu-paginator__node .mdc-button__label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.ictu-paginator__node i {
+    font-size: 13px;
+    line-height: 1;
+    color: inherit;
 }
 
 .ictu-paginator__label {
     font-size: 14px;
     line-height: 1.5;
     display: inline-block;
+    color: inherit;
 }
 
-.ictu-paginator__node:hover {
-    --mat-button-filled-label-text-color: var(--ictu-paginator-text-hover-color);
+.ictu-paginator__node:hover:not(:disabled) {
+    background: rgba(15, 23, 42, 0.06) !important;
+    color: var(--ictu-paginator-text-hover-color, #1e293b);
+    --mat-button-filled-label-text-color: var(--ictu-paginator-text-hover-color, #1e293b);
 }
 
-.ictu-paginator__node--active {
+.ictu-paginator__node--active,
+.ictu-paginator__node--active:disabled {
+    background-color: #0d6efd !important;
+    color: #ffffff !important;
+    opacity: 1 !important;
     --mat-button-filled-label-text-color: #ffffff;
     --mat-button-filled-disabled-label-text-color: #ffffff;
     --mat-button-filled-disabled-container-color: #0d6efd;
+    --mdc-filled-button-disabled-container-color: #0d6efd;
+    --mdc-filled-button-disabled-label-text-color: #ffffff;
+}
+
+.ictu-paginator__node--active .ictu-paginator__label {
+    color: #ffffff !important;
+}
+
+.ictu-paginator__node:disabled:not(.ictu-paginator__node--active) {
+    opacity: 0.35;
+    background: transparent !important;
+    cursor: default;
 }
 
 .ictu-paginator__node__empty {
@@ -42,6 +98,9 @@
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    color: var(--ictu-paginator-text-muted-color);
+    color: var(--ictu-paginator-text-muted-color, #64748b);
     user-select: none;
+    min-width: var(--ictu-paginator-size, 35px);
+    width: var(--ictu-paginator-size, 35px);
+    height: var(--ictu-paginator-size, 35px);
 }

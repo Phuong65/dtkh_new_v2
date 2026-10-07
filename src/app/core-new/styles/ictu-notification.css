@@ -1,0 +1,54 @@
+:root {
+    --ictu-notification-primary: #0162e8;
+    --ictu-notification-danger: #ee335e;
+    --ictu-notification-surface: #ffffff;
+    --ictu-notification-text: #1f2937;
+    --ictu-notification-muted: #64748b;
+}
+
+.ictu-confirm-dialog__btn,
+.ictu-media-player__box-size__btn,
+.ictu-server-connection-lost__retry,
+.app-confirm-wrap__body__buttons button,
+.ictu-confirm-delete__btn-dismiss {
+    --mdc-filled-button-container-shape: 4px;
+    --mdc-outlined-button-container-shape: 4px;
+    --mdc-text-button-container-shape: 4px;
+    --mat-button-filled-container-shape: 4px;
+    --mat-button-outlined-container-shape: 4px;
+    --mat-button-text-container-shape: 4px;
+    border-radius: 4px !important;
+}
+
+.ictu-paginator__node .mdc-button__ripple,
+.ictu-paginator__node .mat-mdc-button-persistent-ripple,
+.ictu-confirm-dialog__btn .mdc-button__ripple,
+.ictu-confirm-dialog__btn .mat-mdc-button-persistent-ripple {
+    border-radius: inherit !important;
+}
+
+.ictu-app-notification {
+    --mat-dialog-container-elevation-shadow: 0 18px 50px rgb(15 23 42 / 18%);
+    --mat-dialog-container-shape: 8px;
+    --mat-dialog-container-color: var(--ictu-notification-surface);
+    --mat-dialog-container-small-max-width: calc(100vw - 20px);
+}
+
+.ictu-app-notification .mat-mdc-dialog-surface {
+    overflow: hidden;
+    background: var(--ictu-notification-surface);
+}
+
+.ictu-app-confirm-delete {
+    --mat-dialog-container-shape: 8px;
+}
+
+.ictu-app-deleting-animation {
+    --mat-dialog-container-shape: 8px;
+}
+
+@media (max-width: 480px) {
+    .ictu-app-notification {
+        --mat-dialog-container-small-max-width: calc(100vw - 16px);
+    }
+}

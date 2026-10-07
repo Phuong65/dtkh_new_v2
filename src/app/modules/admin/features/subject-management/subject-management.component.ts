@@ -2,22 +2,23 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject, signal, viewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatButton } from '@angular/material/button';
 import { Drawer } from 'primeng/drawer';
 import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
-import { Subject as RxSubject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { Observable, Subject as RxSubject, filter, map, switchMap, takeUntil } from 'rxjs';
 import { IctuPaginatorComponent } from '@core-new/components/ictu-paginator/ictu-paginator.component';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 import { AppState } from '@core-new/models/app-state';
-import { IctuDataTable2 } from '@core-new/models/datatable';
+import { DataTableEvent, DataTableEventName, IctuDataTable2 } from '@core-new/models/datatable';
 import { IctuFormControl2 } from '@core-new/models/ictu-form-control';
 import { OvicConditionParam, OvicQueryCondition } from '@core/models/dto';
 import { AuthService } from '@core/services/auth.service';
-import { NotificationService } from '@core/services/notification.service';
 import { Subject } from '@modules/shared/models/subject';
 import { SubjectService } from '@modules/shared/services/subject.service';
-import { MatButton } from '@angular/material/button';
-import { TooltipModule } from 'primeng/tooltip';
+import { IctuDeletingAnimationControl } from '@core-new/models/ictu-deleting-animation-control';
+import { NotificationService } from '@core-new/service/notification.service';
 
 function nonNegativeIntegerValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
@@ -55,13 +56,13 @@ function creditBalanceValidator(): ValidatorFn {
     imports: [
         CommonModule,
         ReactiveFormsModule,
+        MatCheckbox,
         Drawer,
         InputText,
         Textarea,
         IctuPaginatorComponent,
         LoadingProgressComponent,
-        MatButton,
-        TooltipModule
+        MatButton
     ],
     templateUrl: './subject-management.component.html',
     styleUrl: './subject-management.component.css'
@@ -75,11 +76,11 @@ export class SubjectManagementComponent implements OnInit, OnDestroy {
 
     readonly drawer = viewChild<Drawer>('subjectDrawer');
     readonly destroy$ = new RxSubject<void>();
-    readonly searchSubject$ = new RxSubject<string>();
     private closingDrawer = false;
 
-    readonly table = new IctuDataTable2<Subject>({ rows: 15, pageLinkSize: 5 });
+    readonly table = new IctuDataTable2<Subject>({ rows: 20, pageLinkSize: 5 });
     readonly state = signal<AppState>('loading');
+    readonly isSaving = signal<boolean>(false);
     readonly searchValue = signal<string>('');
 
     canAdd = true;
@@ -101,16 +102,21 @@ export class SubjectManagementComponent implements OnInit, OnDestroy {
         drawer: this.drawer
     });
 
+    private readonly handelEvent: Record<DataTableEventName, (data: Subject) => void> = {
+        OPEN_FORM_ADD: () => this.openCreateDrawer(),
+        OPEN_FORM_UPDATE: data => this.openEditDrawer(data),
+        DELETE_SINGLE_ROW: data => this.deleteSubject(data),
+        DELETE_SELECTED_ROWS: () => this.deleteSelectedSubjects(),
+        SUBMIT_FORM: () => this.submitForm()
+    };
+
+    private readonly observeEvents = new RxSubject<DataTableEvent<Subject>>();
+
     ngOnInit(): void {
         this.checkPermissions();
 
-        this.searchSubject$.pipe(
-            debounceTime(300),
-            distinctUntilChanged(),
-            takeUntil(this.destroy$)
-        ).subscribe(query => {
-            this.searchValue.set(query.trim());
-            this.loadData(1, true);
+        this.observeEvents.pipe(takeUntil(this.destroy$)).subscribe(({ name, data }) => {
+            this.handelEvent[name](data);
         });
 
         this.loadData(1, true);
@@ -138,11 +144,11 @@ export class SubjectManagementComponent implements OnInit, OnDestroy {
 
     onSearchChange(event: Event): void {
         const value = (event.target as HTMLInputElement).value || '';
-        this.searchSubject$.next(value);
+        this.searchValue.set(value);
     }
 
-    onClearSearch(): void {
-        this.searchValue.set('');
+    onSearchData(): void {
+        this.searchValue.set(this.searchValue().trim());
         this.loadData(1, true);
     }
 
@@ -200,6 +206,10 @@ export class SubjectManagementComponent implements OnInit, OnDestroy {
         });
     }
 
+    emitEvent(name: DataTableEventName, data: Subject = null): void {
+        this.observeEvents.next({ name, data });
+    }
+
     openCreateDrawer(): void {
         if (!this.canAdd) {
             this.notificationService.toastWarning('Bạn không có quyền thêm mới môn học');
@@ -237,23 +247,6 @@ export class SubjectManagementComponent implements OnInit, OnDestroy {
             return;
         }
 
-        if (this.subjectForm.dirty && !this.formControl.submitted) {
-            this.closingDrawer = true;
-            this.notificationService.confirmDelete(
-                'Dữ liệu biểu mẫu chưa được lưu. Bạn có chắc muốn đóng?',
-                'Xác nhận đóng'
-            ).then(confirmed => {
-                if (confirmed) {
-                    this.closeDrawer();
-                }
-            }).catch(() => {
-                // Đóng hộp thoại xác nhận, giữ nguyên biểu mẫu.
-            }).finally(() => {
-                this.closingDrawer = false;
-            });
-            return;
-        }
-
         this.closeDrawer();
     }
 
@@ -262,7 +255,7 @@ export class SubjectManagementComponent implements OnInit, OnDestroy {
     }
 
     submitForm(): void {
-        if (this.formControl.state() === 'SUBMITTING') {
+        if (this.formControl.state() === 'SUBMITTING' || this.isSaving()) {
             return;
         }
 
@@ -288,21 +281,26 @@ export class SubjectManagementComponent implements OnInit, OnDestroy {
             sotinchi_th: sotinchiTh
         };
 
-        const request$ = this.formControl.isFormAdd
+        const isAdd = this.formControl.isFormAdd;
+        const request$ = isAdd
             ? this.subjectService.create(payload)
             : this.subjectService.update(this.formControl.object.id, payload);
 
-        this.formControl.submit(request$).pipe(
+        this.isSaving.set(true);
+        this.closeDrawer();
+
+        request$.pipe(
             takeUntil(this.destroy$)
         ).subscribe({
             next: () => {
-                const message = this.formControl.isFormAdd ? 'Thêm mới môn học thành công' : 'Cập nhật môn học thành công';
+                this.isSaving.set(false);
+                const message = isAdd ? 'Thêm mới môn học thành công' : 'Cập nhật môn học thành công';
                 this.notificationService.toastSuccess(message, 'Thành công');
-                this.closeDrawer();
                 this.loadData(this.table.paginator.paged(), false);
             },
             error: () => {
-                const message = this.formControl.isFormAdd ? 'Thêm mới môn học thất bại' : 'Cập nhật môn học thất bại';
+                this.isSaving.set(false);
+                const message = isAdd ? 'Thêm mới môn học thất bại' : 'Cập nhật môn học thất bại';
                 this.notificationService.toastError(message, 'Lỗi thao tác');
             }
         });
@@ -315,29 +313,54 @@ export class SubjectManagementComponent implements OnInit, OnDestroy {
         }
 
         const safeTitle = (item.name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        this.notificationService.confirmDelete(`Bạn có chắc muốn xóa môn học "${safeTitle}"?`).then(confirmed => {
-            if (!confirmed) {
-                return;
-            }
+        this.requestDeletingData([item.id], `Bạn có chắc muốn xóa môn học "${safeTitle}"?`);
+    }
 
-            this.state.set('loading');
-            this.subjectService.delete(item.id).pipe(
-                takeUntil(this.destroy$)
-            ).subscribe({
-                next: () => {
+    deleteSelectedSubjects(): void {
+        if (!this.canDelete) {
+            this.notificationService.toastWarning('Bạn không có quyền xóa môn học');
+            return;
+        }
+
+        const selected = this.table.getSelectedData();
+        if (!selected.length) {
+            return;
+        }
+
+        this.requestDeletingData(
+            selected.map(item => item.id),
+            `Bạn có chắc muốn xóa ${selected.length} môn học đã chọn?`
+        );
+    }
+
+    private requestDeletingData(ids: number[], message: string): void {
+        const currentPage = this.table.paginator.paged();
+        const nextPage = ids.length === this.table.data().length && currentPage > 1
+            ? currentPage - 1
+            : currentPage;
+
+        this.notificationService.confirmDelete2({
+            heading: 'Xác nhận xóa',
+            htmlMessage: message
+        }).pipe(
+            filter((confirmed: boolean): boolean => confirmed),
+            map(() => new IctuDeletingAnimationControl(ids, this.subjectService)),
+            switchMap((deleteController: IctuDeletingAnimationControl): Observable<boolean> => {
+                deleteController.run();
+                return this.notificationService.startDeleting(deleteController.progress);
+            }),
+            takeUntil(this.destroy$)
+        ).subscribe({
+            next: (success: boolean): void => {
+                if (success) {
                     this.notificationService.toastSuccess('Xóa môn học thành công', 'Thành công');
-                    const nextPage = this.table.data().length === 1 && this.table.paginator.paged() > 1
-                        ? this.table.paginator.paged() - 1
-                        : this.table.paginator.paged();
-                    this.loadData(nextPage, false);
-                },
-                error: () => {
-                    this.state.set('success');
-                    this.notificationService.toastError('Xóa môn học thất bại', 'Lỗi thao tác');
                 }
-            });
-        }).catch(() => {
-            // modal dismissed
+                this.loadData(nextPage, false);
+            },
+            error: (): void => {
+                this.notificationService.toastError('Xóa một hoặc nhiều môn học thất bại', 'Lỗi thao tác');
+                this.loadData(currentPage, false);
+            }
         });
     }
 

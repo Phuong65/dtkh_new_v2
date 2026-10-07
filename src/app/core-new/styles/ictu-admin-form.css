@@ -141,185 +141,6 @@ body {
 	padding: 0;
 }
 
-/*************************************************************
-* ictu-button / ictu-badge-btn (global)
-*************************************************************/
-button.btn[class*=ictu-button-],
-button.btn[class*=ictu-badge-btn--],
-button.btn.ictu-button,
-button.btn.ictu-badge-btn {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	min-height: 36px;
-	padding: 0.55rem 1.15rem;
-	border: 1px solid transparent;
-	border-radius: 8px;
-	font-size: 12px;
-	font-weight: 600;
-	line-height: 1.25;
-	letter-spacing: 0.01em;
-	cursor: pointer;
-	transition: all 0.2s ease;
-	box-shadow: none;
-}
-
-button.btn[class*=ictu-button-]:hover,
-button.btn[class*=ictu-badge-btn--]:hover,
-button.btn.ictu-button:hover,
-button.btn.ictu-badge-btn:hover {
-	filter: brightness(0.98);
-	transform: translateY(-1px);
-}
-
-button.btn[class*=ictu-button-]:active,
-button.btn[class*=ictu-badge-btn--]:active,
-button.btn.ictu-button:active,
-button.btn.ictu-badge-btn:active {
-	transform: translateY(0);
-}
-
-button.btn[class*=ictu-button-primary-light],
-button.btn[class*=ictu-badge-btn--primary] {
-	background: #eaf2ff;
-	color: #1d4ed8;
-	border-color: #cfe0ff;
-}
-
-button.btn[class*=ictu-button-secondary-light],
-button.btn[class*=ictu-badge-btn--secondary] {
-	background: #eef2f7;
-	color: #334155;
-	border-color: #dfe5ef;
-}
-
-button.btn[class*=ictu-button-warning-light],
-button.btn[class*=ictu-badge-btn--warning] {
-	background: #fff4d6;
-	color: #9a5b00;
-	border-color: #f9d78a;
-}
-
-button.btn[class*=ictu-button-info-light],
-button.btn[class*=ictu-badge-btn--info] {
-	background: #e0f2fe;
-	color: #0f766e;
-	border-color: #bae6fd;
-}
-
-button.btn[class*=ictu-button-success-light],
-button.btn[class*=ictu-badge-btn--success] {
-	background: #e7f9ee;
-	color: #15803d;
-	border-color: #b8e7c7;
-}
-
-button.btn[class*=ictu-button-danger-light],
-button.btn[class*=ictu-badge-btn--danger] {
-	background: #ffe7e7;
-	color: #b42318;
-	border-color: #f7c0c0;
-}
-
-button.btn[class*=ictu-button-purple-light],
-button.btn[class*=ictu-badge-btn--purple] {
-	background: #f2e8ff;
-	color: #7c3aed;
-	border-color: #dcc7ff;
-}
-
-button.btn[class*=ictu-button-teal-light],
-button.btn[class*=ictu-badge-btn--teal] {
-	background: #dffdf7;
-	color: #0f766e;
-	border-color: #b6f4e8;
-}
-
-button.btn[class*=ictu-button-orange-light],
-button.btn[class*=ictu-badge-btn--orange] {
-	background: #fff0e3;
-	color: #c75a00;
-	border-color: #ffd5ac;
-}
-
-button.btn[class*=ictu-button-primary-gradient],
-button.btn[class*=ictu-badge-btn--primary-reverse] {
-	background: linear-gradient(135deg, #4f46e5 0%, #2563eb 100%);
-	color: #ffffff;
-	border-color: transparent;
-}
-
-button.btn[class*=ictu-button-secondary-gradient] {
-	background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
-	color: #0f172a;
-	border-color: transparent;
-}
-
-button.btn[class*=ictu-button-warning-gradient] {
-	background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-	color: #ffffff;
-	border-color: transparent;
-}
-
-button.btn[class*=ictu-button-info-gradient] {
-	background: linear-gradient(135deg, #22d3ee 0%, #06b6d4 100%);
-	color: #ffffff;
-	border-color: transparent;
-}
-
-button.btn[class*=ictu-button-success-gradient] {
-	background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-	color: #ffffff;
-	border-color: transparent;
-}
-
-button.btn[class*=ictu-button-danger-gradient] {
-	background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-	color: #ffffff;
-	border-color: transparent;
-}
-
-button.btn[class*=ictu-button-purple-gradient] {
-	background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
-	color: #ffffff;
-	border-color: transparent;
-}
-
-button.btn[class*=ictu-button-teal-gradient] {
-	background: linear-gradient(135deg, #2dd4bf 0%, #0f766e 100%);
-	color: #ffffff;
-	border-color: transparent;
-}
-
-button.btn[class*=ictu-button-orange-gradient] {
-	background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
-	color: #ffffff;
-	border-color: transparent;
-}
-
-button.btn[class*=ictu-button-primary-ghost],
-button.btn[class*=ictu-button-secondary-ghost],
-button.btn[class*=ictu-button-warning-ghost],
-button.btn[class*=ictu-button-info-ghost],
-button.btn[class*=ictu-button-success-ghost],
-button.btn[class*=ictu-button-danger-ghost],
-button.btn[class*=ictu-button-purple-ghost],
-button.btn[class*=ictu-button-teal-ghost],
-button.btn[class*=ictu-button-orange-ghost] {
-	background: transparent;
-	border-width: 1px;
-}
-
-button.btn[class*=ictu-button-primary-ghost] { color: #2563eb; border-color: #93c5fd; }
-button.btn[class*=ictu-button-secondary-ghost] { color: #475569; border-color: #cbd5e1; }
-button.btn[class*=ictu-button-warning-ghost] { color: #b45309; border-color: #fbbf24; }
-button.btn[class*=ictu-button-info-ghost] { color: #0f766e; border-color: #67e8f9; }
-button.btn[class*=ictu-button-success-ghost] { color: #15803d; border-color: #86efac; }
-button.btn[class*=ictu-button-danger-ghost] { color: #dc2626; border-color: #fca5a5; }
-button.btn[class*=ictu-button-purple-ghost] { color: #7c3aed; border-color: #c4b5fd; }
-button.btn[class*=ictu-button-teal-ghost] { color: #0f766e; border-color: #99f6e4; }
-button.btn[class*=ictu-button-orange-ghost] { color: #c2410c; border-color: #fdba74; }
-
 .ictu-badge {
 	display: inline-flex;
 	align-items: center;
@@ -405,14 +226,49 @@ button.btn[class*=ictu-button-orange-ghost] { color: #c2410c; border-color: #fdb
 	border-color: #dcc7ff;
 }
 
-.admin-wrap-table__head-actions .p-select-label,
-.admin-wrap-table__head-actions .admin-wrap-table__head-actions__search {
+.admin-wrap-table__head-actions .p-select-label {
 	font-family: var(--primary-font-family), sans-serif;
 	font-size: 14px;
 	font-weight: 400;
 	border-radius: var(--admin-wrap-table-element-radius);
 	padding: 6px 10px;
 	line-height: 1.5;
+}
+
+.admin-wrap-table__head-actions .admin-wrap-table__head-actions__search,
+input.admin-wrap-table__head-actions__search,
+.admin-wrap-table__head-actions__search {
+	box-sizing: border-box;
+	height: 35px !important;
+	padding: 6px 10px !important;
+	border: 1px solid #cbd5e1 !important;
+	border-radius: var(--admin-wrap-table-element-radius, 4px) !important;
+	background: #ffffff !important;
+	color: #333333 !important;
+	font-family: var(--primary-font-family), sans-serif;
+	font-size: 14px !important;
+	font-weight: 400;
+	line-height: 1.5 !important;
+	box-shadow: none !important;
+	outline: none !important;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-wrap-table__head-actions .admin-wrap-table__head-actions__search:hover,
+input.admin-wrap-table__head-actions__search:hover,
+.admin-wrap-table__head-actions__search:hover {
+	border-color: #94a3b8 !important;
+}
+
+.admin-wrap-table__head-actions .admin-wrap-table__head-actions__search:focus,
+input.admin-wrap-table__head-actions__search:focus,
+.admin-wrap-table__head-actions__search:focus {
+	border-color: #0d59cf !important;
+	box-shadow: 0 0 0 2px rgb(13 89 207 / 12%) !important;
+}
+
+.admin-wrap-table__head-actions__search::placeholder {
+	color: #94a3b8;
 }
 
 .admin-wrap-table__head-actions .p-select:has(.p-select-clear-icon) .p-select-label {
@@ -443,6 +299,150 @@ button.btn[class*=ictu-button-orange-ghost] { color: #c2410c; border-color: #fdb
 
 .admin-wrap-table__head-actions__separator {
 	border-left: 1px solid var(--admin-table-border-color);
+}
+
+/* Reusable admin CRUD shell primitives */
+.ictu-admin-page-host {
+    display: block;
+    height: 100%;
+    background: #ffffff;
+}
+
+.ictu-admin-page {
+    display: flex;
+    flex-direction: column;
+    height: calc(var(--device-height, 100vh) - var(--topbar-height, 60px));
+    min-height: 0;
+    padding: 0;
+    background: #ffffff;
+}
+
+.ictu-admin-table-shell {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.ictu-admin-table-shell__body {
+    display: flex;
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.ictu-admin-table-scroll {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
+    overflow-x: auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.ictu-admin-icon-button {
+    display: inline-flex !important;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    min-width: 32px !important;
+    height: 32px;
+    padding: 0 !important;
+    border-radius: 4px !important;
+    line-height: 1;
+}
+
+.ictu-admin-icon-button i {
+    display: block;
+    width: 16px;
+    height: 16px;
+    margin: 0 !important;
+    padding: 0;
+    font-size: 16px;
+    line-height: 16px;
+    text-align: center;
+}
+
+.ictu-admin-icon-button:focus-visible {
+    outline: 2px solid rgb(1 98 232 / 45%);
+    outline-offset: 2px;
+}
+
+.ictu-admin-icon-button:disabled {
+    cursor: default;
+}
+
+.ictu-admin-table-actions {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.ictu-admin-drawer-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    width: 100%;
+}
+
+.ictu-admin-drawer-footer > .ictu-admin-footer-button {
+    display: inline-flex;
+    min-width: 100px;
+    min-height: 38px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 4px !important;
+}
+
+.ictu-admin-drawer-footer > .ictu-admin-footer-button i {
+    margin: 0 !important;
+}
+
+.ictu-admin-form-credits {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.ictu-admin-form-textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+.ictu-admin-form-error {
+    display: block;
+    margin-top: 6px;
+    color: #b42318;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+@media (max-width: 680px) {
+    .ictu-admin-form-credits {
+        grid-template-columns: 1fr;
+    }
+
+    .ictu-admin-drawer-footer > .ictu-admin-footer-button {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ictu-admin-icon-button,
+    .ictu-admin-footer-button {
+        transition-duration: 0.01ms;
+    }
 }
 
 /*.admin-section__sidebar {*/

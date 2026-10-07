@@ -1,0 +1,131 @@
+<section class="admin-section--table ictu-admin-page position-relative" aria-labelledby="bo-ctdt-list-title">
+    @if (state() === 'loading') {
+    <app-loading-progress heading="Đang tải danh sách bộ chương trình đào tạo..." backdropFilter="none"></app-loading-progress>
+    }
+    @if (isSaving()) {
+    <app-loading-progress heading="Đang lưu dữ liệu..."></app-loading-progress>
+    }
+
+    <div class="admin-wrap-table ictu-admin-table-shell">
+        @if (state() !== 'error') {
+        <div class="admin-wrap-table__head d-flex">
+            <h4 id="bo-ctdt-list-title" class="admin-wrap-table__heading">Bộ chương trình đào tạo</h4>
+            <div class="admin-wrap-table__head-actions bo-ctdt-toolbar-actions">
+                <input type="text" class="admin-wrap-table__head-actions__search" placeholder="Tìm kiếm..." pInputText
+                    [value]="searchValue()" (input)="onSearchChange($event)" (keyup.enter)="onSearchData()"
+                    aria-label="Tìm theo tên hoặc mã bộ chương trình đào tạo">
+                <button (click)="emitEvent('DELETE_SELECTED_ROWS')" [disabled]="!canDelete || !table.someItemsChecked()"
+                    class="btn ictu-button-danger-gradient ictu-admin-icon-button bo-ctdt-toolbar-actions__btn" mat-flat-button
+                    aria-label="Xóa bộ chương trình đào tạo đã chọn" title="Xóa mục đã chọn">
+                    <i class="ti ti-trash" aria-hidden="true"></i>
+                </button>
+                <button (click)="emitEvent('OPEN_FORM_ADD')" [disabled]="!canAdd" mat-flat-button
+                    class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button bo-ctdt-toolbar-actions__btn"
+                    aria-label="Thêm bộ chương trình đào tạo" title="Thêm bộ chương trình đào tạo">
+                    <i class="ti ti-plus" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="admin-wrap-table__body ictu-admin-table-shell__body">
+            <div class="bo-ctdt-table-scroll ictu-admin-table-scroll">
+                <table class="tbl admin-table table-hover bo-ctdt-table">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="col-checkbox">
+                                <mat-checkbox [checked]="table.totalChecked()" [indeterminate]="table.partiallyChecked()"
+                                    (change)="toggleCheckAll($event.checked)" [disabled]="!table.data().length"
+                                    aria-label="Chọn tất cả bộ chương trình đào tạo trên trang"></mat-checkbox>
+                            </th>
+                            <th scope="col" class="col-index text-center">#</th>
+                            <th scope="col" class="bo-ctdt-col-id text-center">ID</th>
+                            <th scope="col" class="wid-120 text-center">Mã</th>
+                            <th scope="col" class="text-center">Tên bộ chương trình đào tạo</th>
+                            <th scope="col" class="wid-90 text-center px-0">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (row of table.data(); track trackById($index, row); let i = $index) {
+                        <tr [class.bo-ctdt-row--selected]="row._ictuDataTableRowChecked">
+                            <td class="col-checkbox">
+                                <mat-checkbox [checked]="row._ictuDataTableRowChecked" (change)="toggleCheckRow($event.checked, i)"
+                                    [attr.aria-label]="'Chọn bộ chương trình đào tạo ' + row.name"></mat-checkbox>
+                            </td>
+                            <td class="col-index text-center">{{ table.paginator.startIndex() + i }}</td>
+                            <td class="text-center">{{ row.id }}</td>
+                            <td>{{ row.code }}</td>
+                            <td class="text-left"><strong>{{ row.name }}</strong></td>
+                            <td class="p-0 wid-90">
+                                <div class="admin-table__btn-actions ictu-admin-table-actions">
+                                    <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
+                                        (click)="emitEvent('OPEN_FORM_UPDATE', row)" [disabled]="!canUpdate"
+                                        [attr.aria-label]="'Sửa bộ chương trình đào tạo ' + row.name" title="Sửa">
+                                        <i class="ti ti-edit" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
+                                        (click)="emitEvent('DELETE_SINGLE_ROW', row)" [disabled]="!canDelete"
+                                        [attr.aria-label]="'Xóa bộ chương trình đào tạo ' + row.name" title="Xóa">
+                                        <i class="ti ti-trash" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        } @empty {
+                        <tr>
+                            <td colspan="6" class="bo-ctdt-empty">Không có bản ghi nào.</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="admin-wrap-table__foot">
+            <div class="d-flex justify-content-center align-items-center w-100">
+                <ictu-paginator [control]="table.paginator" (onChangePage)="onChangePage($event)"></ictu-paginator>
+            </div>
+        </div>
+        } @else {
+        <div class="admin-table__alert-danger text-center w-100">
+            Tải dữ liệu thất bại. Vui lòng chọn
+            <a (click)="loadData(1, true)" href="javascript:" class="admin-table__alert-danger__btn-reload">tải lại</a>.
+        </div>
+        }
+    </div>
+</section>
+
+<p-drawer #boCtdtDrawer [(visible)]="formControl.visible" [dismissible]="false" [header]="formControl.heading()"
+    [style]="{ width: '400px', 'max-width': '100%' }" appendTo="body" position="right" styleClass="ictu-p-drawer">
+    <div class="ictu-p-drawer__content position-relative">
+        <div class="ictu-p-drawer__content__body position-relative">
+            <form [formGroup]="boCtdtForm" class="bo-ctdt-form">
+                <div class="ictu-form ictu-form--label-on-top">
+                    <div class="ictu-form__row">
+                        <label class="ictu-form__label ictu-form__label--required" for="bo-ctdt-code">Mã bộ chương trình đào tạo</label>
+                        <input id="bo-ctdt-code" type="text" formControlName="code" class="ictu-form__input-field"
+                            pInputText placeholder="Nhập mã" autocomplete="off">
+                        @if (boCtdtForm.get('code')?.touched && boCtdtForm.get('code')?.invalid) {
+                        <span class="ictu-admin-form-error">Mã là bắt buộc, tối đa 50 ký tự.</span>
+                        }
+                    </div>
+                    <div class="ictu-form__row">
+                        <label class="ictu-form__label ictu-form__label--required" for="bo-ctdt-name">Tên bộ chương trình đào tạo</label>
+                        <input id="bo-ctdt-name" type="text" formControlName="name" class="ictu-form__input-field"
+                            pInputText placeholder="Nhập tên bộ chương trình đào tạo" autocomplete="off">
+                        @if (boCtdtForm.get('name')?.touched && boCtdtForm.get('name')?.invalid) {
+                        <span class="ictu-admin-form-error">Tên là bắt buộc, tối đa 255 ký tự.</span>
+                        }
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="ictu-p-drawer__content__footer ictu-admin-drawer-footer">
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button"
+                (click)="requestCloseDrawer()">Hủy</button>
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button"
+                (click)="emitEvent('SUBMIT_FORM')">
+                <i class="ti ti-device-floppy" aria-hidden="true"></i> Lưu lại
+            </button>
+        </div>
+    </div>
+</p-drawer>
