@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { MatButton } from '@angular/material/button';
 import { Drawer } from 'primeng/drawer';
 import { InputText } from 'primeng/inputtext';
+import { Tooltip } from 'primeng/tooltip';
 import { Observable, Subject as RxSubject, filter, map, switchMap, takeUntil } from 'rxjs';
 import { IctuPaginatorComponent } from '@core-new/components/ictu-paginator/ictu-paginator.component';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
@@ -28,6 +29,7 @@ import { CtdtService } from '@modules/shared/services/ctdt.service';
         ReactiveFormsModule,
         Drawer,
         InputText,
+        Tooltip,
         IctuPaginatorComponent,
         LoadingProgressComponent,
         MatButton
@@ -108,10 +110,12 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     private checkPermissions(): void {
         const rawUrl = this.router.url.split('?')[0];
         const routePath = rawUrl.startsWith('/admin/') ? rawUrl.substring(7) : rawUrl.replace(/^\//, '');
-        if (this.auth?.userCanAdd) this.canAdd = this.auth.userCanAdd(routePath) || this.auth.userCanAdd('bo-ctdt');
+        if (this.auth?.userCanAdd) {
+            this.canAdd = this.auth.userCanAdd(routePath) || this.auth.userCanAdd('bo-ctdt');
+            this.canAddCtdt = this.canAdd || this.auth.userCanAdd('chuongtrinh-daotao');
+        }
         if (this.auth?.userCanEdit) this.canUpdate = this.auth.userCanEdit(routePath) || this.auth.userCanEdit('bo-ctdt');
         if (this.auth?.userCanDelete) this.canDelete = this.auth.userCanDelete(routePath) || this.auth.userCanDelete('bo-ctdt');
-        if (this.auth?.userCanAdd) this.canAddCtdt = this.auth.userCanAdd('chuongtrinh-daotao');
     }
 
     emitEvent(name: DataTableEventName, data: BoCtdt = null): void {

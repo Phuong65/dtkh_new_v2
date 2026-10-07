@@ -1,50 +1,63 @@
 <section class="admin-section--table ictu-admin-page bo-ctdt-page position-relative" aria-labelledby="bo-ctdt-title">
     @if (state() === 'loading' || isSaving()) {
-    <app-loading-progress [heading]="isSaving() ? 'Đang lưu dữ liệu...' : 'Đang tải dữ liệu...'" backdropFilter="none"></app-loading-progress>
+    <app-loading-progress [heading]="isSaving() ? 'Đang lưu dữ liệu...' : 'Đang tải dữ liệu...'"
+        backdropFilter="none"></app-loading-progress>
     }
 
     <div class="bo-ctdt-master-detail ictu-admin-table-shell">
         <div class="bo-ctdt-master-card">
-        <aside class="bo-ctdt-master" aria-labelledby="bo-ctdt-master-title">
-            <div class="bo-ctdt-panel-header">
-                <h1 id="bo-ctdt-master-title">Bộ chương trình đào tạo</h1>
-            </div>
-
-            <div class="bo-ctdt-master-search">
-                <input class="admin-wrap-table__head-actions__search" pInputText type="text" placeholder="Tìm bộ CTĐT..."
-                    [value]="searchValue()" (input)="onSearchChange($event)" (keyup.enter)="onSearchData()"
-                    aria-label="Tìm bộ chương trình đào tạo">
-                <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button"
-                    (click)="emitEvent('OPEN_FORM_ADD')" [disabled]="!canAdd" aria-label="Thêm bộ CTĐT" title="Thêm bộ CTĐT">
-                    <i class="ti ti-plus" aria-hidden="true"></i>
-                </button>
-            </div>
-
-            <div class="bo-ctdt-master-list" role="listbox" aria-label="Danh sách bộ chương trình đào tạo">
-                @for (bo of boTable.data(); track trackByBoId($index, bo)) {
-                <div class="bo-ctdt-master-item" [class.bo-ctdt-master-item--active]="selectedBo()?.id === bo.id"
-                    [attr.aria-selected]="selectedBo()?.id === bo.id" role="option" tabindex="0"
-                    (click)="selectBo(bo)" (keydown.enter)="selectBo(bo)" (keydown.space)="selectBo(bo); $event.preventDefault()">
-                    <span class="bo-ctdt-master-item__mark" aria-hidden="true"><i class="ti ti-folder"></i></span>
-                    <span class="bo-ctdt-master-item__content">
-                        <strong>{{ bo.name }}</strong>
-                        <small>{{ bo.code }}</small>
-                    </span>
-                    <button type="button" class="bo-ctdt-master-item__delete ictu-button-danger-light" (click)="deleteBoCtdt(bo); $event.stopPropagation()"
-                        [disabled]="!canDelete" [attr.aria-label]="'Xóa bộ CTĐT ' + bo.name" title="Xóa bộ CTĐT">
-                        <i class="ti ti-trash" aria-hidden="true"></i>
-                    </button>
-                    <span class="bo-ctdt-master-item__chevron" aria-hidden="true"><i class="ti ti-chevron-right"></i></span>
+            <aside class="bo-ctdt-master" aria-labelledby="bo-ctdt-master-title">
+                <div class="bo-ctdt-panel-header">
+                    <h1 id="bo-ctdt-master-title">Bộ chương trình đào tạo</h1>
                 </div>
-                } @empty {
-                <div class="bo-ctdt-empty">Chưa có bộ CTĐT.</div>
-                }
-            </div>
 
-            <div class="bo-ctdt-master-footer">
-                <ictu-paginator [control]="boTable.paginator" (onChangePage)="onBoPageChange($event)"></ictu-paginator>
-            </div>
-        </aside>
+                <div class="bo-ctdt-master-search">
+                    <input class="admin-wrap-table__head-actions__search" pInputText type="text"
+                        placeholder="Tìm bộ CTĐT..." [value]="searchValue()" (input)="onSearchChange($event)"
+                        (keyup.enter)="onSearchData()" aria-label="Tìm bộ chương trình đào tạo">
+                    <button type="button" mat-flat-button
+                        class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button"
+                        (click)="emitEvent('OPEN_FORM_ADD')" [disabled]="!canAdd" aria-label="Thêm bộ CTĐT"
+                        pTooltip="Thêm bộ CTĐT" tooltipPosition="bottom">
+                        <i class="ti ti-plus" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <div class="bo-ctdt-master-list" role="listbox" aria-label="Danh sách bộ chương trình đào tạo">
+                    @for (bo of boTable.data(); track trackByBoId($index, bo)) {
+                    <div class="bo-ctdt-master-item" [class.bo-ctdt-master-item--active]="selectedBo()?.id === bo.id"
+                        [attr.aria-selected]="selectedBo()?.id === bo.id" role="option" tabindex="0"
+                        (click)="selectBo(bo)" (keydown.enter)="selectBo(bo)"
+                        (keydown.space)="selectBo(bo); $event.preventDefault()">
+                        <span class="bo-ctdt-master-item__mark" aria-hidden="true"><i class="ti ti-folder"></i></span>
+                        <span class="bo-ctdt-master-item__content">
+                            <strong>{{ bo.name }}</strong>
+                            <small>{{ bo.code }}</small>
+                        </span>
+                        <button type="button" class="bo-ctdt-master-item__edit ictu-button-info-light"
+                            (click)="emitEvent('OPEN_FORM_UPDATE', bo); $event.stopPropagation()"
+                            [disabled]="!canUpdate" [attr.aria-label]="'Sửa bộ CTĐT ' + bo.name" pTooltip="Sửa bộ CTĐT"
+                            tooltipPosition="right">
+                            <i class="ti ti-edit" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="bo-ctdt-master-item__delete ictu-button-danger-light"
+                            (click)="deleteBoCtdt(bo); $event.stopPropagation()" [disabled]="!canDelete"
+                            [attr.aria-label]="'Xóa bộ CTĐT ' + bo.name" pTooltip="Xóa bộ CTĐT" tooltipPosition="right">
+                            <i class="ti ti-trash" aria-hidden="true"></i>
+                        </button>
+                        <span class="bo-ctdt-master-item__chevron" aria-hidden="true"><i
+                                class="ti ti-chevron-right"></i></span>
+                    </div>
+                    } @empty {
+                    <div class="bo-ctdt-empty">Chưa có bộ CTĐT.</div>
+                    }
+                </div>
+
+                <div class="bo-ctdt-master-footer">
+                    <ictu-paginator [control]="boTable.paginator"
+                        (onChangePage)="onBoPageChange($event)"></ictu-paginator>
+                </div>
+            </aside>
         </div>
 
         <div class="bo-ctdt-divider" aria-hidden="true"></div>
@@ -56,11 +69,14 @@
                         <h1>Chương trình đào tạo</h1>
                     </div>
                     <div class="admin-wrap-table__head-actions bo-ctdt-detail-actions">
-                        <input class="admin-wrap-table__head-actions__search" pInputText type="text" placeholder="Tìm chương trình..."
-                            [value]="ctdtSearchValue()" (input)="onCtdtSearchChange($event)" (keyup.enter)="onCtdtSearchData()"
+                        <input class="admin-wrap-table__head-actions__search" pInputText type="text"
+                            placeholder="Tìm chương trình..." [value]="ctdtSearchValue()"
+                            (input)="onCtdtSearchChange($event)" (keyup.enter)="onCtdtSearchData()"
                             aria-label="Tìm chương trình đào tạo">
-                        <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse bo-ctdt-add-ctdt"
-                            (click)="openCreateCtdt()" [disabled]="!selectedBo() || !canAddCtdt">
+                        <button type="button" mat-flat-button
+                            class="btn ictu-badge-btn--success-reverse bo-ctdt-add-ctdt" (click)="openCreateCtdt()"
+                            [disabled]="!selectedBo() || !canAddCtdt" aria-label="Thêm chương trình đào tạo"
+                            pTooltip="Thêm chương trình đào tạo" tooltipPosition="bottom">
                             <i class="ti ti-plus" aria-hidden="true"></i>
                         </button>
                     </div>
@@ -68,47 +84,99 @@
 
                 <div class="admin-wrap-table__body ictu-admin-table-shell__body bo-ctdt-program-body">
                     @if (ctdtState() === 'loading') {
-                    <app-loading-progress heading="Đang tải chương trình đào tạo..." backdropFilter="none"></app-loading-progress>
+                    <app-loading-progress heading="Đang tải chương trình đào tạo..."
+                        backdropFilter="none"></app-loading-progress>
                     }
                     @if (ctdtState() === 'error') {
-                    <div class="admin-table__alert-danger text-center">Tải danh sách CTĐT thất bại. Vui lòng <a href="javascript:" (click)="loadCtdt(1, true)">tải lại</a>.</div>
+                    <div class="admin-table__alert-danger text-center">Tải danh sách CTĐT thất bại. Vui lòng <a
+                            href="javascript:" (click)="loadCtdt(1, true)">tải lại</a>.</div>
                     } @else {
                     <div class="ictu-admin-table-scroll">
                         <table class="tbl admin-table table-hover bo-ctdt-program-table" style="margin-top: 10px">
-                            <thead><tr><th class="wid-90 text-center">#</th><th>Mã CTĐT</th><th>Tên chương trình</th><th class="wid-120 text-center">Năm</th><th class="wid-90 text-center">Thao tác</th></tr></thead>
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="width: 50px;">#</th>
+                                    <th class="wid-90 text-center" style="width: 90px;">Mã CTĐT</th>
+                                    <th class="text-center">Tên chương trình</th>
+                                    <th class="text-center" style="width: 90px;">Thao tác</th>
+                                </tr>
+                            </thead>
                             <tbody>
                                 @for (ctdt of ctdtTable.data(); track trackByCtdtId($index, ctdt); let i = $index) {
                                 <tr class="bo-ctdt-program-row">
                                     <td class="text-center">{{ ctdtTable.paginator.startIndex() + i }}</td>
-                                    <td><span class="bo-ctdt-code">{{ ctdt.madt || '—' }}</span></td>
+                                    <td>{{ ctdt.madt || '—' }}</td>
                                     <td><strong>{{ ctdt.ten || 'Chưa đặt tên' }}</strong></td>
-                                    <td class="text-center">{{ ctdt.nam || '—' }}</td>
-                                    <td class="text-center"><button type="button" class="btn ictu-button-info-light ictu-admin-icon-button" [attr.aria-label]="'Mở chương trình ' + ctdt.ten" title="Mở chương trình"><i class="ti ti-edit" aria-hidden="true"></i></button></td>
+                                    <td class="text-center"><button type="button"
+                                            class="btn ictu-button-info-light ictu-admin-icon-button"
+                                            [attr.aria-label]="'Mở chương trình ' + ctdt.ten" pTooltip="Mở chương trình"
+                                            tooltipPosition="left"><i class="ti ti-edit"
+                                                aria-hidden="true"></i></button></td>
                                 </tr>
                                 } @empty {
-                                <tr><td colspan="5" class="bo-ctdt-empty">Bộ CTĐT này chưa có chương trình.</td></tr>
+                                <tr>
+                                    <td colspan="5" class="bo-ctdt-empty">Bộ CTĐT này chưa có chương trình.</td>
+                                </tr>
                                 }
                             </tbody>
                         </table>
                     </div>
                     }
                 </div>
-                <div class="admin-wrap-table__foot bo-ctdt-detail-footer"><ictu-paginator [control]="ctdtTable.paginator" (onChangePage)="onCtdtPageChange($event)"></ictu-paginator></div>
+                <div class="admin-wrap-table__foot bo-ctdt-detail-footer"><ictu-paginator
+                        [control]="ctdtTable.paginator" (onChangePage)="onCtdtPageChange($event)"></ictu-paginator>
+                </div>
             </div>
         </main>
     </div>
 </section>
 
-<p-drawer #boCtdtDrawer [(visible)]="formControl.visible" [dismissible]="false" [header]="formControl.heading()" [style]="{ width: '400px', 'max-width': '100%' }" appendTo="body" position="right" styleClass="ictu-p-drawer">
-    <div class="ictu-p-drawer__content position-relative"><div class="ictu-p-drawer__content__body position-relative"><form [formGroup]="boCtdtForm" class="bo-ctdt-form"><div class="ictu-form ictu-form--label-on-top">
-        <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required" for="bo-ctdt-code">Mã bộ CTĐT</label><input id="bo-ctdt-code" type="text" formControlName="code" class="ictu-form__input-field" pInputText placeholder="Nhập mã" autocomplete="off"></div>
-        <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required" for="bo-ctdt-name">Tên bộ CTĐT</label><input id="bo-ctdt-name" type="text" formControlName="name" class="ictu-form__input-field" pInputText placeholder="Nhập tên bộ CTĐT" autocomplete="off"></div>
-    </div></form></div><div class="ictu-p-drawer__content__footer ictu-admin-drawer-footer"><button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button" (click)="requestCloseDrawer()">Hủy</button><button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button" (click)="emitEvent('SUBMIT_FORM')"><i class="ti ti-device-floppy" aria-hidden="true"></i> Lưu lại</button></div></div>
+<p-drawer #boCtdtDrawer [(visible)]="formControl.visible" [dismissible]="false" [header]="formControl.heading()"
+    [style]="{ width: '400px', 'max-width': '100%' }" appendTo="body" position="right" styleClass="ictu-p-drawer">
+    <div class="ictu-p-drawer__content position-relative">
+        <div class="ictu-p-drawer__content__body position-relative">
+            <form [formGroup]="boCtdtForm" class="bo-ctdt-form">
+                <div class="ictu-form ictu-form--label-on-top">
+                    <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required"
+                            for="bo-ctdt-code">Mã bộ CTĐT</label><input id="bo-ctdt-code" type="text"
+                            formControlName="code" class="ictu-form__input-field" pInputText placeholder="Nhập mã"
+                            autocomplete="off"></div>
+                    <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required"
+                            for="bo-ctdt-name">Tên bộ CTĐT</label><input id="bo-ctdt-name" type="text"
+                            formControlName="name" class="ictu-form__input-field" pInputText
+                            placeholder="Nhập tên bộ CTĐT" autocomplete="off"></div>
+                </div>
+            </form>
+        </div>
+        <div class="ictu-p-drawer__content__footer ictu-admin-drawer-footer"><button type="button" mat-flat-button
+                class="btn ictu-badge-btn--secondary ictu-admin-footer-button"
+                (click)="requestCloseDrawer()">Hủy</button><button type="button" mat-flat-button
+                class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button"
+                (click)="emitEvent('SUBMIT_FORM')"><i class="ti ti-device-floppy" aria-hidden="true"></i> Lưu
+                lại</button></div>
+    </div>
 </p-drawer>
 
-<p-drawer [(visible)]="ctdtDrawerVisible" [dismissible]="false" header="Thêm chương trình đào tạo" [style]="{ width: '400px', 'max-width': '100%' }" appendTo="body" position="right" styleClass="ictu-p-drawer">
-    <div class="ictu-p-drawer__content position-relative"><div class="ictu-p-drawer__content__body position-relative"><form [formGroup]="ctdtForm" class="bo-ctdt-form"><div class="ictu-form ictu-form--label-on-top">
-        <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required" for="ctdt-madt">Mã CTĐT</label><input id="ctdt-madt" type="text" formControlName="madt" class="ictu-form__input-field" pInputText placeholder="Nhập mã CTĐT"></div>
-        <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required" for="ctdt-ten">Tên chương trình</label><input id="ctdt-ten" type="text" formControlName="ten" class="ictu-form__input-field" pInputText placeholder="Nhập tên chương trình"></div>
-    </div></form></div><div class="ictu-p-drawer__content__footer ictu-admin-drawer-footer"><button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button" (click)="ctdtDrawerVisible = false">Hủy</button><button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button" (click)="submitCtdtForm()"><i class="ti ti-device-floppy" aria-hidden="true"></i> Lưu lại</button></div></div>
+<p-drawer [(visible)]="ctdtDrawerVisible" [dismissible]="false" header="Thêm chương trình đào tạo"
+    [style]="{ width: '400px', 'max-width': '100%' }" appendTo="body" position="right" styleClass="ictu-p-drawer">
+    <div class="ictu-p-drawer__content position-relative">
+        <div class="ictu-p-drawer__content__body position-relative">
+            <form [formGroup]="ctdtForm" class="bo-ctdt-form">
+                <div class="ictu-form ictu-form--label-on-top">
+                    <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required"
+                            for="ctdt-madt">Mã CTĐT</label><input id="ctdt-madt" type="text" formControlName="madt"
+                            class="ictu-form__input-field" pInputText placeholder="Nhập mã CTĐT"></div>
+                    <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required"
+                            for="ctdt-ten">Tên chương trình</label><input id="ctdt-ten" type="text"
+                            formControlName="ten" class="ictu-form__input-field" pInputText
+                            placeholder="Nhập tên chương trình"></div>
+                </div>
+            </form>
+        </div>
+        <div class="ictu-p-drawer__content__footer ictu-admin-drawer-footer"><button type="button" mat-flat-button
+                class="btn ictu-badge-btn--secondary ictu-admin-footer-button"
+                (click)="ctdtDrawerVisible = false">Hủy</button><button type="button" mat-flat-button
+                class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button" (click)="submitCtdtForm()"><i
+                    class="ti ti-device-floppy" aria-hidden="true"></i> Lưu lại</button></div>
+    </div>
 </p-drawer>

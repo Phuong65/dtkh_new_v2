@@ -21,7 +21,7 @@
     width: 1px;
     height: 100%;
     margin: 0 5px;
-    border-left: 1px dashed #94a3b8;
+    border-left: 1px dashed #cbd5e1;
     pointer-events: none;
 }
 
@@ -184,6 +184,7 @@
     color: #3b82f6;
 }
 
+.bo-ctdt-master-item__edit,
 .bo-ctdt-master-item__delete {
     display: none !important;
     width: 28px;
@@ -196,13 +197,15 @@
     font-size: 14px;
 }
 
+.bo-ctdt-master-item__edit i,
 .bo-ctdt-master-item__delete i {
     font-size: 15px;
 }
 
+.bo-ctdt-master-item:hover .bo-ctdt-master-item__edit,
+.bo-ctdt-master-item:focus-within .bo-ctdt-master-item__edit,
 .bo-ctdt-master-item:hover .bo-ctdt-master-item__delete,
-.bo-ctdt-master-item:focus-within .bo-ctdt-master-item__delete,
-.bo-ctdt-master-item--active .bo-ctdt-master-item__delete {
+.bo-ctdt-master-item:focus-within .bo-ctdt-master-item__delete {
     display: inline-flex !important;
 }
 
