@@ -49,7 +49,7 @@
                                 class="ti ti-chevron-right"></i></span>
                     </div>
                     } @empty {
-                    <div class="bo-ctdt-empty">Chưa có bộ CTĐT.</div>
+                    <div class="bo-ctdt-empty">Chưa có bộ CTĐT</div>
                     }
                 </div>
 
@@ -113,7 +113,8 @@
                                         </button>
                                     </td>
                                     <td class="text-center">
-                                        <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
+                                        <button type="button"
+                                            class="btn ictu-button-danger-light ictu-admin-icon-button"
                                             (click)="deleteCtdt(ctdt); $event.stopPropagation()"
                                             [disabled]="!canDeleteCtdt"
                                             [attr.aria-label]="'Xóa chương trình ' + ctdt.ten"
@@ -149,8 +150,7 @@
                     <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required"
                             for="bo-ctdt-code">Mã bộ CTĐT</label><input id="bo-ctdt-code" type="text"
                             formControlName="code" (input)="uppercaseCodeInput($event, boCtdtForm, 'code')"
-                            class="ictu-form__input-field" pInputText placeholder="Nhập mã"
-                            autocomplete="off"></div>
+                            class="ictu-form__input-field" pInputText placeholder="Nhập mã" autocomplete="off"></div>
                     <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required"
                             for="bo-ctdt-name">Tên bộ CTĐT</label><input id="bo-ctdt-name" type="text"
                             formControlName="name" class="ictu-form__input-field" pInputText
@@ -175,8 +175,8 @@
                 <div class="ictu-form ictu-form--label-on-top">
                     <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required"
                             for="ctdt-madt">Mã CTĐT</label><input id="ctdt-madt" type="text" formControlName="madt"
-                            (input)="uppercaseCodeInput($event, ctdtForm, 'madt')"
-                            class="ictu-form__input-field" pInputText placeholder="Nhập mã CTĐT"></div>
+                            (input)="uppercaseCodeInput($event, ctdtForm, 'madt')" class="ictu-form__input-field"
+                            pInputText placeholder="Nhập mã CTĐT"></div>
                     <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required"
                             for="ctdt-ten">Tên chương trình</label><input id="ctdt-ten" type="text"
                             formControlName="ten" class="ictu-form__input-field" pInputText
