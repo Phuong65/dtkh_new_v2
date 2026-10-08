@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, WritableSignal, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, finalize, forkJoin, map, of, switchMap, takeUntil } from 'rxjs';
@@ -8,6 +8,7 @@ import { Select } from 'primeng/select';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
+import { AppState } from '@core-new/models/app-state';
 import { OvicQueryCondition } from '@core/models/dto';
 import { AuthService } from '@core/services/auth.service';
 import { NotificationService } from '@core/services/notification.service';
@@ -38,7 +39,16 @@ export interface typeMuctieuCuthe {
     templateUrl: './ctdt-muctieu-cdr.component.html',
     styleUrls: ['./ctdt-muctieu-cdr.component.css']
 })
-export class CtdtMuctieuCdrComponent implements OnChanges, OnDestroy {
+export class CtdtMuctieuCdrComponent implements OnInit, OnDestroy {
+    private readonly auth = inject(AuthService);
+    private readonly notificationService = inject(NotificationService);
+    private readonly router = inject(Router);
+    private readonly ctdtService = inject(CtdtService);
+    readonly formBuilder = inject(FormBuilder);
+    private readonly elngUserProfileService = inject(ElngUserProfileService);
+    private readonly ctdtMuctieuCutheService = inject(CtdtMuctieuCutheService);
+    private readonly configsService = inject(ConfigsService);
+    private readonly ctdtConfigService = inject(CtdtConfigService);
     private readonly destroy$ = new Subject<void>();
     private readonly cancelTabLoad$ = new Subject<void>();
     private readonly cancelGoalsLoad$ = new Subject<void>();
@@ -47,11 +57,19 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnDestroy {
 
     @Input() selectedCtdt: Ctdt | null = null;
 
-    isLanhDaoKhoa = false;
-    isManager = false;
-    formMuctieuCuthe: FormGroup;
+    isLanhDaoKhoa = this.auth.userHasRole(ROLES.lanhdaokhoa);
+    isManager = [ROLES.manager, ROLES.admin, ROLES.troly_pdt, ROLES.chuyenvien_pdt]
+        .some(role => this.auth.userHasRole(role));
+    formMuctieuCuthe: FormGroup = this.formBuilder.group({
+        ctdt_id: ['', Validators.required],
+        kyhieu: [''],
+        ordering: ['', Validators.required],
+        noidung: ['', Validators.required],
+        type: ['', Validators.required],
+        tuongthich: [[]]
+    });
     isUpdated = false;
-    userId: number;
+    userId: number = this.auth.user?.id;
     donvi_chuyenmon_id: number;
     type_ctdt_muctieu_cuthe: CtdtConfig[] = [];
     list_tuongthich: CtdtConfig[] = [];
@@ -62,53 +80,24 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnDestroy {
     kyhieuMutieuCuthe = 'PEO';
     mucTieuChungDraft = '';
     drawerVisible = false;
-    isLoading = true;
-    isLoadingGoals = false;
-    loadError = '';
-    goalsError = '';
+    readonly state: WritableSignal<AppState> = signal<AppState>('loading');
+    readonly goalsState: WritableSignal<AppState> = signal<AppState>('success');
     savingGeneral = false;
     savingGoal = false;
     deletingGoalId: number | null = null;
 
-    constructor(
-        private auth: AuthService,
-        private notificationService: NotificationService,
-        private router: Router,
-        private ctdtService: CtdtService,
-        public formBuilder: FormBuilder,
-        private elngUserProfileService: ElngUserProfileService,
-        private ctdtMuctieuCutheService: CtdtMuctieuCutheService,
-        private configsService: ConfigsService,
-        private ctdtConfigService: CtdtConfigService
-    ) {
-        this.isManager = [ROLES.manager, ROLES.admin, ROLES.troly_pdt, ROLES.chuyenvien_pdt]
-            .some(role => this.auth.userHasRole(role));
-        this.isLanhDaoKhoa = this.auth.userHasRole(ROLES.lanhdaokhoa);
-        this.userId = this.auth.user?.id;
-        this.formMuctieuCuthe = this.formBuilder.group({
-            ctdt_id: ['', Validators.required],
-            kyhieu: [''],
-            ordering: ['', Validators.required],
-            noidung: ['', Validators.required],
-            type: ['', Validators.required],
-            tuongthich: [[]]
-        });
-    }
-
     get f() { return this.formMuctieuCuthe.controls; }
 
     get busy(): boolean {
-        return this.isLoading || this.isLoadingGoals || this.savingGeneral || this.savingGoal || this.deletingGoalId !== null;
+        return this.state() === 'loading' || this.goalsState() === 'loading' || this.savingGeneral || this.savingGoal || this.deletingGoalId !== null;
     }
 
     get generalEditorInitialValue(): string {
         return this.selectedCtdt?.muctieu || '';
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
-        const ctdt = changes['selectedCtdt']?.currentValue as Ctdt | null;
-        if (!ctdt?.id || ctdt.id === this.loadedCtdtId) return;
-        this.loadTabData(ctdt);
+    ngOnInit(): void {
+        if (this.selectedCtdt?.id) this.loadTabData(this.selectedCtdt);
     }
 
     ngOnDestroy(): void {
@@ -127,7 +116,7 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnDestroy {
 
     private loadTabData(ctdt: Ctdt, force = false): void {
         if (!this.isManager && !this.isLanhDaoKhoa) {
-            this.isLoading = false;
+            this.state.set('success');
             this.router.navigate(['/admin/content-none']);
             return;
         }
@@ -141,9 +130,8 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnDestroy {
         this.list_muctieu_cuthe = [];
         this.list_ctdt_muctieu_cuthe = [];
         this.mucTieuChungDraft = ctdt.muctieu || '';
-        this.loadError = '';
-        this.goalsError = '';
-        this.isLoading = true;
+        this.state.set('loading');
+        this.goalsState.set('success');
 
         const profile: ConditionOption = {
             condition: [{ conditionName: 'user_id', condition: OvicQueryCondition.equal, value: String(this.userId), orWhere: 'and' }],
@@ -168,7 +156,9 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnDestroy {
         ]).pipe(
             takeUntil(this.cancelTabLoad$),
             takeUntil(this.destroy$),
-            finalize(() => this.isLoading = false)
+            finalize(() => {
+                if (this.state() === 'loading') this.state.set('success');
+            })
         ).subscribe({
             next: ([user, config, ctdtConfig]) => {
                 if (!this.isManager && user.data?.[0]) {
@@ -185,29 +175,35 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnDestroy {
                 };
                 this.type_ctdt_muctieu_cuthe = resolveConfig('KHUNG_TRINH_DO');
                 this.list_tuongthich = resolveConfig('TUONGTHICH_PEOs');
+                this.goalsState.set('loading');
                 this.loadMuctieuCuthe();
             },
             error: () => {
                 this.loadedCtdtId = null;
-                this.loadError = 'Không thể tải dữ liệu mục tiêu chương trình. Vui lòng thử lại.';
+                this.state.set('error');
             }
         });
     }
 
     loadMuctieuCuthe(): void {
-        if (!this.selectedCtdt) return;
+        if (!this.selectedCtdt) {
+            this.goalsState.set('success');
+            return;
+        }
         this.cancelGoalsLoad$.next();
-        this.isLoadingGoals = true;
-        this.goalsError = '';
+        this.goalsState.set('loading');
         const condition: ConditionOption = {
             condition: [{ conditionName: 'ctdt_id', condition: OvicQueryCondition.equal, value: String(this.selectedCtdt.id) }],
             set: [{ label: 'limit', value: '-1' }, { label: 'orderby', value: 'ordering' }, { label: 'order', value: 'ASC' }],
             page: null
         };
         this.ctdtMuctieuCutheService.getCtdtMuctieuCutheByPageNew(condition).pipe(
-            takeUntil(this.cancelGoalsLoad$), takeUntil(this.destroy$), finalize(() => this.isLoadingGoals = false)
+            takeUntil(this.cancelGoalsLoad$), takeUntil(this.destroy$), finalize(() => {
+                if (this.goalsState() === 'loading') this.goalsState.set('success');
+            })
         ).subscribe({
             next: response => {
+                this.goalsState.set('success');
                 this.list_muctieu_cuthe = response.data || [];
                 this.list_ctdt_muctieu_cuthe = this.type_ctdt_muctieu_cuthe.map(group => ({
                     key: group.key,
@@ -220,7 +216,7 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnDestroy {
                 }
                 this.resetForm();
             },
-            error: () => this.goalsError = 'Không thể tải danh sách mục tiêu cụ thể. Vui lòng thử lại.'
+            error: () => this.goalsState.set('error')
         });
     }
 
@@ -252,7 +248,7 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnDestroy {
     }
 
     openAddMuctieu(): void {
-        if (!this.selectedCtdt || this.busy || this.goalsError) return;
+        if (!this.selectedCtdt || this.busy || this.goalsState() === 'error') return;
         this.resetForm();
         this.formTitle = 'Thêm mục tiêu cụ thể';
         this.drawerVisible = true;

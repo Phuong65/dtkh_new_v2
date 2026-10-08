@@ -1,14 +1,14 @@
 <div class="goals-shell">
-@if (isLoading || isLoadingGoals || savingGeneral || deletingGoalId !== null) {
+@if (state() === 'loading' || goalsState() === 'loading' || savingGeneral || deletingGoalId !== null) {
     <app-loading-progress
-        [heading]="savingGeneral ? 'Đang lưu mục tiêu chung...' : deletingGoalId !== null ? 'Đang xóa mục tiêu...' : isLoadingGoals ? 'Đang tải danh sách mục tiêu...' : 'Đang tải mục tiêu chương trình...'"
+    [heading]="savingGeneral ? 'Đang lưu mục tiêu chung...' : deletingGoalId !== null ? 'Đang xóa mục tiêu...' : goalsState() === 'loading' ? 'Đang tải danh sách mục tiêu...' : 'Đang tải mục tiêu chương trình...'"
         backdropFilter="blur(2px)"></app-loading-progress>
 }
-@if (loadError) {
+@if (state() === 'error') {
     <div class="goals-state" role="alert">
         <i class="ti ti-alert-circle" aria-hidden="true"></i>
         <h1>Chưa thể hiển thị mục tiêu</h1>
-        <p>{{ loadError }}</p>
+    <p>Không thể tải dữ liệu mục tiêu chương trình. Vui lòng thử lại.</p>
         <button type="button" class="goal-secondary-button" (click)="reloadData()">Thử lại</button>
     </div>
 } @else if (selectedCtdt) {
@@ -19,7 +19,7 @@
                     <div>
                         <span class="goals-heading__eyebrow">THIẾT KẾ CHƯƠNG TRÌNH</span>
                         <h1>Mục tiêu đào tạo</h1>
-                        <p>Từ định hướng tổng quát đến các mục tiêu cụ thể của chương trình.</p>
+                        <!-- <p>Từ định hướng tổng quát đến các mục tiêu cụ thể của chương trình.</p> -->
                     </div>
                     <span class="goals-heading__badge"><i class="ti ti-target" aria-hidden="true"></i>PEOs</span>
                 </header>
@@ -49,7 +49,7 @@
                     </div>
                 </section>
 
-                <section class="goals-card" aria-labelledby="goal-peo-heading" [attr.aria-busy]="isLoadingGoals">
+                <section class="goals-card" aria-labelledby="goal-peo-heading" [attr.aria-busy]="goalsState() === 'loading'">
                     <header class="goals-card__header">
                         <div class="goals-card__heading">
                             <span class="goals-card__icon" aria-hidden="true"><i class="ti ti-list-check"></i></span>
@@ -59,15 +59,15 @@
                             </div>
                         </div>
                         <button type="button" class="goals-primary-button" (click)="openAddMuctieu()"
-                            [disabled]="busy || !!goalsError || !type_ctdt_muctieu_cuthe.length">
+                            [disabled]="busy || goalsState() === 'error' || !type_ctdt_muctieu_cuthe.length">
                             <i class="ti ti-plus" aria-hidden="true"></i>Thêm mục tiêu
                         </button>
                     </header>
-                    @if (isLoadingGoals) {
+                    @if (goalsState() === 'loading') {
                         <div class="goals-inline-state" role="status">Đang cập nhật danh sách mục tiêu...</div>
-                    } @else if (goalsError) {
+                    } @else if (goalsState() === 'error') {
                         <div class="goals-inline-state goals-inline-state--error" role="alert">
-                            <p>{{ goalsError }}</p>
+                            <p>Không thể tải danh sách mục tiêu cụ thể. Vui lòng thử lại.</p>
                             <button type="button" class="goal-secondary-button" (click)="loadMuctieuCuthe()">Tải lại danh sách</button>
                         </div>
                     } @else {
@@ -133,9 +133,9 @@
                         </div>
                     </header>
                     <p class="goals-matrix-description">Đối chiếu mục tiêu với sứ mạng, tầm nhìn và triết lý giáo dục của cơ sở đào tạo.</p>
-                    @if (isLoadingGoals) {
+                    @if (goalsState() === 'loading') {
                         <div class="goals-inline-state" role="status">Đang cập nhật ma trận...</div>
-                    } @else if (goalsError) {
+                    } @else if (goalsState() === 'error') {
                         <p class="goals-inline-state">Ma trận sẽ hiển thị sau khi tải được danh sách mục tiêu.</p>
                     } @else if (!list_muctieu_cuthe.length || !list_tuongthich.length) {
                         <p class="goals-inline-state">Cần có mục tiêu và cấu hình tương thích để hiển thị ma trận.</p>
@@ -183,12 +183,12 @@
                 <section class="goals-summary-card goals-summary-card--primary">
                     <div class="goals-summary-card__icon" aria-hidden="true"><i class="ti ti-target"></i></div>
                     <h2>Mục tiêu đã thiết lập</h2>
-                    <strong>{{ isLoadingGoals || goalsError ? '—' : list_muctieu_cuthe.length }}</strong>
-                    <p>{{ isLoadingGoals ? 'Đang tải dữ liệu...' : goalsError ? 'Chưa tải được dữ liệu' : 'PEO trong chương trình' }}</p>
+                    <strong>{{ goalsState() === 'loading' || goalsState() === 'error' ? '—' : list_muctieu_cuthe.length }}</strong>
+                    <p>{{ goalsState() === 'loading' ? 'Đang tải dữ liệu...' : goalsState() === 'error' ? 'Chưa tải được dữ liệu' : 'PEO trong chương trình' }}</p>
                 </section>
                 <section class="goals-summary-card">
                     <h2><i class="ti ti-category" aria-hidden="true"></i>Phân nhóm mục tiêu</h2>
-                    @if (!isLoadingGoals && !goalsError) {
+                    @if (goalsState() !== 'loading' && goalsState() !== 'error') {
                         <dl class="goals-summary-list">
                             @for (group of list_ctdt_muctieu_cuthe; track group.key) {
                                 <div><dt>{{ group.title }}</dt><dd>{{ group.children.length }}</dd></div>
@@ -197,7 +197,7 @@
                             }
                         </dl>
                     } @else {
-                        <p class="goals-helper">{{ isLoadingGoals ? 'Đang tải...' : 'Dữ liệu chưa sẵn sàng' }}</p>
+                        <p class="goals-helper">{{ goalsState() === 'loading' ? 'Đang tải...' : 'Dữ liệu chưa sẵn sàng' }}</p>
                     }
                 </section>
                 <section class="goals-summary-card">
