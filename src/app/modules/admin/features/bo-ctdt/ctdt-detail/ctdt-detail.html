@@ -35,25 +35,41 @@
 
     <!-- Nội dung tab -->
     <main class="ctdt-body">
-        @if (activeTabId() === 'thong-tin') {
-            <section class="ctdt-tab-panel ctdt-tab-panel--form"
-                role="tabpanel"
-                [id]="'panel-' + activeTab.id"
-                [attr.aria-labelledby]="'tab-' + activeTab.id">
-                <app-ctdt-thongtin></app-ctdt-thongtin>
+        @if (loadingCtdt()) {
+            <app-loading-progress heading="Đang tải chương trình đào tạo..." backdropFilter="blur(2px)"></app-loading-progress>
+        } @else if (ctdtLoadError()) {
+            <section class="ctdt-placeholder" role="alert">
+                <div class="ctdt-placeholder__icon" aria-hidden="true"><i class="ti ti-alert-circle"></i></div>
+                <h2 class="ctdt-placeholder__title">Không thể tải chương trình</h2>
+                <p class="ctdt-placeholder__desc">{{ ctdtLoadError() }}</p>
+                <button type="button" class="ctdt-placeholder__retry" (click)="retryLoadCtdt()">Thử lại</button>
             </section>
-        } @else {
-            <section class="ctdt-placeholder"
-                role="tabpanel"
-                [id]="'panel-' + activeTab.id"
-                [attr.aria-labelledby]="'tab-' + activeTab.id"
-                tabindex="0">
-                <div class="ctdt-placeholder__icon" aria-hidden="true">
-                    <i [class]="activeTab.icon"></i>
-                </div>
-                <h2 class="ctdt-placeholder__title">{{ activeTab.label }}</h2>
-                <p class="ctdt-placeholder__desc">Nội dung đang được cập nhật</p>
-            </section>
+        } @else if (selectedCtdt()) {
+            @if (activeTabId() === 'thong-tin') {
+                <section class="ctdt-tab-panel ctdt-tab-panel--form" role="tabpanel" id="panel-thong-tin" aria-labelledby="tab-thong-tin">
+                    <app-ctdt-thongtin [selectedCtdt]="selectedCtdt()" (ctdtUpdated)="onCtdtUpdated($event)"></app-ctdt-thongtin>
+                </section>
+            } @else if (activeTabId() === 'muc-tieu') {
+                <section class="ctdt-tab-panel ctdt-tab-panel--form" role="tabpanel" id="panel-muc-tieu" aria-labelledby="tab-muc-tieu">
+                    <app-ctdt-muctieu-cdr [selectedCtdt]="selectedCtdt()"></app-ctdt-muctieu-cdr>
+                </section>
+            } @else if (activeTabId() === 'cdr') {
+                <section class="ctdt-tab-panel ctdt-tab-panel--form" role="tabpanel" id="panel-cdr" aria-labelledby="tab-cdr">
+                    <app-ctdt-cdr></app-ctdt-cdr>
+                </section>
+            } @else {
+                <section class="ctdt-placeholder"
+                    role="tabpanel"
+                    [id]="'panel-' + activeTab.id"
+                    [attr.aria-labelledby]="'tab-' + activeTab.id"
+                    tabindex="0">
+                    <div class="ctdt-placeholder__icon" aria-hidden="true">
+                        <i [class]="activeTab.icon"></i>
+                    </div>
+                    <h2 class="ctdt-placeholder__title">{{ activeTab.label }}</h2>
+                    <p class="ctdt-placeholder__desc">Nội dung đang được cập nhật</p>
+                </section>
+            }
         }
     </main>
 </section>

@@ -1,0 +1,293 @@
+<div class="goals-shell">
+@if (isLoading || isLoadingGoals || savingGeneral || deletingGoalId !== null) {
+    <app-loading-progress
+        [heading]="savingGeneral ? 'Đang lưu mục tiêu chung...' : deletingGoalId !== null ? 'Đang xóa mục tiêu...' : isLoadingGoals ? 'Đang tải danh sách mục tiêu...' : 'Đang tải mục tiêu chương trình...'"
+        backdropFilter="blur(2px)"></app-loading-progress>
+}
+@if (loadError) {
+    <div class="goals-state" role="alert">
+        <i class="ti ti-alert-circle" aria-hidden="true"></i>
+        <h1>Chưa thể hiển thị mục tiêu</h1>
+        <p>{{ loadError }}</p>
+        <button type="button" class="goal-secondary-button" (click)="reloadData()">Thử lại</button>
+    </div>
+} @else if (selectedCtdt) {
+    <div class="goals-workspace">
+        <div class="goals-workspace__grid">
+            <div class="goals-workspace__main" role="region" aria-label="Nội dung mục tiêu chương trình" tabindex="0">
+                <header class="goals-heading">
+                    <div>
+                        <span class="goals-heading__eyebrow">THIẾT KẾ CHƯƠNG TRÌNH</span>
+                        <h1>Mục tiêu đào tạo</h1>
+                        <p>Từ định hướng tổng quát đến các mục tiêu cụ thể của chương trình.</p>
+                    </div>
+                    <span class="goals-heading__badge"><i class="ti ti-target" aria-hidden="true"></i>PEOs</span>
+                </header>
+
+                <section class="goals-card" aria-labelledby="goal-general-heading">
+                    <header class="goals-card__header">
+                        <div class="goals-card__heading">
+                            <span class="goals-card__icon" aria-hidden="true"><i class="ti ti-compass"></i></span>
+                            <div>
+                                <span class="goals-card__eyebrow">01 · ĐỊNH HƯỚNG</span>
+                                <h2 id="goal-general-heading">Mục tiêu chung</h2>
+                            </div>
+                        </div>
+                        <button type="button" class="goal-secondary-button" (click)="saveCurrentMucTieuChung()"
+                            [disabled]="busy" [attr.aria-busy]="savingGeneral">
+                            <i class="ti ti-device-floppy" aria-hidden="true"></i>
+                            {{ savingGeneral ? 'Đang lưu...' : 'Lưu mục tiêu chung' }}
+                        </button>
+                    </header>
+                    <div class="goals-card__body">
+                        <p class="goals-helper">Mô tả định hướng tổng quát và những năng lực chương trình hướng đến.</p>
+                        <div class="goals-editor" role="group" aria-labelledby="goal-general-heading">
+                            <ovic-editor height="220px" (changeText)="onMucTieuChungChange($event)"
+                                [default]="generalEditorInitialValue"></ovic-editor>
+                        </div>
+                        <p class="goals-save-note"><i class="ti ti-info-circle" aria-hidden="true"></i>Mục tiêu chung được lưu riêng với danh sách PEO bên dưới.</p>
+                    </div>
+                </section>
+
+                <section class="goals-card" aria-labelledby="goal-peo-heading" [attr.aria-busy]="isLoadingGoals">
+                    <header class="goals-card__header">
+                        <div class="goals-card__heading">
+                            <span class="goals-card__icon" aria-hidden="true"><i class="ti ti-list-check"></i></span>
+                            <div>
+                                <span class="goals-card__eyebrow">02 · MỤC TIÊU CỤ THỂ</span>
+                                <h2 id="goal-peo-heading">Danh sách PEOs</h2>
+                            </div>
+                        </div>
+                        <button type="button" class="goals-primary-button" (click)="openAddMuctieu()"
+                            [disabled]="busy || !!goalsError || !type_ctdt_muctieu_cuthe.length">
+                            <i class="ti ti-plus" aria-hidden="true"></i>Thêm mục tiêu
+                        </button>
+                    </header>
+                    @if (isLoadingGoals) {
+                        <div class="goals-inline-state" role="status">Đang cập nhật danh sách mục tiêu...</div>
+                    } @else if (goalsError) {
+                        <div class="goals-inline-state goals-inline-state--error" role="alert">
+                            <p>{{ goalsError }}</p>
+                            <button type="button" class="goal-secondary-button" (click)="loadMuctieuCuthe()">Tải lại danh sách</button>
+                        </div>
+                    } @else {
+                        @if (!type_ctdt_muctieu_cuthe.length) {
+                            <p class="goals-config-note"><i class="ti ti-info-circle" aria-hidden="true"></i>Chưa có khung trình độ. Vui lòng thiết lập trong Cấu hình trước khi thêm mục tiêu.</p>
+                        }
+                        <div class="goals-list">
+                            @for (group of list_ctdt_muctieu_cuthe; track group.key) {
+                                <section class="goals-group" [attr.aria-labelledby]="'goal-group-' + group.key">
+                                    <header class="goals-group__header">
+                                        <h3 [id]="'goal-group-' + group.key">{{ group.title }}</h3>
+                                        <span class="goals-group__count">{{ group.children.length }} mục tiêu</span>
+                                    </header>
+                                    @for (goal of group.children; track goal.id) {
+                                        <article class="goals-item">
+                                            <div class="goals-item__main">
+                                                <span class="goals-item__code">{{ goal.kyhieu }}</span>
+                                                <div class="goals-item__content ql-editor" [innerHTML]="goal.noidung | safeHtmlDecode"></div>
+                                                @if (goal.tuongthich?.length) {
+                                                    <div class="goals-item__tags" aria-label="Các định hướng tương thích">
+                                                        @for (key of goal.tuongthich; track $index) {
+                                                            <span><i class="ti ti-link" aria-hidden="true"></i>{{ compatibilityTitle(key) }}</span>
+                                                        }
+                                                    </div>
+                                                }
+                                            </div>
+                                            <div class="goals-item__actions">
+                                                <button type="button" class="goals-icon-button" (click)="editMucTieuchuThe(goal)"
+                                                    [disabled]="busy" [attr.aria-label]="'Sửa ' + goal.kyhieu"
+                                                    ngbTooltip="Sửa mục tiêu" placement="top" container="body">
+                                                    <i class="ti ti-pencil" aria-hidden="true"></i>
+                                                </button>
+                                                <button type="button" class="goals-icon-button goals-icon-button--danger" (click)="deleteMuctieu(goal)"
+                                                    [disabled]="busy" [attr.aria-label]="'Xóa ' + goal.kyhieu"
+                                                    ngbTooltip="Xóa mục tiêu" placement="top" container="body">
+                                                    <i class="ti ti-trash" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                        </article>
+                                    } @empty {
+                                        <p class="goals-empty-group">Chưa có mục tiêu thuộc nhóm này.</p>
+                                    }
+                                </section>
+                            } @empty {
+                                <div class="goals-empty-state">
+                                    <i class="ti ti-target" aria-hidden="true"></i>
+                                    <h3>Chưa có mục tiêu cụ thể</h3>
+                                    <p>Các mục tiêu sẽ được hiển thị tại đây, phân theo khung trình độ.</p>
+                                </div>
+                            }
+                        </div>
+                    }
+                </section>
+
+                <section class="goals-card" aria-labelledby="goal-matrix-heading">
+                    <header class="goals-card__header">
+                        <div class="goals-card__heading">
+                            <span class="goals-card__icon" aria-hidden="true"><i class="ti ti-layout-grid"></i></span>
+                            <div>
+                                <span class="goals-card__eyebrow">03 · ĐỐI CHIẾU</span>
+                                <h2 id="goal-matrix-heading">Ma trận tương thích</h2>
+                            </div>
+                        </div>
+                    </header>
+                    <p class="goals-matrix-description">Đối chiếu mục tiêu với sứ mạng, tầm nhìn và triết lý giáo dục của cơ sở đào tạo.</p>
+                    @if (isLoadingGoals) {
+                        <div class="goals-inline-state" role="status">Đang cập nhật ma trận...</div>
+                    } @else if (goalsError) {
+                        <p class="goals-inline-state">Ma trận sẽ hiển thị sau khi tải được danh sách mục tiêu.</p>
+                    } @else if (!list_muctieu_cuthe.length || !list_tuongthich.length) {
+                        <p class="goals-inline-state">Cần có mục tiêu và cấu hình tương thích để hiển thị ma trận.</p>
+                    } @else {
+                        <div class="goals-matrix-scroll" role="region" aria-labelledby="goal-matrix-heading" tabindex="0">
+                            <table class="goals-matrix">
+                                <caption class="goals-sr-only">Tương thích giữa định hướng đào tạo và các mục tiêu PEO</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Định hướng cơ sở đào tạo</th>
+                                        @for (goal of list_muctieu_cuthe; track goal.id) {
+                                            <th scope="col" class="goals-matrix__goal">{{ goal.kyhieu }}</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (compatibility of list_tuongthich; track compatibility.key) {
+                                        <tr>
+                                            <th scope="row">
+                                                <strong>{{ compatibility.title }}</strong>
+                                                @if (compatibility.noidung) { <p>{{ compatibility.noidung }}</p> }
+                                            </th>
+                                            @for (goal of list_muctieu_cuthe; track goal.id) {
+                                                <td class="goals-matrix__check">
+                                                    @if (checkTuongthich(compatibility.key, goal)) {
+                                                        <i class="ti ti-check" aria-hidden="true"></i>
+                                                        <span class="goals-sr-only">Có tương thích</span>
+                                                    } @else {
+                                                        <span aria-hidden="true">—</span>
+                                                        <span class="goals-sr-only">Chưa liên kết</span>
+                                                    }
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="goals-save-note goals-matrix-legend"><i class="ti ti-check" aria-hidden="true"></i>Có tương thích <span>— Chưa liên kết</span></p>
+                    }
+                </section>
+            </div>
+
+            <aside class="goals-workspace__aside" aria-label="Tổng quan mục tiêu">
+                <section class="goals-summary-card goals-summary-card--primary">
+                    <div class="goals-summary-card__icon" aria-hidden="true"><i class="ti ti-target"></i></div>
+                    <h2>Mục tiêu đã thiết lập</h2>
+                    <strong>{{ isLoadingGoals || goalsError ? '—' : list_muctieu_cuthe.length }}</strong>
+                    <p>{{ isLoadingGoals ? 'Đang tải dữ liệu...' : goalsError ? 'Chưa tải được dữ liệu' : 'PEO trong chương trình' }}</p>
+                </section>
+                <section class="goals-summary-card">
+                    <h2><i class="ti ti-category" aria-hidden="true"></i>Phân nhóm mục tiêu</h2>
+                    @if (!isLoadingGoals && !goalsError) {
+                        <dl class="goals-summary-list">
+                            @for (group of list_ctdt_muctieu_cuthe; track group.key) {
+                                <div><dt>{{ group.title }}</dt><dd>{{ group.children.length }}</dd></div>
+                            } @empty {
+                                <div><dt>Chưa có nhóm mục tiêu</dt></div>
+                            }
+                        </dl>
+                    } @else {
+                        <p class="goals-helper">{{ isLoadingGoals ? 'Đang tải...' : 'Dữ liệu chưa sẵn sàng' }}</p>
+                    }
+                </section>
+                <section class="goals-summary-card">
+                    <h2><i class="ti ti-bulb" aria-hidden="true"></i>Gợi ý soạn mục tiêu</h2>
+                    <ul class="goals-guidance">
+                        <li>Diễn đạt rõ ràng, có thể đánh giá.</li>
+                        <li>Phù hợp với khung trình độ đã chọn.</li>
+                        <li>Liên kết với định hướng của cơ sở đào tạo.</li>
+                        <li>Tránh trùng lặp giữa các mục tiêu.</li>
+                    </ul>
+                </section>
+            </aside>
+        </div>
+    </div>
+}
+
+</div>
+
+<p-drawer [(visible)]="drawerVisible" [dismissible]="!busy" [closable]="!busy"
+    [closeOnEscape]="!busy" [blockScroll]="true" [style]="{ width: 'min(700px, 100vw)' }"
+    appendTo="body" position="right" styleClass="ctdt-goals-drawer" ariaCloseLabel="Đóng biểu mẫu">
+    <ng-template pTemplate="header">
+        <div class="goal-form-heading">
+            <span class="goal-form-heading__eyebrow">MỤC TIÊU CỤ THỂ</span>
+            <h2>{{ formTitle }}</h2>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="content">
+    <div class="goal-drawer-body">
+    @if (savingGoal) {
+        <app-loading-progress heading="Đang lưu mục tiêu..." backdropFilter="blur(2px)"></app-loading-progress>
+    }
+    <form id="goal-form" [formGroup]="formMuctieuCuthe" class="goal-form" (ngSubmit)="saveMucTieuCuthe()"
+        [attr.aria-busy]="savingGoal">
+        <p class="goals-helper">Điền thông tin dưới đây. Mỗi mục tiêu có một ký hiệu PEO riêng.</p>
+        <fieldset class="goal-form-grid" [disabled]="savingGoal">
+            <legend class="goals-sr-only">Thông tin mục tiêu cụ thể</legend>
+            <div class="goal-form-field">
+                <label for="goal-ordering">Ký hiệu <span>*</span></label>
+                <div class="goal-code-input">
+                    <span>{{ kyhieuMutieuCuthe }}</span>
+                    <input id="goal-ordering" type="text" class="admin-wrap-table__input" formControlName="ordering"
+                        inputmode="numeric" (keydown)="pointQuestionKeyDown($event)" autocomplete="off" aria-required="true"
+                        [attr.aria-invalid]="f['ordering'].touched && f['ordering'].invalid">
+                </div>
+                @if (f['ordering'].touched && f['ordering'].invalid) {
+                    <p class="goal-form-error">Nhập số thứ tự mục tiêu.</p>
+                }
+            </div>
+            <div class="goal-form-field">
+                <label for="goal-type">Khung trình độ <span>*</span></label>
+                <p-select inputId="goal-type" [options]="type_ctdt_muctieu_cuthe" optionLabel="title" optionValue="key"
+                    formControlName="type" placeholder="Chọn khung trình độ" appendTo="body" [filter]="true" filterBy="title">
+                </p-select>
+                @if (f['type'].touched && f['type'].invalid) {
+                    <p class="goal-form-error">Chọn khung trình độ.</p>
+                }
+                @if (!type_ctdt_muctieu_cuthe.length) {
+                    <p class="goals-helper">Chưa cấu hình khung trình độ cho chương trình.</p>
+                }
+            </div>
+            <div class="goal-form-field goal-form-field--full">
+                <label for="goal-compatibility">Tương thích với định hướng</label>
+                <p-multiSelect inputId="goal-compatibility" optionValue="key" optionLabel="title" [options]="list_tuongthich"
+                    formControlName="tuongthich" placeholder="Chọn các định hướng liên quan" display="chip" appendTo="body">
+                </p-multiSelect>
+                <p class="goals-helper">Có thể chọn nhiều định hướng. Lựa chọn được phản ánh trong ma trận tương thích.</p>
+            </div>
+            <div class="goal-form-field goal-form-field--full">
+                <span id="goal-content-label" class="goal-form-label">Nội dung mục tiêu <span>*</span></span>
+                <div class="goal-form-editor" role="group" aria-labelledby="goal-content-label">
+                    <ovic-editor height="260px" [formField]="f['noidung']" [default]="f['noidung'].value"></ovic-editor>
+                </div>
+                @if (f['noidung'].touched && f['noidung'].invalid) {
+                    <p class="goal-form-error">Nhập nội dung mục tiêu.</p>
+                }
+            </div>
+        </fieldset>
+    </form>
+    </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <div class="goal-form-footer">
+            <p><span>*</span> Trường bắt buộc.</p>
+            <div>
+                <button type="button" class="goal-secondary-button" (click)="closeForm()" [disabled]="busy">Hủy</button>
+                <button type="submit" form="goal-form" class="goals-primary-button" [disabled]="busy">
+                    <i class="ti ti-device-floppy" aria-hidden="true"></i>{{ savingGoal ? 'Đang lưu...' : 'Lưu mục tiêu' }}
+                </button>
+            </div>
+        </div>
+    </ng-template>
+</p-drawer>

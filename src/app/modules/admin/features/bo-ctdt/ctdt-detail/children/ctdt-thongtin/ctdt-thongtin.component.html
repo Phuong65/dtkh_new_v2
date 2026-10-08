@@ -1,91 +1,255 @@
-<div class="layout_component_container">
-    <div class="document-type-a4" style="position: relative;">
-        <button ngbTooltip="Lưu lại" placement="top" container="body"
-            style="position: sticky; top: 20px; margin-top: -65px; margin-left: 721px; z-index: 10;"
-            class="btn btn-primary btn-icon" (click)="saveCtdt()">
-            <i class="fa fa-floppy-o"></i>
-        </button>
-        @if (selectedCtdt) {
-            <div class="ovic-vertical__inputs" style="line-height: 1.5;">
-                <form [formGroup]="formCtdt" class="formCtdt" style="line-height: 1;">
-                    <div class="row form-row form-row-flex-row">
-                        <div class="col-12 flex-div">
-                            <label for="ten">Tên Chương trình Đào tạo:<span class="ovic-mark">*</span></label>
-                            <input type="text" id="ten" class="ovic-input-field" formControlName="ten" autocomplete="off">
+<div class="ctdt-thongtin-shell">
+@if (isLoading || isSaving) {
+    <app-loading-progress [heading]="isSaving ? 'Đang lưu thông tin chương trình...' : 'Đang tải thông tin chương trình...'"
+        backdropFilter="blur(2px)"></app-loading-progress>
+}
+@if (selectedCtdt) {
+<div class="ctdt-workspace">
+    <form [formGroup]="formCtdt" class="ctdt-workspace__grid" (ngSubmit)="saveCtdt()">
+        <div class="ctdt-workspace__main">
+            <!-- <div class="ctdt-workspace__heading">
+                <div>
+                    <span class="ctdt-workspace__eyebrow">HỒ SƠ CHƯƠNG TRÌNH</span>
+                    <h1>Thông tin chung</h1>
+                    <p>Quản lý định danh, thông số đào tạo và định hướng sau tốt nghiệp.</p>
+                </div>
+                <span class="ctdt-workspace__code" [title]="f['madt'].value || 'Chưa có mã'">
+                    <i class="ti ti-hash" aria-hidden="true"></i>{{ f['madt'].value || 'Chưa có mã' }}
+                </span>
+            </div> -->
+
+            <section class="ctdt-card" aria-labelledby="ctdt-basics-heading">
+                <div class="ctdt-card__header">
+                    <div class="ctdt-card__heading">
+                        <span class="ctdt-card__icon" aria-hidden="true"><i class="ti ti-id"></i></span>
+                        <div>
+                            <h2 id="ctdt-basics-heading">Định danh chương trình</h2>
+                            <!-- <p>Thông tin cơ bản để nhận diện chương trình đào tạo</p> -->
                         </div>
                     </div>
-                    <div class="row form-row form-row-flex-row">
-                        <div class="col-12 flex-div edit-hight-100 ">
-                            <label for="madt">Mã CTDT:<span class="ovic-mark">*</span></label>
-                            <input type="text" id="madt" class="ovic-input-field" formControlName="madt" autocomplete="off">
+                    <!-- <span class="ctdt-card__index">01 / 03</span> -->
+                </div>
+                <div class="ctdt-card__body">
+                    <div class="ctdt-fields ctdt-fields--basics">
+                        <div class="ctdt-field ctdt-field--wide">
+                            <label for="ten">Tên chương trình đào tạo <span class="ctdt-required">*</span></label>
+                            <input id="ten" type="text" class="admin-wrap-table__input" formControlName="ten"
+                                placeholder="Nhập tên chương trình đào tạo" autocomplete="off"
+                                [attr.aria-invalid]="f['ten'].touched && f['ten'].invalid"
+                                aria-describedby="ten-error">
+                            @if (f['ten'].touched && f['ten'].invalid) {
+                                <span id="ten-error" class="ctdt-field__error">Vui lòng nhập tên chương trình đào tạo</span>
+                            }
+                        </div>
+                        <div class="ctdt-field">
+                            <label for="madt">Mã CTĐT <span class="ctdt-required">*</span></label>
+                            <input id="madt" type="text" class="admin-wrap-table__input" formControlName="madt"
+                                placeholder="VD: 7480201_AI" autocomplete="off"
+                                [attr.aria-invalid]="f['madt'].touched && f['madt'].invalid"
+                                aria-describedby="madt-error">
+                            @if (f['madt'].touched && f['madt'].invalid) {
+                                <span id="madt-error" class="ctdt-field__error">Vui lòng nhập mã CTĐT</span>
+                            }
+                        </div>
+                        <div class="ctdt-field">
+                            <label for="khoa_apdung">Khóa áp dụng</label>
+                            <input id="khoa_apdung" type="text" class="admin-wrap-table__input" formControlName="khoa_apdung"
+                                (keydown)="pointQuestionKeyDown($event)" placeholder="VD: 2024" autocomplete="off" inputmode="numeric">
                         </div>
                     </div>
-                    <div class="row form-row form-row-flex-row">
-                        <div class="col-4 flex-div">
-                            <label for="ten">Đơn vị đào tạo:<span class="ovic-mark">*</span></label>
-                            <ovic-dropdown [disabled]="isManager ? false : true" (onChange)="onChangeDonviCM($event)"
-                                placeholder="---chọn khoa---" [options]="list_donvi" [defaultValue]="f['category_id'].value"
-                                optionId="id" optionLabel="title" [formField]="f['category_id']" [filter]="true"
-                                filterBy="title"></ovic-dropdown>
+                </div>
+            </section>
+
+            <section class="ctdt-card" aria-labelledby="ctdt-training-heading">
+                <div class="ctdt-card__header">
+                    <div class="ctdt-card__heading">
+                        <span class="ctdt-card__icon" aria-hidden="true"><i class="ti ti-school"></i></span>
+                        <div>
+                            <h2 id="ctdt-training-heading">Tổ chức đào tạo</h2>
+                            <!-- <p>Đơn vị quản lý và các thông số triển khai chương trình</p> -->
                         </div>
-                        <div class="col-4 flex-div">
-                            <label for="ten">Ngành đào tạo:<span class="ovic-mark">*</span></label>
-                            <ovic-dropdown placeholder="--- chọn ngành ---"
+                    </div>
+                    <!-- <span class="ctdt-card__index">02 / 03</span> -->
+                </div>
+                <div class="ctdt-card__body">
+                    <div class="ctdt-fields ctdt-fields--training">
+                        <div class="ctdt-field">
+                            <span id="ctdt-donvi-label" class="ctdt-field__label">Đơn vị đào tạo (Khoa) <span class="ctdt-required">*</span></span>
+                            <ovic-dropdown [disabled]="!isManager" (onChange)="onChangeDonviCM($event)"
+                                placeholder="Chọn khoa quản lý" [options]="list_donvi" [defaultValue]="f['category_id'].value"
+                                optionId="id" optionLabel="title" [formField]="f['category_id']" [filter]="true" filterBy="title">
+                            </ovic-dropdown>
+                            @if (f['category_id'].touched && f['category_id'].invalid) {
+                                <span class="ctdt-field__error">Vui lòng chọn đơn vị đào tạo</span>
+                            }
+                        </div>
+                        <div class="ctdt-field">
+                            <span id="ctdt-nganh-label" class="ctdt-field__label">Ngành đào tạo <span class="ctdt-required">*</span></span>
+                            <ovic-dropdown placeholder="Chọn ngành đào tạo"
                                 [options]="list_nganh | filter : f['category_id'].value : ['donvi_chuyenmon_id']"
                                 [defaultValue]="f['nganh_id'].value" optionId="id" optionLabel="title"
-                                [formField]="f['nganh_id']" [filter]="true" filterBy="title"></ovic-dropdown>
+                                [formField]="f['nganh_id']" [filter]="true" filterBy="title">
+                            </ovic-dropdown>
+                            @if (f['nganh_id'].touched && f['nganh_id'].invalid) {
+                                <span class="ctdt-field__error">Vui lòng chọn ngành đào tạo</span>
+                            }
                         </div>
-                        <div class="col-4 flex-div">
-                            <label for="thoigian_daotao">Hệ đào tạo:<span class="ovic-mark">*</span></label>
-                            <ovic-dropdown placeholder="--- chọn hệ đào tạo ---" [options]="list_hedt"
+                        <div class="ctdt-field">
+                            <span class="ctdt-field__label">Hệ đào tạo</span>
+                            <ovic-dropdown placeholder="Chọn hệ đào tạo" [options]="list_hedt"
                                 [defaultValue]="f['he_dt'].value" optionId="kyhieu" optionLabel="title"
                                 [formField]="f['he_dt']" [filter]="true" filterBy="title">
                             </ovic-dropdown>
                         </div>
-                    </div>
-                    <div class="row form-row form-row-flex-row">
-                        <div class="col-4 flex-div">
-                            <label for="khoa_apdung">Khóa áp dụng:<span class="ovic-mark">*</span></label>
-                            <input (keydown)="pointQuestionKeyDown($event)" type="text" id="khoa_apdung"
-                                class="ovic-input-field" formControlName="khoa_apdung" autocomplete="off">
+                        <div class="ctdt-field">
+                            <label for="thoigian_daotao">Thời gian đào tạo (năm)</label>
+                            <input id="thoigian_daotao" type="text" class="admin-wrap-table__input"
+                                formControlName="thoigian_daotao" (keydown)="pointQuestionKeyDown($event)"
+                                placeholder="VD: 4" autocomplete="off" inputmode="numeric">
                         </div>
-                        <div class="col-4 flex-div">
-                            <label for="thoigian_daotao">Thời gian đào tạo:<span class="ovic-mark">*</span></label>
-                            <input (keydown)="pointQuestionKeyDown($event)" type="text" id="thoigian_daotao"
-                                class="ovic-input-field" formControlName="thoigian_daotao" autocomplete="off">
-                        </div>
-                        <div class="col-4 flex-div" style="line-height: 1.5;">
-                            <label for="thoigian_daotao">Danh hiệu tốt nghiệp:<span class="ovic-mark">*</span></label>
-                            <ovic-dropdown placeholder="--- chọn danh hiệu ---" [options]="danhhieu_totnghiep"
+                        <div class="ctdt-field ctdt-field--wide">
+                            <span class="ctdt-field__label">Danh hiệu tốt nghiệp</span>
+                            <ovic-dropdown placeholder="Chọn danh hiệu tốt nghiệp" [options]="danhhieu_totnghiep"
                                 [defaultValue]="f['danhhieu_totnghiep'].value" optionId="key" optionLabel="label"
                                 [formField]="f['danhhieu_totnghiep']" [filter]="true" filterBy="label">
                             </ovic-dropdown>
                         </div>
                     </div>
-                    <div class="row form-row form-row-flex-row">
-                        <div class="col-12 flex-div edit-hight-100 ">
-                            <label for="khoa_apdung">Mô tả:<span class="ovic-mark">*</span></label>
-                            <ovic-editor height="auto" [formField]="f['mota']" [default]="f['mota']['value']"></ovic-editor>
+                </div>
+            </section>
+
+            <section class="ctdt-card ctdt-card--editor" aria-labelledby="ctdt-profile-heading">
+                <div class="ctdt-card__header">
+                    <div class="ctdt-card__heading">
+                        <span class="ctdt-card__icon" aria-hidden="true"><i class="ti ti-file-text"></i></span>
+                        <div>
+                            <h2 id="ctdt-profile-heading">Hồ sơ & định hướng phát triển</h2>
+                            <!-- <p>Chọn nội dung cần chỉnh sửa, mọi thay đổi sẽ được lưu cùng hồ sơ</p> -->
                         </div>
                     </div>
-                    <div class="row form-row form-row-flex-row">
-                        <div class="col-12 flex-div edit-hight-100 ">
-                            <label for="khoa_apdung">Cơ hội học tập sau tốt nghiệp:<span class="ovic-mark">*</span></label>
-                            <ovic-editor height="auto" [formField]="f['cohoihoctap_sautotnghiep']"
-                                [default]="f['cohoihoctap_sautotnghiep']['value']">
-                            </ovic-editor>
+                    <!-- <span class="ctdt-card__index">03 / 03</span> -->
+                </div>
+                <div class="ctdt-editor-tabs" role="tablist" aria-label="Nội dung hồ sơ">
+                    <button type="button" role="tab" id="ctdt-editor-tab-mota" class="ctdt-editor-tab"
+                        [class.ctdt-editor-tab--active]="activeEditorTab() === 'mota'"
+                        [attr.aria-selected]="activeEditorTab() === 'mota'" aria-controls="ctdt-editor-panel-mota"
+                        [attr.tabindex]="activeEditorTab() === 'mota' ? 0 : -1"
+                        (click)="activeEditorTab.set('mota')">
+                        <i class="ti ti-notes" aria-hidden="true"></i> Mô tả tổng quan
+                    </button>
+                    <button type="button" role="tab" id="ctdt-editor-tab-cohoi" class="ctdt-editor-tab"
+                        [class.ctdt-editor-tab--active]="activeEditorTab() === 'cohoi'"
+                        [attr.aria-selected]="activeEditorTab() === 'cohoi'" aria-controls="ctdt-editor-panel-cohoi"
+                        [attr.tabindex]="activeEditorTab() === 'cohoi' ? 0 : -1"
+                        (click)="activeEditorTab.set('cohoi')">
+                        <i class="ti ti-book-2" aria-hidden="true"></i> Cơ hội học tập
+                    </button>
+                    <button type="button" role="tab" id="ctdt-editor-tab-vitri" class="ctdt-editor-tab"
+                        [class.ctdt-editor-tab--active]="activeEditorTab() === 'vitri'"
+                        [attr.aria-selected]="activeEditorTab() === 'vitri'" aria-controls="ctdt-editor-panel-vitri"
+                        [attr.tabindex]="activeEditorTab() === 'vitri' ? 0 : -1"
+                        (click)="activeEditorTab.set('vitri')">
+                        <i class="ti ti-briefcase" aria-hidden="true"></i> Vị trí việc làm
+                    </button>
+                </div>
+                <div class="ctdt-editor-content">
+                    <div class="ctdt-editor-content__pane" role="tabpanel" id="ctdt-editor-panel-mota"
+                        aria-labelledby="ctdt-editor-tab-mota" [hidden]="activeEditorTab() !== 'mota'">
+                        <!-- <p class="ctdt-editor-content__hint">Tổng quan về cấu trúc, đặc trưng và giá trị của chương trình.</p> -->
+                        <div class="ctdt-editor-wrap">
+                            <ovic-editor height="240px" [formField]="f['mota']" [default]="f['mota']['value']"></ovic-editor>
                         </div>
                     </div>
-                    <div class="row form-row form-row-flex-row">
-                        <div class="col-12 flex-div edit-hight-100">
-                            <label for="khoa_apdung">Vị trí làm việc sau tốt nghiệp:<span class="ovic-mark">*</span></label>
-                            <ovic-editor height="auto" [formField]="f['vitri_lamviec_sautotnghiep']"
-                                [default]="f['vitri_lamviec_sautotnghiep']['value']">
-                            </ovic-editor>
+                    <div class="ctdt-editor-content__pane" role="tabpanel" id="ctdt-editor-panel-cohoi"
+                        aria-labelledby="ctdt-editor-tab-cohoi" [hidden]="activeEditorTab() !== 'cohoi'">
+                        <!-- <p class="ctdt-editor-content__hint">Lộ trình học tập nâng cao sau khi hoàn thành chương trình.</p> -->
+                        <div class="ctdt-editor-wrap">
+                            <ovic-editor height="240px" [formField]="f['cohoihoctap_sautotnghiep']"
+                                [default]="f['cohoihoctap_sautotnghiep']['value']"></ovic-editor>
                         </div>
                     </div>
-                </form>
+                    <div class="ctdt-editor-content__pane" role="tabpanel" id="ctdt-editor-panel-vitri"
+                        aria-labelledby="ctdt-editor-tab-vitri" [hidden]="activeEditorTab() !== 'vitri'">
+                        <!-- <p class="ctdt-editor-content__hint">Các vị trí nghề nghiệp phù hợp sau tốt nghiệp.</p> -->
+                        <div class="ctdt-editor-wrap">
+                            <ovic-editor height="240px" [formField]="f['vitri_lamviec_sautotnghiep']"
+                                [default]="f['vitri_lamviec_sautotnghiep']['value']"></ovic-editor>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <aside class="ctdt-workspace__aside" aria-label="Tổng quan và thao tác hồ sơ">
+            <div class="ctdt-aside-card ctdt-aside-card--action">
+                <div class="ctdt-aside-card__header">
+                    <span class="ctdt-aside-card__icon" aria-hidden="true"><i class="ti ti-circle-check"></i></span>
+                    <h2>Trạng thái hồ sơ</h2>
+                </div>
+                <p class="ctdt-aside-card__caption">Kiểm tra dữ liệu trước khi lưu thay đổi.</p>
+                <div class="ctdt-aside-status" [class.ctdt-aside-status--complete]="formCtdt.valid">
+                    <span class="ctdt-aside-status__dot" aria-hidden="true"></span>
+                    {{ formCtdt.valid ? 'Đã điền đủ thông tin bắt buộc' : 'Cần bổ sung thông tin bắt buộc' }}
+                </div>
+                <button type="submit" class="ctdt-save-btn" [disabled]="formCtdt.invalid">
+                    <i class="ti ti-device-floppy" aria-hidden="true"></i>
+                    <span>Lưu thay đổi</span>
+                </button>
             </div>
-        }
-    </div>
+
+            <div class="ctdt-aside-card">
+                <div class="ctdt-aside-card__header">
+                    <span class="ctdt-aside-card__icon" aria-hidden="true"><i class="ti ti-list-details"></i></span>
+                    <h2>Thông tin nhanh</h2>
+                </div>
+                <dl class="ctdt-overview">
+                    <div class="ctdt-overview__row">
+                        <dt>Mã CTĐT</dt><dd>{{ f['madt'].value || 'Chưa cập nhật' }}</dd>
+                    </div>
+                    <div class="ctdt-overview__row">
+                        <dt>Khóa áp dụng</dt><dd>{{ f['khoa_apdung'].value || 'Chưa cập nhật' }}</dd>
+                    </div>
+                    <div class="ctdt-overview__row">
+                        <dt>Đơn vị đào tạo</dt><dd>{{ selectedCtdt?.category_title || 'Xem trong biểu mẫu' }}</dd>
+                    </div>
+                    <div class="ctdt-overview__row">
+                        <dt>Hệ đào tạo</dt><dd>{{ f['he_dt'].value || 'Chưa cập nhật' }}</dd>
+                    </div>
+                </dl>
+            </div>
+
+            <div class="ctdt-aside-card">
+                <div class="ctdt-aside-card__header">
+                    <span class="ctdt-aside-card__icon" aria-hidden="true"><i class="ti ti-checklist"></i></span>
+                    <h2>Mục cần hoàn thiện</h2>
+                </div>
+                <ul class="ctdt-checklist">
+                    <li [class.ctdt-checklist__item--done]="f['ten'].valid">
+                        <i class="ti" [class.ti-circle-check]="f['ten'].valid" [class.ti-circle-dashed]="f['ten'].invalid" aria-hidden="true"></i>
+                        <span>Tên chương trình đào tạo</span>
+                    </li>
+                    <li [class.ctdt-checklist__item--done]="f['madt'].valid">
+                        <i class="ti" [class.ti-circle-check]="f['madt'].valid" [class.ti-circle-dashed]="f['madt'].invalid" aria-hidden="true"></i>
+                        <span>Mã chương trình</span>
+                    </li>
+                    <li [class.ctdt-checklist__item--done]="f['category_id'].valid">
+                        <i class="ti" [class.ti-circle-check]="f['category_id'].valid" [class.ti-circle-dashed]="f['category_id'].invalid" aria-hidden="true"></i>
+                        <span>Đơn vị đào tạo</span>
+                    </li>
+                    <li [class.ctdt-checklist__item--done]="f['nganh_id'].valid">
+                        <i class="ti" [class.ti-circle-check]="f['nganh_id'].valid" [class.ti-circle-dashed]="f['nganh_id'].invalid" aria-hidden="true"></i>
+                        <span>Ngành đào tạo</span>
+                    </li>
+                </ul>
+                <p class="ctdt-aside-card__note"><span class="ctdt-required">*</span> Các trường bắt buộc phải được hoàn thiện trước khi lưu.</p>
+            </div>
+        </aside>
+    </form>
+</div>
+} @else if (!isLoading) {
+<div class="ctdt-empty-loading" role="alert">
+    <p>Không thể hiển thị thông tin chương trình đào tạo.</p>
+    <button type="button" class="ctdt-save-btn" (click)="reloadData()">Thử lại</button>
+</div>
+}
 </div>

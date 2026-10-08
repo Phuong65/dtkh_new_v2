@@ -2,8 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnDestroy, OnInit, inject, signal, viewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Tooltip } from 'primeng/tooltip';
-import { Subject as RxSubject, takeUntil } from 'rxjs';
+import { Subject as RxSubject, distinctUntilChanged, filter, map, switchMap, takeUntil } from 'rxjs';
+import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
+import { Ctdt } from '@modules/shared/models/ctdt';
 import { CtdtThongtinComponent } from './children/ctdt-thongtin/ctdt-thongtin.component';
+import { CtdtMuctieuCdrComponent } from './children/ctdt-muctieu-cdr/ctdt-muctieu-cdr.component';
+import { CtdtCdrComponent } from './children/ctdt-cdr/ctdt-cdr.component';
 import { ConditionOption } from '@modules/shared/models/condition-option';
 import { CtdtService } from '@modules/shared/services/ctdt.service';
 import { OvicQueryCondition } from '@core/models/dto';
@@ -19,7 +23,7 @@ export interface CtdtTabItem {
 @Component({
     selector: 'app-ctdt-detail',
     standalone: true,
-    imports: [CommonModule, Tooltip, CtdtThongtinComponent],
+    imports: [CommonModule, Tooltip, LoadingProgressComponent, CtdtThongtinComponent, CtdtMuctieuCdrComponent, CtdtCdrComponent],
     templateUrl: './ctdt-detail.html',
     styleUrl: './ctdt-detail.css',
 })
@@ -27,7 +31,7 @@ export class CtdtDetail implements OnInit, OnDestroy {
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly ctdtService = inject(CtdtService);
-    private readonly destroy$ = new RxSubject<void>();
+    private readonly destroy$ = new RxSubject<void>(); 
 
     readonly tabButtons = viewChildren<ElementRef<HTMLButtonElement>>('tabButton');
 
@@ -43,6 +47,9 @@ export class CtdtDetail implements OnInit, OnDestroy {
     readonly activeTabId = signal<CtdtTabId>('thong-tin');
     readonly boId = signal<number | null>(null);
     readonly ctdtId = signal<number | null>(null);
+    readonly selectedCtdt = signal<Ctdt | null>(null);
+    readonly loadingCtdt = signal(false);
+    readonly ctdtLoadError = signal('');
     readonly programName = signal<string>('Chương trình đào tạo');
 
     get activeTab(): CtdtTabItem {
@@ -50,20 +57,29 @@ export class CtdtDetail implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
-            const boId = params['bo_id'] ? Number(params['bo_id']) : null;
-            const code = params['code'] ? Number(params['code']) : null;
-            const requestedTab = params['tab'] as CtdtTabId;
-
+        this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
+            const boId = params.get('bo_id') ? Number(params.get('bo_id')) : null;
+            const requestedTab = params.get('tab') as CtdtTabId;
             this.boId.set(boId);
             if (requestedTab && this.tabs.some(tab => tab.id === requestedTab)) {
                 this.activeTabId.set(requestedTab);
             }
+        });
 
-            if (code && code !== this.ctdtId()) {
-                this.ctdtId.set(code);
-                this.loadProgramName(code);
-            }
+        // CTĐT chỉ tải ở đây; thay đổi query param "tab" không kích hoạt request này.
+        this.route.queryParamMap.pipe(
+            map(params => params.get('code')),
+            filter((code): code is string => !!code),
+            distinctUntilChanged(),
+            switchMap(code => {
+                const id = Number(code);
+                this.prepareCtdtLoad(id);
+                return this.ctdtService.getCtdtByPageNew(this.createCtdtCondition(id));
+            }),
+            takeUntil(this.destroy$)
+        ).subscribe({
+            next: response => this.completeCtdtLoad(response.data?.[0] || null),
+            error: () => this.failCtdtLoad()
         });
     }
 
@@ -114,15 +130,52 @@ export class CtdtDetail implements OnInit, OnDestroy {
         this.router.navigate(['/admin/dao-tao/bo-ctdt'], { queryParams });
     }
 
-    private loadProgramName(id: number): void {
-        const condition: ConditionOption = {
+    retryLoadCtdt(): void {
+        const id = this.ctdtId();
+        if (id) this.loadCtdt(id);
+    }
+
+    onCtdtUpdated(updated: Ctdt): void {
+        if (!updated) return;
+        this.selectedCtdt.set(updated);
+        if (updated.ten) {
+            this.programName.set(updated.ten);
+        }
+    }
+
+    private loadCtdt(id: number): void {
+        this.prepareCtdtLoad(id);
+        this.ctdtService.getCtdtByPageNew(this.createCtdtCondition(id)).pipe(takeUntil(this.destroy$)).subscribe({
+            next: response => this.completeCtdtLoad(response.data?.[0] || null),
+            error: () => this.failCtdtLoad()
+        });
+    }
+
+    private prepareCtdtLoad(id: number): void {
+        this.ctdtId.set(id);
+        this.selectedCtdt.set(null);
+        this.loadingCtdt.set(true);
+        this.ctdtLoadError.set('');
+    }
+
+    private createCtdtCondition(id: number): ConditionOption {
+        return {
             condition: [{ conditionName: 'id', condition: OvicQueryCondition.equal, value: String(id) }],
             set: [{ label: 'limit', value: '1' }],
             page: null
         };
+    }
 
-        this.ctdtService.getCtdtByPageNew(condition).pipe(takeUntil(this.destroy$)).subscribe({
-            next: response => this.programName.set(response.data?.[0]?.ten || 'Chương trình đào tạo')
-        });
+    private completeCtdtLoad(ctdt: Ctdt | null): void {
+        this.selectedCtdt.set(ctdt);
+        this.programName.set(ctdt?.ten || 'Chương trình đào tạo');
+        this.loadingCtdt.set(false);
+        if (!ctdt) this.ctdtLoadError.set('Không tìm thấy chương trình đào tạo.');
+    }
+
+    private failCtdtLoad(): void {
+        this.selectedCtdt.set(null);
+        this.loadingCtdt.set(false);
+        this.ctdtLoadError.set('Không thể tải chương trình đào tạo. Vui lòng thử lại.');
     }
 }

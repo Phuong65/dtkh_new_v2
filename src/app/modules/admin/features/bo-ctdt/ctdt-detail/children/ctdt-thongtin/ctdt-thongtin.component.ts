@@ -1,27 +1,27 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from "@angular/router";
-import { Title } from '@angular/platform-browser';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, signal } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Subject, forkJoin, takeUntil } from 'rxjs';
+import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { OvicQueryCondition } from '@core/models/dto';
 import { AuthService } from '@core/services/auth.service';
 import { NotificationService } from '@core/services/notification.service';
+import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 import { ConditionOption } from '@modules/shared/models/condition-option';
-import { CtdtService } from '@modules/shared/services/ctdt.service';
 import { Ctdt } from '@modules/shared/models/ctdt';
-import { ROLES, DANHHIEU_TOTNGHIEP } from '@modules/shared/utils/syscat';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { OvicDropdownComponent } from '@modules/shared/components/ovic-dropdown/ovic-dropdown.component';
-import { OvicEditorComponent } from '@modules/shared/components/ovic-editor/ovic-editor.component';
-import { FilterPipe } from '@modules/shared/directives/filter.pipe';
 import { DonVi } from '@modules/shared/models/don-vi';
 import { ElnChuyenMuc } from '@modules/shared/models/Elng';
 import { HeDt } from '@modules/shared/models/he-dt';
+import { CtdtService } from '@modules/shared/services/ctdt.service';
+import { DonViService } from '@modules/shared/services/don-vi.service';
 import { ElngUserProfileService } from '@modules/shared/services/elearning-user-profile.service';
-import { firstValueFrom, forkJoin } from 'rxjs';
 import { ElnChuyenMucService } from '@modules/shared/services/elearning-chuyen-muc.service';
 import { HeDtService } from '@modules/shared/services/he-dt.service';
-import { DonViService } from '@modules/shared/services/don-vi.service';
-import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { OvicDropdownComponent } from '@modules/shared/components/ovic-dropdown/ovic-dropdown.component';
+import { OvicEditorComponent } from '@modules/shared/components/ovic-editor/ovic-editor.component';
+import { FilterPipe } from '@modules/shared/directives/filter.pipe';
+import { ROLES, DANHHIEU_TOTNGHIEP } from '@modules/shared/utils/syscat';
 
 @Component({
     selector: 'app-ctdt-thongtin',
@@ -34,234 +34,182 @@ import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
         OvicDropdownComponent,
         OvicEditorComponent,
         FilterPipe,
-        NgbTooltipModule
+        NgbTooltipModule,
+        LoadingProgressComponent
     ],
     templateUrl: './ctdt-thongtin.component.html',
     styleUrls: ['./ctdt-thongtin.component.css']
 })
-export class CtdtThongtinComponent implements OnInit {
+export class CtdtThongtinComponent implements OnChanges, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
+    private readonly cancelLoad$ = new Subject<void>();
+    private loadedCtdtId: number | null = null;
 
-    isLanhDaoKhoa: boolean = false;
+    @Input() selectedCtdt: Ctdt | null = null;
+    @Output() ctdtUpdated = new EventEmitter<Ctdt>();
 
-    isManager: boolean = false;
-
-    selectedCtdt: Ctdt;
-
+    isLanhDaoKhoa = false;
+    isManager = false;
+    activeEditorTab = signal<'mota' | 'cohoi' | 'vitri'>('mota');
     formCtdt: FormGroup;
-
-    isUpdated: boolean = false;
-
-    list_donvi: DonVi[];
-
-    list_nganh: ElnChuyenMuc[];
-
+    isLoading = true;
+    isSaving = false;
+    list_donvi: DonVi[] = [];
+    list_nganh: ElnChuyenMuc[] = [];
     danhhieu_totnghiep = DANHHIEU_TOTNGHIEP;
-
-    list_hedt: HeDt[];
-
+    list_hedt: HeDt[] = [];
     userId: number;
-
     donvi_chuyenmon_id: number;
 
-    ckEditor = {
-        mota: null,
-        cohoihoctap_sautotnghiep: null,
-        vitri_lamviec_sautotnghiep: null
-    };
     constructor(
         private auth: AuthService,
         private notificationService: NotificationService,
         private router: Router,
-        private activatedRoute: ActivatedRoute,
         private ctdtService: CtdtService,
-        private title: Title,
         public formBuilder: FormBuilder,
         private elngUserProfileService: ElngUserProfileService,
         private elnChuyenMucService: ElnChuyenMucService,
         private heDtService: HeDtService,
         private donViService: DonViService
     ) {
-        this.isManager = this.auth.userHasRole(ROLES.manager) || this.auth.userHasRole(ROLES.admin) || this.auth.userHasRole(ROLES.troly_pdt) || this.auth.userHasRole(ROLES.chuyenvien_pdt) ? true : false;
-
+        this.isManager = [ROLES.manager, ROLES.admin, ROLES.troly_pdt, ROLES.chuyenvien_pdt]
+            .some(role => this.auth.userHasRole(role));
         this.isLanhDaoKhoa = this.auth.userHasRole(ROLES.lanhdaokhoa);
-
-        this.formCtdt = this.formBuilder.group(
-            {
-                ten: ['', Validators.required],
-                mota: [''],
-                madt: ['', Validators.required],
-                nganh_id: ['', Validators.required],
-                he_dt: [''],
-                danhhieu_totnghiep: [''],
-                thoigian_daotao: [''],
-                vitri_lamviec_sautotnghiep: [''],
-                cohoihoctap_sautotnghiep: [''],
-                category_id: ['', Validators.required],
-                khoa_apdung: [''],
-            }
-        );
-
-        this.userId = this.auth.user.id;
+        this.userId = this.auth.user?.id;
+        this.formCtdt = this.formBuilder.group({
+            ten: ['', Validators.required],
+            mota: [''],
+            madt: ['', Validators.required],
+            nganh_id: ['', Validators.required],
+            he_dt: [''],
+            danhhieu_totnghiep: [''],
+            thoigian_daotao: [''],
+            vitri_lamviec_sautotnghiep: [''],
+            cohoihoctap_sautotnghiep: [''],
+            category_id: ['', Validators.required],
+            khoa_apdung: ['']
+        });
     }
 
-    get f() {
-        return this.formCtdt.controls;
-    }
+    get f() { return this.formCtdt.controls; }
 
     ngOnInit(): void {
-        if (this.isLanhDaoKhoa || this.isManager) {
-            this.activatedRoute.queryParams.subscribe(async (params) => {
-                if (params && params['code']) {
-
-                    this.notificationService.isProcessing(true);
-
-                    const ctdtId = params['code'];
-
-                    const contition_ctdt: ConditionOption = {
-                        condition: [
-                            { conditionName: 'id', condition: OvicQueryCondition.equal, value: ctdtId.toString() },
-                        ],
-                        set: [
-                            { label: 'limit', value: '1' }
-                        ],
-                        page: null
-                    }
-
-                    const condition_user: ConditionOption = {
-                        condition: [
-                            { conditionName: 'user_id', condition: OvicQueryCondition.equal, value: this.userId.toString(), orWhere: 'and' },
-                        ],
-                        set: [
-                            { label: 'limit', value: '1' },
-                        ],
-                        page: null
-                    }
-
-                    const condition_nganh: ConditionOption = {
-                        condition: [
-                            { conditionName: 'type', condition: OvicQueryCondition.equal, value: 'nganh', orWhere: 'and' },
-                        ],
-                        set: [
-                            { label: 'limit', value: '-1' }
-                        ],
-                        page: null
-                    }
-
-                    const condition_donvi: ConditionOption = {
-                        condition: [
-                            { conditionName: 'status', condition: OvicQueryCondition.greaterThan, value: '0', orWhere: 'and' },
-                            { conditionName: 'parent_id', condition: OvicQueryCondition.equal, value: this.auth.user.donvi_id.toString(), orWhere: 'and' },
-                        ],
-                        set: [
-                            { label: 'limit', value: '-1' },
-                            { label: 'order', value: 'ASC' },
-                            { label: 'orderby', value: 'title' }
-                        ],
-                        page: null
-                    }
-
-
-                    forkJoin([
-                        this.ctdtService.getCtdtByPageNew(contition_ctdt),
-                        this.elnChuyenMucService.getChuyemucByPageNew(condition_nganh),
-                        this.donViService.getDonviByPageNew(condition_donvi),
-                        this.elngUserProfileService.getUserProfileByPageNewV2(condition_user),
-                        this.heDtService.getAllHeDt(),
-                    ]).subscribe({
-                        next: ([_ctdt, _nganh, _donvi, _user, _hedt]) => {
-
-                            this.selectedCtdt = _ctdt.data[0];
-
-                            if (!this.isManager && _user.data[0]) {
-                                this.donvi_chuyenmon_id = _user.data[0].donvi_chuyenmon_id;
-                                if (this.donvi_chuyenmon_id !== this.selectedCtdt.category_id) {
-                                    this.router.navigate(['/admin/content-none']);
-                                }
-                            }
-
-                            this.list_nganh = _nganh.data;
-                            this.list_donvi = _donvi.data;
-                            this.list_hedt = _hedt;
-                            this.resetForm();
-                            this.notificationService.isProcessing(false);
-                        },
-                        error: () => {
-
-                        }
-                    })
-                } else {
-                    this.router.navigate(['/admin/content-none']);
-                }
-            })
-        } else {
-            this.router.navigate(['/admin/content-none']);
+        if (this.selectedCtdt?.id && this.selectedCtdt.id !== this.loadedCtdtId) {
+            this.loadTabData(this.selectedCtdt);
         }
     }
 
-    pointQuestionKeyDown(event: KeyboardEvent) {
-        if (!event) return;
+    ngOnChanges(changes: SimpleChanges): void {
+        const ctdt = changes['selectedCtdt']?.currentValue as Ctdt | null;
+        if (!ctdt?.id || ctdt.id === this.loadedCtdtId) return;
+        this.loadTabData(ctdt);
+    }
 
-        const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight'];
+    ngOnDestroy(): void {
+        this.cancelLoad$.next();
+        this.cancelLoad$.complete();
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 
-        if (/^[0-9]$/.test(event.key)) {
+    reloadData(): void {
+        if (this.selectedCtdt) this.loadTabData(this.selectedCtdt, true);
+    }
+
+    private loadTabData(ctdt: Ctdt, force = false): void {
+        if (!this.isLanhDaoKhoa && !this.isManager) {
+            this.isLoading = false;
+            this.router.navigate(['/admin/content-none']);
             return;
         }
+        if (!force && this.loadedCtdtId === ctdt.id && this.list_hedt.length) return;
+        this.cancelLoad$.next();
+        this.loadedCtdtId = ctdt.id;
+        this.isLoading = true;
 
-        if (allowedKeys.includes(event.key)) {
-            return;
-        }
+        const profile: ConditionOption = {
+            condition: [{ conditionName: 'user_id', condition: OvicQueryCondition.equal, value: String(this.userId), orWhere: 'and' }],
+            set: [{ label: 'limit', value: '1' }], page: null
+        };
+        const major: ConditionOption = {
+            condition: [{ conditionName: 'type', condition: OvicQueryCondition.equal, value: 'nganh', orWhere: 'and' }],
+            set: [{ label: 'limit', value: '-1' }], page: null
+        };
+        const unit: ConditionOption = {
+            condition: [
+                { conditionName: 'status', condition: OvicQueryCondition.greaterThan, value: '0', orWhere: 'and' },
+                { conditionName: 'parent_id', condition: OvicQueryCondition.equal, value: String(this.auth.user?.donvi_id), orWhere: 'and' }
+            ],
+            set: [{ label: 'limit', value: '-1' }, { label: 'order', value: 'ASC' }, { label: 'orderby', value: 'title' }],
+            page: null
+        };
 
+        forkJoin([
+            this.elnChuyenMucService.getChuyemucByPageNew(major),
+            this.donViService.getDonviByPageNew(unit),
+            this.elngUserProfileService.getUserProfileByPageNewV2(profile),
+            this.heDtService.getAllHeDt()
+        ]).pipe(takeUntil(this.cancelLoad$), takeUntil(this.destroy$)).subscribe({
+            next: ([nganh, donvi, user, hedt]) => {
+                if (!this.isManager && user.data?.[0]) {
+                    this.donvi_chuyenmon_id = user.data[0].donvi_chuyenmon_id;
+                    if (this.donvi_chuyenmon_id !== ctdt.category_id) {
+                        this.router.navigate(['/admin/content-none']);
+                        return;
+                    }
+                }
+                this.list_nganh = nganh.data || [];
+                this.list_donvi = donvi.data || [];
+                this.list_hedt = hedt || [];
+                this.resetForm(ctdt);
+                this.isLoading = false;
+            },
+            error: () => this.isLoading = false
+        });
+    }
+
+    pointQuestionKeyDown(event: KeyboardEvent): void {
+        if (event.ctrlKey || event.metaKey || /^[0-9]$/.test(event.key)
+            || ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
         event.preventDefault();
     }
 
-    onChangeDonviCM(event: DonVi) {
+    onChangeDonviCM(_event: DonVi): void {
         this.f['nganh_id'].setValue(null);
     }
 
-    resetForm() {
-        this.formCtdt.reset();
-        this.f['ten'].setValue(this.selectedCtdt.ten);
-        this.f['mota'].setValue(this.selectedCtdt.mota);
-        this.f['nganh_id'].setValue(this.selectedCtdt.nganh_id);
-        this.f['he_dt'].setValue(this.selectedCtdt.he_dt);
-        this.f['danhhieu_totnghiep'].setValue(this.selectedCtdt.danhhieu_totnghiep);
-        this.f['thoigian_daotao'].setValue(this.selectedCtdt.thoigian_daotao);
-        this.f['madt'].setValue(this.selectedCtdt.madt);
-        this.f['category_id'].setValue(this.selectedCtdt.category_id);
-        this.f['khoa_apdung'].setValue(this.selectedCtdt.khoa_apdung);
-        // if (this.ckEditor.mota) {
-        //     this.ckEditor.mota.data.set('');
-        // }
-
-        // if (this.ckEditor.vitri_lamviec_sautotnghiep) {
-        //     this.ckEditor.vitri_lamviec_sautotnghiep.data.set('');
-        // }
-        // if (this.ckEditor.cohoihoctap_sautotnghiep) {
-        //     this.ckEditor.cohoihoctap_sautotnghiep.data.set('');
-        // }
-
-        this.f['vitri_lamviec_sautotnghiep'].setValue(this.selectedCtdt.vitri_lamviec_sautotnghiep);
-        this.f['cohoihoctap_sautotnghiep'].setValue(this.selectedCtdt.cohoihoctap_sautotnghiep);
+    private resetForm(ctdt: Ctdt): void {
+        this.formCtdt.reset({
+            ten: ctdt.ten,
+            mota: ctdt.mota,
+            madt: ctdt.madt,
+            nganh_id: ctdt.nganh_id,
+            he_dt: ctdt.he_dt,
+            danhhieu_totnghiep: ctdt.danhhieu_totnghiep,
+            thoigian_daotao: ctdt.thoigian_daotao,
+            vitri_lamviec_sautotnghiep: ctdt.vitri_lamviec_sautotnghiep,
+            cohoihoctap_sautotnghiep: ctdt.cohoihoctap_sautotnghiep,
+            category_id: ctdt.category_id,
+            khoa_apdung: ctdt.khoa_apdung
+        });
     }
 
-    saveCtdt() {
-        if (this.formCtdt.valid) {
-            this.notificationService.isProcessing(true);
-            const data = { ...this.formCtdt.getRawValue() }
-            this.ctdtService.updateCtdt(this.selectedCtdt.id, data).subscribe({
-                next: () => {
-                    this.notificationService.isProcessing(false);
-                    this.notificationService.toastSuccess("Sửa thành công");
-                },
-                error: () => {
-                    this.notificationService.isProcessing(false);
-                    this.notificationService.toastError("Sửa thất bại");
-                }
-            })
-        }
-    }
-
-    ckEditorSetup(ckEditor, name) {
-        this.ckEditor[name] = ckEditor;
+    saveCtdt(): void {
+        if (this.formCtdt.invalid || !this.selectedCtdt || this.isSaving) return;
+        this.isSaving = true;
+        const data = { ...this.formCtdt.getRawValue() };
+        this.ctdtService.updateCtdt(this.selectedCtdt.id, data).pipe(takeUntil(this.destroy$)).subscribe({
+            next: () => {
+                this.isSaving = false;
+                const updated = { ...this.selectedCtdt, ...data } as Ctdt;
+                this.selectedCtdt = updated;
+                this.ctdtUpdated.emit(updated);
+                this.notificationService.toastSuccess('Sửa thành công');
+            },
+            error: () => {
+                this.isSaving = false;
+                this.notificationService.toastError('Sửa thất bại');
+            }
+        });
     }
 }

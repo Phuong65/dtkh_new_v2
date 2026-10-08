@@ -1,0 +1,226 @@
+<main class="cdr-shell" aria-label="Chuẩn đầu ra chương trình đào tạo">
+    @if (selectedCtdt) {
+        <div class="cdr-workspace">
+            <header class="cdr-heading">
+                <div class="cdr-heading__copy">
+                    <span class="cdr-eyebrow">THIẾT KẾ CHƯƠNG TRÌNH</span>
+                    <h1>Chuẩn đầu ra</h1>
+                    <p>{{ selectedCtdt.ten }}</p>
+                </div>
+                <button type="button" class="cdr-primary-button" (click)="openAddCtdtCdr()">
+                    <i class="ti ti-plus" aria-hidden="true"></i>Thêm PLO
+                </button>
+            </header>
+
+            <div class="cdr-overview" aria-label="Tổng quan chuẩn đầu ra">
+                <div class="cdr-overview__item">
+                    <span class="cdr-overview__icon" aria-hidden="true"><i class="ti ti-target"></i></span>
+                    <div><strong>{{ list_ctdt_cdr.length }}</strong><span>Chuẩn PLO</span></div>
+                </div>
+                <div class="cdr-overview__item">
+                    <span class="cdr-overview__icon cdr-overview__icon--teal" aria-hidden="true"><i class="ti ti-bullseye"></i></span>
+                    <div><strong>{{ list_cdr_muctieu.length }}</strong><span>Mục tiêu PEO</span></div>
+                </div>
+                <p><i class="ti ti-info-circle" aria-hidden="true"></i> PLO mô tả năng lực đầu ra; PI cụ thể hóa từng PLO.</p>
+            </div>
+
+            <section class="cdr-section" aria-labelledby="cdr-list-heading">
+                <header class="cdr-section__header">
+                    <div>
+                        <span class="cdr-section__eyebrow">01 · NỘI DUNG</span>
+                        <h2 id="cdr-list-heading">Danh sách chuẩn đầu ra</h2>
+                    </div>
+                    <span class="cdr-count">{{ list_ctdt_cdr.length }} PLO</span>
+                </header>
+
+                <div class="cdr-plo-list">
+                    @for (cdr of list_ctdt_cdr; track cdr.id) {
+                        <article class="cdr-plo">
+                            <header class="cdr-plo__header">
+                                <div class="cdr-plo__identity">
+                                    <span class="cdr-code">{{ cdr.kyhieu }}</span>
+                                    <span class="cdr-plo__label">Chuẩn đầu ra {{ cdr.ordering }}</span>
+                                </div>
+                                <div class="cdr-actions">
+                                    <button type="button" class="cdr-action-button cdr-action-button--add"
+                                        (click)="openAddCtdtCdr(cdr)" [attr.aria-label]="'Thêm PI cho ' + cdr.kyhieu"
+                                        ngbTooltip="Thêm PI" placement="top" container="body">
+                                        <i class="ti ti-plus" aria-hidden="true"></i><span>Thêm PI</span>
+                                    </button>
+                                    <button type="button" class="cdr-icon-button" (click)="editCtdtCdr(cdr)"
+                                        [attr.aria-label]="'Sửa ' + cdr.kyhieu" ngbTooltip="Sửa PLO" placement="top" container="body">
+                                        <i class="ti ti-pencil" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" class="cdr-icon-button cdr-icon-button--danger" (click)="deleteCtdtCdr(cdr)"
+                                        [attr.aria-label]="'Xóa ' + cdr.kyhieu" ngbTooltip="Xóa PLO và các PI" placement="top" container="body">
+                                        <i class="ti ti-trash" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </header>
+                            <div class="cdr-plo__content ql-editor" [innerHTML]="cdr.noidung | safeHtmlDecode"></div>
+
+                            <div class="cdr-pi-list" aria-label="Các chỉ báo PI">
+                                @for (child of cdr.children; track child.id) {
+                                    <article class="cdr-pi">
+                                        <span class="cdr-pi__code">{{ child.kyhieu }}</span>
+                                        <div class="cdr-pi__content ql-editor" [innerHTML]="child.noidung | safeHtmlDecode"></div>
+                                        <span class="cdr-pi__percent" [attr.aria-label]="'Tỷ lệ ' + child.percent_pi + ' phần trăm'">{{ child.percent_pi }}<small>%</small></span>
+                                        <div class="cdr-actions cdr-actions--compact">
+                                            <button type="button" class="cdr-icon-button" (click)="editCtdtCdr(child, cdr)"
+                                                [attr.aria-label]="'Sửa ' + child.kyhieu" ngbTooltip="Sửa PI" placement="top" container="body">
+                                                <i class="ti ti-pencil" aria-hidden="true"></i>
+                                            </button>
+                                            <button type="button" class="cdr-icon-button cdr-icon-button--danger" (click)="deleteCtdtCdr(child)"
+                                                [attr.aria-label]="'Xóa ' + child.kyhieu" ngbTooltip="Xóa PI" placement="top" container="body">
+                                                <i class="ti ti-trash" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </article>
+                                } @empty {
+                                    <div class="cdr-pi-empty">
+                                        <span>Chưa có chỉ báo PI cho chuẩn này.</span>
+                                        <button type="button" class="cdr-text-button" (click)="openAddCtdtCdr(cdr)">
+                                            <i class="ti ti-plus" aria-hidden="true"></i>Thêm PI
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </article>
+                    } @empty {
+                        <div class="cdr-empty-state">
+                            <span class="cdr-empty-state__icon" aria-hidden="true"><i class="ti ti-target-arrow"></i></span>
+                            <h3>Chưa có chuẩn đầu ra</h3>
+                            <p>Tạo PLO đầu tiên để bắt đầu xây dựng khung năng lực của chương trình.</p>
+                            <button type="button" class="cdr-primary-button" (click)="openAddCtdtCdr()">
+                                <i class="ti ti-plus" aria-hidden="true"></i>Tạo PLO đầu tiên
+                            </button>
+                        </div>
+                    }
+                </div>
+            </section>
+
+            <section class="cdr-section cdr-matrix-section" aria-labelledby="cdr-matrix-heading">
+                <header class="cdr-section__header">
+                    <div>
+                        <span class="cdr-section__eyebrow">02 · ĐỐI CHIẾU</span>
+                        <h2 id="cdr-matrix-heading">Ma trận PEO – PLO</h2>
+                    </div>
+                    <span class="cdr-matrix-legend"><i class="ti ti-check" aria-hidden="true"></i> Có liên kết</span>
+                </header>
+                <p class="cdr-section__description">Mối liên hệ giữa mục tiêu đào tạo và chuẩn đầu ra của chương trình.</p>
+                @if (!list_cdr_muctieu.length || !list_ctdt_cdr.length) {
+                    <div class="cdr-matrix-empty">
+                        <i class="ti ti-layout-grid" aria-hidden="true"></i>
+                        <span>Ma trận sẽ hiển thị khi có cả PEO và PLO.</span>
+                    </div>
+                } @else {
+                    <div class="cdr-matrix-scroll" role="region" aria-labelledby="cdr-matrix-heading" tabindex="0">
+                        <table class="cdr-matrix">
+                            <caption class="cdr-sr-only">Ma trận liên kết giữa các mục tiêu PEO và chuẩn đầu ra PLO</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col" rowspan="2" class="cdr-matrix__row-heading">Mục tiêu</th>
+                                    <th scope="colgroup" [attr.colspan]="list_ctdt_cdr.length">Chuẩn đầu ra PLO</th>
+                                </tr>
+                                <tr>
+                                    @for (cdr of list_ctdt_cdr; track cdr.id) {
+                                        <th scope="col" class="cdr-matrix__code">{{ cdr.kyhieu }}</th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (peo of list_cdr_muctieu; track peo.id) {
+                                    <tr>
+                                        <th scope="row"><span>{{ peo.kyhieu || 'PEO ' + peo.ordering }}</span></th>
+                                        @for (cdr of list_ctdt_cdr; track cdr.id) {
+                                            <td class="cdr-matrix__cell">
+                                                @if (compatibilityMatrix[peo.id]?.[cdr.id]) {
+                                                    <i class="ti ti-check" aria-hidden="true"></i>
+                                                    <span class="cdr-sr-only">Có liên kết</span>
+                                                } @else {
+                                                    <span class="cdr-matrix__dash" aria-hidden="true">—</span>
+                                                    <span class="cdr-sr-only">Chưa liên kết</span>
+                                                }
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </section>
+        </div>
+    } @else {
+        <div class="cdr-loading-state" role="status">
+            <span class="cdr-loading-state__icon" aria-hidden="true"><i class="ti ti-chart-dots-3"></i></span>
+            <p>Đang tải chuẩn đầu ra...</p>
+        </div>
+    }
+</main>
+
+<ng-template #templateCtdtCdr>
+    <div class="ovic-over-right-section cdr-form-drawer">
+        <header class="ovic-over-right-section__head cdr-form-drawer__header">
+            <div>
+                <span class="cdr-section__eyebrow">{{ selectedParentCtdtCdr ? 'CHỈ BÁO PI' : 'CHUẨN ĐẦU RA PLO' }}</span>
+                <h2 class="ovic-over-right-section__header">{{ formTitle }}</h2>
+            </div>
+            <button type="button" class="btn ovic-over-right-section__close-button" (click)="closeForm()" aria-label="Đóng biểu mẫu">
+                <i class="ti ti-x" aria-hidden="true"></i>
+            </button>
+        </header>
+        <div class="ovic-over-right-section__body cdr-form-drawer__body">
+            <form [formGroup]="formCtdtCdr" class="cdr-form">
+                <p class="cdr-form__intro">{{ selectedParentCtdtCdr ? 'Thêm chỉ báo đo lường cho ' + selectedParentCtdtCdr.kyhieu + '.' : 'Xác định chuẩn đầu ra và các mục tiêu PEO liên quan.' }}</p>
+                <div class="cdr-form__grid">
+                    <div class="cdr-form-field" [class.cdr-form-field--half]="!!selectedParentCtdtCdr">
+                        <label for="cdr-ordering">Ký hiệu <span aria-hidden="true">*</span></label>
+                        <div class="cdr-code-input">
+                            <span aria-hidden="true">{{ kyhieu_cdr }}</span>
+                            <input (keydown)="pointQuestionKeyDown($event)" type="text" inputmode="numeric" id="cdr-ordering"
+                                class="ovic-input-field" formControlName="ordering" autocomplete="off" aria-required="true">
+                        </div>
+                        @if (f['ordering'].touched && f['ordering'].invalid) {
+                            <p class="cdr-form-error" role="alert">Nhập số thứ tự cho ký hiệu.</p>
+                        }
+                    </div>
+                    @if (selectedParentCtdtCdr) {
+                        <div class="cdr-form-field cdr-form-field--half">
+                            <label for="cdr-percent">Tỷ lệ PI (%)</label>
+                            <div class="cdr-percent-input">
+                                <input (keydown)="pointQuestionKeyDown($event)" type="text" inputmode="numeric" id="cdr-percent"
+                                    class="ovic-input-field" formControlName="percent_pi" autocomplete="off">
+                                <span aria-hidden="true">%</span>
+                            </div>
+                        </div>
+                    }
+                    @if (!selectedParentCtdtCdr) {
+                        <div class="cdr-form-field cdr-form-field--full">
+                            <label for="cdr-peos">Mục tiêu tương thích</label>
+                            <p-multiSelect inputId="cdr-peos" optionValue="id" optionLabel="kyhieu" [options]="list_cdr_muctieu"
+                                formControlName="tuongthich_peos" placeholder="Chọn các mục tiêu PEO" display="chip">
+                            </p-multiSelect>
+                            <p class="cdr-form-hint">Chọn một hoặc nhiều PEO có liên quan đến PLO này.</p>
+                        </div>
+                    }
+                    <div class="cdr-form-field cdr-form-field--full">
+                        <label for="cdr-content-editor">Nội dung chuẩn đầu ra <span aria-hidden="true">*</span></label>
+                        <div class="cdr-editor">
+                            <ovic-editor height="220px" [formField]="f['noidung']" [default]="f['noidung']['value']"></ovic-editor>
+                        </div>
+                        @if (f['noidung'].touched && f['noidung'].invalid) {
+                            <p class="cdr-form-error" role="alert">Vui lòng nhập nội dung chuẩn đầu ra.</p>
+                        }
+                    </div>
+                </div>
+            </form>
+        </div>
+        <footer class="cdr-form-drawer__footer">
+            <p><i class="ti ti-info-circle" aria-hidden="true"></i> Trường có dấu <span>*</span> là bắt buộc.</p>
+            <button type="button" class="cdr-primary-button" (click)="saveCtdtCdr()">
+                <i class="ti ti-device-floppy" aria-hidden="true"></i>Lưu chuẩn đầu ra
+            </button>
+        </footer>
+    </div>
+</ng-template>
