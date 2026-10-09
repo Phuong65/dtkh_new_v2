@@ -1,0 +1,59 @@
+.layout_component_container {
+    background-color: #f2f2f2;
+}
+
+.ctdt-config-layout .document-type-a4-vertical {
+    background-color: transparent;
+    padding: 0px;
+    margin: 20px auto;
+}
+
+.box-panel-setting {
+    margin-bottom: 10px;
+}
+
+.box-panel-setting:last-child {
+    margin-bottom: 0px;
+}
+
+.editor-in-table {
+    border: none;
+    width: 100%;
+    box-shadow: none;
+    outline: none;
+    line-height: 1.5;
+    padding: 5px;
+}
+
+.text-innerhtml-raw {
+    white-space: pre-wrap
+}
+
+.check-course-muctieu {
+    cursor: pointer;
+}
+
+.check-course-muctieu i {
+    font-size: 16px;
+}
+
+.check-course-muctieu .fa-square-o {
+    color: #E0E0E0;
+}
+
+.ctdt-config-layout {
+    height: calc(100% - 51px);
+    overflow: auto;
+}
+
+.footer-layout-setting-ctdt {
+    line-height: 1;
+    padding: 10px;
+    border-top: 1px solid #c8c8c8;
+    text-align: right;
+    background-color: #fff;
+}
+
+.footer-layout-setting-ctdt button {
+    line-height: 1;
+}
