@@ -179,9 +179,11 @@
                             <tbody>
                                 @for (peo of list_cdr_muctieu; track peo.id) {
                                     <tr>
-                                        <th class="matrix-th-row">
+                                        <th class="matrix-th-row"
+                                            [pTooltip]="getPeoTooltip(peo)"
+                                            tooltipPosition="right"
+                                            appendTo="body">
                                             <b>{{ peo.kyhieu || 'PEO ' + peo.ordering }}</b>
-                                            <div class="matrix-peo-text ql-editor" [innerHTML]="peo.noidung | safeHtmlDecode"></div>
                                         </th>
                                         @for (cdr of list_ctdt_cdr; track cdr.id) {
                                             <td class="matrix-cell" [class.matrix-cell--checked]="compatibilityMatrix[peo.id]?.[cdr.id]">
@@ -203,40 +205,32 @@
     }
 </main>
 
-<!-- FORM DRAWER (THÊM / SỬA PLO HOẶC PI DÙNG PRIMENG DRAWER ĐỒNG BỘ BO-CTDT) -->
 <p-drawer [(visible)]="drawerVisible" [dismissible]="!savingCdr" [closable]="!savingCdr"
-    [closeOnEscape]="!savingCdr" [blockScroll]="true" [style]="{ width: 'min(700px, 100vw)' }"
-    appendTo="body" position="right" styleClass="ctdt-cdr-drawer ictu-p-drawer" ariaCloseLabel="Đóng biểu mẫu">
-    <ng-template pTemplate="header">
-        <div class="cdr-drawer__header-content">
-            <span class="cdr-drawer__eyebrow">{{ selectedParentCtdtCdr ? 'CHỈ BÁO PI (CẤP CON)' : 'CHUẨN ĐẦU RA PLO (CẤP CHA)' }}</span>
-            <h2 class="cdr-drawer__title">{{ formTitle }}</h2>
-        </div>
-    </ng-template>
-
-    <ng-template pTemplate="content">
-        <div class="cdr-drawer__body">
+    [closeOnEscape]="!savingCdr" [blockScroll]="true" [header]="formTitle"
+    [style]="{ width: 'min(700px, 100vw)' }" appendTo="body" position="right"
+    styleClass="ictu-p-drawer" ariaCloseLabel="Đóng biểu mẫu">
+    <div class="ictu-p-drawer__content">
+        <div class="ictu-p-drawer__content__body cdr-drawer-body position-relative">
             @if (savingCdr) {
                 <app-loading-progress heading="Đang lưu chuẩn đầu ra..." backdropFilter="blur(2px)"></app-loading-progress>
             }
             @if (selectedParentCtdtCdr) {
                 <div class="parent-context-bar">
                     <span class="parent-tag">{{ selectedParentCtdtCdr.kyhieu }}</span>
-                    <span>Đang thêm chỉ báo PI trực thuộc PLO này</span>
+                    <span>Chỉ báo PI thuộc PLO này</span>
                 </div>
             }
-
-            <form id="cdr-form" [formGroup]="formCtdtCdr" class="cdr-form" (ngSubmit)="saveCtdtCdr()">
-                <div class="cdr-form-grid">
+            <form id="cdr-form" [formGroup]="formCtdtCdr" (ngSubmit)="saveCtdtCdr()">
+                <div class="ictu-form cdr-form-grid">
                     <div class="ictu-form__row form-field" [class.form-field--half]="!!selectedParentCtdtCdr">
                         <label class="ictu-form__label ictu-form__label--required" for="cdr-ordering">Ký hiệu</label>
                         <div class="input-with-prefix">
                             <span class="prefix">{{ kyhieu_cdr }}</span>
                             <input pInputText (keydown)="pointQuestionKeyDown($event)" type="text" inputmode="numeric" id="cdr-ordering"
-                                class="ictu-form__input-field form-input" formControlName="ordering" autocomplete="off" placeholder="Số thứ tự">
+                                class="ictu-form__input-field" formControlName="ordering" autocomplete="off" placeholder="Số thứ tự">
                         </div>
                         @if (f['ordering'].touched && f['ordering'].invalid) {
-                            <p class="err-text" role="alert">Vui lòng nhập số thứ tự.</p>
+                            <span class="ictu-admin-form-error" role="alert">Vui lòng nhập số thứ tự.</span>
                         }
                     </div>
 
@@ -245,7 +239,7 @@
                             <label class="ictu-form__label" for="cdr-percent">Tỷ lệ % của PI</label>
                             <div class="input-with-suffix">
                                 <input pInputText (keydown)="pointQuestionKeyDown($event)" type="text" inputmode="numeric" id="cdr-percent"
-                                    class="ictu-form__input-field form-input" formControlName="percent_pi" autocomplete="off" placeholder="Ví dụ: 50">
+                                    class="ictu-form__input-field" formControlName="percent_pi" autocomplete="off" placeholder="Ví dụ: 50">
                                 <span class="suffix">%</span>
                             </div>
                         </div>
@@ -262,29 +256,25 @@
                     }
 
                     <div class="ictu-form__row form-field form-field--full">
-                        <label class="ictu-form__label ictu-form__label--required" id="cdr-content-label">{{ selectedParentCtdtCdr ? 'Nội dung PI' : 'Nội dung PLO' }}</label>
+                        <span class="ictu-form__label ictu-form__label--required" id="cdr-content-label">{{ selectedParentCtdtCdr ? 'Nội dung PI' : 'Nội dung PLO' }}</span>
                         <div class="editor-box" role="group" aria-labelledby="cdr-content-label">
                             <ovic-editor height="230px" [formField]="f['noidung']" [default]="f['noidung']['value']"></ovic-editor>
                         </div>
                         @if (f['noidung'].touched && f['noidung'].invalid) {
-                            <p class="err-text" role="alert">Vui lòng nhập nội dung.</p>
+                            <span class="ictu-admin-form-error" role="alert">Vui lòng nhập nội dung.</span>
                         }
                     </div>
                 </div>
             </form>
         </div>
-    </ng-template>
-
-    <ng-template pTemplate="footer">
-        <div class="cdr-drawer__footer ictu-admin-drawer-footer">
-            <span class="note-req">Trường có dấu <b class="req">*</b> là bắt buộc</span>
-            <div class="drawer-btn-row">
-                <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button" (click)="closeForm()" [disabled]="savingCdr">Hủy</button>
-                <button type="submit" form="cdr-form" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button" [disabled]="savingCdr">
-                    <i class="ti ti-device-floppy" aria-hidden="true"></i>
-                    <span>{{ savingCdr ? 'Đang lưu...' : (selectedParentCtdtCdr ? 'Lưu PI' : 'Lưu PLO') }}</span>
-                </button>
-            </div>
+        <div class="ictu-p-drawer__content__footer ictu-admin-drawer-footer">
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button"
+                (click)="closeForm()" [disabled]="savingCdr">Hủy</button>
+            <button type="submit" form="cdr-form" mat-flat-button
+                class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button" [disabled]="savingCdr">
+                <i class="ti ti-device-floppy" aria-hidden="true"></i>
+                {{ savingCdr ? 'Đang lưu...' : (selectedParentCtdtCdr ? 'Lưu PI' : 'Lưu PLO') }}
+            </button>
         </div>
-    </ng-template>
+    </div>
 </p-drawer>

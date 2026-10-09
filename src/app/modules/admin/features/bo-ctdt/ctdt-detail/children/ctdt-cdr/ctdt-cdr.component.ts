@@ -1,4 +1,5 @@
 import { CtdtCdrService } from '@modules/shared/services/ctdt-cdr.service';
+import { HelperService } from '@core/services/helper.service';
 import { Component, OnInit, WritableSignal, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SafeHtmlDecodePipe } from '@modules/shared/pipes/safe-html-decode';
@@ -26,6 +27,7 @@ import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { MatButtonModule } from '@angular/material/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { Drawer } from 'primeng/drawer';
+import { TooltipModule } from 'primeng/tooltip';
 
 export interface CtdtCdrParent extends CtdtCdr {
     children?: CtdtCdr[];
@@ -43,6 +45,7 @@ export interface CtdtCdrParent extends CtdtCdr {
         MatButtonModule,
         InputTextModule,
         Drawer,
+        TooltipModule,
         MultiSelectModule,
         OvicEditorComponent,
         SafeHtmlDecodePipe,
@@ -62,6 +65,7 @@ export class CtdtCdrComponent implements OnInit {
     private readonly elngUserProfileService = inject(ElngUserProfileService);
     private readonly ctdtCdrService = inject(CtdtCdrService);
     private readonly ctdtMuctieuCutheService = inject(CtdtMuctieuCutheService);
+    private readonly helperService = inject(HelperService);
 
     readonly state: WritableSignal<AppState> = signal<AppState>('loading');
     loadingHeading = 'Đang tải chuẩn đầu ra...';
@@ -391,6 +395,11 @@ export class CtdtCdrComponent implements OnInit {
 
     getMatrixLinkCount(): number {
         return this.list_cdr_muctieu.reduce((total, peo) => total + this.getLinkedPloCountForPeo(peo), 0);
+    }
+
+    getPeoTooltip(peo: CtdtMuctieuCuthe): string {
+        const content = this.helperService.decodeHTML(peo.noidung || '');
+        return content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() || 'Chưa có mô tả mục tiêu đào tạo.';
     }
 
     getRemainingPiPercent(cdr: CtdtCdrParent): number {
