@@ -847,6 +847,41 @@ input.admin-wrap-table__input::placeholder,
 	border-radius: 4px;
 }
 
+/* PrimeNG MultiSelect trong ictu-form dùng cùng kích thước với input chuẩn. */
+.ictu-form__row p-multiSelect,
+.ictu-form__row p-multiselect,
+.ictu-form__row p-multi-select,
+.ictu-form__row .p-multiselect {
+	font-weight: 500;
+	display: flex;
+	width: 100% !important;
+	height: 43px !important;
+	min-height: 43px !important;
+	box-sizing: border-box;
+	font-family: var(--primary-font-family), sans-serif;
+	font-size: 14px !important;
+	line-height: 1.5;
+}
+
+.ictu-form__row .p-multiselect .p-multiselect-label-container,
+.ictu-form__row .p-multiselect .p-multiselect-label {
+	min-height: 41px;
+}
+
+.ictu-form__row .p-multiselect .p-multiselect-label {
+	display: flex;
+	align-items: center;
+	padding-block: 8px;
+	padding-inline: var(--ictu-input-padding-x, 10px);
+	font-family: var(--primary-font-family), sans-serif;
+	font-size: 14px;
+	line-height: 1.5;
+}
+
+.ictu-form__row .p-multiselect .p-multiselect-dropdown {
+	width: 40px;
+}
+
 .ictu-form__row span.ictu-form__input-field,
 .ictu-form__row employee-control-multiple,
 .ictu-form__row employee-control-2,
@@ -1124,6 +1159,13 @@ input.admin-wrap-table__input::placeholder,
 	border-inline-start: 0 none;
 	color: #475569;
 	transition: background var(--p-inputtext-transition-duration), color var(--p-inputtext-transition-duration), border-color var(--p-inputtext-transition-duration), outline-color var(--p-inputtext-transition-duration), box-shadow var(--p-inputtext-transition-duration);
+}
+
+.ictu-form__after-input-field {
+	font-family: var(--primary-font-family), sans-serif;
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 1.5;
 }
 
 .ictu-form__btn-input-field {

@@ -1,181 +1,171 @@
-<div class="layout_component_container">
-    <div class="document-type-a4-vertical">
-        <div>
-            <p-table [value]="list_cdt_hocphan" styleClass="table-reBorder">
-                <ng-template pTemplate="caption">
-                    <div style="text-align: right;" class="table-header">
-                        <button style="line-height: 1.5;" (click)="saveUpdateCtdtHocPhan()" class="btn btn-primary">
-                            <i class="fa fa-floppy-o"></i>
-                            Lưu lại
-                        </button>
-                    </div>
-                </ng-template>
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th style="width: 5rem; text-align: center;">TT</th>
-                        <th style="width:120px; text-align: center;">Mã HP</th>
-                        <th style="text-align: center;">Tên học phần</th>
-                        <th style="text-align: center; width: 80px;">Số TC</th>
-                        <th style="text-align: center; width: 80px;">TCTH</th>
-                        <th style="text-align: center; width: 80px;">Học kỳ</th>
-                        <th style="text-align: center; width: 120px;">HP học trước</th>
-                        <th style="text-align: center; width: 120px;">HP tiên quyết</th>
-                        <th style="text-align: center; width: 120px;">HP song hành</th>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-khoi let-rowIndex="rowIndex">
-                    <tr style="background-color: antiquewhite;">
-                        <td style="text-align: center;">
-                            <strong>{{rowIndex + 1}}</strong>
-                        </td>
-                        <td colspan="8">
-                            <div style="display: flex; align-items: center;">
-                                <strong style="flex:1">{{khoi.title}}</strong>
-                                <button (click)="openSelectedMonhoc(khoi)"
-                                    style="line-height: 1.25!important; margin-left: 10px;" class="btn btn-success">
-                                    <i class="fa fa-plus"></i>
-                                    Thêm học phần
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    @for (child of khoi['children']; track child.id; let index = $index) {
+<main class="content-shell" aria-label="Nội dung chương trình đào tạo" [attr.aria-busy]="isLoadingData || savingHp">
+    @if (isLoadingData) {
+        <app-loading-progress heading="Đang tải nội dung chương trình..." backdropFilter="blur(2px)"></app-loading-progress>
+    }
+    @if (savingHp) {
+        <app-loading-progress [heading]="savingTitle" backdropFilter="blur(2px)"></app-loading-progress>
+    }
+
+    <section class="admin-wrap-table ictu-admin-table-shell content-card">
+        <div class="admin-wrap-table__body ictu-admin-table-shell__body">
+            <div class="ictu-admin-table-scroll content-table-scroll">
+                <table class="tbl admin-table content-table">
+                    <caption class="content-sr-only">Danh sách khối kiến thức và học phần trong chương trình đào tạo</caption>
+                    <colgroup>
+                        <col class="content-col-index">
+                        <col class="content-col-code">
+                        <col class="content-col-name">
+                        <col class="content-col-number">
+                        <col class="content-col-number">
+                        <col class="content-col-semester">
+                        <col class="content-col-condition">
+                        <col class="content-col-condition">
+                        <col class="content-col-condition">
+                    </colgroup>
+                    <thead>
                         <tr>
-                            <td style="text-align: center;">
-                                {{index + 1}}
-                            </td>
-                            <td style="text-align: center;">
-                                {{child['maso']}}
-                            </td>
-                            <td>
-                                {{child['course_name']}}
-                            </td>
-                            <td style="text-align: center;">
-                                {{child['sotinchi']}}
-                            </td>
-                            <td style="text-align: center;">
-                                {{child['sotinchi_thuchanh']}}
-                            </td>
-                            <td>
-                                <input #input_point (keydown)="pointQuestionKeyDown($event)"
-                                    style="width: 100%; text-align: center; border:none" [(ngModel)]="child['hocky']"
-                                    type="text" />
-                            </td>
-                            <td class="hover-td" (click)="togglePanel(child,opCtdtHp,$event,'hp_hoctruoc')"
-                                style="text-align: center; cursor: pointer;">
-                                <div>
-                                    @if (child['hp_hoctruoc']) {
-                                        <span>
-                                            {{child['hp_hoctruoc'].length}} HP
-                                        </span>
-                                    }
-                                </div>
-                            </td>
-                            <td class="hover-td" (click)="togglePanel(child,opCtdtHp,$event,'hp_tienquyet')"
-                                style="text-align: center; cursor: pointer;">
-                                <div>
-                                    @if (child['hp_tienquyet']) {
-                                        <span>
-                                            {{child['hp_tienquyet'].length }} HP
-                                        </span>
-                                    }
-                                </div>
-                            </td>
-                            <td class="hover-td" (click)="togglePanel(child,opCtdtHp,$event,'hp_songhanh')"
-                                style="text-align: center; cursor: pointer;">
-                                <div>
-                                    @if (child['hp_songhanh']) {
-                                        <span>
-                                            {{child['hp_songhanh'].length}} HP
-                                        </span>
-                                    }
-                                </div>
-                            </td>
+                            <th class="content-col-index">TT</th>
+                            <th class="content-col-code">Mã HP</th>
+                            <th class="content-col-name">Tên học phần</th>
+                            <th class="content-col-number">TC</th>
+                            <th class="content-col-number">TCTH</th>
+                            <th class="content-col-semester">HK</th>
+                            <th class="content-col-condition">HP học trước</th>
+                            <th class="content-col-condition">HP tiên quyết</th>
+                            <th class="content-col-condition">HP song hành</th>
                         </tr>
-                    }
-                </ng-template>
-            </p-table>
-        </div>
-    </div>
-</div>
+                    </thead>
+                    <tbody>
+                        @for (khoi of list_cdt_hocphan; track khoi.key; let blockIndex = $index) {
+                            <tr class="content-block-row">
+                                <td class="content-cell-center"><span class="content-block-index">{{ blockIndex + 1 }}</span></td>
+                                <td colspan="8">
+                                    <div class="content-block-title">
+                                        <div class="content-block-name">
+                                            <i class="ti ti-folder" aria-hidden="true"></i>
+                                            <strong>{{ khoi.title }}</strong>
+                                        </div>
+                                        <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse content-add-button"
+                                            (click)="openSelectedMonhoc(khoi)" [attr.aria-label]="'Thêm học phần vào ' + khoi.title">
+                                            <i class="ti ti-plus" aria-hidden="true"></i>Thêm học phần
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
 
-<p-popover #opCtdtHp appendTo="body">
-    <ng-template pTemplate>
-        <div style="height: 300px; overflow: hidden; width: 400px;">
-            <div class="search-layout">
-                <div class="search-layout-top" style="display: flex; align-items: center;">
-                    <input [(ngModel)]="searchCourse_hp" type="text" class="ovic-input-field"
-                        placeholder="Nhập tên rồi nhấn enter" style="width: 100%;">
+                            @for (child of khoi.children; track child.id; let courseIndex = $index) {
+                                <tr class="content-course-row">
+                                    <td class="content-cell-center">{{ courseIndex + 1 }}</td>
+                                    <td class="content-cell-center"><span class="content-course-code">{{ child['maso'] || '—' }}</span></td>
+                                    <td><strong class="content-course-name">{{ child.course_name }}</strong></td>
+                                    <td class="content-cell-center">{{ child.sotinchi }}</td>
+                                    <td class="content-cell-center">{{ child.sotinchi_thuchanh || 0 }}</td>
+                                    <td class="content-cell-center">
+                                        <input class="content-semester-input" type="text" inputmode="numeric" [value]="child.hocky || ''"
+                                            [attr.aria-label]="'Học kỳ của ' + child.course_name"
+                                            (input)="child.hocky = $any($event.target).value"
+                                            (keydown)="pointQuestionKeyDown($event)" placeholder="—">
+                                    </td>
+                                    @for (condition of ['hp_hoctruoc', 'hp_tienquyet', 'hp_songhanh']; track condition) {
+                                        <td class="content-cell-center">
+                                            <button type="button" class="content-condition-button"
+                                                (click)="togglePanel(child, conditionPopover, $event, condition)"
+                                                [attr.aria-label]="'Chọn ' + condition + ' cho ' + child.course_name">
+                                                @if (getSelectedConditionCount(child, condition) > 0) {
+                                                    <span class="content-condition-badge"><i class="ti ti-link" aria-hidden="true"></i>{{ getSelectedConditionCount(child, condition) }} HP</span>
+                                                } @else {
+                                                    <span class="content-condition-empty"><i class="ti ti-plus" aria-hidden="true"></i>Thêm</span>
+                                                }
+                                            </button>
+                                        </td>
+                                    }
+                                </tr>
+                            } @empty {
+                                <tr><td colspan="9" class="content-empty-block">Chưa có học phần trong khối này. Bấm “Thêm học phần” để bắt đầu.</td></tr>
+                            }
+                        } @empty {
+                            <tr><td colspan="9" class="content-empty-state"><i class="ti ti-books" aria-hidden="true"></i><strong>Chưa có nội dung chương trình</strong><span>Chưa có khối kiến thức hoặc học phần nào được thiết lập.</span></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- THANH NÚT LƯU CỐ ĐỊNH Ở ĐÁY TRANG KHI CUỘN -->
+    <footer class="content-sticky-footer">
+        <div class="content-sticky-footer__inner">
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse content-sticky-save-btn"
+                (click)="saveUpdateCtdtHocPhan()" [disabled]="savingHp || isLoadingData">
+                <i class="ti ti-device-floppy" aria-hidden="true"></i>
+                <span>Lưu lại</span>
+            </button>
+        </div>
+    </footer>
+
+    <p-popover #conditionPopover appendTo="body" styleClass="content-condition-popover">
+        <div class="condition-popover">
+            <!-- <header class="condition-popover__header">
+                <div class="condition-popover__title">
+                    <span class="condition-popover__icon" aria-hidden="true"><i class="ti ti-link"></i></span>
+                    <div>
+                        <strong>Học phần điều kiện</strong>
+                        <small>Chọn môn học liên quan</small>
+                    </div>
+                </div>
+                <span class="condition-popover__count">{{ list_course_dk.length }} kết quả</span>
+            </header> -->
+            <label class="condition-search-wrap" for="condition-course-search">
+                <i class="ti ti-search" aria-hidden="true"></i>
+                <input id="condition-course-search" pInputText class="condition-search" [(ngModel)]="searchCourse_hp" placeholder="Tìm theo mã hoặc tên học phần" aria-label="Tìm học phần điều kiện">
+                @if (searchCourse_hp) { <button type="button" class="condition-search-clear" (click)="searchCourse_hp = ''" aria-label="Xóa tìm kiếm"><i class="ti ti-x" aria-hidden="true"></i></button> }
+            </label>
+            <div class="condition-list" role="listbox" aria-label="Danh sách học phần điều kiện">
+                @for (course of filterCourses(list_course_dk, searchCourse_hp); track course.id) {
+                    <button type="button" class="condition-item" [class.condition-item--selected]="course['selected_hp']" (click)="toggleCourseCondition(course)">
+                        <span class="condition-check"><i class="ti" [class.ti-check]="course['selected_hp']" aria-hidden="true"></i></span>
+                        <span><strong>{{ course.title }}</strong><small>{{ course.maso }}</small></span>
+                    </button>
+                } @empty {
+                    <div class="condition-empty" role="status">
+                        <span class="condition-empty__icon" aria-hidden="true"><i class="ti ti-book"></i></span>
+                        <strong>{{ searchCourse_hp ? 'Không tìm thấy học phần' : 'Chưa có học phần phù hợp' }}</strong>
+                        <span>{{ searchCourse_hp ? 'Hãy thử từ khóa ngắn hơn hoặc kiểm tra lại mã học phần.' : 'Hãy nhập học kỳ trước khi chọn học phần điều kiện.' }}</span>
+                        @if (searchCourse_hp) { <button type="button" (click)="searchCourse_hp = ''">Xóa tìm kiếm</button> }
+                    </div>
+                }
+            </div>
+        </div>
+    </p-popover>
+
+    <p-drawer [(visible)]="drawerChooseMonhocVisible" [dismissible]="!savingHp" [closable]="!savingHp"
+        [closeOnEscape]="!savingHp" [blockScroll]="true" [header]="selectedKhoiKienthuc?.title || 'Chọn học phần'"
+        [style]="{ width: 'min(620px, 100vw)' }" appendTo="body" position="right" styleClass="ictu-p-drawer content-course-drawer">
+        <div class="ictu-p-drawer__content">
+            <div class="ictu-p-drawer__content__body position-relative">
+                <div class="ictu-form ictu-form--label-on-top">
+                    <div class="ictu-form__row">
+                        <label class="ictu-form__label" for="content-course-search">Tìm học phần</label>
+                        <input id="content-course-search" pInputText class="ictu-form__input-field" [(ngModel)]="searchCourse" placeholder="Nhập mã hoặc tên học phần" autocomplete="off">
+                    </div>
+                </div>
+                <div class="course-picker-summary"><i class="ti ti-info-circle" aria-hidden="true"></i> Chọn các học phần muốn đưa vào khối kiến thức.</div>
+                <div class="course-picker-list">
+                    @for (course of filterCourses(list_selected_course, searchCourse); track course.id) {
+                        <button type="button" class="course-picker-item" [class.course-picker-item--selected]="course['checked']"
+                            (click)="toggleCourseCheck(course)" [disabled]="course['disabled']">
+                            <span class="course-picker-check"><i class="ti" [class.ti-check]="course['checked']" aria-hidden="true"></i></span>
+                            <span class="course-picker-copy"><strong>{{ course.title }}</strong><small>{{ course.maso }} · {{ course.params?.sotinchi || 0 }} tín chỉ</small></span>
+                        </button>
+                    } @empty { <p class="course-picker-empty">Không có học phần phù hợp.</p> }
                 </div>
             </div>
-            <div class="list-course-layout" style="line-height: 1.5;">
-                <mat-selection-list (selectionChange)="onSelectedHp($event)" [multiple]="true"
-                    class="selection-list-mat" #courses>
-                    @for (course of list_course_dk | filter : searchCourse_hp : ['title','maso']; track course.id) {
-                        <mat-list-option [selected]="course['selected_hp']" [value]="course">
-                            <div mat-line style="font-weight: 600;">
-                                {{course.title + ' (' + course.maso + ')'}}
-                            </div>
-                            @if (course.params && course.params.exam_format) {
-                                <div mat-line>{{course.params.exam_format |
-                                    showlabel : type_test : 'key' : 'label'}}</div>
-                            }
-                        </mat-list-option>
-                    }
-                </mat-selection-list>
-            </div>
-        </div>
-    </ng-template>
-</p-popover>
-
-<ng-template #templateChooseMonhoc>
-    <div class="ovic-over-right-section">
-        <div class="ovic-over-right-section__head">
-            <h3 class="ovic-over-right-section__header">
-                {{selectedKhoiKienthuc?selectedKhoiKienthuc.title:'Chọn môn học'}}
-            </h3>
-            <button class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
-        </div>
-        <div class="ovic-over-right-section__body" style="height: calc(100vh - 51px - 57px); line-height: 1.5;">
-            <div class="search-layout">
-                <div class="search-layout-top" style="display: flex; align-items: center;">
-                    <input [(ngModel)]="searchCourse" type="text" class="ovic-input-field"
-                        placeholder="Nhập tên rồi nhấn enter" style="width: 100%;">
-                </div>
-            </div>
-            <div class="list-course-layout" style="line-height: 1.5; font-size: 14px;">
-                <mat-selection-list (selectionChange)="changeSelecCourse($event)" [multiple]="true"
-                    class="selection-list-mat" style="color:red" #courses>
-                    @for (course of list_selected_course | filter : searchCourse : ['title','maso']; track course.id) {
-                        <mat-list-option [selected]="course['checked']" [value]="course">
-                            <div mat-line style="font-weight: 600;">
-                                {{course.title + ' (' + course.maso + ')'}}
-                            </div>
-                            @if (course.params && course.params.exam_format) {
-                                <div mat-line>{{course.params.exam_format |
-                                    showlabel : type_test : 'key' : 'label'}}</div>
-                            }
-                        </mat-list-option>
-                    }
-                </mat-selection-list>
-            </div>
-        </div>
-        <div class="ovic-dynamic-right-section__foot">
-            <p class="ovic-over-right-section__foot-wrap-buttons">
-                <button (click)="saveCtdtHocPhan()" class="btn ovic-over-right-section__foot-btn btn-primary">
-                    <i class="fa fa-floppy-o"></i>Lưu lại
+            <div class="ictu-p-drawer__content__footer ictu-admin-drawer-footer">
+                <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button" (click)="closeDrawerChooseMonhoc()" [disabled]="savingHp">Hủy</button>
+                <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button" (click)="saveCtdtHocPhan()" [disabled]="savingHp">
+                    <i class="ti ti-device-floppy" aria-hidden="true"></i>Lưu lại
                 </button>
-            </p>
+            </div>
         </div>
-    </div>
-</ng-template>
-
-<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
-    [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
-    <div class="popup-waiting-loading">
-        <label style="width: 100%;">{{waitting_title}}</label>
-        <div class="tn-import-student-progressbar">
-            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
-        </div>
-    </div>
-</p-dialog>
+    </p-drawer>
+</main>

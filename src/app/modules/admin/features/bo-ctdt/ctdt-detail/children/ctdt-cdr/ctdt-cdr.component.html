@@ -18,13 +18,11 @@
             <section class="admin-wrap-table ictu-admin-table-shell cdr-table-card">
                 <header class="admin-wrap-table__head cdr-table-card__header">
                     <div class="cdr-table-card__title-wrap">
-                        <h1 class="admin-wrap-table__heading cdr-table-card__title">CHUẨN ĐẦU RA CỦA CHƯƠNG TRÌNH ĐÀO TẠO</h1>
-                        <span class="cdr-table-card__sub" [title]="selectedCtdt.ten">{{ selectedCtdt.ten }}</span>
+                        <span class="admin-wrap-table__heading cdr-table-card__title">CHUẨN ĐẦU RA CỦA CHƯƠNG TRÌNH ĐÀO TẠO</span>
                     </div>
                     <div class="admin-wrap-table__head-actions cdr-table-card__actions">
                         <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse cdr-add-button" (click)="openAddCtdtCdr()">
-                            <i class="ti ti-plus" aria-hidden="true"></i>
-                            <span>Thêm mới</span>
+                            <i class="ti ti-plus"></i>
                         </button>
                     </div>
                 </header>
@@ -89,7 +87,7 @@
                                                 (click)="editCtdtCdr(cdr)"
                                                 [attr.aria-label]="'Sửa ' + cdr.kyhieu"
                                                 ngbTooltip="Sửa PLO" placement="top" container="body">
-                                                <i class="ti ti-pencil" aria-hidden="true"></i>
+                                                <i class="ti ti-edit"></i>
                                             </button>
                                             <button type="button" mat-flat-button class="btn ictu-button-danger-light ictu-admin-icon-button"
                                                 (click)="deleteCtdtCdr(cdr)"
@@ -125,7 +123,7 @@
                                                     (click)="editCtdtCdr(child, cdr)"
                                                     [attr.aria-label]="'Sửa ' + child.kyhieu"
                                                     ngbTooltip="Sửa PI" placement="top" container="body">
-                                                    <i class="ti ti-pencil" aria-hidden="true"></i>
+                                                    <i class="ti ti-edit"></i>
                                                 </button>
                                                 <button type="button" mat-flat-button class="btn ictu-button-danger-light ictu-admin-icon-button"
                                                     (click)="deleteCtdtCdr(child)"
@@ -170,9 +168,12 @@
                         <table class="matrix-table">
                             <thead>
                                 <tr>
-                                    <th class="matrix-th-corner">PEO \ PLO</th>
+                                    <th class="matrix-th-corner" scope="col" rowspan="2">PEOs</th>
+                                    <th class="matrix-th-group" scope="colgroup" [attr.colspan]="list_ctdt_cdr.length">Chuẩn đầu ra CTĐT (PLOs)</th>
+                                </tr>
+                                <tr>
                                     @for (cdr of list_ctdt_cdr; track cdr.id) {
-                                        <th class="matrix-th-col">{{ cdr.kyhieu }}</th>
+                                        <th class="matrix-th-col" scope="col" [attr.aria-label]="cdr.kyhieu">{{ cdr.ordering }}</th>
                                     }
                                 </tr>
                             </thead>
@@ -206,9 +207,9 @@
 </main>
 
 <p-drawer [(visible)]="drawerVisible" [dismissible]="!savingCdr" [closable]="!savingCdr"
-    [closeOnEscape]="!savingCdr" [blockScroll]="true" [header]="formTitle"
+    [closeOnEscape]="!savingCdr" [blockScroll]="true" [header]="formTitle" ariaCloseLabel="Đóng biểu mẫu"
     [style]="{ width: 'min(700px, 100vw)' }" appendTo="body" position="right"
-    styleClass="ictu-p-drawer" ariaCloseLabel="Đóng biểu mẫu">
+    styleClass="ictu-p-drawer ctdt-cdr-form-drawer">
     <div class="ictu-p-drawer__content">
         <div class="ictu-p-drawer__content__body cdr-drawer-body position-relative">
             @if (savingCdr) {
@@ -222,12 +223,12 @@
             }
             <form id="cdr-form" [formGroup]="formCtdtCdr" (ngSubmit)="saveCtdtCdr()">
                 <div class="ictu-form cdr-form-grid">
-                    <div class="ictu-form__row form-field" [class.form-field--half]="!!selectedParentCtdtCdr">
+                    <div class="ictu-form__row form-field form-field--half">
                         <label class="ictu-form__label ictu-form__label--required" for="cdr-ordering">Ký hiệu</label>
-                        <div class="input-with-prefix">
-                            <span class="prefix">{{ kyhieu_cdr }}</span>
+                        <div class="ictu-form__group-control--before cdr-code-control">
                             <input pInputText (keydown)="pointQuestionKeyDown($event)" type="text" inputmode="numeric" id="cdr-ordering"
                                 class="ictu-form__input-field" formControlName="ordering" autocomplete="off" placeholder="Số thứ tự">
+                            <span class="ictu-form__after-input-field cdr-code-prefix" aria-hidden="true">{{ kyhieu_cdr }}</span>
                         </div>
                         @if (f['ordering'].touched && f['ordering'].invalid) {
                             <span class="ictu-admin-form-error" role="alert">Vui lòng nhập số thứ tự.</span>
@@ -237,16 +238,16 @@
                     @if (selectedParentCtdtCdr) {
                         <div class="ictu-form__row form-field form-field--half">
                             <label class="ictu-form__label" for="cdr-percent">Tỷ lệ % của PI</label>
-                            <div class="input-with-suffix">
+                            <div class="ictu-form__group-control--after cdr-percent-control">
                                 <input pInputText (keydown)="pointQuestionKeyDown($event)" type="text" inputmode="numeric" id="cdr-percent"
                                     class="ictu-form__input-field" formControlName="percent_pi" autocomplete="off" placeholder="Ví dụ: 50">
-                                <span class="suffix">%</span>
+                                <span class="ictu-form__after-input-field cdr-percent-suffix" aria-hidden="true">%</span>
                             </div>
                         </div>
                     }
 
                     @if (!selectedParentCtdtCdr) {
-                        <div class="ictu-form__row form-field form-field--full">
+                        <div class="ictu-form__row form-field form-field--half">
                             <label class="ictu-form__label" for="cdr-peos">Mục tiêu PEO tương thích</label>
                             <p-multiSelect inputId="cdr-peos" optionValue="id" optionLabel="kyhieu" [options]="list_cdr_muctieu"
                                 formControlName="tuongthich_peos" placeholder="Chọn các mục tiêu PEO liên quan" display="chip"

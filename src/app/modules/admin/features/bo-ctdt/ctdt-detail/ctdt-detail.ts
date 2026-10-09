@@ -8,6 +8,7 @@ import { Ctdt } from '@modules/shared/models/ctdt';
 import { CtdtThongtinComponent } from './children/ctdt-thongtin/ctdt-thongtin.component';
 import { CtdtMuctieuCdrComponent } from './children/ctdt-muctieu-cdr/ctdt-muctieu-cdr.component';
 import { CtdtCdrComponent } from './children/ctdt-cdr/ctdt-cdr.component';
+import { CtdtNoidungComponent } from './children/ctdt-noidung/ctdt-noidung.component';
 import { ConditionOption } from '@modules/shared/models/condition-option';
 import { CtdtService } from '@modules/shared/services/ctdt.service';
 import { OvicQueryCondition } from '@core/models/dto';
@@ -23,7 +24,7 @@ export interface CtdtTabItem {
 @Component({
     selector: 'app-ctdt-detail',
     standalone: true,
-    imports: [CommonModule, Tooltip, LoadingProgressComponent, CtdtThongtinComponent, CtdtMuctieuCdrComponent, CtdtCdrComponent],
+    imports: [CommonModule, Tooltip, LoadingProgressComponent, CtdtThongtinComponent, CtdtMuctieuCdrComponent, CtdtCdrComponent, CtdtNoidungComponent],
     templateUrl: './ctdt-detail.html',
     styleUrl: './ctdt-detail.css',
 })

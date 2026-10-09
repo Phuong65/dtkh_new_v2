@@ -5,8 +5,12 @@ import { Router } from '@angular/router';
 import { Subject, finalize, forkJoin, map, of, switchMap, takeUntil } from 'rxjs';
 import { Drawer } from 'primeng/drawer';
 import { Select } from 'primeng/select';
+import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { MatButtonModule } from '@angular/material/button';
+import { TooltipModule } from 'primeng/tooltip';
+import { HelperService } from '@core/services/helper.service';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 import { AppState } from '@core-new/models/app-state';
 import { OvicQueryCondition } from '@core/models/dto';
@@ -34,8 +38,8 @@ export interface typeMuctieuCuthe {
 @Component({
     selector: 'app-ctdt-muctieu-cdr',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, Drawer, Select, MultiSelectModule,
-        OvicEditorComponent, SafeHtmlDecodePipe, NgbTooltipModule, LoadingProgressComponent],
+    imports: [CommonModule, ReactiveFormsModule, Drawer, Select, MultiSelectModule, InputTextModule,
+        OvicEditorComponent, SafeHtmlDecodePipe, NgbTooltipModule, MatButtonModule, TooltipModule, LoadingProgressComponent],
     templateUrl: './ctdt-muctieu-cdr.component.html',
     styleUrls: ['./ctdt-muctieu-cdr.component.css']
 })
@@ -49,6 +53,7 @@ export class CtdtMuctieuCdrComponent implements OnInit, OnDestroy {
     private readonly ctdtMuctieuCutheService = inject(CtdtMuctieuCutheService);
     private readonly configsService = inject(ConfigsService);
     private readonly ctdtConfigService = inject(CtdtConfigService);
+    private readonly helperService = inject(HelperService);
     private readonly destroy$ = new Subject<void>();
     private readonly cancelTabLoad$ = new Subject<void>();
     private readonly cancelGoalsLoad$ = new Subject<void>();
@@ -333,6 +338,17 @@ export class CtdtMuctieuCdrComponent implements OnInit, OnDestroy {
 
     compatibilityTitle(key: string): string {
         return this.list_tuongthich.find(item => item.key === key)?.title || key;
+    }
+
+    compatibilityTooltip(key: string): string {
+        const item = this.list_tuongthich.find(config => config.key === key);
+        const content = item?.noidung ? this.helperService.decodeHTML(item.noidung) : '';
+        return content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() || this.compatibilityTitle(key);
+    }
+
+    getCompatibilityLinkCount(): number {
+        return this.list_muctieu_cuthe.reduce((count, goal) =>
+            count + (Array.isArray(goal.tuongthich) ? goal.tuongthich.length : 0), 0);
     }
 
     pointQuestionKeyDown(event: KeyboardEvent): void {

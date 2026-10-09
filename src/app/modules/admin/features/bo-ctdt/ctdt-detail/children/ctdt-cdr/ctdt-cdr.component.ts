@@ -236,7 +236,7 @@ export class CtdtCdrComponent implements OnInit {
 
     openAddCtdtCdr(parent?: CtdtCdrParent) {
         this.selectedParentCtdtCdr = null;
-        this.formTitle = "Tạo CDR";
+        this.formTitle = parent ? 'Thêm chỉ báo PI' : 'Thêm chuẩn đầu ra PLO';
         this.kyhieu_cdr = "PLO";
         if (parent) {
             this.selectedParentCtdtCdr = parent;
@@ -343,7 +343,7 @@ export class CtdtCdrComponent implements OnInit {
     editCtdtCdr(ctdtCdr: CtdtCdrParent, ctdtCdrParent?: CtdtCdrParent) {
         this.selectedCtdtCdr = ctdtCdr;
         this.selectedParentCtdtCdr = ctdtCdrParent ? ctdtCdrParent : null;
-        this.formTitle = "Sửa CDR";
+        this.formTitle = ctdtCdrParent ? 'Cập nhật chỉ báo PI' : 'Cập nhật chuẩn đầu ra PLO';
         this.kyhieu_cdr = "PLO";
         if (ctdtCdrParent) {
             this.selectedParentCtdtCdr = ctdtCdrParent;
