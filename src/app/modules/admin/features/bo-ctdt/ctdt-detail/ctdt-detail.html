@@ -61,6 +61,10 @@
                 <section class="ctdt-tab-panel ctdt-tab-panel--form" role="tabpanel" id="panel-noi-dung" aria-labelledby="tab-noi-dung">
                     <app-ctdt-noidung [selectedCtdt]="selectedCtdt()"></app-ctdt-noidung>
                 </section>
+            } @else if (activeTabId() === 'cau-hinh') {
+                <section class="ctdt-tab-panel ctdt-tab-panel--form" role="tabpanel" id="panel-cau-hinh" aria-labelledby="tab-cau-hinh">
+                    <app-ctdt-cauhinh></app-ctdt-cauhinh>
+                </section>
             } @else {
                 <section class="ctdt-placeholder"
                     role="tabpanel"

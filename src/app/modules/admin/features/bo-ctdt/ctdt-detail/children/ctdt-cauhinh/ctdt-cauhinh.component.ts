@@ -1,9 +1,13 @@
-import { CtdtConfigService } from './../../../../shared/services/ctdt-config.service';
-import { CtdtConfig } from './../../../../shared/models/ctdt-config';
+import { CtdtConfigService } from '@modules/shared/services/ctdt-config.service';
+import { CtdtConfig } from '@modules/shared/models/ctdt-config';
 import { HelperService } from '@core/services/helper.service';
 import { ConfigsService } from '@modules/shared/services/configs.service';
 import { NotificationService } from '@core/services/notification.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, WritableSignal, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TooltipModule } from 'primeng/tooltip';
+import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
+import { AppState } from '@core-new/models/app-state';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@core/services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,7 +18,7 @@ import { CtdtService } from '@modules/shared/services/ctdt.service';
 import { ElngUserProfileService } from '@modules/shared/services/elearning-user-profile.service';
 import { Ctdt } from '@modules/shared/models/ctdt';
 import { ROLES } from '@modules/shared/utils/syscat';
-import { PanelModule } from 'primeng/panel';
+import { MatButtonModule } from '@angular/material/button';
 import { Configs } from '@modules/shared/models/configs';
 import { TableModule } from 'primeng/table';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -30,7 +34,9 @@ export interface CtdtConfiAll {
     standalone: true,
     imports: [
         CommonModule,
-        PanelModule,
+        TooltipModule,
+        LoadingProgressComponent,
+        MatButtonModule,
         TableModule,
         ReactiveFormsModule,
         FormsModule
@@ -53,7 +59,14 @@ export class CtdtCauhinhComponent implements OnInit {
 
     list_config: Configs[];
 
-    list_ctdt_config: CtdtConfiAll[];
+    list_ctdt_config: CtdtConfiAll[] = [];
+
+    readonly state: WritableSignal<AppState> = signal<AppState>('loading');
+    loadingHeading = 'Đang tải cấu hình chương trình...';
+    get busy(): boolean {
+        return this.state() !== 'success';
+    }
+    private readonly destroyRef = inject(DestroyRef);
 
     constructor(
         private auth: AuthService,
@@ -74,78 +87,22 @@ export class CtdtCauhinhComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        if (this.isLanhDaoKhoa || this.isManager) {
-            this.activatedRoute.queryParams.subscribe(async (params) => {
-                if (params && params['code']) {
-
-                    this.notificationService.isProcessing(true);
-
-                    const ctdtId = params['code'];
-
-                    const contition_ctdt: ConditionOption = {
-                        condition: [
-                            { conditionName: 'id', condition: OvicQueryCondition.equal, value: ctdtId.toString() },
-                        ],
-                        set: [
-                            { label: 'limit', value: '1' }
-                        ],
-                        page: null
-                    }
-
-                    const condition_user: ConditionOption = {
-                        condition: [
-                            { conditionName: 'user_id', condition: OvicQueryCondition.equal, value: this.userId.toString(), orWhere: 'and' },
-                        ],
-                        set: [
-                            { label: 'limit', value: '1' },
-                        ],
-                        page: null
-                    }
-
-                    const condition_config: ConditionOption = {
-                        condition: [
-                        ],
-
-                        set: [
-                            { label: 'limit', value: '-1' },
-                            { label: 'include', value: 'KHUNG_TRINH_DO,KHOI_KIEN_THUC,TUONGTHICH_PEOs' },
-                            { label: 'include_by', value: 'config_key' }
-                        ],
-
-                        page: null
-                    }
-                    forkJoin([
-                        this.ctdtService.getCtdtByPageNew(contition_ctdt),
-                        this.elngUserProfileService.getUserProfileByPageNewV2(condition_user),
-                        this.configsService.getConfigsByPageNew(condition_config),
-                    ]).subscribe({
-                        next: ([_ctdt, _user, _config]) => {
-
-                            this.selectedCtdt = _ctdt.data[0];
-
-                            if (!this.isManager && _user.data[0]) {
-                                this.donvi_chuyenmon_id = _user.data[0].donvi_chuyenmon_id;
-                                if (this.donvi_chuyenmon_id !== this.selectedCtdt.category_id) {
-                                    this.router.navigate(['/admin/content-none']);
-                                }
-                            }
-
-                            this.list_config = _config.data;
-
-                            this.loadCtdtConfig();
-                        },
-                        error: () => {
-                            this.notificationService.isProcessing(false);
-                            this.notificationService.toastWarning("Lỗi kết nối, vui lòng thử lại");
-                        }
-                    })
-                } else {
-                    this.router.navigate(['/admin/content-none']);
-                }
-            })
-        } else {
+        if (!this.isLanhDaoKhoa && !this.isManager) {
             this.router.navigate(['/admin/content-none']);
+            return;
         }
+
+        this.activatedRoute.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
+            const ctdtId = params['code'];
+            if (!ctdtId) {
+                this.router.navigate(['/admin/content-none']);
+                return;
+            }
+
+            this.loadingHeading = 'Đang tải cấu hình chương trình...';
+            this.state.set('loading');
+            this.loadInitialData(String(ctdtId));
+        });
     }
 
     autoResize(event: Event) {
@@ -162,9 +119,67 @@ export class CtdtCauhinhComponent implements OnInit {
         }
     }
 
-    loadCtdtConfig() {
+    reloadData(): void {
+        const code = this.activatedRoute.snapshot.queryParamMap.get('code');
+        if (!code) return;
 
-        this.notificationService.isProcessing(true);
+        this.loadingHeading = 'Đang tải cấu hình chương trình...';
+        this.state.set('loading');
+        this.loadInitialData(code);
+    }
+
+    private loadInitialData(ctdtId: string): void {
+        const contition_ctdt: ConditionOption = {
+            condition: [{ conditionName: 'id', condition: OvicQueryCondition.equal, value: ctdtId }],
+            set: [{ label: 'limit', value: '1' }],
+            page: null
+        };
+        const condition_user: ConditionOption = {
+            condition: [{ conditionName: 'user_id', condition: OvicQueryCondition.equal, value: this.userId.toString(), orWhere: 'and' }],
+            set: [{ label: 'limit', value: '1' }],
+            page: null
+        };
+        const condition_config: ConditionOption = {
+            condition: [],
+            set: [
+                { label: 'limit', value: '-1' },
+                { label: 'include', value: 'KHUNG_TRINH_DO,KHOI_KIEN_THUC,TUONGTHICH_PEOs' },
+                { label: 'include_by', value: 'config_key' }
+            ],
+            page: null
+        };
+
+        forkJoin([
+            this.ctdtService.getCtdtByPageNew(contition_ctdt),
+            this.elngUserProfileService.getUserProfileByPageNewV2(condition_user),
+            this.configsService.getConfigsByPageNew(condition_config),
+        ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+            next: ([_ctdt, _user, _config]) => {
+                this.selectedCtdt = _ctdt.data?.[0];
+                if (!this.selectedCtdt) {
+                    this.state.set('error');
+                    return;
+                }
+                if (!this.isManager && _user.data[0]) {
+                    this.donvi_chuyenmon_id = _user.data[0].donvi_chuyenmon_id;
+                    if (this.donvi_chuyenmon_id !== this.selectedCtdt.category_id) {
+                        this.router.navigate(['/admin/content-none']);
+                        return;
+                    }
+                }
+                this.list_config = _config.data || [];
+                this.loadCtdtConfig();
+            },
+            error: () => {
+                this.state.set('error');
+                this.notificationService.toastWarning('Lỗi kết nối, vui lòng thử lại');
+            }
+        });
+    }
+
+    loadCtdtConfig() {
+        this.loadingHeading = 'Đang tải danh mục cấu hình...';
+        this.state.set('loading');
 
         const condition_config: ConditionOption = {
             condition: [
@@ -180,9 +195,7 @@ export class CtdtCauhinhComponent implements OnInit {
             page: null
         }
 
-        console.log(this.list_config);
-
-        this.ctdtConfigService.getCtdtConfigByPageNew(condition_config).subscribe({
+        this.ctdtConfigService.getCtdtConfigByPageNew(condition_config).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
             next: (_config) => {
                 const data: CtdtConfiAll[] = [];
                 this.list_config.forEach(f => {
@@ -235,11 +248,10 @@ export class CtdtCauhinhComponent implements OnInit {
                 }
 
                 this.list_ctdt_config = this.helperService.sort(data, 'title');
-
-                this.notificationService.isProcessing(false);
+                this.state.set('success');
             },
             error: () => {
-                this.notificationService.isProcessing(false)
+                this.state.set('error');
             }
         })
     }
@@ -264,14 +276,15 @@ export class CtdtCauhinhComponent implements OnInit {
         if (config.id) {
             this.notificationService.confirmDelete().then(a => {
                 if (a) {
-                    this.notificationService.isProcessing(true);
-                    this.ctdtConfigService.deleteCtdtConfig(config.id).subscribe({
+                    this.loadingHeading = 'Đang xóa cấu hình...';
+                    this.state.set('loading');
+                    this.ctdtConfigService.deleteCtdtConfig(config.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
                         next: () => {
                             this.loadCtdtConfig();
                             this.notificationService.toastSuccess("Xóa thành công");
                         },
                         error: () => {
-                            this.notificationService.isProcessing(false);
+                            this.state.set('success');
                             this.notificationService.toastError("Xóa thất bại");
                         }
                     })
@@ -300,14 +313,15 @@ export class CtdtCauhinhComponent implements OnInit {
         })
 
         if (request.length) {
-            this.notificationService.isProcessing(true);
-            forkJoin(request).subscribe({
+            this.loadingHeading = 'Đang lưu cấu hình...';
+            this.state.set('loading');
+            forkJoin(request).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
                 next: () => {
                     this.loadCtdtConfig();
                     this.notificationService.toastSuccess("Cập nhật thành công");
                 },
                 error: () => {
-                    this.notificationService.isProcessing(false);
+                    this.state.set('success');
                     this.notificationService.toastError("Cập nhật thất bại");
                 }
             })
