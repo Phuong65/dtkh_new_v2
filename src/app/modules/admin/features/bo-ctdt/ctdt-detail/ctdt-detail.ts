@@ -41,7 +41,7 @@ export class CtdtDetail implements OnInit, OnDestroy {
         { id: 'thong-tin', label: 'Thông tin chung', icon: 'ti ti-info-circle' },
         { id: 'muc-tieu', label: 'Mục tiêu', icon: 'ti ti-target' },
         { id: 'cdr', label: 'CDR', icon: 'ti ti-certificate' },
-        { id: 'noi-dung', label: 'Nội dung', icon: 'ti ti-book' },
+        { id: 'noi-dung', label: 'Học phần', icon: 'ti ti-book' },
         { id: 'doi-ngu', label: 'Đội ngũ', icon: 'ti ti-users' },
         { id: 'cau-hinh', label: 'Cấu hình', icon: 'ti ti-settings' }
     ];

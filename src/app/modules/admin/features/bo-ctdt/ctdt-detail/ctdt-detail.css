@@ -1,12 +1,17 @@
 :host {
     --ctdt-header-side: 64px;
-    --ctdt-navy: #172230;
-    --ctdt-navy-deep: #101923;
-    --ctdt-navy-raised: #263548;
-    --ctdt-blue: #3b82f6;
-    --ctdt-blue-bright: #60a5fa;
+    --ctdt-header-bg: #eaf2ff;
+    --ctdt-header-border: #bfdbfe;
+    --ctdt-back-hover-bg: #dbeafe;
+    --ctdt-tab-hover-bg: #dbeafe;
+    --ctdt-tab-active-bg: #1d4ed8;
+    --ctdt-tab-indicator: #1e3a8a;
+    --ctdt-primary: #2563eb;
+    --ctdt-primary-hover: #1d4ed8;
+    --ctdt-blue: #2563eb;
     --ctdt-ink: #0f172a;
-    --ctdt-muted: #64748b;
+    --ctdt-text: #334155;
+    --ctdt-muted: #52657f;
     display: block;
     height: 100%;
     background: #f5f7fb;
@@ -22,7 +27,6 @@
     background: #f5f7fb;
 }
 
-/* Header tối toàn chiều ngang, cùng tinh thần ảnh tham chiếu. */
 .ctdt-header {
     position: relative;
     display: flex;
@@ -31,11 +35,9 @@
     align-items: stretch;
     gap: 12px;
     padding: 0 18px;
-    border-bottom: 1px solid rgb(255 255 255 / 6%);
-    background:
-        linear-gradient(90deg, rgb(59 130 246 / 5%), transparent 26%),
-        var(--ctdt-navy);
-    box-shadow: 0 5px 16px rgb(15 23 42 / 14%);
+    border-bottom: 1px solid var(--ctdt-header-border);
+    background: var(--ctdt-header-bg);
+    box-shadow: 0 5px 16px rgb(15 23 42 / 6%);
 }
 
 .ctdt-header__left {
@@ -53,7 +55,7 @@
 .ctdt-program-name {
     min-width: 0;
     overflow: hidden;
-    color: #f8fafc;
+    color: var(--ctdt-ink);
     font-size: 14px;
     font-weight: 650;
     letter-spacing: -.01em;
@@ -69,36 +71,36 @@
     align-items: center;
     justify-content: center;
     padding: 0;
-    border: 1px solid rgb(255 255 255 / 12%);
+    border: 1px solid #cbd5e1;
     border-radius: 10px;
-    background: rgb(255 255 255 / 5%);
-    color: #cbd5e1;
+    background: #ffffff;
+    color: var(--ctdt-text);
     font-size: 19px;
     cursor: pointer;
     transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
 }
 
 .ctdt-back-btn:hover {
-    border-color: rgb(96 165 250 / 45%);
-    background: rgb(59 130 246 / 13%);
-    color: #ffffff;
+    border-color: #93c5fd;
+    background: var(--ctdt-back-hover-bg);
+    color: var(--ctdt-primary-hover);
     transform: translateX(-2px);
 }
 
 .ctdt-back-btn:focus-visible,
 .ctdt-tab:focus-visible,
 .ctdt-placeholder:focus-visible {
-    outline: 2px solid var(--ctdt-blue-bright);
+    outline: 2px solid var(--ctdt-primary);
     outline-offset: 2px;
 }
 
 .ctdt-header-divider {
     width: 1px;
     height: 28px;
-    background: rgb(255 255 255 / 10%);
+    background: var(--ctdt-header-border);
 }
 
-/* Tabs phẳng, rõ, tab active có nền nâng và indicator xanh. */
+/* Tabs sáng, có nền hover nhẹ và indicator xanh rõ ràng. */
 .ctdt-tabs {
     display: flex;
     flex: 1 1 auto;
@@ -133,7 +135,7 @@
     padding: 0 18px;
     border: 0;
     background: transparent;
-    color: #b8c4d4;
+    color: #334155;
     font-family: inherit;
     font-size: 13.5px;
     font-weight: 500;
@@ -153,22 +155,12 @@
     transition: background-color .2s ease, box-shadow .2s ease;
 }
 
-.ctdt-tab:hover {
-    color: #f8fafc;
+.ctdt-tab:not(.ctdt-tab--active):hover {
+    color: #1e40af;
 }
 
-.ctdt-tab:hover::before {
-    background: rgb(255 255 255 / 5%);
-}
-
-.ctdt-tab--active {
-    color: #ffffff;
-    font-weight: 650;
-}
-
-.ctdt-tab--active::before {
-    background: linear-gradient(180deg, #2b3b4f 0%, #243244 100%);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 5%);
+.ctdt-tab:not(.ctdt-tab--active):hover::before {
+    background: var(--ctdt-tab-hover-bg);
 }
 
 .ctdt-tab__icon,
@@ -181,17 +173,27 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #8191a6;
+    color: #2563eb;
     font-size: 16px;
     transition: color .2s ease, transform .2s ease;
 }
 
-.ctdt-tab:hover .ctdt-tab__icon {
-    color: #bfdbfe;
+.ctdt-tab:not(.ctdt-tab--active):hover .ctdt-tab__icon {
+    color: var(--ctdt-primary-hover);
+}
+
+.ctdt-tab--active {
+    color: #ffffff;
+    font-weight: 650;
+}
+
+.ctdt-tab--active::before {
+    background: var(--ctdt-tab-active-bg);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%);
 }
 
 .ctdt-tab--active .ctdt-tab__icon {
-    color: var(--ctdt-blue-bright);
+    color: #ffffff;
     transform: translateY(-1px);
 }
 
@@ -203,7 +205,7 @@
     z-index: 2;
     height: 3px;
     border-radius: 0;
-    background: linear-gradient(90deg, #2563eb, #60a5fa);
+    background: var(--ctdt-tab-indicator);
     opacity: 0;
     transform: scaleX(.3);
     transition: opacity .18s ease, transform .24s cubic-bezier(.4, 0, .2, 1);
@@ -280,7 +282,7 @@
     place-items: center;
     border: 1px solid #dbeafe;
     border-radius: 16px;
-    background: linear-gradient(145deg, #eff6ff, #dbeafe);
+    background: #dbeafe;
     color: var(--ctdt-blue);
     font-size: 27px;
     box-shadow: 0 5px 14px rgb(37 99 235 / 10%);
