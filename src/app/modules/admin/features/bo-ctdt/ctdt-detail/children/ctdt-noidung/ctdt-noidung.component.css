@@ -1,6 +1,6 @@
 :host,
-:host ::ng-deep .content-condition-popover,
-:host ::ng-deep .content-course-drawer {
+::ng-deep .content-condition-popover,
+::ng-deep .content-course-drawer {
     --noidung-border: #cbd5e1;
     --noidung-surface: #ffffff;
     --noidung-bg: #f3f4f6;
@@ -132,7 +132,7 @@
     background: var(--noidung-head-bg);
     color: var(--noidung-ink);
     font-size: 14px;
-    font-weight: 750;
+    font-weight: 600;
     text-align: center;
     white-space: nowrap;
 }
@@ -178,7 +178,7 @@
     background: #ffffff;
     color: var(--noidung-ink);
     font-size: 14px;
-    font-weight: 800;
+    font-weight: 600;
 }
 
 .content-block-title {
@@ -205,7 +205,7 @@
 .content-block-title strong {
     color: var(--noidung-ink);
     font-size: 14px;
-    font-weight: 800;
+    font-weight: 600;
     letter-spacing: .01em;
 }
 
@@ -219,7 +219,7 @@
 
 .content-block-total {
     text-align: right;
-    font-weight: 800;
+    font-weight: 600;
     color: var(--noidung-ink);
     font-size: 14px;
     padding-right: 14px !important;
@@ -258,7 +258,7 @@
     color: var(--noidung-text);
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .content-course-name {
@@ -278,7 +278,7 @@
     color: var(--noidung-ink);
     font-family: inherit;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
     text-align: center;
     outline: none;
     transition: border-color .15s ease, box-shadow .15s ease;
@@ -331,7 +331,7 @@
     background: #f1f5f9;
     color: var(--noidung-text);
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
     white-space: nowrap;
     transition: all .15s ease;
 }
@@ -389,7 +389,7 @@
     background: #f1f5f9;
     color: var(--noidung-ink);
     font-size: 14px;
-    font-weight: 800;
+    font-weight: 600;
     padding: 10px !important;
 }
 
@@ -459,7 +459,7 @@
 .condition-popover__title strong {
     color: var(--noidung-ink);
     font-size: 14px;
-    font-weight: 750;
+    font-weight: 600;
     line-height: 1.35;
 }
 
@@ -476,7 +476,7 @@
     background: #f1f5f9;
     color: #475569;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
     white-space: nowrap;
 }
 
@@ -639,7 +639,7 @@
     margin-top: 2px;
     color: var(--noidung-ink);
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .condition-empty > span:not(.condition-empty__icon) {
@@ -656,7 +656,7 @@
     color: #0369a1;
     font: inherit;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
 }
 
@@ -664,63 +664,124 @@
     text-decoration: underline;
 }
 
-/* Course Drawer Picker */
-:host ::ng-deep .content-course-drawer .p-drawer-content {
+/* Course Drawer Picker — drawer append vào body nên selector không được phụ thuộc :host. */
+::ng-deep .content-course-drawer,
+::ng-deep .content-course-drawer * {
+    box-sizing: border-box;
+}
+
+::ng-deep .content-course-drawer .p-drawer-content {
     display: flex;
+    flex: 1 1 auto;
     flex-direction: column;
     min-height: 0;
     padding: 0;
-}
-
-:host ::ng-deep .content-course-drawer .ictu-p-drawer__content {
-    min-height: 0;
-}
-
-:host ::ng-deep .content-course-drawer .ictu-p-drawer__content__body {
-    min-height: 0;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    box-sizing: border-box;
     overflow: hidden;
+}
+
+::ng-deep .content-course-drawer .ictu-p-drawer__content {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    height: auto;
+    overflow: hidden;
+}
+
+::ng-deep .content-course-drawer .ictu-p-drawer__content__body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    width: 100%;
+    height: auto;
+    padding: 18px 16px 12px;
+    overflow: hidden;
+}
+
+.course-picker-panel {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    flex-direction: column;
+    gap: 0;
+}
+
+.course-picker-search {
+    flex: 0 0 auto;
+    margin: 0 0 12px;
+    padding: 0;
+}
+
+.course-picker-search .ictu-form__row {
+    width: 100%;
+}
+
+.course-picker-search .ictu-form__input-field {
+    width: 100%;
+}
+
+.course-picker-pagination {
+    display: flex;
+    flex: 0 0 35px;
+    min-height: 35px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 8px;
+    border-top: 1px solid var(--noidung-border, #cbd5e1);
+}
+
+.course-picker-pagination ictu-paginator {
+    width: 100%;
+    height: 35px;
 }
 
 .course-picker-summary {
     display: flex;
-    align-items: center;
+    flex: 0 0 auto;
+    align-items: flex-start;
     gap: 6px;
     margin: 8px 0 12px;
     padding: 8px 10px;
     border: 1px solid #cbd5e1;
     border-radius: 4px;
     background: #f1f5f9;
-    color: var(--noidung-muted);
+    color: var(--noidung-muted, #64748b);
     font-size: 14px;
+    line-height: 1.4;
 }
 
 .course-picker-summary i { color: #475569; }
 
 .course-picker-list {
-    flex: 1 1 auto;
-    overflow-y: auto;
     display: flex;
+    flex: 1 1 auto;
     flex-direction: column;
-    gap: 4px;
+    min-height: 0;
+    gap: 6px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.course-picker-list > * {
+    flex: 0 0 auto;
 }
 
 .course-picker-item {
     display: flex;
+    width: 100%;
+    min-height: 52px;
     align-items: center;
     gap: 10px;
-    padding: 10px 12px;
-    border: 1px solid var(--noidung-border);
+    padding: 7px 10px;
+    border: 1px solid var(--noidung-border, #cbd5e1);
     border-radius: 4px;
     background: #ffffff;
+    color: var(--noidung-text, #334155);
     text-align: left;
     cursor: pointer;
-    font-family: inherit;
-    transition: all .15s ease;
+    font: inherit;
+    transition: background-color .15s ease, border-color .15s ease;
 }
 
 .course-picker-item:hover:not(:disabled) {
@@ -759,22 +820,35 @@
 }
 
 .course-picker-copy {
+    display: flex;
     flex: 1 1 auto;
     min-width: 0;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1px;
+    line-height: 1.35;
 }
 
 .course-picker-copy strong {
     display: block;
-    color: var(--noidung-ink);
-    font-size: 14px;
-    line-height: 1.4;
+    overflow: hidden;
+    color: var(--noidung-ink, #0f172a);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .course-picker-copy small {
     display: block;
-    margin-top: 2px;
-    color: var(--noidung-muted);
-    font-size: 14px;
+    overflow: hidden;
+    margin-top: 1px;
+    color: var(--noidung-muted, #64748b);
+    font-size: 13px;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .course-picker-empty {
@@ -783,6 +857,28 @@
     color: var(--noidung-muted);
     font-size: 14px;
 }
+
+.content-load-error {
+    margin: 10px 0;
+    padding: 10px 12px;
+    border: 1px solid #fca5a5;
+    border-radius: var(--noidung-radius);
+    background: #fef2f2;
+    color: #991b1b;
+    font-size: 14px;
+}
+
+.content-load-error button {
+    margin-left: 8px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 
 /* Màn hình nhỏ: ưu tiên đọc bảng, cho phép cuộn ngang riêng trong bảng. */
 @media (max-width: 1024px) {

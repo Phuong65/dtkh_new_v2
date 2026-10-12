@@ -34,6 +34,12 @@
                             <strong>{{ bo.name }}</strong>
                             <small>{{ bo.code }}</small>
                         </span>
+                        <button type="button" class="bo-ctdt-master-item__subjects ictu-button-info-light"
+                            (click)="openSubjectDrawer(bo, $event)" [disabled]="!canUpdate"
+                            [attr.aria-label]="'Chọn môn học cho bộ CTĐT ' + bo.name" pTooltip="Chọn môn học"
+                            tooltipPosition="right">
+                            <i class="ti ti-book"></i>
+                        </button>
                         <button type="button" class="bo-ctdt-master-item__edit ictu-button-info-light"
                             (click)="emitEvent('OPEN_FORM_UPDATE', bo); $event.stopPropagation()"
                             [disabled]="!canUpdate" [attr.aria-label]="'Sửa bộ CTĐT ' + bo.name" pTooltip="Sửa bộ CTĐT"
@@ -164,6 +170,82 @@
                 class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button"
                 (click)="emitEvent('SUBMIT_FORM')"><i class="ti ti-device-floppy" aria-hidden="true"></i> Lưu
                 lại</button></div>
+    </div>
+</p-drawer>
+
+<p-drawer [(visible)]="subjectDrawerVisible" [dismissible]="!isSavingSubjects()" [closable]="!isSavingSubjects()"
+    [closeOnEscape]="!isSavingSubjects()" [blockScroll]="true"
+    [header]="'Chọn môn học · ' + (subjectDrawerBo()?.name || '')" [style]="{ width: 'min(620px, 100vw)' }"
+    appendTo="body" position="right" styleClass="ictu-p-drawer bo-ctdt-subject-drawer" (onHide)="onSubjectDrawerHide()">
+    <div class="ictu-p-drawer__content bo-ctdt-subject-picker">
+        <div class="ictu-p-drawer__content__body position-relative bo-ctdt-subject-picker__body">
+            @if (isLoadingSubjectRelations()) {
+            <app-loading-progress heading="Đang tải môn học..." backdropFilter="none"></app-loading-progress>
+            }
+            <div class="bo-ctdt-subject-toolbar">
+                <label class="bo-ctdt-subject-search" for="bo-ctdt-subject-search">
+                    <i class="ti ti-search" aria-hidden="true"></i>
+                    <input id="bo-ctdt-subject-search" pInputText type="search"
+                        placeholder="Tìm theo mã hoặc tên môn học" [value]="subjectSearchValue()"
+                        (input)="onSubjectSearchChange($event)"
+                        (keydown.enter)="$event.preventDefault(); onSubjectSearch()" [disabled]="isSavingSubjects()"
+                        aria-label="Tìm môn học">
+                </label>
+            </div>
+            @if (subjectLoadError()) {
+            <div class="admin-table__alert-danger text-center w-100">
+                Tải dữ liệu thất bại. Vui lòng chọn
+                <a (click)="isSavingSubjects()" href="javascript:" class="admin-table__alert-danger__btn-reload">tải
+                    lại</a>.
+            </div>
+            } @else if (isLoadingSubjects()) {
+            <div class="bo-ctdt-subject-state"><i class="ti ti-loader-2" aria-hidden="true"></i><span>Đang tải danh mục
+                    môn học...</span></div>
+            } @else {
+            <!-- @if (linkedSubjects().length) {
+            <div class="bo-ctdt-linked-subjects" aria-label="môn học đang gán">
+                <span>Đang gán: {{ linkedSubjects().length }} môn học</span>
+                @for (subject of linkedSubjects(); track subject.id) {
+                <small>{{ subject.code }} · {{ subject.name }}</small>
+                }
+            </div>
+            } -->
+            <div class="bo-ctdt-subject-list" role="listbox" aria-label="Danh sách môn học">
+                @for (subject of subjects(); track subject.id) {
+                <button type="button" class="bo-ctdt-subject-option"
+                    [class.bo-ctdt-subject-option--selected]="isSubjectSelected(subject.id)"
+                    [attr.aria-selected]="isSubjectSelected(subject.id)" (click)="toggleSubjectSelection(subject)"
+                    [disabled]="isSavingSubjects() || !subjectRelationsReady">
+                    <span class="bo-ctdt-subject-option__check" aria-hidden="true">
+                        @if (isSubjectSelected(subject.id)) {
+                        <i class="ti ti-check" aria-hidden="true"></i>
+                        }
+                    </span>
+                    <span class="bo-ctdt-subject-option__copy">
+                        <strong>{{ subject.name }} ({{ subject.code }})</strong>
+                        <small>{{ subject.sotinchi || 0 }} tín chỉ{{ subject.sotinchi_th ? ' · ' + subject.sotinchi_th + ' TC thực hành' : '' }}</small>
+                    </span>
+                </button>
+                } @empty {
+                <div class="bo-ctdt-subject-state"><i class="ti ti-books" aria-hidden="true"></i><span>Không có môn học
+                        phù hợp.</span></div>
+                }
+            </div>
+            <ictu-paginator [control]="subjectPaginator" (onChangePage)="onSubjectPageChange($event)"></ictu-paginator>
+            }
+            @if (subjectSaveError()) {
+            <div class="bo-ctdt-subject-save-error" role="alert">{{ subjectSaveError() }}</div>
+            }
+        </div>
+        <div class="ictu-p-drawer__content__footer ictu-admin-drawer-footer">
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button"
+                (click)="closeSubjectDrawer()" [disabled]="isSavingSubjects()">Hủy</button>
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button"
+                (click)="saveSubjectCourses()" [disabled]="isSavingSubjects() || isLoadingSubjectRelations()">
+                <i class="ti ti-device-floppy" aria-hidden="true"></i>{{ isSavingSubjects() ? 'Đang lưu...' : 'Lưu lại'
+                }}
+            </button>
+        </div>
     </div>
 </p-drawer>
 

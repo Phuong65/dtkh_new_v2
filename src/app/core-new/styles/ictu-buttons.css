@@ -138,6 +138,24 @@
     border-radius: inherit !important;
 }
 
+/* Nội dung Material phải là flex để icon và nhãn luôn căn giữa. */
+[class*=ictu-badge-btn].mdc-button .mdc-button__label {
+    display: inline-flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    line-height: 1;
+}
+
+[class*=ictu-badge-btn].mdc-button .mdc-button__label > i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 !important;
+    line-height: 1;
+}
+
 /* Start:: Light Buttons */
 .ictu-button-primary-light.mdc-button:not(:disabled),
 .ictu-button-primary-light {

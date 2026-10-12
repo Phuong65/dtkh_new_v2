@@ -1,151 +1,141 @@
 <main class="cauhinh-shell" aria-label="Cấu hình danh mục chương trình đào tạo"
     [attr.aria-busy]="state() === 'loading'">
     @if (state() === 'loading') {
-        <app-loading-progress [heading]="loadingHeading" backdropFilter="blur(2px)"></app-loading-progress>
+    <app-loading-progress [heading]="loadingHeading" backdropFilter="blur(2px)"></app-loading-progress>
     }
 
     @if (state() === 'error') {
-        <section class="cauhinh-state" role="alert">
-            <i class="ti ti-alert-circle" aria-hidden="true"></i>
-            <h2>Chưa thể tải cấu hình chương trình</h2>
-            <p>Vui lòng kiểm tra kết nối và thử lại.</p>
-            <button type="button" mat-flat-button class="btn ictu-button-info-light"
-                (click)="reloadData()">
-                <i class="ti ti-refresh" aria-hidden="true"></i>
-                <span>Tải lại</span>
-            </button>
-        </section>
+    <div class="admin-table__alert-danger text-center w-100">
+        Tải dữ liệu thất bại. Vui lòng chọn
+        <a (click)="reloadData()" href="javascript:" class="admin-table__alert-danger__btn-reload">tải lại</a>.
+    </div>
     } @else {
     <div class="cauhinh-workspace">
         <div class="cauhinh-workspace__inner">
             @for (parent of list_ctdt_config; track parent.group) {
-                <section class="admin-wrap-table ictu-admin-table-shell cauhinh-card"
-                    [attr.aria-label]="parent.title">
-                    <header class="admin-wrap-table__head cauhinh-card__header">
-                        <div class="cauhinh-card__title-wrap">
-                            <span class="cauhinh-card__icon" aria-hidden="true">
-                                <i class="ti ti-settings"></i>
-                            </span>
-                            <span class="admin-wrap-table__heading cauhinh-card__heading">{{ parent.title }}</span>
-                            <span class="cauhinh-count-badge" aria-label="Số lượng cấu hình">
-                                {{ parent.ctdt_config.length }} mục
-                            </span>
-                        </div>
-                        <div class="admin-wrap-table__head-actions">
-                            <button type="button" mat-flat-button
-                                class="btn ictu-badge-btn--success-reverse cauhinh-add-button"
-                                (click)="addConfig(parent)" [disabled]="busy"
-                                [attr.aria-label]="'Thêm mục cho ' + parent.title"
-                                [pTooltip]="'Thêm mục cấu hình cho ' + parent.title" tooltipPosition="top" appendTo="body">
-                                <i class="ti ti-plus" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    </header>
-
-                    <div class="admin-wrap-table__body ictu-admin-table-shell__body">
-                        <div class="ictu-admin-table-scroll cauhinh-table-responsive">
-                            <p-table [reorderableColumns]="true" [value]="parent.ctdt_config"
-                                styleClass="cauhinh-grid-table admin-table">
-                                <ng-template pTemplate="header">
-                                    <tr>
-                                        <th class="col-handle" aria-label="Kéo thả để sắp xếp"></th>
-                                        <th class="col-order">Thứ tự</th>
-                                        <th class="col-title">Tiêu đề</th>
-                                        <th class="col-content">Nội dung (nếu có)</th>
-                                        <th class="col-actions">Thao tác</th>
-                                    </tr>
-                                </ng-template>
-
-                                <ng-template pTemplate="body" let-con let-rowIndex="rowIndex">
-                                    <tr [pReorderableRow]="rowIndex" class="cauhinh-row">
-                                        <td class="col-handle cell-center">
-                                            <span class="cauhinh-drag-handle" pReorderableRowHandle
-                                                aria-label="Kéo thả đổi thứ tự"
-                                                pTooltip="Kéo thả để đổi thứ tự" tooltipPosition="top" appendTo="body">
-                                                <i class="ti ti-menu-2" aria-hidden="true"></i>
-                                            </span>
-                                        </td>
-                                        <td class="col-order cell-center">
-                                            <span class="cauhinh-order-badge">{{ con.ordering }}</span>
-                                        </td>
-                                        <td class="col-title cauhinh-editable-cell" pEditableColumn>
-                                            <p-cellEditor>
-                                                <ng-template pTemplate="input">
-                                                    <textarea (focus)="autoResize($event)" (input)="autoResize($event)"
-                                                        (keydown)="blockArrowKeys($event)" [attr.spellcheck]="false"
-                                                        class="cauhinh-editor-textarea" [(ngModel)]="con.title"
-                                                        placeholder="Nhập tiêu đề...">
-                                                    </textarea>
-                                                </ng-template>
-                                                <ng-template pTemplate="output">
-                                                    @if (con.title) {
-                                                        <div class="cauhinh-text-output" [innerHTML]="con.title"></div>
-                                                    } @else {
-                                                        <div class="cauhinh-text-output cauhinh-placeholder">
-                                                            Click vào đây để nhập tiêu đề...
-                                                        </div>
-                                                    }
-                                                </ng-template>
-                                            </p-cellEditor>
-                                        </td>
-                                        <td class="col-content cauhinh-editable-cell" pEditableColumn>
-                                            <p-cellEditor>
-                                                <ng-template pTemplate="input">
-                                                    <textarea (focus)="autoResize($event)" (input)="autoResize($event)"
-                                                        (keydown)="blockArrowKeys($event)" [attr.spellcheck]="false"
-                                                        class="cauhinh-editor-textarea" [(ngModel)]="con.noidung"
-                                                        placeholder="Nhập nội dung...">
-                                                    </textarea>
-                                                </ng-template>
-                                                <ng-template pTemplate="output">
-                                                    @if (con.noidung) {
-                                                        <div class="cauhinh-text-output" [innerHTML]="con.noidung"></div>
-                                                    } @else {
-                                                        <div class="cauhinh-text-output cauhinh-placeholder">
-                                                            Click vào đây để nhập nội dung...
-                                                        </div>
-                                                    }
-                                                </ng-template>
-                                            </p-cellEditor>
-                                        </td>
-                                        <td class="col-actions cell-center">
-                                            <div class="cauhinh-actions-wrap">
-                                                <button type="button" mat-flat-button
-                                                    class="btn ictu-button-danger-light ictu-admin-icon-button"
-                                                    (click)="deleteConfig(parent, con, rowIndex)" [disabled]="busy"
-                                                    [attr.aria-label]="'Xóa mục thứ ' + con.ordering"
-                                                    pTooltip="Xóa mục này" tooltipPosition="top" appendTo="body">
-                                                    <i class="ti ti-trash" aria-hidden="true"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </ng-template>
-
-                                <ng-template pTemplate="emptymessage">
-                                    <tr>
-                                        <td colspan="5" class="cauhinh-empty-row">
-                                            <div class="cauhinh-empty-state">
-                                                <i class="ti ti-info-circle" aria-hidden="true"></i>
-                                                <span>Chưa có cấu hình cho nhóm này. Bấm <b>Thêm</b> để tạo mục mới.</span>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </ng-template>
-                            </p-table>
-                        </div>
+            <section class="admin-wrap-table ictu-admin-table-shell cauhinh-card" [attr.aria-label]="parent.title">
+                <header class="admin-wrap-table__head cauhinh-card__header">
+                    <div class="cauhinh-card__title-wrap">
+                        <span class="cauhinh-card__icon" aria-hidden="true">
+                            <i class="ti ti-settings"></i>
+                        </span>
+                        <span class="admin-wrap-table__heading cauhinh-card__heading">{{ parent.title }}</span>
+                        <span class="cauhinh-count-badge" aria-label="Số lượng cấu hình">
+                            {{ parent.ctdt_config.length }} mục
+                        </span>
                     </div>
-                </section>
+                    <div class="admin-wrap-table__head-actions">
+                        <button type="button" mat-flat-button
+                            class="btn ictu-badge-btn--success-reverse cauhinh-add-button" (click)="addConfig(parent)"
+                            [disabled]="busy" [attr.aria-label]="'Thêm mục cho ' + parent.title"
+                            [pTooltip]="'Thêm mục cấu hình cho ' + parent.title" tooltipPosition="top" appendTo="body">
+                            <i class="ti ti-plus" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </header>
+
+                <div class="admin-wrap-table__body ictu-admin-table-shell__body">
+                    <div class="ictu-admin-table-scroll cauhinh-table-responsive">
+                        <p-table [reorderableColumns]="true" [value]="parent.ctdt_config"
+                            styleClass="cauhinh-grid-table admin-table">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th class="col-handle" aria-label="Kéo thả để sắp xếp"></th>
+                                    <th class="col-order">Thứ tự</th>
+                                    <th class="col-title">Tiêu đề</th>
+                                    <th class="col-content">Nội dung (nếu có)</th>
+                                    <th class="col-actions">Thao tác</th>
+                                </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="body" let-con let-rowIndex="rowIndex">
+                                <tr [pReorderableRow]="rowIndex" class="cauhinh-row">
+                                    <td class="col-handle cell-center">
+                                        <span class="cauhinh-drag-handle" pReorderableRowHandle
+                                            aria-label="Kéo thả đổi thứ tự" pTooltip="Kéo thả để đổi thứ tự"
+                                            tooltipPosition="top" appendTo="body">
+                                            <i class="ti ti-menu-2" aria-hidden="true"></i>
+                                        </span>
+                                    </td>
+                                    <td class="col-order cell-center">
+                                        <span class="cauhinh-order-badge">{{ con.ordering }}</span>
+                                    </td>
+                                    <td class="col-title cauhinh-editable-cell" pEditableColumn>
+                                        <p-cellEditor>
+                                            <ng-template pTemplate="input">
+                                                <textarea (focus)="autoResize($event)" (input)="autoResize($event)"
+                                                    (keydown)="blockArrowKeys($event)" [attr.spellcheck]="false"
+                                                    class="cauhinh-editor-textarea" [(ngModel)]="con.title"
+                                                    placeholder="Nhập tiêu đề...">
+                                                    </textarea>
+                                            </ng-template>
+                                            <ng-template pTemplate="output">
+                                                @if (con.title) {
+                                                <div class="cauhinh-text-output" [innerHTML]="con.title"></div>
+                                                } @else {
+                                                <div class="cauhinh-text-output cauhinh-placeholder">
+                                                    Click vào đây để nhập tiêu đề...
+                                                </div>
+                                                }
+                                            </ng-template>
+                                        </p-cellEditor>
+                                    </td>
+                                    <td class="col-content cauhinh-editable-cell" pEditableColumn>
+                                        <p-cellEditor>
+                                            <ng-template pTemplate="input">
+                                                <textarea (focus)="autoResize($event)" (input)="autoResize($event)"
+                                                    (keydown)="blockArrowKeys($event)" [attr.spellcheck]="false"
+                                                    class="cauhinh-editor-textarea" [(ngModel)]="con.noidung"
+                                                    placeholder="Nhập nội dung...">
+                                                    </textarea>
+                                            </ng-template>
+                                            <ng-template pTemplate="output">
+                                                @if (con.noidung) {
+                                                <div class="cauhinh-text-output" [innerHTML]="con.noidung"></div>
+                                                } @else {
+                                                <div class="cauhinh-text-output cauhinh-placeholder">
+                                                    Click vào đây để nhập nội dung...
+                                                </div>
+                                                }
+                                            </ng-template>
+                                        </p-cellEditor>
+                                    </td>
+                                    <td class="col-actions cell-center">
+                                        <div class="cauhinh-actions-wrap">
+                                            <button class="btn ictu-button-danger-light ictu-admin-icon-button"
+                                                (click)="deleteConfig(parent, con, rowIndex)" [disabled]="busy"
+                                                [attr.aria-label]="'Xóa mục thứ ' + con.ordering" pTooltip="Xóa mục này"
+                                                tooltipPosition="top" appendTo="body">
+                                                <i class="ti ti-trash" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="emptymessage">
+                                <tr>
+                                    <td colspan="5" class="cauhinh-empty-row">
+                                        <div class="cauhinh-empty-state">
+                                            <i class="ti ti-info-circle" aria-hidden="true"></i>
+                                            <span>Chưa có cấu hình cho nhóm này. Bấm <b>Thêm</b> để tạo mục mới.</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                </div>
+            </section>
             }
         </div>
     </div>
 
     <footer class="cauhinh-sticky-footer">
         <div class="cauhinh-sticky-footer__inner">
-            <button type="button" mat-flat-button
-                class="btn ictu-badge-btn--primary-reverse cauhinh-save-button"
-                (click)="saveConfig()" [disabled]="busy"
-                pTooltip="Lưu toàn bộ thay đổi cấu hình" tooltipPosition="top" appendTo="body">
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse cauhinh-save-button"
+                (click)="saveConfig()" [disabled]="busy" pTooltip="Lưu toàn bộ thay đổi cấu hình" tooltipPosition="top"
+                appendTo="body">
                 <i class="ti ti-device-floppy" aria-hidden="true"></i>
                 <span>Lưu cấu hình</span>
             </button>

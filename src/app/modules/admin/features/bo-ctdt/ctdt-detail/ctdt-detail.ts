@@ -14,7 +14,7 @@ import { ConditionOption } from '@modules/shared/models/condition-option';
 import { CtdtService } from '@modules/shared/services/ctdt.service';
 import { OvicQueryCondition } from '@core/models/dto';
 
-export type CtdtTabId = 'thong-tin' | 'muc-tieu' | 'cdr' | 'noi-dung' | 'doi-ngu' | 'cau-hinh';
+export type CtdtTabId = 'thong-tin' | 'muc-tieu' | 'cdr' | 'noi-dung' | 'cau-hinh';
 
 export interface CtdtTabItem {
     id: CtdtTabId;
@@ -42,7 +42,6 @@ export class CtdtDetail implements OnInit, OnDestroy {
         { id: 'muc-tieu', label: 'Mục tiêu', icon: 'ti ti-target' },
         { id: 'cdr', label: 'CDR', icon: 'ti ti-certificate' },
         { id: 'noi-dung', label: 'Học phần', icon: 'ti ti-book' },
-        { id: 'doi-ngu', label: 'Đội ngũ', icon: 'ti ti-users' },
         { id: 'cau-hinh', label: 'Cấu hình', icon: 'ti ti-settings' }
     ];
 

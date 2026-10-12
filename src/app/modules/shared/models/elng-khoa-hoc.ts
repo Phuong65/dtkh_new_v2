@@ -2,6 +2,7 @@ import { key_server } from '@env';
 import { OvicFileStore } from './file-store';
 import { DocumentFileAndLink } from '../components/form-document-file-and-link/form-document-file-and-link.component';
 import { User } from '@core/models/user';
+
 export interface ElnKhoaHoc {
     dot_capnhat?: string;
     id?: number;
@@ -43,6 +44,9 @@ export interface ElnKhoaHoc {
     creator_plan_id?: number;
     av?: number;
     copy_course_id?: number;
+    ctdt_id?: number;
+    bo_ctdt_id?: number;
+    subject_id?: number;
     yeucau_sinhvien?: string;
     muctieu?: string;
     tailieu_thamkhao?: DocumentFileAndLink[];

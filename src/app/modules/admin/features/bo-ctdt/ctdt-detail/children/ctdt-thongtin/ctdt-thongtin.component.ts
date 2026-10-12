@@ -6,7 +6,7 @@ import { Subject, forkJoin, takeUntil } from 'rxjs';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { OvicQueryCondition } from '@core/models/dto';
 import { AuthService } from '@core/services/auth.service';
-import { NotificationService } from '@core/services/notification.service';
+import { NotificationService } from '@core-new/service/notification.service';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 import { ConditionOption } from '@modules/shared/models/condition-option';
 import { Ctdt } from '@modules/shared/models/ctdt';

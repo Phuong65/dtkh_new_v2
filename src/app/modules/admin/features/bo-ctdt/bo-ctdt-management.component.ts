@@ -6,7 +6,7 @@ import { MatButton } from '@angular/material/button';
 import { Drawer } from 'primeng/drawer';
 import { InputText } from 'primeng/inputtext';
 import { Tooltip } from 'primeng/tooltip';
-import { Observable, Subject as RxSubject, filter, map, switchMap, takeUntil } from 'rxjs';
+import { Observable, Subject as RxSubject, concatMap, filter, forkJoin, from, map, switchMap, takeUntil, tap, toArray } from 'rxjs';
 import { IctuPaginatorComponent } from '@core-new/components/ictu-paginator/ictu-paginator.component';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 import { AppState } from '@core-new/models/app-state';
@@ -20,6 +20,11 @@ import { BoCtdt } from '@modules/shared/models/bo-ctdt';
 import { BoCtdtService } from '@modules/shared/services/bo-ctdt.service';
 import { Ctdt } from '@modules/shared/models/ctdt';
 import { CtdtService } from '@modules/shared/services/ctdt.service';
+import { SubjectService } from '@modules/shared/services/subject.service';
+import { SubjectCourseService } from '@modules/shared/services/subject-course.service';
+import { Subject } from '@modules/shared/models/subject';
+import { SubjectCourseExtend } from '@modules/shared/models/subject-course';
+import { IctuPaginatorControl } from '@core-new/components/ictu-paginator/ictu-paginator-control';
 
 @Component({
     selector: 'app-bo-ctdt-management',
@@ -41,6 +46,15 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     private readonly fb = inject(FormBuilder);
     private readonly boCtdtService = inject(BoCtdtService);
     private readonly ctdtService = inject(CtdtService);
+    private readonly subjectService = inject(SubjectService);
+    private readonly subjectCourseService = inject(SubjectCourseService);
+    private readonly cancelSubjectLoad$ = new RxSubject<void>();
+    private readonly cancelRelationLoad$ = new RxSubject<void>();
+    private subjectRequestId = 0;
+    private subjectDrawerSession = 0;
+    private appliedSubjectSearch = '';
+    private requestedSubjectPage = 1;
+    subjectRelationsReady = false;
     private readonly cancelCtdtLoad$ = new RxSubject<void>();
     private readonly cancelBoLoad$ = new RxSubject<void>();
     private readonly notificationService = inject(NotificationService);
@@ -57,6 +71,18 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     readonly searchValue = signal<string>('');
     readonly selectedBo = signal<BoCtdt | null>(null);
     readonly ctdtSearchValue = signal<string>('');
+    readonly subjectDrawerBo = signal<BoCtdt | null>(null);
+    readonly subjectRelations = signal<SubjectCourseExtend[]>([]);
+    readonly linkedSubjects = signal<Subject[]>([]);
+    readonly subjects = signal<Subject[]>([]);
+    readonly selectedSubjectIds = signal<ReadonlySet<number>>(new Set<number>());
+    readonly subjectSearchValue = signal<string>('');
+    readonly isLoadingSubjects = signal<boolean>(false);
+    readonly isLoadingSubjectRelations = signal<boolean>(false);
+    readonly isSavingSubjects = signal<boolean>(false);
+    readonly subjectLoadError = signal<string>('');
+    readonly subjectSaveError = signal<string>('');
+    readonly subjectPaginator = new IctuPaginatorControl({ rows: 15, pageLinkSize: 5, showFirstLastIcon: true });
 
     canAdd = true;
     canUpdate = true;
@@ -64,6 +90,7 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     canAddCtdt = false;
     canDeleteCtdt = true;
     ctdtDrawerVisible = false;
+    subjectDrawerVisible = false;
     private creatingForBo: BoCtdt | null = null;
 
     readonly ctdtForm = this.fb.group({
@@ -104,6 +131,10 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
         this.cancelCtdtLoad$.complete();
         this.cancelBoLoad$.next();
         this.cancelBoLoad$.complete();
+        this.cancelSubjectLoad$.next();
+        this.cancelSubjectLoad$.complete();
+        this.cancelRelationLoad$.next();
+        this.cancelRelationLoad$.complete();
         this.destroy$.next();
         this.destroy$.complete();
     }
@@ -164,6 +195,28 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
 
     onCtdtPageChange(page: number): void {
         this.loadCtdt(page, false);
+    }
+
+    onSubjectSearchChange(event: Event): void {
+        this.subjectSearchValue.set((event.target as HTMLInputElement).value || '');
+    }
+
+    onSubjectSearch(): void {
+        this.appliedSubjectSearch = this.subjectSearchValue().trim();
+        const bo = this.subjectDrawerBo();
+        if (bo) this.loadSubjectPicker(bo.id, this.subjectDrawerSession, 1);
+    }
+
+    onSubjectPageChange(page: number): void {
+        const bo = this.subjectDrawerBo();
+        if (bo) this.loadSubjectPicker(bo.id, this.subjectDrawerSession, page);
+    }
+
+    retrySubjectLoad(): void {
+        const bo = this.subjectDrawerBo();
+        if (!bo) return;
+        if (!this.subjectRelationsReady) this.loadSubjectPicker(bo.id, this.subjectDrawerSession, this.requestedSubjectPage);
+        else this.loadSubjects(this.requestedSubjectPage);
     }
 
     loadBoCtdt(page = 1, resetPaginator = false): void {
@@ -243,6 +296,237 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
                 this.notificationService.toastError('Không thể tải danh sách chương trình đào tạo', 'Lỗi kết nối');
             }
         });
+    }
+
+    openSubjectDrawer(bo: BoCtdt, event?: Event): void {
+        event?.stopPropagation();
+        if (!this.canUpdate) {
+            this.notificationService.toastWarning('Bạn không có quyền cập nhật học phần của bộ chương trình đào tạo');
+            return;
+        }
+        if (this.isSavingSubjects()) return;
+
+        this.cancelSubjectLoad$.next();
+        this.cancelRelationLoad$.next();
+        const session = ++this.subjectDrawerSession;
+        this.subjectDrawerBo.set(bo);
+        this.subjectRelations.set([]);
+        this.linkedSubjects.set([]);
+        this.subjects.set([]);
+        this.selectedSubjectIds.set(new Set<number>());
+        this.subjectSearchValue.set('');
+        this.appliedSubjectSearch = '';
+        this.requestedSubjectPage = 1;
+        this.subjectRelationsReady = false;
+        this.subjectLoadError.set('');
+        this.subjectSaveError.set('');
+        this.subjectPaginator.reset(0);
+        this.subjectDrawerVisible = true;
+        this.loadSubjectPicker(bo.id, session, 1);
+    }
+
+    closeSubjectDrawer(): void {
+        if (this.isSavingSubjects()) return;
+        this.subjectDrawerVisible = false;
+        this.resetSubjectDrawer();
+    }
+
+    onSubjectDrawerHide(): void {
+        if (!this.subjectDrawerVisible && !this.isSavingSubjects()) this.resetSubjectDrawer();
+    }
+
+    toggleSubjectSelection(subject: Subject): void {
+        if (this.isSavingSubjects() || !this.subjectRelationsReady) return;
+        const selected = new Set(this.selectedSubjectIds());
+        const subjectId = Number(subject.id);
+        if (selected.has(subjectId)) selected.delete(subjectId);
+        else selected.add(subjectId);
+        this.selectedSubjectIds.set(selected);
+    }
+
+    isSubjectSelected(subjectId: number): boolean {
+        return this.selectedSubjectIds().has(Number(subjectId));
+    }
+
+    saveSubjectCourses(): void {
+        const bo = this.subjectDrawerBo();
+        if (!bo || this.isSavingSubjects() || !this.subjectRelationsReady) return;
+
+        const existingBySubjectId = new Map<number, SubjectCourseExtend>();
+        this.subjectRelations().forEach(relation => {
+            const subjectId = Number(relation.subject_id);
+            if (!existingBySubjectId.has(subjectId)) existingBySubjectId.set(subjectId, relation);
+        });
+        const selected = this.selectedSubjectIds();
+        const toCreate = [...selected].filter(subjectId => !existingBySubjectId.has(subjectId));
+        const toDelete = [...existingBySubjectId.entries()]
+            .filter(([subjectId]) => !selected.has(subjectId))
+            .map(([, relation]) => relation);
+        if (!toCreate.length && !toDelete.length) {
+            this.closeSubjectDrawer();
+            return;
+        }
+
+        this.isSavingSubjects.set(true);
+        this.subjectSaveError.set('');
+        const session = this.subjectDrawerSession;
+        const operations = [
+            ...toCreate.map(subjectId => ({ type: 'create' as const, subjectId })),
+            ...toDelete.map(relation => ({ type: 'delete' as const, relation }))
+        ];
+        let completed = 0;
+        from(operations).pipe(
+            concatMap(operation => (operation.type === 'create'
+                ? this.subjectCourseService.create({ ctdt_bo_id: bo.id, subject_id: operation.subjectId })
+                : this.subjectCourseService.delete(operation.relation.id)
+            ).pipe(tap(() => completed++))),
+            toArray(),
+            takeUntil(this.destroy$)
+        ).subscribe({
+            next: () => {
+                if (session !== this.subjectDrawerSession) return;
+                this.isSavingSubjects.set(false);
+                this.notificationService.toastSuccess('Đã cập nhật học phần cho bộ chương trình đào tạo', 'Thành công');
+                this.closeSubjectDrawer();
+            },
+            error: () => {
+                if (session !== this.subjectDrawerSession) return;
+                this.isSavingSubjects.set(false);
+                this.subjectSaveError.set(`Đã hoàn thành ${completed}/${operations.length} thao tác. Dữ liệu đã được tải lại từ máy chủ.`);
+                this.notificationService.toastError('Không thể cập nhật toàn bộ học phần. Vui lòng kiểm tra lại và thử lại.', 'Lỗi thao tác');
+                this.loadSubjectRelations(bo.id, session);
+            }
+        });
+    }
+
+    private loadSubjectPicker(boId: number, session: number, page: number): void {
+        this.cancelSubjectLoad$.next();
+        this.cancelRelationLoad$.next();
+        this.isLoadingSubjectRelations.set(true);
+        this.isLoadingSubjects.set(true);
+        this.subjectLoadError.set('');
+        this.subjectRequestId++;
+        this.requestedSubjectPage = page;
+        const keyword = this.appliedSubjectSearch;
+        const conditions: OvicConditionParam[] = keyword
+            ? ['name', 'code'].map(conditionName => ({ conditionName, condition: OvicQueryCondition.like, value: `%${keyword}%`, orWhere: 'or' }))
+            : [];
+        const relations$ = this.subjectCourseService.getByBoCtdt(boId);
+        const subjects$ = this.subjectService.get(conditions, {
+            limit: this.subjectPaginator.rows(), paged: page, orderby: 'name', order: 'ASC'
+        });
+        forkJoin({ relations: relations$, subjects: subjects$ }).pipe(
+            takeUntil(this.cancelSubjectLoad$),
+            takeUntil(this.cancelRelationLoad$),
+            takeUntil(this.destroy$)
+        ).subscribe({
+            next: response => {
+                if (session !== this.subjectDrawerSession || this.subjectDrawerBo()?.id !== boId) return;
+                const relations = response.relations.data || [];
+                this.subjectRelations.set(relations);
+                this.linkedSubjects.set(this.flattenRelationSubjects(relations));
+                this.selectedSubjectIds.set(new Set(relations.map(relation => Number(relation.subject_id))));
+                this.subjects.set(response.subjects.data || []);
+                this.subjectPaginator.reset(response.subjects.totalRecords || 0);
+                this.subjectPaginator.changePage(page);
+                this.subjectRelationsReady = true;
+                this.isLoadingSubjectRelations.set(false);
+                this.isLoadingSubjects.set(false);
+            },
+            error: () => {
+                if (session !== this.subjectDrawerSession) return;
+                this.isLoadingSubjectRelations.set(false);
+                this.isLoadingSubjects.set(false);
+                this.subjectLoadError.set('Không thể tải danh sách học phần. Vui lòng thử lại.');
+            }
+        });
+    }
+
+    private loadSubjectRelations(boId: number, session: number): void {
+        this.isLoadingSubjectRelations.set(true);
+        this.cancelRelationLoad$.next();
+        this.subjectCourseService.getByBoCtdt(boId).pipe(
+            takeUntil(this.cancelRelationLoad$),
+            takeUntil(this.destroy$)
+        ).subscribe({
+            next: response => {
+                if (session !== this.subjectDrawerSession || this.subjectDrawerBo()?.id !== boId) return;
+                const relations = response.data || [];
+                this.subjectRelations.set(relations);
+                this.linkedSubjects.set(this.flattenRelationSubjects(relations));
+                this.selectedSubjectIds.set(new Set(relations.map(relation => relation.subject_id)));
+                this.subjectRelationsReady = true;
+                this.isLoadingSubjectRelations.set(false);
+            },
+            error: () => {
+                if (session !== this.subjectDrawerSession) return;
+                this.isLoadingSubjectRelations.set(false);
+                this.subjectLoadError.set('Không thể tải học phần đã gán cho bộ CTĐT. Vui lòng thử lại.');
+            }
+        });
+    }
+
+    flattenRelationSubjects(relations: SubjectCourseExtend[]): Subject[] {
+        const result: Subject[] = [];
+        const seen = new Set<number>();
+        relations.forEach(r => {
+            const list = Array.isArray(r.subjects) ? r.subjects : r.subjects ? [r.subjects] : [];
+            list.forEach(s => {
+                if (s && !seen.has(s.id)) {
+                    seen.add(s.id);
+                    result.push(s);
+                }
+            });
+        });
+        return result;
+    }
+
+    private loadSubjects(page: number, session = this.subjectDrawerSession): void {
+        if (!this.subjectDrawerVisible || this.isSavingSubjects()) return;
+        this.cancelSubjectLoad$.next();
+        const requestId = ++this.subjectRequestId;
+        this.requestedSubjectPage = page;
+        this.isLoadingSubjects.set(true);
+        const keyword = this.appliedSubjectSearch;
+        const conditions: OvicConditionParam[] = keyword
+            ? ['name', 'code'].map(conditionName => ({ conditionName, condition: OvicQueryCondition.like, value: `%${keyword}%`, orWhere: 'or' }))
+            : [];
+        this.subjectService.get(conditions, {
+            limit: this.subjectPaginator.rows(), paged: page, orderby: 'name', order: 'ASC'
+        }).pipe(
+            takeUntil(this.cancelSubjectLoad$),
+            takeUntil(this.destroy$)
+        ).subscribe({
+            next: response => {
+                if (session !== this.subjectDrawerSession || requestId !== this.subjectRequestId) return;
+                this.subjects.set(response.data || []);
+                this.subjectPaginator.reset(response.totalRecords || 0);
+                this.subjectPaginator.changePage(page);
+                this.isLoadingSubjects.set(false);
+            },
+            error: () => {
+                if (session !== this.subjectDrawerSession || requestId !== this.subjectRequestId) return;
+                this.isLoadingSubjects.set(false);
+                this.subjectLoadError.set('Không thể tải danh mục học phần. Vui lòng thử lại.');
+            }
+        });
+    }
+
+    private resetSubjectDrawer(): void {
+        this.cancelSubjectLoad$.next();
+        this.cancelRelationLoad$.next();
+        ++this.subjectDrawerSession;
+        this.subjectDrawerBo.set(null);
+        this.subjectRelations.set([]);
+        this.linkedSubjects.set([]);
+        this.subjects.set([]);
+        this.selectedSubjectIds.set(new Set<number>());
+        this.subjectSearchValue.set('');
+        this.subjectLoadError.set('');
+        this.subjectSaveError.set('');
+        this.subjectRelationsReady = false;
+        this.isLoadingSubjects.set(false);
+        this.isLoadingSubjectRelations.set(false);
     }
 
     openCreateDrawer(): void {

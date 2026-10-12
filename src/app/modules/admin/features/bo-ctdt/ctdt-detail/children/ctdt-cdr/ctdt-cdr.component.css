@@ -88,7 +88,7 @@
     margin: 0;
     color: var(--cdr-teal-dark);
     font-size: 14.5px;
-    font-weight: 800;
+    font-weight: 600;
     letter-spacing: .02em;
     text-transform: uppercase;
 }
@@ -139,7 +139,7 @@
     background: var(--cdr-head-bg);
     color: var(--cdr-teal-dark);
     font-size: 14px;
-    font-weight: 750;
+    font-weight: 600;
     text-align: center;
 }
 
@@ -182,13 +182,13 @@
     color: var(--cdr-plo-ink);
     font-family: inherit;
     font-size: 14px;
-    font-weight: 800;
+    font-weight: 600;
 }
 
 .plo-order-num {
     color: var(--cdr-plo-ink);
     font-size: 14px;
-    font-weight: 800;
+    font-weight: 600;
 }
 
 .plo-content-wrap {
@@ -217,7 +217,7 @@
     padding: 0 !important;
     color: var(--cdr-ink) !important;
     font-style: italic !important;
-    font-weight: 750 !important;
+    font-weight: 600 !important;
     font-size: 14px !important;
     line-height: 1.5 !important;
 }
@@ -237,7 +237,7 @@
     border-radius: 3px;
     background: var(--cdr-peo-soft);
     color: var(--cdr-peo);
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .plo-total-percent {
@@ -245,7 +245,7 @@
     padding: 2px 6px;
     border-radius: 3px;
     font-size: 11px;
-    font-weight: 750;
+    font-weight: 600;
     cursor: default;
 }
 
@@ -355,7 +355,7 @@
     gap: 7px;
     color: var(--cdr-ink);
     font-size: 13px;
-    font-weight: 750;
+    font-weight: 600;
 }
 
 .cdr-matrix-card__title i {
@@ -369,7 +369,7 @@
     background: var(--cdr-teal-soft);
     color: var(--cdr-teal-dark);
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .matrix-scroll-wrap {
@@ -400,7 +400,7 @@
     min-width: 96px;
     background: var(--cdr-head-bg);
     color: var(--cdr-teal-dark);
-    font-weight: 750;
+    font-weight: 600;
     text-align: center !important;
 }
 
@@ -412,7 +412,7 @@
     background: var(--cdr-head-bg);
     color: var(--cdr-teal-dark);
     font-size: 14px;
-    font-weight: 750;
+    font-weight: 600;
 }
 
 .matrix-th-col {
@@ -423,7 +423,7 @@
     background: var(--cdr-head-bg);
     color: var(--cdr-teal-dark);
     font-size: 14px;
-    font-weight: 750;
+    font-weight: 600;
     font-family: inherit;
 }
 
@@ -446,7 +446,7 @@
     display: inline-block;
     color: var(--cdr-peo);
     font-size: 14px;
-    font-weight: 800;
+    font-weight: 600;
 }
 
 .matrix-peo-text {
@@ -468,7 +468,7 @@
 .matrix-cell--checked i {
     color: #2f7d4c;
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .matrix-dash {
@@ -509,7 +509,7 @@
     border-radius: 3px;
     background: #e2e8f0;
     color: #0f172a;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .cdr-form-grid.ictu-form {
@@ -535,7 +535,7 @@
 :host ::ng-deep .ctdt-cdr-form-drawer .p-drawer-title {
     color: var(--cdr-ink);
     font-size: 16px;
-    font-weight: 750;
+    font-weight: 600;
     line-height: 1.4;
 }
 
@@ -736,7 +736,7 @@
     margin: 0;
     color: var(--cdr-ink);
     font-size: 16px;
-    font-weight: 750;
+    font-weight: 600;
 }
 
 .cdr-state p {

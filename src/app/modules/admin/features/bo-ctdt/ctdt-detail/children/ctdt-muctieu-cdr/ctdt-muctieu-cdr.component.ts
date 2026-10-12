@@ -15,7 +15,7 @@ import { LoadingProgressComponent } from '@core-new/components/loading-progress/
 import { AppState } from '@core-new/models/app-state';
 import { OvicQueryCondition } from '@core/models/dto';
 import { AuthService } from '@core/services/auth.service';
-import { NotificationService } from '@core/services/notification.service';
+import { NotificationService } from '@core-new/service/notification.service';
 import { ConditionOption } from '@modules/shared/models/condition-option';
 import { Ctdt } from '@modules/shared/models/ctdt';
 import { CtdtConfig } from '@modules/shared/models/ctdt-config';
@@ -315,9 +315,13 @@ export class CtdtMuctieuCdrComponent implements OnInit, OnDestroy {
     }
 
     deleteMuctieu(goal: CtdtMuctieuCuthe): void {
-        if (!this.selectedCtdt || this.busy) return;
+        if (!this.selectedCtdt || this.busy || !goal?.id) return;
         const programmeId = this.selectedCtdt.id;
-        this.notificationService.confirmDelete().then(confirmed => {
+        const safeTitle = (goal.kyhieu || `PEO ${goal.ordering}`).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        this.notificationService.confirmDelete2({
+            heading: 'Xác nhận xóa',
+            htmlMessage: `Bạn có chắc muốn xóa mục tiêu cụ thể "${safeTitle}"?`
+        }).pipe(takeUntil(this.destroy$)).subscribe(confirmed => {
             if (!confirmed || this.destroyed || this.busy || this.selectedCtdt?.id !== programmeId) return;
             this.deletingGoalId = goal.id;
             this.ctdtMuctieuCutheService.deleteCtdtMuctieuCuthe(goal.id).pipe(
@@ -329,7 +333,7 @@ export class CtdtMuctieuCdrComponent implements OnInit, OnDestroy {
                 },
                 error: () => this.notificationService.toastError('Xóa mục tiêu thất bại')
             });
-        }, () => { /* Dismissed confirmation. */ });
+        });
     }
 
     checkTuongthich(key: string, goal: CtdtMuctieuCuthe): boolean {

@@ -12,7 +12,7 @@ import { TableModule } from 'primeng/table';
 import { Router, ActivatedRoute } from '@angular/router';
 import { OvicQueryCondition } from '@core/models/dto';
 import { AuthService } from '@core/services/auth.service';
-import { NotificationService } from '@core/services/notification.service';
+import { NotificationService } from '@core-new/service/notification.service';
 import { ConditionOption } from '@modules/shared/models/condition-option';
 import { CtdtMuctieuCutheService } from '@modules/shared/services/ctdt-muctieu-cuthe.service';
 import { CtdtService } from '@modules/shared/services/ctdt.service';
@@ -427,27 +427,39 @@ export class CtdtCdrComponent implements OnInit {
     }
 
     deleteCtdtCdr(ctdtCdr: CtdtCdrParent) {
+        if (!ctdtCdr?.id || !this.selectedCtdt || this.state() === 'loading') return;
+        const isParent = ctdtCdr.parent_id === 0;
+        const safeTitle = (ctdtCdr.kyhieu || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const hasChildren = Boolean(ctdtCdr.children && ctdtCdr.children.length);
+        const childCount = ctdtCdr.children?.length ?? 0;
+        const msg = isParent
+            ? hasChildren
+                ? `Bạn có chắc muốn xóa chuẩn đầu ra "${safeTitle}" cùng <b>${childCount}</b> chỉ báo PI trực thuộc?`
+                : `Bạn có chắc muốn xóa chuẩn đầu ra "${safeTitle}"?`
+            : `Bạn có chắc muốn xóa chỉ báo "${safeTitle}"?`;
 
-        this.notificationService.confirmDelete().then(a => {
-            if (a) {
-                this.loadingHeading = 'Đang xóa chuẩn đầu ra...';
-                this.state.set('loading');
-                let id_delete = [ctdtCdr.id];
-                if (ctdtCdr.children && ctdtCdr.children.length) {
-                    id_delete = id_delete.concat(ctdtCdr.children.map(m => m.id));
-                }
-                this.ctdtCdrService.deleteCtdtCdr(id_delete.toString()).subscribe({
-                    next: () => {
-                        this.notificationService.toastSuccess("Xóa thành công");
-                        this.loadCtdtCdr();
-                    },
-                    error: () => {
-                        this.state.set('success');
-                        this.notificationService.toastError("Xóa thất bại");
-                    }
-                })
+        this.notificationService.confirmDelete2({
+            heading: 'Xác nhận xóa',
+            htmlMessage: msg
+        }).subscribe(confirmed => {
+            if (!confirmed || !this.selectedCtdt) return;
+            this.loadingHeading = 'Đang xóa chuẩn đầu ra...';
+            this.state.set('loading');
+            let id_delete = [ctdtCdr.id];
+            if (ctdtCdr.children && ctdtCdr.children.length) {
+                id_delete = id_delete.concat(ctdtCdr.children.map(m => m.id));
             }
-        })
+            this.ctdtCdrService.deleteCtdtCdr(id_delete.toString()).subscribe({
+                next: () => {
+                    this.notificationService.toastSuccess("Xóa thành công");
+                    this.loadCtdtCdr();
+                },
+                error: () => {
+                    this.state.set('success');
+                    this.notificationService.toastError("Xóa thất bại");
+                }
+            });
+        });
     }
 
 }

@@ -2,7 +2,7 @@ import { CtdtConfigService } from '@modules/shared/services/ctdt-config.service'
 import { CtdtConfig } from '@modules/shared/models/ctdt-config';
 import { HelperService } from '@core/services/helper.service';
 import { ConfigsService } from '@modules/shared/services/configs.service';
-import { NotificationService } from '@core/services/notification.service';
+import { NotificationService } from '@core-new/service/notification.service';
 import { Component, DestroyRef, OnInit, WritableSignal, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TooltipModule } from 'primeng/tooltip';
@@ -274,22 +274,25 @@ export class CtdtCauhinhComponent implements OnInit {
 
     deleteConfig(parent: CtdtConfiAll, config: CtdtConfig, index: number) {
         if (config.id) {
-            this.notificationService.confirmDelete().then(a => {
-                if (a) {
-                    this.loadingHeading = 'Đang xóa cấu hình...';
-                    this.state.set('loading');
-                    this.ctdtConfigService.deleteCtdtConfig(config.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-                        next: () => {
-                            this.loadCtdtConfig();
-                            this.notificationService.toastSuccess("Xóa thành công");
-                        },
-                        error: () => {
-                            this.state.set('success');
-                            this.notificationService.toastError("Xóa thất bại");
-                        }
-                    })
-                }
-            })
+            const safeTitle = (config.title || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            this.notificationService.confirmDelete2({
+                heading: 'Xác nhận xóa',
+                htmlMessage: `Bạn có chắc muốn xóa mục cấu hình "${safeTitle}"?`
+            }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(confirmed => {
+                if (!confirmed || !this.selectedCtdt || this.selectedCtdt.id !== config.ctdt_id || this.busy) return;
+                this.loadingHeading = 'Đang xóa cấu hình...';
+                this.state.set('loading');
+                this.ctdtConfigService.deleteCtdtConfig(config.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+                    next: () => {
+                        this.loadCtdtConfig();
+                        this.notificationService.toastSuccess("Xóa thành công");
+                    },
+                    error: () => {
+                        this.state.set('success');
+                        this.notificationService.toastError("Xóa thất bại");
+                    }
+                });
+            });
         } else {
             parent.ctdt_config.splice(index, 1);
         }
