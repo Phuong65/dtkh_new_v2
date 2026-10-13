@@ -1,35 +1,36 @@
-import { CourseCloContributeService } from '@modules/shared/services/course-clo-contribute.service';
-import { HelperService } from '@core/services/helper.service';
-import { CtdtCdrService } from '@modules/shared/services/ctdt-cdr.service';
-import { CtdtService } from '@modules/shared/services/ctdt.service';
-import { CtdtHocphanService } from '@shared/services/ctdt-hocphan.service';
-import { CourseMuctieuChitietService } from '@modules/shared/services/course-muctieu-chitiet.service';
-import { CourseCloService } from '@modules/shared/services/course-clo.service';
-import { AfterViewInit, Component, ElementRef, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SharedModule } from '@modules/shared/shared.module';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, DestroyRef, ElementRef, OnInit, ViewChild, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { OvicQueryCondition } from '@core/models/dto';
-import { NotificationService } from '@core/services/notification.service';
-import { ConditionOption } from '@modules/shared/models/condition-option';
-import { firstValueFrom, forkJoin, mergeMap, Observable, of } from 'rxjs';
-import { ElnKhoaHoc } from '@modules/shared/models/elng-khoa-hoc';
+import { MatButtonModule } from '@angular/material/button';
+import { Drawer } from 'primeng/drawer';
+import { TableModule } from 'primeng/table';
+import { Observable, Subject, distinctUntilChanged, firstValueFrom, forkJoin, map, takeUntil } from 'rxjs';
+import { SafeHtmlDecodePipe } from '@modules/shared/pipes/safe-html-decode';
+import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
+import { AppState } from '@core-new/models/app-state';
 import { AuthService } from '@core/services/auth.service';
-import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
-import { ElngUserProfileService } from '@modules/shared/services/elearning-user-profile.service';
-import { ROLES, ROUTERS } from '@modules/shared/utils/syscat';
-import { DividerModule } from 'primeng/divider';
+import { HelperService } from '@core/services/helper.service';
+import { NotificationService } from '@core-new/service/notification.service';
+import { OvicQueryCondition } from '@core/models/dto';
+import { SharedModule } from '@modules/shared/shared.module';
+import { ShowLabelData } from '@modules/shared/pipes/show-label-data.pipe';
+import { ConditionOption } from '@modules/shared/models/condition-option';
+import { ElnKhoaHoc } from '@modules/shared/models/elng-khoa-hoc';
 import { CourseMuctieuChitiet } from '@modules/shared/models/course-muctieu-chitiet';
 import { CourseClo } from '@modules/shared/models/course-clo';
-import { TableModule } from 'primeng/table';
 import { Ctdt } from '@modules/shared/models/ctdt';
-import { MultiSelectModule } from 'primeng/multiselect';
 import { CtdtCdr } from '@modules/shared/models/ctdt-cdr';
-import { DialogModule } from 'primeng/dialog';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { ShowLabelData } from '@modules/shared/pipes/show-label-data.pipe';
-
+import { ROLES, ROUTERS } from '@modules/shared/utils/syscat';
+import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
+import { ElngUserProfileService } from '@modules/shared/services/elearning-user-profile.service';
+import { CourseMuctieuChitietService } from '@modules/shared/services/course-muctieu-chitiet.service';
+import { CourseCloService } from '@modules/shared/services/course-clo.service';
+import { CourseCloContributeService } from '@modules/shared/services/course-clo-contribute.service';
+import { CtdtHocphanService } from '@modules/shared/services/ctdt-hocphan.service';
+import { CtdtService } from '@modules/shared/services/ctdt.service';
+import { CtdtCdrService } from '@modules/shared/services/ctdt-cdr.service';
 
 interface CtdtCdrExtend extends CtdtCdr {
     items?: CtdtCdr[];
@@ -38,718 +39,384 @@ interface CtdtCdrExtend extends CtdtCdr {
 @Component({
     selector: 'app-monhoc-muctieu-cdr',
     standalone: true,
-    imports: [
-        CommonModule,
-        SharedModule,
-        FormsModule,
-        ReactiveFormsModule,
-        DividerModule,
-        TableModule,
-        MultiSelectModule,
-        DialogModule,
-        MatProgressBarModule,
-        ShowLabelData
-    ],
+    imports: [CommonModule, SharedModule, FormsModule, ReactiveFormsModule, TableModule,
+        ShowLabelData, SafeHtmlDecodePipe, MatButtonModule, Drawer, LoadingProgressComponent],
     templateUrl: './monhoc-muctieu-cdr.component.html',
     styleUrls: ['./monhoc-muctieu-cdr.component.css']
 })
-export class MonhocMuctieuCdrComponent implements OnInit, AfterViewInit {
-    private notificationService = inject(NotificationService);
-    private activatedRoute = inject(ActivatedRoute);
-    private router = inject(Router);
-    private elngUserProfileService = inject(ElngUserProfileService);
-    private elnKhoaHocService = inject(ElnKhoaHocService);
-    private auth = inject(AuthService);
-    private courseCloService = inject(CourseCloService);
-    private courseMuctieuChitietService = inject(CourseMuctieuChitietService);
-    formBuilder = inject(FormBuilder);
-    private ctdtHocphanService = inject(CtdtHocphanService);
-    private ctdtService = inject(CtdtService);
-    private ctdtCdrService = inject(CtdtCdrService);
-    private helperService = inject(HelperService);
-    private courseCloContributeService = inject(CourseCloContributeService);
+export class MonhocMuctieuCdrComponent implements OnInit {
+    private readonly destroyRef = inject(DestroyRef);
+    private readonly notificationService = inject(NotificationService);
+    private readonly activatedRoute = inject(ActivatedRoute);
+    private readonly router = inject(Router);
+    private readonly auth = inject(AuthService);
+    private readonly helperService = inject(HelperService);
+    private readonly elnKhoaHocService = inject(ElnKhoaHocService);
+    private readonly elngUserProfileService = inject(ElngUserProfileService);
+    private readonly courseMuctieuChitietService = inject(CourseMuctieuChitietService);
+    private readonly courseCloService = inject(CourseCloService);
+    private readonly courseCloContributeService = inject(CourseCloContributeService);
+    private readonly ctdtHocphanService = inject(CtdtHocphanService);
+    private readonly ctdtService = inject(CtdtService);
+    private readonly ctdtCdrService = inject(CtdtCdrService);
+    private readonly cancelLoad$ = new Subject<void>();
+    private loadVersion = 0;
 
-    @ViewChild('templateCourseCdr') templateCourseCdr: TemplateRef<any>;
+    readonly state = signal<AppState>('loading');
+    readonly isSaving = signal(false);
+    readonly errorMessage = signal('');
+    readonly generalObjectiveControl = new FormControl('', { nonNullable: true });
+    readonly editingGoalId = signal<number | null>(null);
+    @ViewChild('goalEditor') goalEditor?: ElementRef<HTMLTextAreaElement>;
+    loadingHeading = 'Đang tải mục tiêu và chuẩn đầu ra...';
+    piDrawerVisible = false;
 
-    @ViewChild('templateCtdtCdr') templateCtdtCdr: TemplateRef<any>;
-
-    selectedCourse: ElnKhoaHoc;
-
-    isManager: boolean = false;
-
-    isLanhDaoKhoa: boolean = false;
-
-    isLanhDaoBomon: boolean = false;
-
-    routerAdmin: boolean = false;
-
-    routerDaotao: boolean = false;
-
-    routerLanhdaokhoa: boolean = false;
-
-    routerGiangvien: boolean = false;
-
-    routerLanhdaobomon: boolean = false;
-
-    userId: number;
-
-    list_course_muctieu: CourseMuctieuChitiet[];
-
-    selectedCourseMuctieu: CourseMuctieuChitiet;
-
+    selectedCourse: ElnKhoaHoc | null = null;
+    list_course_muctieu: CourseMuctieuChitiet[] = [];
     list_course_clo: CourseClo[] = [];
-
-    seletedCourseClo: CourseClo;
-
-    formMuctieu: FormGroup;
-
-    kyhieuMuctieu: string = "CO";
-
-    formTitle: string;
-
-    isUpdated: boolean = false;
-
-    disabledButton: boolean = false;
-
-    list_course_clo_add: CourseClo[] = [];
-
     list_ctdt: Ctdt[] = [];
-
-    selectedClo: CourseClo;
-
-    selectedCtdt: Ctdt;
-
-    // selectedStates lưu trữ dạng { [id: number]: boolean }
-    selectedStates: { [key: number]: boolean } = {};
-
-    displayModal: boolean = false;
-
-    progressValue: number = 0;
-
     list_ctdt_cdr: CtdtCdrExtend[] = [];
+    selectedClo: CourseClo | null = null;
+    selectedCtdt: Ctdt | null = null;
+    selectedStates: Record<number, boolean> = {};
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-    constructor() {
-        this.isManager = this.auth.userHasRole(ROLES.manager) || this.auth.userHasRole(ROLES.admin) || this.auth.userHasRole(ROLES.troly_pdt) || this.auth.userHasRole(ROLES.chuyenvien_pdt) ? true : false;
-
-        this.isLanhDaoKhoa = this.auth.userHasRole(ROLES.lanhdaokhoa);
-
-        this.isLanhDaoBomon = this.auth.userHasRole(ROLES.lanhdaobomon);
-
-        this.routerAdmin = this.auth.hasRouter(ROUTERS.admin, '/monhoc-muctieu');
-
-        this.routerDaotao = this.auth.hasRouter(ROUTERS.daotao, '/monhoc-muctieu');
-
-        this.routerLanhdaokhoa = this.auth.hasRouter(ROUTERS.lanhdao_khoa, '/monhoc-muctieu');
-
-        this.routerGiangvien = this.auth.hasRouter(ROUTERS.giangvien, '/monhoc-muctieu');
-
-        this.routerLanhdaobomon = this.auth.hasRouter(ROUTERS.lanhdao_bomon, '/monhoc-muctieu');
-
-        this.userId = this.auth.user.id;
-
-        this.formMuctieu = this.formBuilder.group(
-            {
-                course_id: [''],
-                ordering: ['', Validators.required],
-                kyhieu: [''],
-                noidung: ['', Validators.required]
-            }
-        );
-    }
-
-    get fMt() {
-        return this.formMuctieu.controls;
-    }
+    readonly isManager = [ROLES.manager, ROLES.admin, ROLES.troly_pdt, ROLES.chuyenvien_pdt]
+        .some(role => this.auth.userHasRole(role));
+    readonly routerGiangvien = this.auth.hasRouter(ROUTERS.giangvien, '/monhoc-muctieu');
+    readonly routerLanhdaokhoa = this.auth.hasRouter(ROUTERS.lanhdao_khoa, '/monhoc-muctieu');
+    readonly routerLanhdaobomon = this.auth.hasRouter(ROUTERS.lanhdao_bomon, '/monhoc-muctieu');
+    readonly userId = this.auth.user.id;
 
     ngOnInit(): void {
-        this.activatedRoute.queryParams.subscribe((params) => {
-            if (params && params['code']) {
-                this.notificationService.isProcessing(true);
+        this.activatedRoute.queryParamMap.pipe(
+            map(params => params.get('code')),
+            distinctUntilChanged(),
+            takeUntilDestroyed(this.destroyRef)
+        ).subscribe(code => void this.loadData(code));
+        this.destroyRef.onDestroy(() => this.cancelLoad$.complete());
+    }
 
-                const course_id = params['code'];
+    reloadData(): void {
+        if (this.isSaving()) return;
+        void this.loadData(this.activatedRoute.snapshot.queryParamMap.get('code'));
+    }
 
-                const contition_course: ConditionOption = {
-                    condition: [
-                        { conditionName: 'id', condition: OvicQueryCondition.equal, value: course_id.toString(), orWhere: 'and' },
-                    ],
-                    set: [
-                        { label: 'limit', value: '1' }
-                    ],
-                    page: null
-                }
+    private condition(column: string, value: string, limit = '-1', ordered = false): ConditionOption {
+        return {
+            condition: [{ conditionName: column, condition: OvicQueryCondition.equal, value, orWhere: 'and' }],
+            set: [
+                { label: 'limit', value: limit },
+                ...(ordered ? [{ label: 'order', value: 'ASC' }, { label: 'orderby', value: 'ordering' }] : [])
+            ],
+            page: null
+        };
+    }
 
-                if (this.routerGiangvien) {
-                    contition_course.condition.push({ conditionName: 'creator_plan_id', condition: OvicQueryCondition.equal, value: this.userId.toString(), orWhere: 'and' })
-                }
+    private request<T>(source: Observable<T>): Promise<T> {
+        return firstValueFrom(source.pipe(takeUntil(this.cancelLoad$), takeUntilDestroyed(this.destroyRef)));
+    }
 
-                const condition_user: ConditionOption = {
-                    condition: [
-                        { conditionName: 'user_id', condition: OvicQueryCondition.equal, value: this.userId.toString(), orWhere: 'and' }
-                    ],
-                    set: [
-                        { label: 'limit', value: '1' }
-                    ],
-                    page: null
-                }
+    private async loadData(code: string | null): Promise<void> {
+        const version = ++this.loadVersion;
+        this.cancelLoad$.next();
+        this.isSaving.set(false);
+        this.closeForm();
+        this.selectedCourse = null;
+        this.list_ctdt = [];
+        this.list_ctdt_cdr = [];
+        this.errorMessage.set('');
+        this.loadingHeading = 'Đang tải mục tiêu và chuẩn đầu ra...';
+        this.state.set('loading');
+        if (!code || !Number.isSafeInteger(Number(code)) || Number(code) <= 0) {
+            this.errorMessage.set('ID học phần không hợp lệ.');
+            this.state.set('error');
+            return;
+        }
 
-                const condition_muctieu: ConditionOption = {
-                    condition: [
-                        { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: course_id.toString(), orWhere: 'and' },
-                    ],
-                    set: [
-                        { label: 'limit', value: '-1' },
-                        { label: 'order', value: 'ASC' },
-                        { label: 'orderby', value: 'ordering' }
-                    ],
-                    page: null
-                }
-
-                const condition_course_cdr: ConditionOption = {
-                    condition: [
-                        { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: course_id.toString(), orWhere: 'and' },
-                    ],
-                    set: [
-                        { label: 'limit', value: '-1' },
-                        { label: 'order', value: 'ASC' },
-                        { label: 'orderby', value: 'ordering' }
-                    ],
-                    page: null
-                }
-
-                const condition_ctdt_hocphan: ConditionOption = {
-                    condition: [
-                        { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: course_id.toString(), orWhere: 'and' },
-                    ],
-                    set: [
-                        { label: 'limit', value: '-1' },
-                        { label: 'order', value: 'ASC' },
-                        { label: 'orderby', value: 'ordering' }
-                    ],
-                    page: null
-                }
-
-                forkJoin([
-                    this.elnKhoaHocService.getKhoaHocByPageNew_2(contition_course),
-                    this.elngUserProfileService.getUserProfileByPageNewV2(condition_user),
-                    this.courseMuctieuChitietService.getCourseMuctieuChitietByPageNew(condition_muctieu),
-                    this.courseCloService.getCourseCloByPageNew(condition_course_cdr),
-                    this.ctdtHocphanService.getCtdtHocphanByPageNew(condition_ctdt_hocphan).pipe(mergeMap(_ctdt_hocphan => {
-                        const ctdt_ids = _ctdt_hocphan.data.map(m => m.ctdt_id);
-                        if (ctdt_ids.length) {
-                            const condition_ctdt: ConditionOption = {
-                                condition: [],
-                                set: [
-                                    { label: 'limit', value: '-1' },
-                                    { label: 'include', value: ctdt_ids.toString() },
-                                    { label: 'include_by', value: 'id' },
-                                ],
-                                page: null
-                            }
-
-                            const condition_ctdt_cdr: ConditionOption = {
-                                condition: [],
-                                set: [
-                                    { label: 'limit', value: '-1' },
-                                    { label: 'include', value: ctdt_ids.toString() },
-                                    { label: 'include_by', value: 'ctdt_id' },
-                                    { label: 'order', value: 'ASC' },
-                                    { label: 'orderby', value: 'ordering' }
-                                ],
-                                page: null
-                            }
-
-                            return forkJoin([
-                                this.ctdtService.getCtdtByPageNew(condition_ctdt),
-                                this.ctdtCdrService.getCtdtCdrByPageNew(condition_ctdt_cdr)
-                            ]).pipe(mergeMap(([_ctdt, _ctdt_cdr]) => {
-                                const parent_ctdt_cdr = _ctdt_cdr.data.filter(m => m.parent_id === 0);
-                                parent_ctdt_cdr.forEach(f => {
-                                    f['items'] = _ctdt_cdr.data.filter(m => m.parent_id === f.id);
-                                })
-                                _ctdt.data.forEach(f => {
-                                    f['ctdt_cdr'] = parent_ctdt_cdr.filter(m => m.ctdt_id === f.id);
-                                })
-
-                                _ctdt_cdr.data.forEach(f => {
-                                    f['kyhieu_number'] = f.kyhieu.replace(/\D/gi, '');
-                                })
-
-                                this.list_ctdt_cdr = _ctdt_cdr.data;
-
-
-                                this.list_ctdt = _ctdt.data;
-
-                                return of(null);
-                            }))
-                        }
-                        return of(null);
-                    }))
-                ]).subscribe({
-                    next: async ([_course, _user_profile, _muctieu, _course_clo]) => {
-                        if (_course.recordsFiltered) {
-
-                            this.selectedCourse = _course.data[0];
-
-                            if (this.routerLanhdaokhoa) {
-                                if (_user_profile.recordsFiltered === 0 || this.selectedCourse.category_ids !== _user_profile.data[0].donvi_chuyenmon_id) {
-                                    this.notificationService.toastError("Không tìm thấy môn học");
-                                    this.router.navigate(['/admin/content-none']);
-                                }
-                            }
-
-                            if (this.routerLanhdaobomon) {
-                                if (_user_profile.recordsFiltered === 0 || this.selectedCourse.nganh_bomon_id !== _user_profile.data[0].bomon_id) {
-                                    this.notificationService.toastError("Không tìm thấy môn học");
-                                    this.router.navigate(['/admin/content-none']);
-                                }
-                            }
-
-                            this.list_course_muctieu = _muctieu.data;
-                            this.list_course_clo = _course_clo.data;
-                            await this.loadCourseCloPi();
-                            console.log("run");
-                            this.notificationService.isProcessing(false);
-                        } else {
-                            this.notificationService.toastError("Không tìm thấy môn học");
-                            this.router.navigate(['/admin/content-none']);
-                        }
-                    },
-                    error: () => {
-                        this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
-                    }
-                })
-            } else {
-                this.router.navigate(['/admin/content-none']);
+        try {
+            const courseCondition = this.condition('id', code, '1');
+            if (this.routerGiangvien) {
+                courseCondition.condition.push({ conditionName: 'creator_plan_id', condition: OvicQueryCondition.equal,
+                    value: String(this.userId), orWhere: 'and' });
             }
-        })
+            const [course, profile, goals, clos, links] = await this.request(forkJoin([
+                this.elnKhoaHocService.getKhoaHocByPageNew_2(courseCondition),
+                this.elngUserProfileService.getUserProfileByPageNewV2(this.condition('user_id', String(this.userId), '1')),
+                this.courseMuctieuChitietService.getCourseMuctieuChitietByPageNew(this.condition('course_id', code, '-1', true)),
+                this.courseCloService.getCourseCloByPageNew(this.condition('course_id', code, '-1', true)),
+                this.ctdtHocphanService.getCtdtHocphanByPageNew(this.condition('course_id', code, '-1', true))
+            ]));
+            if (this.destroyRef.destroyed || version !== this.loadVersion) return;
+            const selected = course.data?.[0];
+            if (!selected) {
+                this.errorMessage.set('Không tìm thấy học phần.');
+                this.state.set('error');
+                return;
+            }
+            if ((this.routerLanhdaokhoa && (!profile.data?.[0] || selected.category_ids !== profile.data[0].donvi_chuyenmon_id))
+                || (this.routerLanhdaobomon && (!profile.data?.[0] || selected.nganh_bomon_id !== profile.data[0].bomon_id))) {
+                this.state.set('error');
+                this.errorMessage.set('Không có quyền truy cập học phần.');
+                void this.router.navigate(['/admin/content-none']);
+                return;
+            }
+            this.selectedCourse = selected;
+            this.generalObjectiveControl.setValue(selected.muctieu || '');
+            this.list_course_muctieu = goals.data || [];
+            this.list_course_clo = clos.data || [];
+            const ids = links.data.map(item => item.ctdt_id);
+            if (ids.length) {
+                const programmeCondition: ConditionOption = {
+                    condition: [], set: [{ label: 'limit', value: '-1' }, { label: 'include', value: ids.toString() },
+                        { label: 'include_by', value: 'id' }], page: null
+                };
+                const cdrCondition: ConditionOption = {
+                    condition: [], set: [{ label: 'limit', value: '-1' }, { label: 'include', value: ids.toString() },
+                        { label: 'include_by', value: 'ctdt_id' }, { label: 'order', value: 'ASC' },
+                        { label: 'orderby', value: 'ordering' }], page: null
+                };
+                const [programmes, cdrs] = await this.request(forkJoin([
+                    this.ctdtService.getCtdtByPageNew(programmeCondition),
+                    this.ctdtCdrService.getCtdtCdrByPageNew(cdrCondition)
+                ]));
+                if (this.destroyRef.destroyed || version !== this.loadVersion) return;
+                this.list_ctdt_cdr = cdrs.data;
+                this.list_ctdt_cdr.forEach(cdr => cdr['kyhieu_number'] = (cdr.kyhieu || '').replace(/\D/gi, ''));
+                const parents = this.list_ctdt_cdr.filter(cdr => cdr.parent_id === 0);
+                parents.forEach(parent => parent.items = this.list_ctdt_cdr.filter(cdr => cdr.parent_id === parent.id));
+                this.list_ctdt = programmes.data;
+                this.list_ctdt.forEach(ctdt => ctdt['ctdt_cdr'] = parents.filter(cdr => cdr.ctdt_id === ctdt.id));
+            }
+            await this.loadCourseCloPi();
+            if (!this.destroyRef.destroyed && version === this.loadVersion) this.state.set('success');
+        } catch {
+            if (this.destroyRef.destroyed || version !== this.loadVersion) return;
+            this.errorMessage.set('Không thể tải mục tiêu và chuẩn đầu ra. Vui lòng thử lại.');
+            this.state.set('error');
+        }
     }
 
-    ngAfterViewInit() {
-
+    private async runOperation(heading: string, action: () => Promise<void>, successMessage: string): Promise<void> {
+        if (this.isSaving() || this.state() !== 'success' || !this.selectedCourse) return;
+        const version = this.loadVersion;
+        this.loadingHeading = heading;
+        this.isSaving.set(true);
+        try {
+            await action();
+            if (!this.destroyRef.destroyed && version === this.loadVersion) this.notificationService.toastSuccess(successMessage);
+        } catch {
+            if (!this.destroyRef.destroyed && version === this.loadVersion) this.notificationService.toastError('Thao tác thất bại. Vui lòng thử lại.');
+        } finally {
+            if (!this.destroyRef.destroyed && version === this.loadVersion) this.isSaving.set(false);
+        }
     }
 
+    async loadMuctieu(): Promise<void> {
+        const response = await this.request(this.courseMuctieuChitietService.getCourseMuctieuChitietByPageNew(
+            this.condition('course_id', String(this.selectedCourse.id), '-1', true)));
+        this.list_course_muctieu = response.data || [];
+    }
 
+    async loadCoureClo(): Promise<void> {
+        const response = await this.request(this.courseCloService.getCourseCloByPageNew(
+            this.condition('course_id', String(this.selectedCourse.id), '-1', true)));
+        this.list_course_clo = response.data || [];
+        await this.loadCourseCloPi();
+    }
 
-    autoResize(event: Event) {
+    async loadCourseCloPi(): Promise<void> {
+        const response = await this.request(this.courseCloContributeService.getCourseCloContributeByPageNew(
+            this.condition('course_id', String(this.selectedCourse.id))));
+        this.list_course_clo.forEach(clo => {
+            const links = response.data.filter(link => link.course_clo_id === clo.id);
+            const pis = this.list_ctdt_cdr.filter(pi => links.some(link => link.ctdt_cdr_id === pi.id));
+            this.list_ctdt.forEach(ctdt => {
+                clo['ctdt_cdr_' + ctdt.id] = this.helperService.sort(pis.filter(pi => pi.ctdt_id === ctdt.id), 'kyhieu_number');
+            });
+        });
+    }
+
+    saveMucTieuChung(value: string): void {
+        void this.runOperation('Đang lưu mục tiêu chung...', async () => {
+            await this.request(this.elnKhoaHocService.updateElnKhoaHoc(this.selectedCourse.id, { muctieu: value }));
+            this.selectedCourse.muctieu = value;
+        }, 'Lưu thành công');
+    }
+
+    addMuctieu(): void {
+        void this.runOperation('Đang thêm mục tiêu...', async () => {
+            const ordering = this.list_course_muctieu.length + 1;
+            await this.request(this.courseMuctieuChitietService.addCourseMuctieuChitiet({
+                ordering, kyhieu: 'CO' + ordering, course_id: this.selectedCourse.id
+            }));
+            await this.loadMuctieu();
+        }, 'Thêm thành công');
+    }
+
+    async deleteCourseMuctieuchitiet(goal: CourseMuctieuChitiet): Promise<void> {
+        if (this.isSaving()) return;
+        const version = this.loadVersion;
+        const confirmed = await firstValueFrom(this.notificationService.confirmDelete2({
+            heading: 'Xác nhận xóa mục tiêu',
+            htmlMessage: `<p class="m-0 f-roboto f-14 lh-base text-center">Bạn có chắc muốn xóa mục tiêu <b>${goal.kyhieu}</b>?</p>`
+        }));
+        if (!confirmed || this.destroyRef.destroyed || version !== this.loadVersion) return;
+        await this.runOperation('Đang xóa mục tiêu...', async () => {
+            const requests: Observable<any>[] = [this.courseMuctieuChitietService.deleteCourseMuctieuChitiet(goal.id)];
+            let ordering = goal.ordering;
+            this.list_course_muctieu.filter(item => item.ordering > goal.ordering).forEach(item => {
+                requests.push(this.courseMuctieuChitietService.updateCourseMuctieuChitiet(item.id, { ordering, kyhieu: 'CO' + ordering }));
+                ordering++;
+            });
+            await this.request(forkJoin(requests));
+            await this.loadMuctieu();
+        }, 'Xóa thành công');
+    }
+
+    editMuctieu(goal: CourseMuctieuChitiet): void {
+        if (this.isSaving()) return;
+        this.editingGoalId.set(goal.id);
+        setTimeout(() => {
+            const editor = this.goalEditor?.nativeElement;
+            if (!editor) return;
+            editor.focus();
+            editor.style.height = 'auto';
+            editor.style.height = editor.scrollHeight + 'px';
+        });
+    }
+
+    finishEditMuctieu(): void {
+        this.editingGoalId.set(null);
+    }
+
+    saveMuctieuChitiet(): void {
+        if (!this.list_course_muctieu.length) return;
+        void this.runOperation('Đang lưu mục tiêu chi tiết...', async () => {
+            await this.request(forkJoin(this.list_course_muctieu.map((goal, index) =>
+                this.courseMuctieuChitietService.updateCourseMuctieuChitiet(goal.id, {
+                    noidung: goal.noidung, ordering: index + 1, kyhieu: 'CO' + (index + 1)
+                }))));
+            await this.loadMuctieu();
+        }, 'Lưu thành công');
+    }
+
+    addClo(): void {
+        void this.runOperation('Đang thêm chuẩn đầu ra...', async () => {
+            const ordering = this.list_course_clo.length + 1;
+            await this.request(this.courseCloService.addCourseClo({ ordering, kyhieu: 'CLO' + ordering, course_id: this.selectedCourse.id }));
+            await this.loadCoureClo();
+        }, 'Thêm thành công');
+    }
+
+    saveClo(): void {
+        if (!this.list_course_clo.length) return;
+        void this.runOperation('Đang lưu chuẩn đầu ra...', async () => {
+            await this.request(forkJoin(this.list_course_clo.map((clo, index) => this.courseCloService.updateCourseClo(clo.id, {
+                noidung: clo.noidung, ordering: index + 1, kyhieu: 'CLO' + (index + 1),
+                course_muctieu_chitiet_id: clo.course_muctieu_chitiet_id
+            }))));
+            await this.loadCoureClo();
+        }, 'Lưu thành công');
+    }
+
+    async deleteClo(clo: CourseClo): Promise<void> {
+        if (this.isSaving()) return;
+        const version = this.loadVersion;
+        const confirmed = await firstValueFrom(this.notificationService.confirmDelete2({
+            heading: 'Xác nhận xóa chuẩn đầu ra',
+            htmlMessage: `<p class="m-0 f-roboto f-14 lh-base text-center">Bạn có chắc muốn xóa chuẩn đầu ra <b>${clo.kyhieu}</b>?</p>`
+        }));
+        if (!confirmed || this.destroyRef.destroyed || version !== this.loadVersion) return;
+        await this.runOperation('Đang xóa chuẩn đầu ra...', async () => {
+            const requests: Observable<any>[] = [this.courseCloService.deleteCourseClo(clo.id)];
+            let ordering = clo.ordering;
+            this.list_course_clo.filter(item => item.ordering > clo.ordering).forEach(item => {
+                requests.push(this.courseCloService.updateCourseClo(item.id, { ordering, kyhieu: 'CLO' + ordering }));
+                ordering++;
+            });
+            await this.request(forkJoin(requests));
+            await this.loadCoureClo();
+        }, 'Xóa thành công');
+    }
+
+    autoResize(event: Event): void {
         const textarea = event.target as HTMLTextAreaElement;
         textarea.style.height = 'auto';
         textarea.style.height = textarea.scrollHeight + 'px';
     }
 
-    resetFormMuctieu() {
-        this.formMuctieu.reset();
-        this.fMt['course_id'].setValue(this.selectedCourse.id);
-        this.fMt['ordering'].setValue(1);
-        if (this.list_course_muctieu && this.list_course_muctieu.length) {
-            this.fMt['ordering'].setValue(this.list_course_muctieu.length + 1);
-        }
-        this.isUpdated = false;
+    blockArrowKeys(event: KeyboardEvent): void {
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(event.key)) event.stopPropagation();
     }
 
-    loadMuctieu() {
-        this.notificationService.isProcessing(true);
-
-        const condition: ConditionOption = {
-            condition: [
-                { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: this.selectedCourse.id.toString(), orWhere: 'and' },
-            ],
-            set: [
-                { label: 'limit', value: '-1' },
-                { label: 'order', value: 'ASC' },
-                { label: 'orderby', value: 'ordering' }
-            ],
-            page: null
-        }
-
-        this.courseMuctieuChitietService.getCourseMuctieuChitietByPageNew(condition).subscribe({
-            next: (_muctieu) => {
-                this.list_course_muctieu = _muctieu.data;
-                this.notificationService.isProcessing(false);
-            },
-            error: () => {
-                this.notificationService.isProcessing(false);
-            }
-        })
+    chooseMuctieuForClo(clo: CourseClo, goal: CourseMuctieuChitiet): void {
+        if (!this.isSaving()) clo.course_muctieu_chitiet_id = goal.id;
     }
 
-    loadCoureClo() {
-        this.notificationService.isProcessing(true);
-        const condition_course_cdr: ConditionOption = {
-            condition: [
-                { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: this.selectedCourse.id.toString(), orWhere: 'and' },
-            ],
-            set: [
-                { label: 'limit', value: '-1' },
-                { label: 'order', value: 'ASC' },
-                { label: 'orderby', value: 'ordering' }
-            ],
-            page: null
-        }
-
-        this.courseCloService.getCourseCloByPageNew(condition_course_cdr).subscribe({
-            next: (_course_clo) => {
-                this.list_course_clo = _course_clo.data;
-                this.notificationService.isProcessing(false);
-            },
-            error: () => {
-                this.notificationService.isProcessing(false);
-            }
-        })
-    }
-
-    loadCourseCloPi(): Promise<any> {
-        return new Promise(async (resolve, reject) => {
-            const condition_clo_c: ConditionOption = {
-                condition: [
-                    { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: this.selectedCourse.id.toString(), orWhere: 'and' }
-                ],
-                set: [
-                    { label: 'limit', value: '-1' }
-                ],
-                page: null
-            }
-
-            const clo_co = await firstValueFrom(this.courseCloContributeService.getCourseCloContributeByPageNew(condition_clo_c));
-
-            this.list_course_clo.forEach(clo => {
-                const clo_tem = clo_co.data.filter(m => m.course_clo_id === clo.id);
-                const pi = this.list_ctdt_cdr.filter(m => clo_tem.findIndex(i => i.ctdt_cdr_id === m.id) !== -1);
-                console.log(pi);
-                this.list_ctdt.forEach(ctdt => {
-                    const pi_clo = pi.filter(m => m.ctdt_id === ctdt.id);
-                    if (pi_clo.length)
-                        clo['ctdt_cdr_'.concat(ctdt.id.toString())] = this.helperService.sort(pi.filter(m => m.ctdt_id === ctdt.id), 'kyhieu_number');
-                })
-            })
-            resolve(clo_co)
-        });
-    }
-
-    saveMucTieuChung(event) {
-        this.notificationService.isProcessing(true);
-        this.elnKhoaHocService.updateElnKhoaHoc(this.selectedCourse.id, { muctieu: event }).subscribe({
-            next: () => {
-                this.notificationService.isProcessing(false);
-                this.notificationService.toastSuccess("Lưu thành công");
-                this.selectedCourse.muctieu = event;
-            },
-            error: () => {
-                this.notificationService.isProcessing(false);
-                this.notificationService.toastSuccess("Lưu thất bại");
-            }
-        })
-    }
-
-    pointQuestionKeyDown(event: KeyboardEvent) {
-        if (!event) return;
-
-        const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight'];
-
-        if (/^[0-9]$/.test(event.key)) {
-            return;
-        }
-
-        if (allowedKeys.includes(event.key)) {
-            return;
-        }
-
-        event.preventDefault();
-    }
-
-    closeForm() {
-        this.selectedClo = null;
-        this.selectedCtdt = null;
-        this.notificationService.isProcessing(true);
-    }
-
-    addMuctieu() {
-        this.notificationService.isProcessing(true);
-        this.disabledButton = true;
-        const ordering = this.list_course_muctieu && this.list_course_muctieu.length ? this.list_course_muctieu.length + 1 : 1;
-        const data = {
-            ordering: ordering,
-            kyhieu: "CO".concat(ordering.toString()),
-            course_id: this.selectedCourse.id,
-        }
-        this.courseMuctieuChitietService.addCourseMuctieuChitiet(data).subscribe({
-            next: () => {
-                this.loadMuctieu();
-                this.disabledButton = false;
-                this.notificationService.toastSuccess("Thêm thành công");
-            },
-            error: () => {
-                this.disabledButton = false;
-                this.notificationService.isProcessing(false);
-                this.notificationService.toastError("Thêm thất bại");
-            }
-        })
-    }
-
-    deleteCourseMuctieuchitiet(muctieu: CourseMuctieuChitiet) {
-        this.notificationService.confirmDelete().then(a => {
-            if (a) {
-                this.notificationService.isProcessing(true);
-                const request: Observable<any>[] = [];
-                let i = muctieu.ordering;
-                request.push(this.courseMuctieuChitietService.deleteCourseMuctieuChitiet(muctieu.id));
-                this.list_course_muctieu.forEach(f => {
-                    if (f.ordering > muctieu.ordering) {
-                        const data = {
-                            ordering: i,
-                            kyhieu: 'CO'.concat(i.toString())
-                        }
-                        i = i + 1;
-                        request.push(this.courseMuctieuChitietService.updateCourseMuctieuChitiet(f.id, data))
-                    }
-                })
-
-                if (request.length) {
-                    forkJoin(request).subscribe({
-                        next: () => {
-                            this.notificationService.toastSuccess("Xóa thành công");
-                            this.loadMuctieu();
-                        },
-                        error: () => {
-                            this.notificationService.isProcessing(false);
-                            this.notificationService.toastError("Xóa thất bại");
-                        }
-                    })
-                }
-            }
-        })
-    }
-
-    saveMuctieuChitiet() {
-        this.notificationService.isProcessing(true)
-        const request: Observable<any>[] = [];
-        this.list_course_muctieu.forEach((f, key) => {
-            const data = {
-                noidung: f.noidung,
-                ordering: key + 1,
-                kyhieu: 'CO'.concat((key + 1).toString())
-            }
-            request.push(this.courseMuctieuChitietService.updateCourseMuctieuChitiet(f.id, data))
-        })
-
-        if (request.length) {
-            forkJoin(request).subscribe({
-                next: () => {
-                    this.notificationService.toastSuccess("Lưu thành công");
-                    this.loadMuctieu();
-                },
-                error: () => {
-                    this.notificationService.isProcessing(false);
-                    this.notificationService.toastError("Lưu thất bại");
-                }
-            })
-        }
-    }
-    /** clo */
-
-    addClo() {
-        this.notificationService.isProcessing(true);
-        const ordering = this.list_course_clo && this.list_course_clo.length ? this.list_course_clo.length + 1 : 1;
-        const data = {
-            ordering: ordering,
-            kyhieu: "CLO".concat(ordering.toString()),
-            course_id: this.selectedCourse.id,
-        }
-        this.courseCloService.addCourseClo(data).subscribe({
-            next: () => {
-                this.loadCoureClo();
-                this.disabledButton = false;
-                this.notificationService.toastSuccess("Thêm thành công");
-            },
-            error: () => {
-                this.disabledButton = false;
-                this.notificationService.isProcessing(false);
-                this.notificationService.toastError("Thêm thất bại");
-            }
-        })
-    }
-
-    saveClo() {
-        this.notificationService.isProcessing(true)
-        const request: Observable<any>[] = [];
-        this.list_course_clo.forEach((f, key) => {
-            const data = {
-                noidung: f.noidung,
-                ordering: key + 1,
-                kyhieu: 'CLO'.concat((key + 1).toString()),
-                course_muctieu_chitiet_id: f.course_muctieu_chitiet_id,
-            }
-            request.push(this.courseCloService.updateCourseClo(f.id, data))
-        })
-
-        if (request.length) {
-            forkJoin(request).subscribe({
-                next: () => {
-                    this.notificationService.toastSuccess("Lưu thành công");
-                    this.loadCoureClo();
-                },
-                error: () => {
-                    this.notificationService.isProcessing(false);
-                    this.notificationService.toastError("Lưu thất bại");
-                }
-            })
-        }
-    }
-
-    deleteClo(Clo: CourseClo) {
-        this.notificationService.confirmDelete().then(a => {
-            if (a) {
-                this.notificationService.isProcessing(true);
-                const request: Observable<any>[] = [];
-                let i = Clo.ordering;
-                request.push(this.courseCloService.deleteCourseClo(Clo.id));
-                this.list_course_clo.forEach(f => {
-                    if (f.ordering > Clo.ordering) {
-                        const data = {
-                            ordering: i,
-                            kyhieu: 'CLO'.concat(i.toString())
-                        }
-                        i = i + 1;
-                        request.push(this.courseCloService.updateCourseClo(f.id, data))
-                    }
-                })
-
-                if (request.length) {
-                    forkJoin(request).subscribe({
-                        next: () => {
-                            this.notificationService.toastSuccess("Xóa thành công");
-                            this.loadCoureClo();
-                        },
-                        error: () => {
-                            this.notificationService.isProcessing(false);
-                            this.notificationService.toastError("Xóa thất bại");
-                        }
-                    })
-                }
-            }
-        })
-    }
-
-    blockArrowKeys(event: KeyboardEvent) {
-        const arrowKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'];
-
-        if (arrowKeys.includes(event.key)) {
-            event.stopPropagation();
-        }
-    }
-
-    addCdrOfCourseMuctieu() {
-        this.notificationService.openSideNavigationMenu({ template: this.templateCourseCdr, size: 800, offsetTop: "0px" });
-    }
-
-    chooseMuctieuForClo(clo: CourseClo, muctieu: CourseMuctieuChitiet) {
-        clo.course_muctieu_chitiet_id = muctieu.id;
-    }
-
-    openLayoutCtdtCdr(clo: CourseClo, ctdt: Ctdt) {
+    openLayoutCtdtCdr(clo: CourseClo, ctdt: Ctdt): void {
+        if (this.isSaving()) return;
         this.selectedClo = clo;
         this.selectedCtdt = ctdt;
         this.selectedStates = {};
-        if (this.selectedClo['ctdt_cdr_'.concat(this.selectedCtdt.id.toString())])
-            this.selectedClo['ctdt_cdr_'.concat(this.selectedCtdt.id.toString())].forEach(f => {
-                this.selectedStates[f.id] = true;
-            })
-        this.notificationService.openSideNavigationMenu({ template: this.templateCtdtCdr, size: 700, offsetTop: '0px' });
+        (clo['ctdt_cdr_' + ctdt.id] || []).forEach(pi => this.selectedStates[pi.id] = true);
+        this.piDrawerVisible = true;
     }
 
-    toggleAllChildren(plo: any, event: any) {
-        const isChecked = event.target.checked;
-        if (plo.items && plo.items.length > 0) {
-            plo.items.forEach((pi: any) => {
-                this.selectedStates[pi.id] = isChecked;
-            });
-        }
-        this.addToClo();
+    closeForm(): void {
+        this.piDrawerVisible = false;
+        this.onHideOp();
     }
 
-    // Khi click chọn lẻ từng PI
-    onItemSelect() {
-        // Thu thập danh sách ID đã chọn
-        const selectedIds = Object.keys(this.selectedStates).filter(id => this.selectedStates[+id]).map(id => Number(id));
-        this.addToClo();
-    }
-
-    // Kiểm tra xem tất cả con đã được chọn chưa (để tick checkbox cha)
-    isAllSelected(plo: CtdtCdrExtend): boolean {
-        if (!plo.items || plo.items.length === 0) return false;
-        return plo.items.every((pi: any) => this.selectedStates[pi.id]);
-    }
-
-    // Trạng thái gạch ngang (indeterminate) cho Bootstrap
-    isIndeterminate(plo: CtdtCdrExtend): boolean {
-        if (!plo.items || plo.items.length === 0) return false;
-        const selectedCount = plo.items.filter((pi: any) => this.selectedStates[pi.id]).length;
-        return selectedCount > 0 && selectedCount < plo.items.length;
-    }
-
-    addToClo() {
-        let select_cdr = []
-        this.selectedCtdt['ctdt_cdr'].forEach(f => {
-            if (f.items)
-                select_cdr = select_cdr.concat(f.items.filter(m => this.selectedStates[m.id]));
-        })
-        this.selectedClo['ctdt_cdr'.concat("_", this.selectedCtdt.id.toString())] = this.helperService.sort(select_cdr, 'kyhieu_number');
-    }
-
-    onHideOp() {
+    onHideOp(): void {
         this.selectedClo = null;
         this.selectedCtdt = null;
     }
 
-    savePiOnClo() {
-        const request: Observable<any>[] = [];
-        request.push(this.courseCloContributeService.deleteCourseCloContributeByCol(this.selectedCourse.id.toString(), "course_id"))
-        this.list_course_clo.forEach(clo => {
-            this.list_ctdt.forEach(ctdt => {
-                if (clo['ctdt_cdr_'.concat(ctdt.id.toString())]) {
-                    clo['ctdt_cdr_'.concat(ctdt.id.toString())].forEach(pi => {
-                        const data = {
-                            course_id: this.selectedCourse.id,
-                            course_clo_id: clo.id,
-                            ctdt_id: ctdt.id,
-                            ctdt_cdr_parent_id: pi.parent_id,
-                            ctdt_cdr_id: pi.id
-                        }
-                        request.push(this.courseCloContributeService.addCourseCloContribute(data));
-                    })
-                }
-            })
-        })
-
-        if (request.length > 1) {
-            this.displayModal = true;
-            this.progressValue = 0;
-            this.loopAddPiClo(request, 0).subscribe({
-                next: async () => {
-                    this.selectedClo = null;
-                    this.selectedCtdt = null;
-                    await this.loadCourseCloPi();
-                    this.displayModal = false;
-                    this.notificationService.toastSuccess("Lưu thành công")
-                }, error: () => {
-                    this.displayModal = false;
-                    this.notificationService.toastSuccess("Lưu thất bại")
-                }
-            })
-        } else {
-            this.notificationService.toastWarning("Không tìm thấy PI");
-        }
+    toggleAllChildren(plo: CtdtCdrExtend, event: Event): void {
+        const checked = (event.target as HTMLInputElement).checked;
+        (plo.items || []).forEach(pi => this.selectedStates[pi.id] = checked);
+        this.addToClo();
     }
 
-    loopAddPiClo(request: Observable<any>[], key: number): Observable<any> {
-        return request[key].pipe(mergeMap(a => {
-            this.progressValue = (key + 1) / request.length * 100;
-            if (request[key + 1]) {
-                return this.loopAddPiClo(request, key + 1);
-            } else {
-                return of(null);
+    onItemSelect(): void {
+        this.addToClo();
+    }
+
+    isAllSelected(plo: CtdtCdrExtend): boolean {
+        return !!plo.items?.length && plo.items.every(pi => this.selectedStates[pi.id]);
+    }
+
+    isIndeterminate(plo: CtdtCdrExtend): boolean {
+        const count = (plo.items || []).filter(pi => this.selectedStates[pi.id]).length;
+        return count > 0 && count < (plo.items?.length || 0);
+    }
+
+    addToClo(): void {
+        if (!this.selectedClo || !this.selectedCtdt) return;
+        const pis = (this.selectedCtdt['ctdt_cdr'] || []).flatMap(plo => (plo.items || []).filter(pi => this.selectedStates[pi.id]));
+        this.selectedClo['ctdt_cdr_' + this.selectedCtdt.id] = this.helperService.sort(pis, 'kyhieu_number');
+    }
+
+    savePiOnClo(): void {
+        const requests: Observable<any>[] = [];
+        this.list_course_clo.forEach(clo => this.list_ctdt.forEach(ctdt => {
+            (clo['ctdt_cdr_' + ctdt.id] || []).forEach(pi => requests.push(this.courseCloContributeService.addCourseCloContribute({
+                course_id: this.selectedCourse.id, course_clo_id: clo.id, ctdt_id: ctdt.id,
+                ctdt_cdr_parent_id: pi.parent_id, ctdt_cdr_id: pi.id
+            })));
+        }));
+        if (!requests.length) {
+            this.notificationService.toastWarning('Không tìm thấy PI');
+            return;
+        }
+        void this.runOperation('Đang lưu liên kết CLO – PI...', async () => {
+            await this.request(this.courseCloContributeService.deleteCourseCloContributeByCol(String(this.selectedCourse.id), 'course_id'));
+            for (let index = 0; index < requests.length; index++) {
+                await this.request(requests[index]);
+                this.loadingHeading = `Đang lưu liên kết CLO – PI (${index + 1}/${requests.length})...`;
             }
-        }))
+            this.closeForm();
+            await this.loadCourseCloPi();
+        }, 'Lưu thành công');
     }
 }

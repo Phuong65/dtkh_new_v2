@@ -36,6 +36,7 @@ import { Ctdt } from '@modules/shared/models/ctdt';
 import { CtdtHocphan } from '@modules/shared/models/ctdt_hocphan';
 import { OvicGroupsRadioV2Component } from '@modules/shared/components/ovic-groups-radio-v2/ovic-groups-radio-v2.component';
 import { FormDocumentFileAndLinkComponent } from '@modules/shared/components/form-document-file-and-link/form-document-file-and-link.component';
+import { MatButtonModule } from '@angular/material/button';
 
 
 interface ItemGroupExTend extends SelectItemGroup {
@@ -60,7 +61,8 @@ interface ItemGroupExTend extends SelectItemGroup {
         OvicGroupsRadioV2Component,
         FormDocumentFileAndLinkComponent,
         SelectModule,
-        LoadingProgressComponent
+        LoadingProgressComponent,
+        MatButtonModule
     ],
     templateUrl: './monhoc-thongtin.component.html',
     styleUrls: ['./monhoc-thongtin.component.css']

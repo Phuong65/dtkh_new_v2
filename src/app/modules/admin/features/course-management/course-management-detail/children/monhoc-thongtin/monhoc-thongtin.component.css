@@ -1,6 +1,8 @@
 :host {
     display: block;
     width: 100%;
+    height: 100%;
+    min-height: 0;
     --mh-primary: #1e40af;
     --mh-primary-hover: #1d4ed8;
     --mh-primary-light: #eff6ff;
@@ -27,6 +29,23 @@
     --input-hover-border: #94a3b8;
     --input-focus-border: #64748b;
     --focus-ring: rgb(100 116 139 / 16%);
+    --mh-loading-offset: 64px;
+}
+
+:host > .layout_component_container > app-loading-progress {
+    position: fixed !important;
+    top: var(--mh-loading-offset);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 50;
+    width: auto !important;
+    height: auto !important;
+}
+
+:host ::ng-deep app-loading-progress .loading-progress__inside {
+    width: 300px;
+    margin: auto;
 }
 
 /* ==========================================================================
@@ -222,17 +241,17 @@
     font-weight: 700 !important;
     border-radius: var(--mh-radius-sm) !important;
     border: none !important;
-    background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #4f46e5 100%) !important;
+    background: #2563eb !important;
     color: #ffffff !important;
-    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35) !important;
+    box-shadow: 0 4px 10px rgb(37 99 235 / 24%) !important;
     cursor: pointer;
     transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
     white-space: nowrap;
 }
 
 .mh-primary-action:hover {
-    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
-    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45) !important;
+    background: #1d4ed8 !important;
+    box-shadow: 0 6px 14px rgb(37 99 235 / 32%) !important;
     transform: translateY(-2px);
 }
 
@@ -1112,24 +1131,24 @@
 .mh-complete {
     display: flex;
     align-items: center;
-    gap: 18px;
-    padding: 20px 24px;
-    border: 1px solid #1e40af;
-    border-radius: 16px;
-    background: linear-gradient(110deg, #1e3a8a 0%, #2563eb 60%, #4f46e5 100%);
-    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.2);
+    gap: 16px;
+    padding: 18px 20px;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgb(15 23 42 / 6%);
 }
 
 .mh-complete__icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: #dbeafe;
-    color: #1e40af;
-    font-size: 18px;
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    background: #eaf2ff;
+    color: #2563eb;
+    font-size: 19px;
     flex-shrink: 0;
 }
 
@@ -1139,30 +1158,41 @@
 }
 
 .mh-complete span {
-    font-size: 11.5px !important;
-    font-weight: 700 !important;
-    color: #2563eb;
-    text-transform: uppercase;
     display: block;
+    color: #2563eb;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: .06em;
+    text-transform: uppercase;
 }
 
 .mh-complete h2 {
-    margin: 2px 0;
-    font-size: 15px !important;
+    margin: 2px 0 3px;
+    color: #0f172a;
+    font-size: 16px !important;
     font-weight: 700 !important;
-    color: #ffffff;
 }
 
 .mh-complete p {
     margin: 0;
+    color: #52657f;
     font-size: 12px !important;
-    color: #dbeafe;
+    line-height: 1.45;
 }
 
 .mh-primary-action--large {
-    padding: 11px 26px !important;
-    min-height: 44px !important;
-    font-size: 14.5px !important;
+    flex: 0 0 auto;
+    min-width: 156px;
+    padding: 10px 18px !important;
+    min-height: 42px !important;
+    font-size: 14px !important;
+}
+
+.mh-primary-action--large:disabled {
+    background: #dbeafe !important;
+    color: #94a3b8 !important;
+    box-shadow: none !important;
+    cursor: not-allowed;
 }
 
 /* ==========================================================================
@@ -1216,6 +1246,43 @@
 :host ::ng-deep .mh-field .p-multiselect:focus-within {
     border-color: var(--input-focus-border) !important;
     box-shadow: 0 0 0 2px var(--focus-ring) !important;
+}
+
+:host ::ng-deep .mh-program-picker .p-multiselect-label {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    padding: 5px 10px !important;
+}
+
+:host ::ng-deep .mh-program-picker .p-multiselect-chip-item,
+:host ::ng-deep .mh-program-picker .p-multiselect-chip {
+    display: inline-flex;
+    min-width: 0;
+    max-width: 100%;
+    align-items: center;
+    overflow: hidden;
+    border: 1px solid #bfdbfe;
+    border-radius: 5px;
+    background: #eff6ff;
+    color: #1e40af;
+    font-size: 12px;
+    line-height: 1.25;
+}
+
+:host ::ng-deep .mh-program-picker .p-multiselect-chip-label,
+:host ::ng-deep .mh-program-picker .p-chip-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:host ::ng-deep .mh-program-picker .p-multiselect-chip-icon,
+:host ::ng-deep .mh-program-picker .p-chip-remove-icon {
+    flex: 0 0 auto;
 }
 
 :host ::ng-deep .group-radio-v2 {
@@ -1366,13 +1433,18 @@
     }
 
     .mh-complete {
-        flex-direction: column;
         align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .mh-complete div:nth-child(2) {
+        flex-basis: calc(100% - 58px);
     }
 
     .mh-primary-action--large {
         width: 100%;
         justify-content: center;
+        margin-left: 58px;
     }
 }
 

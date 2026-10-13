@@ -94,8 +94,8 @@
                                 <div><strong>{{ f['sotinchi_th'].value || 0 }}</strong><span>TC thực hành</span></div>
                                 <div><strong>{{ f['tongsogio'].value || 0 }}</strong><span>Tổng số tiết</span></div>
                             </div>
-                            <div class="mh-summary__note"><i class="fa fa-info-circle" aria-hidden="true"></i>Thay đổi
-                                được lưu khi nhấn “Lưu học phần”.</div>
+                            <!-- <div class="mh-summary__note"><i class="fa fa-info-circle" aria-hidden="true"></i>Thay đổi
+                                được lưu khi nhấn “Lưu học phần”.</div> -->
                         </div>
                     </div>
                 </aside>
@@ -370,12 +370,12 @@
                     <div class="mh-complete">
                         <div class="mh-complete__icon"><i class="fa fa-check" aria-hidden="true"></i></div>
                         <div><span>Hoàn tất thiết lập</span>
-                            <h2>Sẵn sàng lưu học phần?</h2>
+                            <!-- <h2>Sẵn sàng lưu học phần?</h2> -->
                             <p>Kiểm tra lại các trường bắt buộc và liên kết chương trình đào tạo trước khi lưu.</p>
                         </div>
-                        <button type="submit" class="btn mh-primary-action mh-primary-action--large"
+                        <button mat-flat-button class="btn ictu-badge-btn--info-reverse"
                             [disabled]="formKhoaHoc.invalid || isSaving()"><i class="fa fa-floppy-o"
-                                aria-hidden="true"></i><span>Lưu toàn bộ thông tin</span></button>
+                                aria-hidden="true"></i>Lưu toàn bộ thông tin</button>
                     </div>
                 </div>
             </div>
