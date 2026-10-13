@@ -1,4 +1,3 @@
-import { HelperService } from '@core/services/helper.service';
 import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, WritableSignal, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -11,13 +10,13 @@ import { ConditionOption } from '@modules/shared/models/condition-option';
 import { CtdtService } from '@modules/shared/services/ctdt.service';
 import { CtdtHocphanService } from '@modules/shared/services/ctdt-hocphan.service';
 import { ElngUserProfileService } from '@modules/shared/services/elearning-user-profile.service';
-import { concatMap, defer, finalize, forkJoin, from, map, of, Subject, switchMap, takeUntil, tap, throwError, toArray } from 'rxjs';
+import { concatMap, finalize, forkJoin, from, map, of, Subject, switchMap, takeUntil, tap, toArray } from 'rxjs';
 import { Ctdt } from '@modules/shared/models/ctdt';
 import { ROLES } from '@modules/shared/utils/syscat';
 import { ConfigsService } from '@modules/shared/services/configs.service';
 import { TableModule } from 'primeng/table';
-import { ElnKhoaHoc } from '@modules/shared/models/elng-khoa-hoc';
 import { CtdtHocphan } from '@modules/shared/models/ctdt_hocphan';
+import { ElnKhoaHoc } from '@modules/shared/models/elng-khoa-hoc';
 import { Subject as CatalogSubject } from '@modules/shared/models/subject';
 import { SubjectCourseExtend } from '@modules/shared/models/subject-course';
 import { SubjectCourseService } from '@modules/shared/services/subject-course.service';
@@ -41,6 +40,8 @@ type CourseRow = ElnKhoaHoc & {
     hp_songhanh?: number[];
     selected_hp?: boolean;
 };
+
+type SubjectCourseOption = CatalogSubject & { course_id: number };
 
 export interface typeCtdtHocphan {
     key: string;
@@ -71,7 +72,6 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
     private readonly configsService = inject(ConfigsService);
     private readonly elnKhoaHocService = inject(ElnKhoaHocService);
     private readonly subjectCourseService = inject(SubjectCourseService);
-    private readonly helperService = inject(HelperService);
     private readonly ctdtConfigService = inject(CtdtConfigService);
 
     @Input() selectedCtdt: Ctdt | null = null;
@@ -83,10 +83,9 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
     list_cdt_hocphan: typeCtdtHocphan[] = [];
     list_course: CourseRow[] = [];
     selectedKhoiKienthuc: typeCtdtHocphan | null = null;
-    list_subjects: CatalogSubject[] = [];
-    selectedSubjects = new Map<number, CatalogSubject>();
-    private readonly createdSubjectIds = new Set<number>();
-    private readonly pendingCourseLinks = new Map<number, Map<number, Partial<ElnKhoaHoc>>>();
+    list_subjects: SubjectCourseOption[] = [];
+    selectedSubjects = new Map<number, SubjectCourseOption>();
+    private readonly linkedCourseIds = new Set<number>();
     private readonly dirtyCourseIds = new Set<number>();
     readonly subjectPaginator = new IctuPaginatorControl({ pageLinkSize: 5, rows: 20, showFirstLastIcon: true });
     private appliedSubjectSearch = '';
@@ -150,8 +149,7 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         this.loadedCtdtId = Number(ctdtId);
         this.list_course = [];
         this.list_cdt_hocphan = [];
-        this.createdSubjectIds.clear();
-        this.pendingCourseLinks.clear();
+        this.linkedCourseIds.clear();
         this.dirtyCourseIds.clear();
         this.isLoadingData.set(true);
         this.courseLoadError = '';
@@ -206,41 +204,47 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         this.cancelLoad$.next();
         this.isLoadingData.set(true);
         this.courseLoadError = '';
-        const courseCondition: ConditionOption = {
-            condition: [{ conditionName: 'ctdt_id', condition: OvicQueryCondition.equal, value: String(ctdtId) },
-                { conditionName: 'status', condition: OvicQueryCondition.greaterThan, value: '-1', orWhere: 'and' }],
-            set: [{ label: 'limit', value: '-1' }], page: null
-        };
         const linkCondition: ConditionOption = {
             condition: [{ conditionName: 'ctdt_id', condition: OvicQueryCondition.equal, value: String(ctdtId) }],
             set: [{ label: 'limit', value: '-1' }], page: null
         };
-        forkJoin({
-            courses: this.elnKhoaHocService.getKhoaHocByPageNew_2(courseCondition),
-            links: this.ctdtHocphanService.getCtdtHocphanByPageNew(linkCondition)
-        }).pipe(takeUntil(this.cancelLoad$), takeUntil(this.destroy$)).subscribe({
-            next: ({ courses, links }) => {
+        this.ctdtHocphanService.getCtdtHocphanByPageNew(linkCondition).pipe(
+            switchMap(links => {
+                const courseIds = [...new Set((links.data || []).map(link => Number(link.course_id)).filter(id => Number.isInteger(id) && id > 0))];
+                if (!courseIds.length) return of({ links: links.data || [], courses: [] as ElnKhoaHoc[] });
+                const courseCondition: ConditionOption = {
+                    condition: [{ conditionName: 'status', condition: OvicQueryCondition.greaterThan, value: '-1' }],
+                    set: [{ label: 'limit', value: '-1' }, { label: 'include', value: courseIds.join(',') }, { label: 'include_by', value: 'id' }],
+                    page: null
+                };
+                return this.elnKhoaHocService.getKhoaHocByPageNew_2(courseCondition).pipe(
+                    map(response => ({ links: links.data || [], courses: response.data || [] }))
+                );
+            }),
+            takeUntil(this.cancelLoad$), takeUntil(this.destroy$)
+        ).subscribe({
+            next: ({ links, courses }) => {
                 if (this.selectedCtdt?.id !== ctdtId) return;
-                const linkByCourseId = new Map<number, CtdtHocphan>((links.data || []).map(link => [Number(link.course_id), link]));
+                const courseById = new Map(courses.map(course => [Number(course.id), course]));
                 const drafts = new Map(this.list_course.filter(c => this.dirtyCourseIds.has(c.id)).map(c => [c.id, c]));
-                this.list_course = (courses.data || []).map(course => {
+                this.list_course = links.map(link => {
+                    const course = courseById.get(Number(link.course_id));
+                    if (!course) return null;
                     const draft = drafts.get(course.id);
                     if (draft) return draft;
-                    const link = linkByCourseId.get(Number(course.id));
                     return {
                         ...course,
-                        ctdt_hocphan_id: link?.id,
-                        khoikienthuc: link?.khoikienthuc || '',
-                        hocky: link?.hocky ?? null,
-                        hp_hoctruoc: [...(link?.hp_hoctruoc || [])],
-                        hp_tienquyet: [...(link?.hp_tienquyet || [])],
-                        hp_songhanh: [...(link?.hp_songhanh || [])]
+                        ctdt_hocphan_id: link.id,
+                        khoikienthuc: link.khoikienthuc,
+                        hocky: link.hocky ?? null,
+                        hp_hoctruoc: [...(link.hp_hoctruoc || [])],
+                        hp_tienquyet: [...(link.hp_tienquyet || [])],
+                        hp_songhanh: [...(link.hp_songhanh || [])]
                     };
-                });
+                }).filter((course): course is CourseRow => course !== null);
+                this.linkedCourseIds.clear();
                 this.list_course.forEach(course => {
-                    if (course.subject_id && linkByCourseId.has(Number(course.id))) {
-                        this.createdSubjectIds.add(Number(course.subject_id));
-                    }
+                    this.linkedCourseIds.add(Number(course.id));
                 });
                 this.groupCourses();
                 this.isLoadingData.set(false);
@@ -341,17 +345,16 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         });
     }
 
-    private flattenSubjectCourses(relations: SubjectCourseExtend[]): CatalogSubject[] {
-        const subjects: CatalogSubject[] = [];
+    private flattenSubjectCourses(relations: SubjectCourseExtend[]): SubjectCourseOption[] {
+        const subjects: SubjectCourseOption[] = [];
         const seen = new Set<number>();
         relations.forEach(relation => {
             const entries = Array.isArray(relation.subjects) ? relation.subjects : relation.subjects ? [relation.subjects] : [];
-            entries.forEach(subject => {
-                if (subject && !seen.has(Number(subject.id))) {
-                    seen.add(Number(subject.id));
-                    subjects.push(subject);
-                }
-            });
+            const subject = entries.find(item => item && Number(item.id) === Number(relation.subject_id));
+            if (subject && !seen.has(Number(subject.id))) {
+                seen.add(Number(subject.id));
+                subjects.push({ ...subject, course_id: Number(relation.course_id) });
+            }
         });
         return subjects.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'vi'));
     }
@@ -369,86 +372,50 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         this.selectedSubjects.clear();
     }
 
-    isSubjectCreated(subject: CatalogSubject): boolean {
-        return this.createdSubjectIds.has(Number(subject.id));
+    isSubjectCreated(subject: SubjectCourseOption): boolean {
+        return this.linkedCourseIds.has(Number(subject.course_id));
     }
 
-    toggleSubjectCheck(subject: CatalogSubject): void {
+    toggleSubjectCheck(subject: SubjectCourseOption): void {
         if (this.savingHp() || this.isSubjectCreated(subject)) return;
         if (this.selectedSubjects.has(subject.id)) this.selectedSubjects.delete(subject.id);
         else this.selectedSubjects.set(subject.id, subject);
-    }
-
-    buildCourseFromSubject(subject: CatalogSubject, ctdt: Ctdt): Partial<ElnKhoaHoc> {
-        return {
-            ctdt_id: ctdt.id,
-            bo_ctdt_id: ctdt.ctdt_bo_id,
-            subject_id: subject.id,
-            title: subject.name,
-            maso: subject.code,
-            slug: this.helperService.slugVietnamese(subject.name),
-            desc: subject.desc || '',
-            category_ids: ctdt.category_id,
-            status: 1,
-            params: {
-                sotinchi: Number(subject.sotinchi) || 0,
-                sotinchi_th: Number(subject.sotinchi_th) || 0,
-                exam_format: null, cdr: null, exam_type: null
-            }
-        };
     }
 
     saveCoursesFromSubjects(): void {
         if (this.savingHp() || this.isLoadingSubjects() || !this.selectedCtdt?.id || !this.selectedKhoiKienthuc?.key) return;
         const subjects = [...this.selectedSubjects.values()].filter(subject => !this.isSubjectCreated(subject));
         if (!subjects.length) return;
+        if (subjects.some(subject => !Number.isInteger(Number(subject.course_id)) || Number(subject.course_id) <= 0)) {
+            this.createError = 'Môn học chưa có course_id trong subject-courses. Vui lòng tạo course cho môn này trước.';
+            return;
+        }
         const ctdt = { ...this.selectedCtdt };
         const blockKey = this.selectedKhoiKienthuc.key;
         let completed = 0;
-        let current: CatalogSubject = subjects[0];
+        let current: SubjectCourseOption = subjects[0];
         this.savingHp.set(true);
         this.createError = '';
         this.progressValue = 0;
 
         from(subjects).pipe(
-            concatMap(subject => defer(() => {
+            concatMap(subject => {
                 current = subject;
-                const existingCourse = this.pendingCourseLinks.get(ctdt.id)?.get(subject.id);
-                if (existingCourse) return of(existingCourse);
-                this.savingTitle = `Đang tạo học phần ${completed + 1}/${subjects.length}: ${subject.code}`;
-                const payload = this.buildCourseFromSubject(subject, ctdt);
-                return this.elnKhoaHocService.addElnKhoaHoc(payload).pipe(
-                    map(course => typeof course === 'object' ? { ...payload, ...(course as ElnKhoaHoc) } : { ...payload, id: course as number })
-                );
-            }).pipe(
-                switchMap(course => {
-                    const courseId = this.getCreatedCourseId(course);
-                    if (!courseId) return throwError(() => new Error('API courses không trả về ID học phần mới.'));
-                    const courseData = typeof course === 'object' ? course as ElnKhoaHoc : this.buildCourseFromSubject(subject, ctdt) as ElnKhoaHoc;
-                    let ctdtPending = this.pendingCourseLinks.get(ctdt.id);
-                    if (!ctdtPending) {
-                        ctdtPending = new Map<number, Partial<ElnKhoaHoc>>();
-                        this.pendingCourseLinks.set(ctdt.id, ctdtPending);
-                    }
-                    ctdtPending.set(subject.id, { ...courseData, id: courseId });
-                    this.savingTitle = `Đang thêm học phần ${completed + 1}/${subjects.length} vào CTĐT...`;
-                    return this.ctdtHocphanService.addCtdtHocphan(this.buildCtdtHocphan(courseData, subject, courseId, ctdt, blockKey));
-                }),
-                tap(() => {
-                    this.pendingCourseLinks.get(ctdt.id)?.delete(subject.id);
+                this.savingTitle = `Đang thêm học phần ${completed + 1}/${subjects.length} vào CTĐT...`;
+                return this.ctdtHocphanService.addCtdtHocphan(this.buildCtdtHocphan(subject, ctdt, blockKey)).pipe(tap(() => {
                     completed++;
                     this.progressValue = Math.round(completed / subjects.length * 100);
                     if (this.selectedCtdt?.id === ctdt.id) {
-                        this.createdSubjectIds.add(Number(subject.id));
+                        this.linkedCourseIds.add(Number(subject.course_id));
                         this.selectedSubjects.delete(subject.id);
                     }
-                })
-            )),
+                }));
+            }),
             toArray(), takeUntil(this.destroy$), finalize(() => this.savingHp.set(false))
         ).subscribe({
             next: () => {
                 this.savingHp.set(false);
-                this.notificationService.toastSuccess(`Đã tạo và thêm ${completed} học phần vào CTĐT`);
+                this.notificationService.toastSuccess(`Đã thêm ${completed} học phần vào CTĐT`);
                 this.closeDrawerChooseMonhoc();
                 if (this.selectedCtdt?.id === ctdt.id) this.loadCtdthocPhan();
             },
@@ -462,21 +429,11 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         });
     }
 
-    private getCreatedCourseId(course: unknown): number | null {
-        const data = course as { id?: number; data?: number | { id?: number } } | null;
-        const nestedData = data?.data;
-        const rawId = typeof course === 'number'
-            ? course
-            : data?.id ?? (typeof nestedData === 'number' ? nestedData : nestedData?.id);
-        const id = Number(rawId);
-        return Number.isInteger(id) && id > 0 ? id : null;
-    }
-
-    private buildCtdtHocphan(course: ElnKhoaHoc, subject: CatalogSubject, courseId: number, ctdt: Ctdt, blockKey: string): Partial<CtdtHocphan> {
+    private buildCtdtHocphan(subject: SubjectCourseOption, ctdt: Ctdt, blockKey: string): Partial<CtdtHocphan> {
         return {
             ctdt_id: ctdt.id,
-            course_id: courseId,
-            course_name: course.title || subject.name,
+            course_id: subject.course_id,
+            course_name: subject.name,
             khoikienthuc: blockKey,
             sotinchi: Number(subject.sotinchi) || 0,
             sotinchi_thuchanh: Number(subject.sotinchi_th) || 0,

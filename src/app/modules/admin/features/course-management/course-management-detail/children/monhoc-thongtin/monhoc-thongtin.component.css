@@ -260,7 +260,6 @@
    ========================================================================== */
 .mh-rail {
     position: sticky;
-    top: 76px;
     display: flex;
     flex-direction: column;
 }

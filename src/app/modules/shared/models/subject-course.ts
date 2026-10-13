@@ -4,6 +4,7 @@ import { Subject } from "./subject";
 export interface SubjectCourse extends BaseModel {
     id: number;
     subject_id: number;
+    course_id?: number;
     ctdt_bo_id: number;
 }
 

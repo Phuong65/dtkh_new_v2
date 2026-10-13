@@ -113,7 +113,7 @@
 
 .course-management-table {
     min-width: 980px;
-    table-layout: fixed;
+    table-layout: auto;
     border-collapse: collapse;
 }
 
@@ -139,19 +139,26 @@
 }
 
 .course-management-col-index { width: 58px; }
-.course-management-col-code { width: 100px; }
+.course-management-col-code { width: 1%; }
 .course-management-col-number { width: 70px; }
 .course-management-col-category { width: 180px; }
 .course-management-col-programme { width: 230px; }
 
+.course-management-table td:nth-child(2) {
+    white-space: nowrap;
+}
+
 .course-management-code {
     display: inline-block;
+    width: max-content;
+    max-width: none;
     padding: 2px 6px;
     border-radius: 3px;
     background: #f1f5f9;
     color: #475569;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 12px;
+    white-space: nowrap;
 }
 
 .course-management-title {

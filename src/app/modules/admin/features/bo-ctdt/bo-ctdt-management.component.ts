@@ -6,7 +6,7 @@ import { MatButton } from '@angular/material/button';
 import { Drawer } from 'primeng/drawer';
 import { InputText } from 'primeng/inputtext';
 import { Tooltip } from 'primeng/tooltip';
-import { Observable, Subject as RxSubject, concatMap, filter, forkJoin, from, map, switchMap, takeUntil, tap, toArray } from 'rxjs';
+import { Observable, Subject as RxSubject, concatMap, filter, forkJoin, from, map, of, switchMap, takeUntil, tap, toArray } from 'rxjs';
 import { IctuPaginatorComponent } from '@core-new/components/ictu-paginator/ictu-paginator.component';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 import { AppState } from '@core-new/models/app-state';
@@ -16,6 +16,8 @@ import { IctuDeletingAnimationControl } from '@core-new/models/ictu-deleting-ani
 import { NotificationService } from '@core-new/service/notification.service';
 import { OvicConditionParam, OvicQueryCondition } from '@core/models/dto';
 import { AuthService } from '@core/services/auth.service';
+import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
+import { HelperService } from '@core/services/helper.service';
 import { BoCtdt } from '@modules/shared/models/bo-ctdt';
 import { BoCtdtService } from '@modules/shared/services/bo-ctdt.service';
 import { Ctdt } from '@modules/shared/models/ctdt';
@@ -48,6 +50,10 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     private readonly ctdtService = inject(CtdtService);
     private readonly subjectService = inject(SubjectService);
     private readonly subjectCourseService = inject(SubjectCourseService);
+    private readonly courseService = inject(ElnKhoaHocService);
+    private readonly helperService = inject(HelperService);
+    private readonly pendingCourseIds = new Map<string, number>();
+    private readonly selectedSubjectData = new Map<number, Subject>();
     private readonly cancelSubjectLoad$ = new RxSubject<void>();
     private readonly cancelRelationLoad$ = new RxSubject<void>();
     private subjectRequestId = 0;
@@ -202,14 +208,20 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     }
 
     onSubjectSearch(): void {
+        if (this.isSavingSubjects()) return;
         this.appliedSubjectSearch = this.subjectSearchValue().trim();
         const bo = this.subjectDrawerBo();
-        if (bo) this.loadSubjectPicker(bo.id, this.subjectDrawerSession, 1);
+        if (!bo) return;
+        if (this.subjectRelationsReady) this.loadSubjects(1);
+        else this.loadSubjectPicker(bo.id, this.subjectDrawerSession, 1);
     }
 
     onSubjectPageChange(page: number): void {
+        if (this.isSavingSubjects()) return;
         const bo = this.subjectDrawerBo();
-        if (bo) this.loadSubjectPicker(bo.id, this.subjectDrawerSession, page);
+        if (!bo) return;
+        if (this.subjectRelationsReady) this.loadSubjects(page);
+        else this.loadSubjectPicker(bo.id, this.subjectDrawerSession, page);
     }
 
     retrySubjectLoad(): void {
@@ -312,6 +324,7 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
         this.subjectDrawerBo.set(bo);
         this.subjectRelations.set([]);
         this.linkedSubjects.set([]);
+        this.selectedSubjectData.clear();
         this.subjects.set([]);
         this.selectedSubjectIds.set(new Set<number>());
         this.subjectSearchValue.set('');
@@ -340,7 +353,10 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
         const selected = new Set(this.selectedSubjectIds());
         const subjectId = Number(subject.id);
         if (selected.has(subjectId)) selected.delete(subjectId);
-        else selected.add(subjectId);
+        else {
+            selected.add(subjectId);
+            this.selectedSubjectData.set(subjectId, subject);
+        }
         this.selectedSubjectIds.set(selected);
     }
 
@@ -359,6 +375,11 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
         });
         const selected = this.selectedSubjectIds();
         const toCreate = [...selected].filter(subjectId => !existingBySubjectId.has(subjectId));
+        const missingSubject = toCreate.find(subjectId => !this.selectedSubjectData.has(subjectId));
+        if (missingSubject) {
+            this.subjectSaveError.set('Không tìm thấy dữ liệu môn học đã chọn. Vui lòng tải lại danh sách.');
+            return;
+        }
         const toDelete = [...existingBySubjectId.entries()]
             .filter(([subjectId]) => !selected.has(subjectId))
             .map(([, relation]) => relation);
@@ -377,7 +398,7 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
         let completed = 0;
         from(operations).pipe(
             concatMap(operation => (operation.type === 'create'
-                ? this.subjectCourseService.create({ ctdt_bo_id: bo.id, subject_id: operation.subjectId })
+                ? this.createCourseSubjectRelation(bo, this.selectedSubjectData.get(operation.subjectId))
                 : this.subjectCourseService.delete(operation.relation.id)
             ).pipe(tap(() => completed++))),
             toArray(),
@@ -397,6 +418,40 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
                 this.loadSubjectRelations(bo.id, session);
             }
         });
+    }
+
+    private createCourseSubjectRelation(bo: BoCtdt, subject: Subject): Observable<unknown> {
+        const key = `${bo.id}:${subject.id}`;
+        const existingCourseId = this.pendingCourseIds.get(key);
+        const courseId$ = existingCourseId
+            ? of(existingCourseId)
+            : this.courseService.addElnKhoaHoc({
+                bo_ctdt_id: Number(bo.id),
+                subject_id: Number(subject.id),
+                title: subject.name,
+                maso: subject.code,
+                slug: this.helperService.slugVietnamese(subject.name),
+                desc: subject.desc || '',
+                status: 1,
+                params: {
+                    sotinchi: Number(subject.sotinchi) || 0,
+                    sotinchi_th: Number(subject.sotinchi_th) || 0
+                }
+            }).pipe(map(response => {
+                const rawId = typeof response === 'number' ? response : response?.id ?? response?.data?.id ?? response?.data;
+                const id = Number(rawId);
+                if (!Number.isInteger(id) || id <= 0) throw new Error('API courses không trả về ID hợp lệ.');
+                this.pendingCourseIds.set(key, id);
+                return id;
+            }));
+        return courseId$.pipe(
+            switchMap(courseId => this.subjectCourseService.create({
+                ctdt_bo_id: Number(bo.id),
+                subject_id: Number(subject.id),
+                course_id: courseId
+            })),
+            tap(() => this.pendingCourseIds.delete(key))
+        );
     }
 
     private loadSubjectPicker(boId: number, session: number, page: number): void {
@@ -426,7 +481,9 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
                 this.subjectRelations.set(relations);
                 this.linkedSubjects.set(this.flattenRelationSubjects(relations));
                 this.selectedSubjectIds.set(new Set(relations.map(relation => Number(relation.subject_id))));
-                this.subjects.set(response.subjects.data || []);
+                const pageSubjects = response.subjects.data || [];
+                pageSubjects.forEach(subject => this.selectedSubjectData.set(Number(subject.id), subject));
+                this.subjects.set(pageSubjects);
                 this.subjectPaginator.reset(response.subjects.totalRecords || 0);
                 this.subjectPaginator.changePage(page);
                 this.subjectRelationsReady = true;
@@ -499,7 +556,9 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
         ).subscribe({
             next: response => {
                 if (session !== this.subjectDrawerSession || requestId !== this.subjectRequestId) return;
-                this.subjects.set(response.data || []);
+                const pageSubjects = response.data || [];
+                pageSubjects.forEach(subject => this.selectedSubjectData.set(Number(subject.id), subject));
+                this.subjects.set(pageSubjects);
                 this.subjectPaginator.reset(response.totalRecords || 0);
                 this.subjectPaginator.changePage(page);
                 this.isLoadingSubjects.set(false);
@@ -519,6 +578,7 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
         this.subjectDrawerBo.set(null);
         this.subjectRelations.set([]);
         this.linkedSubjects.set([]);
+        this.selectedSubjectData.clear();
         this.subjects.set([]);
         this.selectedSubjectIds.set(new Set<number>());
         this.subjectSearchValue.set('');

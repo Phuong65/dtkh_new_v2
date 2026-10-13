@@ -172,7 +172,7 @@
 
     <p-drawer [(visible)]="drawerChooseMonhocVisible" (onHide)="onSubjectDrawerHide()" [dismissible]="!savingHp()"
         [closable]="!savingHp()" [closeOnEscape]="!savingHp()" [blockScroll]="true"
-        [header]="selectedKhoiKienthuc?.title || 'Chọn môn học từ danh mục'" [style]="{ width: 'min(620px, 100vw)' }"
+        [header]="selectedKhoiKienthuc?.title || 'Gắn học phần vào CTĐT'" [style]="{ width: 'min(620px, 100vw)' }"
         appendTo="body" position="right" styleClass="ictu-p-drawer content-course-drawer">
         <div class="ictu-p-drawer__content">
             <div class="ictu-p-drawer__content__body position-relative">
@@ -185,9 +185,6 @@
                                 placeholder="Nhập mã hoặc tên môn học" autocomplete="off">
                         </div>
                     </div>
-                    <!-- <div class="course-picker-summary"><i class="ti ti-info-circle" aria-hidden="true"></i>
-                        <span>Chọn môn bất kỳ. Mỗi môn sẽ tạo một course mới gắn với CTĐT này.</span>
-                    </div> -->
                     @if (subjectLoadError) {
                     <div class="admin-table__alert-danger text-center w-100">
                         Tải dữ liệu thất bại. Vui lòng chọn

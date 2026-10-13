@@ -29,7 +29,7 @@ export class SubjectCourseService {
         );
     }
 
-    create(data: Pick<SubjectCourse, 'ctdt_bo_id' | 'subject_id'>): Observable<SubjectCourse> {
+    create(data: Pick<SubjectCourse, 'ctdt_bo_id' | 'subject_id' | 'course_id'>): Observable<SubjectCourse> {
         return this.http.post<Dto>(this.api, data).pipe(map(response => response.data as SubjectCourse));
     }
 

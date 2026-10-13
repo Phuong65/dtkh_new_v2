@@ -79,7 +79,6 @@ export class CourseManagementComponent {
                 },
                 error: () => {
                     this.filterState.set('error');
-                    this.filterError.set('Không thể tải bộ lọc khoa/CTĐT.');
                 }
             });
     }
@@ -89,7 +88,6 @@ export class CourseManagementComponent {
         this.state.set('loading');
         this.errorMessage.set('');
         const conditions: OvicConditionParam[] = [
-            { conditionName: 'ctdt_id', condition: OvicQueryCondition.notEqual, value: '0', orWhere: 'and' },
             { conditionName: 'status', condition: OvicQueryCondition.greaterThan, value: '-1', orWhere: 'and' }
         ];
         const query = this.searchValue().trim();
@@ -98,7 +96,7 @@ export class CourseManagementComponent {
         if (this.ctdtId() !== null) conditions.push({ conditionName: 'ctdt_id', condition: OvicQueryCondition.equal, value: String(this.ctdtId()), orWhere: 'and' });
         const option: ConditionOption = {
             condition: conditions,
-            set: [{ label: 'limit', value: String(this.table.paginator.rows()) }, { label: 'orderby', value: 'title' }, { label: 'order', value: 'ASC' }],
+            set: [{ label: 'limit', value: String(this.table.paginator.rows()) }, { label: 'orderby', value: 'created_at' }, { label: 'order', value: 'DESC' }],
             page: String(page)
         };
         this.courseService.getKhoaHocByPageNew_2(option).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
