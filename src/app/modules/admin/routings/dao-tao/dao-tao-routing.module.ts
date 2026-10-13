@@ -26,6 +26,11 @@ const routes: Routes = [
         loadChildren: () => import('@modules/admin/features/chuongtrinh-daotao/ctdt.module').then(m => m.CtdtModule)
     },
     {
+        path: 'course-management',
+        loadComponent: () => import('@modules/admin/features/course-management/course-management.component')
+            .then(c => c.CourseManagementComponent)
+    },
+    {
         path: 'quanly-monhoc',
         loadChildren: () => import('@modules/admin/features/quanly-monhoc/quanly-monhoc.module').then(m => m.QuanlyMonhocModule)
     },

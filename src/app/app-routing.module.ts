@@ -22,6 +22,11 @@ const routes: Routes = [
          loadComponent: () => import('@modules/admin/features/bo-ctdt/ctdt-detail/ctdt-detail').then(c => c.CtdtDetail)
     },
     {
+        path: 'hoc-phan',
+        loadComponent: () => import('@modules/admin/features/course-management/course-management-detail/course-management-detail')
+            .then(c => c.CourseManagementDetail)
+    },
+    {
         path: '',
         loadChildren: () =>
             import('@modules/public/public.module').then((m) => m.PublicModule),
