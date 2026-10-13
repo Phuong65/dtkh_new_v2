@@ -8,6 +8,13 @@ import { OvicQueryCondition } from '@core/models/dto';
 import { ConditionOption } from '@modules/shared/models/condition-option';
 import { ElnKhoaHoc } from '@modules/shared/models/elng-khoa-hoc';
 import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
+import { MonhocThongtinComponent } from './children/monhoc-thongtin/monhoc-thongtin.component';
+import { MonhocMuctieuCdrComponent } from './children/monhoc-muctieu-cdr/monhoc-muctieu-cdr.component';
+import { MonhocNoidungComponent } from './children/monhoc-noidung/monhoc-noidung.component';
+import { MonhocQuestionCdrComponent } from './children/monhoc-question-cdr/monhoc-question-cdr.component';
+import { MonhocFormdeComponent } from './children/monhoc-formde/monhoc-formde.component';
+import { MonhocKiemtraDanhgiaComponent } from './children/monhoc-kiemtra-danhgia/monhoc-kiemtra-danhgia.component';
+import { MonhocCauhinhComponent } from './children/monhoc-cauhinh/monhoc-cauhinh.component';
 
 export type CourseManagementTabId =
     | 'thong-tin'
@@ -27,7 +34,17 @@ export interface CourseManagementTabItem {
 @Component({
     selector: 'app-course-management-detail',
     standalone: true,
-    imports: [CommonModule, LoadingProgressComponent],
+    imports: [
+        CommonModule,
+        LoadingProgressComponent,
+        MonhocThongtinComponent,
+        MonhocMuctieuCdrComponent,
+        MonhocNoidungComponent,
+        MonhocQuestionCdrComponent,
+        MonhocFormdeComponent,
+        MonhocKiemtraDanhgiaComponent,
+        MonhocCauhinhComponent
+    ],
     templateUrl: './course-management-detail.html',
     styleUrl: './course-management-detail.css',
 })

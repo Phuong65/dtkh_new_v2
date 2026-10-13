@@ -33,16 +33,45 @@
         @if (state() === 'loading') {
         <app-loading-progress heading="Đang tải học phần..." backdropFilter="blur(2px)"></app-loading-progress>
         } @else if (state() === 'error') {
-        <div class="course-detail-error" role="alert">
-            <span>{{ errorMessage() }}</span>
-            @if (courseId()) {
-            <button type="button" (click)="retryLoadCourse()">Tải lại</button>
-            }
-        </div>
+        <div class="admin-table__alert-danger text-center w-100">
+        Tải dữ liệu thất bại. Vui lòng chọn
+        <a (click)="retryLoadCourse()" href="javascript:" class="admin-table__alert-danger__btn-reload">tải lại</a>.
+    </div>
         } @else {
-            @for (tab of tabs; track tab.id) {
-            <section class="course-detail-tab-panel" role="tabpanel" [id]="'course-panel-' + tab.id"
-                [attr.aria-labelledby]="'course-tab-' + tab.id" [hidden]="activeTabId() !== tab.id" tabindex="0">
+            @if (activeTabId() === 'thong-tin') {
+            <section class="course-detail-tab-panel" role="tabpanel" id="course-panel-thong-tin"
+                aria-labelledby="course-tab-thong-tin" tabindex="0">
+                <app-monhoc-thongtin></app-monhoc-thongtin>
+            </section>
+            } @else if (activeTabId() === 'muc-tieu-cdr') {
+            <section class="course-detail-tab-panel" role="tabpanel" id="course-panel-muc-tieu-cdr"
+                aria-labelledby="course-tab-muc-tieu-cdr" tabindex="0">
+                <app-monhoc-muctieu-cdr></app-monhoc-muctieu-cdr>
+            </section>
+            } @else if (activeTabId() === 'noi-dung') {
+            <section class="course-detail-tab-panel" role="tabpanel" id="course-panel-noi-dung"
+                aria-labelledby="course-tab-noi-dung" tabindex="0">
+                <app-monhoc-noidung></app-monhoc-noidung>
+            </section>
+            } @else if (activeTabId() === 'phan-bo-cdr-cau-hoi') {
+            <section class="course-detail-tab-panel" role="tabpanel" id="course-panel-phan-bo-cdr-cau-hoi"
+                aria-labelledby="course-tab-phan-bo-cdr-cau-hoi" tabindex="0">
+                <app-monhoc-question-cdr></app-monhoc-question-cdr>
+            </section>
+            } @else if (activeTabId() === 'form-de') {
+            <section class="course-detail-tab-panel" role="tabpanel" id="course-panel-form-de"
+                aria-labelledby="course-tab-form-de" tabindex="0">
+                <app-monhoc-formde></app-monhoc-formde>
+            </section>
+            } @else if (activeTabId() === 'kiem-tra-danh-gia') {
+            <section class="course-detail-tab-panel" role="tabpanel" id="course-panel-kiem-tra-danh-gia"
+                aria-labelledby="course-tab-kiem-tra-danh-gia" tabindex="0">
+                <app-monhoc-kiemtra-danhgia></app-monhoc-kiemtra-danhgia>
+            </section>
+            } @else if (activeTabId() === 'cau-hinh') {
+            <section class="course-detail-tab-panel" role="tabpanel" id="course-panel-cau-hinh"
+                aria-labelledby="course-tab-cau-hinh" tabindex="0">
+                <app-monhoc-cauhinh></app-monhoc-cauhinh>
             </section>
             }
         }

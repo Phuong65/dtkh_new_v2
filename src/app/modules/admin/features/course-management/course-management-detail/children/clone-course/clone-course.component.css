@@ -1,0 +1,28 @@
+.phanquyen-dulieu-content-left .mat-selection-list {
+    height: calc(100% - 40px);
+    overflow: auto;
+}
+
+.clone-course {
+    height: 100%;
+}
+
+.info-course {
+    padding: 10px;
+}
+
+.info-course-content {
+    background-color: #caf1d8;
+    padding: 10px;
+    font-size: 14px;
+}
+
+.info-course-content label {
+    width: 150px;
+    margin: 0px;
+    font-weight: 500;
+}
+
+.info-course-item {
+    margin-bottom: 10px;
+}

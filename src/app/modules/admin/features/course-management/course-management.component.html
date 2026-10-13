@@ -1,78 +1,82 @@
 <section class="admin-section--table ictu-admin-page course-management-page" aria-labelledby="course-management-title">
     @if (state() === 'loading') {
-        <app-loading-progress heading="Đang tải danh sách học phần..." backdropFilter="none"></app-loading-progress>
+    <app-loading-progress heading="Đang tải danh sách học phần..." backdropFilter="none"></app-loading-progress>
     }
 
     <div class="admin-wrap-table ictu-admin-table-shell course-management-shell">
         @if (state() === 'error') {
-            <div class="course-management-error" role="alert">
-                <i class="ti ti-alert-circle" aria-hidden="true"></i>
-                <span>{{ errorMessage() }}</span>
-                <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary" (click)="loadCourses(1, true)">Tải lại</button>
-            </div>
+        <div class="admin-table__alert-danger text-center w-100">
+            Tải dữ liệu thất bại. Vui lòng chọn
+            <a (click)="loadCourses(1, true)" href="javascript:" class="admin-table__alert-danger__btn-reload">tải
+                lại</a>.
+        </div>
         } @else {
-            <header class="admin-wrap-table__head course-management-toolbar">
-                <div></div>
-                <div class="course-management-filters" role="search">
-                    <label class="course-management-search-input">
-                        <span class="content-sr-only">Tìm học phần</span>
-                        <input pInputText type="search" [ngModel]="searchValue()" (ngModelChange)="searchValue.set($event)"
-                            (keydown.enter)="onSearch()" placeholder="Tìm theo tên học phần" aria-label="Tìm theo tên học phần">
-                    </label>
-                    <p-select [options]="categories()" optionLabel="title" optionValue="id" [ngModel]="categoryId()"
-                        (ngModelChange)="categoryId.set($event); onFilterChange()" [showClear]="true" placeholder="Khoa quản lý"
-                        ariaLabel="Lọc theo khoa quản lý"></p-select>
-                    <p-select [options]="filteredProgrammes()" optionLabel="ten" optionValue="id" [ngModel]="ctdtId()"
-                        (ngModelChange)="ctdtId.set($event); onFilterChange()" [showClear]="true" placeholder="Chương trình đào tạo"
-                        ariaLabel="Lọc theo chương trình đào tạo"></p-select>
-                </div>
-            </header>
-
-            @if (filterState() === 'error') {
-                <div class="course-management-filter-error" role="status">
-                    <i class="ti ti-info-circle" aria-hidden="true"></i>{{ filterError() }}
-                </div>
-            }
-
-            <div class="admin-wrap-table__body ictu-admin-table-shell__body">
-                <div class="ictu-admin-table-scroll course-management-table-scroll">
-                    <table class="tbl admin-table course-management-table">
-                        <caption class="content-sr-only">Danh sách học phần đã gắn chương trình đào tạo</caption>
-                        <thead>
-                            <tr>
-                                <th class="course-management-col-index text-center">STT</th>
-                                <th class="course-management-col-code text-center">Mã học phần</th>
-                                <th class="text-center">Tên học phần</th>
-                                <th class="course-management-col-number text-center">TC</th>
-                                <th class="course-management-col-number text-center">TCTH</th>
-                                <th class="course-management-col-category text-center">Khoa quản lý</th>
-                                <th class="course-management-col-programme text-center">Chương trình đào tạo</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (course of table.data(); track course.id; let index = $index) {
-                                <tr>
-                                    <td class="text-center">{{ table.paginator.startIndex() + index }}</td>
-                                    <td class="text-center">{{ course.maso || '—' }}</td>
-                                    <td class="text-left">
-                                        <a class="course-management-title" [routerLink]="['/hoc-phan']"
-                                            [queryParams]="{ code: course.id }">{{ course.title || 'Chưa đặt tên' }}</a>
-                                    </td>
-                                    <td class="text-center">{{ course.params?.sotinchi || 0 }}</td>
-                                    <td class="text-center">{{ course.params?.sotinchi_th || 0 }}</td>
-                                    <td class="text-center">{{ categoryName(course.category_ids) }}</td>
-                                    <td class="text-center">{{ programmeName(course.ctdt_id) }}</td>
-                                </tr>
-                            } @empty {
-                                <tr><td colspan="7" class="course-management-empty">Không có học phần thuộc chương trình đào tạo.</td></tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+        <header class="admin-wrap-table__head course-management-toolbar">
+            <div></div>
+            <div class="course-management-filters" role="search">
+                <label class="course-management-search-input">
+                    <span class="content-sr-only">Tìm học phần</span>
+                    <input pInputText type="search" [ngModel]="searchValue()" (ngModelChange)="searchValue.set($event)"
+                        (keydown.enter)="onSearch()" placeholder="Tìm theo tên học phần"
+                        aria-label="Tìm theo tên học phần">
+                </label>
+                <p-select [options]="categories()" optionLabel="title" optionValue="id" [ngModel]="categoryId()"
+                    (ngModelChange)="categoryId.set($event); onFilterChange()" [showClear]="true"
+                    placeholder="Khoa quản lý" ariaLabel="Lọc theo khoa quản lý"></p-select>
+                <p-select [options]="filteredProgrammes()" optionLabel="ten" optionValue="id" [ngModel]="ctdtId()"
+                    (ngModelChange)="ctdtId.set($event); onFilterChange()" [showClear]="true"
+                    placeholder="Chương trình đào tạo" ariaLabel="Lọc theo chương trình đào tạo"></p-select>
             </div>
-            <footer class="admin-wrap-table__foot course-management-footer">
-                <ictu-paginator [control]="table.paginator" (onChangePage)="loadCourses($event, false)"></ictu-paginator>
-            </footer>
+        </header>
+
+        @if (filterState() === 'error') {
+        <div class="course-management-filter-error" role="status">
+            <i class="ti ti-info-circle" aria-hidden="true"></i>{{ filterError() }}
+        </div>
+        }
+
+        <div class="admin-wrap-table__body ictu-admin-table-shell__body">
+            <div class="ictu-admin-table-scroll course-management-table-scroll">
+                <table class="tbl admin-table course-management-table">
+                    <caption class="content-sr-only">Danh sách học phần đã gắn chương trình đào tạo</caption>
+                    <thead>
+                        <tr>
+                            <th class="course-management-col-index text-center">STT</th>
+                            <th class="course-management-col-code text-center">Mã học phần</th>
+                            <th class="text-center">Tên học phần</th>
+                            <th class="course-management-col-number text-center">TC</th>
+                            <th class="course-management-col-number text-center">TCTH</th>
+                            <th class="course-management-col-category text-center">Khoa quản lý</th>
+                            <th class="course-management-col-programme text-center">Chương trình đào tạo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (course of table.data(); track course.id; let index = $index) {
+                        <tr>
+                            <td class="text-center">{{ table.paginator.startIndex() + index }}</td>
+                            <td class="text-center">{{ course.maso || '—' }}</td>
+                            <td class="text-left">
+                                <a class="course-management-title" [routerLink]="['/hoc-phan']"
+                                    [queryParams]="{ code: course.id }">{{ course.title || 'Chưa đặt tên' }}</a>
+                            </td>
+                            <td class="text-center">{{ course.params?.sotinchi || 0 }}</td>
+                            <td class="text-center">{{ course.params?.sotinchi_th || 0 }}</td>
+                            <td class="text-center">{{ categoryName(course.category_ids) }}</td>
+                            <td class="text-center">{{ programmeName(course.ctdt_id) }}</td>
+                        </tr>
+                        } @empty {
+                        <tr>
+                            <td colspan="7" class="course-management-empty">Không có học phần thuộc chương trình đào
+                                tạo.</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <footer class="admin-wrap-table__foot course-management-footer">
+            <ictu-paginator [control]="table.paginator" (onChangePage)="loadCourses($event, false)"></ictu-paginator>
+        </footer>
         }
     </div>
 </section>
