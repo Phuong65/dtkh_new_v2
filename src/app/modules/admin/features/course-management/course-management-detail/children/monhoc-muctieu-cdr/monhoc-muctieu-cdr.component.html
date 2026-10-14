@@ -162,11 +162,17 @@
 </main>
 
 <p-drawer [(visible)]="piDrawerVisible" (onHide)="onHideOp()" [dismissible]="!isSaving()" [closable]="!isSaving()"
-    [closeOnEscape]="!isSaving()" [blockScroll]="true" header="Chọn PI" ariaCloseLabel="Đóng"
+    [closeOnEscape]="!isSaving()" [blockScroll]="true" header="Chọn PLO / PI" ariaCloseLabel="Đóng"
     [style]="{ width: 'min(700px, 100vw)' }" appendTo="body" position="right"
     styleClass="ictu-p-drawer course-cdr-pi-drawer">
     <div class="ictu-p-drawer__content">
         <div class="ictu-p-drawer__content__body pi-drawer-body">
+            @if (selectedCtdt) {
+            <div class="pi-drawer-context">
+                <span class="pi-drawer-context__icon" aria-hidden="true"><i class="ti ti-school"></i></span>
+                <div><strong>{{ selectedCtdt.ten }}</strong><span>Chọn các chỉ báo PI phù hợp với chuẩn đầu ra học phần.</span></div>
+            </div>
+            }
             @if (selectedCtdt?.['ctdt_cdr']?.length) {
             <div class="plo-container">
                 @for (plo of selectedCtdt['ctdt_cdr']; track plo.id) {
@@ -174,7 +180,10 @@
                     <header class="pi-group-header">
                         <input type="checkbox" [id]="'plo-' + plo.id" [checked]="isAllSelected(plo)"
                             [indeterminate]="isIndeterminate(plo)" (change)="toggleAllChildren(plo, $event)">
-                        <label [for]="'plo-' + plo.id"><b>{{ plo.kyhieu }}</b><span [innerHTML]="plo.noidung | safeHtmlDecode"></span></label>
+                        <label [for]="'plo-' + plo.id">
+                            <span class="plo-heading"><b>{{ plo.kyhieu }}</b><small>{{ plo.items?.length || 0 }} PI</small></span>
+                            <span class="plo-description" [innerHTML]="plo.noidung | safeHtmlDecode"></span>
+                        </label>
                     </header>
                     @for (pi of plo.items; track pi.id) {
                     <label class="pi-item" [for]="'pi-' + pi.id">

@@ -3,14 +3,18 @@ import { CourseQuestionFormService } from '@modules/shared/services/course-quest
 import { CourseQuestionForm } from '@modules/shared/models/course-question-form';
 import { CoursePlanActivitiesService } from '@modules/shared/services/course-plan-activities.service';
 import { ThiFormDetailsService } from '@modules/shared/services/thi-form-details.service';
-import { Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild, ElementRef, ViewChildren, QueryList, inject } from '@angular/core';
+import { Component, DestroyRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild, ElementRef, ViewChildren, QueryList, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
+import { AppState } from '@core-new/models/app-state';
+import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from '@modules/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from '@core/services/auth.service';
 import { HelperService } from '@core/services/helper.service';
-import { NotificationService } from '@core/services/notification.service';
+import { NotificationService } from '@core-new/service/notification.service';
 import { ThiFormService } from '@modules/shared/services/thi-form.service';
 import { PaginatorModule } from 'primeng/paginator';
 import { TableModule } from 'primeng/table';
@@ -21,8 +25,6 @@ import { OvicQueryCondition } from '@core/models/dto';
 import { forkJoin, mergeMap, Observable, of } from 'rxjs';
 import { ElnKhoaHoc } from '@modules/shared/models/elng-khoa-hoc';
 import { CHUAN_DAU_RA } from '@modules/shared/utils/syscat';
-import { DialogModule } from 'primeng/dialog';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { APP_CONFIGS, key_server } from '@env';
 import { PlanActivityCdr } from '../monhoc-question-cdr/monhoc-question-cdr.component';
 import { CourseQuestionsService } from '@modules/shared/services/course-questions.service';
@@ -38,14 +40,15 @@ import { CourseQuestionsService } from '@modules/shared/services/course-question
         PaginatorModule,
         ReactiveFormsModule,
         MatMenuModule,
-        DialogModule,
-        MatProgressBarModule
+        MatButtonModule,
+        LoadingProgressComponent
     ],
     templateUrl: './form-de-kthp.component.html',
     styleUrls: ['./form-de-kthp.component.css']
 })
 export class FormDeKthpComponent implements OnInit, OnChanges {
     private notificationService = inject(NotificationService);
+    private readonly destroyRef = inject(DestroyRef);
     private helperService = inject(HelperService);
     private auth = inject(AuthService);
     private thiFormService = inject(ThiFormService);
@@ -76,6 +79,9 @@ export class FormDeKthpComponent implements OnInit, OnChanges {
     progressValue: number = 0;
 
     displayModal: boolean = false;
+    readonly state = signal<AppState>('loading');
+    readonly errorMessage = signal('');
+    readonly loadingHeading = signal('Đang tải Form KTHP...');
 
     /** Inserted by Angular inject() migration for backwards compatibility */
     constructor(...args: unknown[]);
@@ -98,7 +104,9 @@ export class FormDeKthpComponent implements OnInit, OnChanges {
         console.log('initFormDetail');
         this._course['question_take_total'] = null;
         this.list_course_plan = null;
-        this.notificationService.isProcessing(true);
+        this.state.set('loading');
+        this.errorMessage.set('');
+        this.loadingHeading.set('Đang tải Form KTHP...');
         switch (this._course.av) {
             case 0:
                 this.loadType0();
@@ -207,7 +215,7 @@ export class FormDeKthpComponent implements OnInit, OnChanges {
             this.coursePlanActivitiesService.getCoursePlanActivitiesByPageNew(condition_plan),
             this.courseFormKthpService.getCourseFormKthpByPageNew(condition_form_detail),
             this.courseQuestionsService.getCourseQuestionsByPageNew(condition_question)
-        ]).subscribe({
+        ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
             next: ([_plan_activity, _form_detail, _course_question]) => {
 
                 const parent = _plan_activity.data.filter(m => m.parent_id === 0);
@@ -356,10 +364,11 @@ export class FormDeKthpComponent implements OnInit, OnChanges {
                     default:
                         break;
                 }
-                this.notificationService.isProcessing(false);
+                this.state.set('success');
             },
             error: () => {
-
+                this.errorMessage.set('Không thể tải Form KTHP. Vui lòng thử lại.');
+                this.state.set('error');
             }
         })
     }
@@ -722,7 +731,7 @@ export class FormDeKthpComponent implements OnInit, OnChanges {
 
                 this.setNumberQuestiontype1();
 
-                this.notificationService.isProcessing(false);
+                this.state.set('success');
             }
         })
     }

@@ -2,24 +2,28 @@ import { CourseFormCommentService } from '@shared/services/course-form-comment.s
 import { HoidongThamdinhService } from '@modules/shared/services/hoidong-thamdinh.service';
 import { HoidongThamdinhMonhocThanhvienService } from '@modules/shared/services/hoidong-thamdinh-monhoc-thanhvien.service';
 import { CourseFormDuyetService } from '@shared/services/course-form-duyet.service';
-import { AfterViewInit, Component, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren, inject } from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
+import { AppState } from '@core-new/models/app-state';
+import { MatButtonModule } from '@angular/material/button';
+import { Drawer } from 'primeng/drawer';
+import { TooltipModule } from 'primeng/tooltip';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from '@modules/shared/shared.module';
 import { FormDeKthpComponent } from '../form-de-kthp/form-de-kthp.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatListModule } from '@angular/material/list';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
 import { PanelModule } from 'primeng/panel';
 import { TableModule } from 'primeng/table';
 import { OvicQueryCondition } from '@core/models/dto';
 import { ConditionOption } from '@modules/shared/models/condition-option';
-import { forkJoin, mergeMap, Observable, of } from 'rxjs';
+import { distinctUntilChanged, forkJoin, mergeMap, Observable, of, Subject, takeUntil } from 'rxjs';
 import { ElnKhoaHoc } from '@modules/shared/models/elng-khoa-hoc';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NotificationService } from '@core/services/notification.service';
+import { NotificationService } from '@core-new/service/notification.service';
 import { CoursePlanActivitiesService } from '@modules/shared/services/course-plan-activities.service';
 import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
 import { ElngUserProfileService } from '@modules/shared/services/elearning-user-profile.service';
@@ -62,8 +66,6 @@ interface Tuluan15pRow {
         TableModule,
         FormsModule,
         ReactiveFormsModule,
-        MatProgressBarModule,
-        DialogModule,
         NgbModule,
         PanelModule,
         ButtonModule,
@@ -71,13 +73,18 @@ interface Tuluan15pRow {
         FormDeKthpComponent,
         ShowLabelData,
         BadgeModule,
-        DuyetFormDeComponent
+        DuyetFormDeComponent,
+        MatButtonModule,
+        Drawer,
+        TooltipModule,
+        LoadingProgressComponent
     ],
     templateUrl: './monhoc-formde.component.html',
     styleUrls: ['./monhoc-formde.component.css']
 })
 export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     private activatedRoute = inject(ActivatedRoute);
+    private readonly destroyRef = inject(DestroyRef);
     private notificationService = inject(NotificationService);
     private coursePlanActivitiesService = inject(CoursePlanActivitiesService);
     private router = inject(Router);
@@ -96,8 +103,6 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     private hoidongThamdinhMonhocService = inject(HoidongThamdinhMonhocService);
     private hoidongThamdinhMonhocThanhvienService = inject(HoidongThamdinhMonhocThanhvienService);
     private courseFormCommentService = inject(CourseFormCommentService);
-
-    @ViewChild('templateAddBaigiang') templateAddBaigiang: TemplateRef<any>;
 
     @ViewChildren('inputNumberQuestion') inputNumberQuestion: QueryList<any>;
 
@@ -146,6 +151,11 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     progressValue: number = 0;
 
     displayModal: boolean = false;
+    readonly state = signal<AppState>('loading');
+    readonly errorMessage = signal('');
+    readonly loadingHeading = signal('Đang tải Form đề...');
+    readonly addWeekDrawerVisible = signal(false);
+    private readonly cancelCourseLoad$ = new Subject<void>();
 
     list_course_plan: PlanActivityCdr[];
 
@@ -208,11 +218,22 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        this.activatedRoute.queryParams.subscribe((params) => {
-            if (params && params['code']) {
-                this.notificationService.isProcessing(true);
+        this.activatedRoute.queryParamMap.pipe(
+            distinctUntilChanged((previous, current) => previous.get('code') === current.get('code')),
+            takeUntilDestroyed(this.destroyRef)
+        ).subscribe(params => this.loadCourseData(params.get('code')));
+    }
 
-                const course_id = params['code'];
+    private loadCourseData(code: string | null): void {
+            this.cancelCourseLoad$.next();
+            this.selectedCourse = null;
+            if (code && Number.isSafeInteger(Number(code)) && Number(code) > 0) {
+                this.state.set('loading');
+                this.addWeekDrawerVisible.set(false);
+                this.errorMessage.set('');
+                this.loadingHeading.set('Đang tải Form đề...');
+
+                const course_id = code;
 
                 const contition_course: ConditionOption = {
                     condition: [
@@ -302,7 +323,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                         return of(null)
                     })),
                     this.courseFormCommentService.getCourseFormCommentByPageNew(condition_form_comment)
-                ]).subscribe({
+                ]).pipe(takeUntil(this.cancelCourseLoad$), takeUntilDestroyed(this.destroyRef)).subscribe({
                     next: ([_course, _user_profile, _course_form_duyet, _hoidong_thanhvien, _comment]) => {
                         if (_course.recordsFiltered) {
 
@@ -345,24 +366,31 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                             this.createListTab(_course_form_duyet.data);
 
                             this.loadFormCcCauhoi();
+                            this.state.set('success');
 
                         } else {
-                            this.notificationService.toastError("Không tìm thấy môn học");
-                            this.router.navigate(['/admin/content-none']);
+                            this.errorMessage.set('Không tìm thấy học phần.');
+                            this.state.set('error');
                         }
                     },
                     error: () => {
-                        this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
+                        this.errorMessage.set('Không thể tải Form đề. Vui lòng thử lại.');
+                        this.state.set('error');
                     }
                 })
             } else {
-                this.router.navigate(['/admin/content-none']);
+                this.errorMessage.set('ID học phần không hợp lệ.');
+                this.state.set('error');
             }
-        })
     }
 
     ngOnInit(): void {
 
+    }
+
+    reloadData(): void {
+        const code = this.activatedRoute.snapshot.queryParamMap.get('code');
+        this.loadCourseData(code);
     }
 
     isEmptyObject(obj: any): boolean {
@@ -629,7 +657,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     closeForm() {
-        this.notificationService.closeSideNavigationMenu();
+        this.addWeekDrawerVisible.set(false);
     }
     //** môn thường */
     loadFormCcCauhoiType0() {
@@ -1462,7 +1490,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
         if (check) {
             return this.notificationService.toastWarning("Vui lòng kiểm tra lại số lượng câu hỏi lấy");
         } else {
-            if (request.length > 1) {
+            if (request.length > 0) {
                 this.progressValue = 0;
                 this.displayModal = true;
                 this.loopAddForm(request, 0).subscribe({
@@ -1476,6 +1504,8 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                         this.notificationService.toastError("Lưu thất bại, vui lòng thử lại")
                     }
                 })
+            } else {
+                this.notificationService.toastWarning('Chưa đủ điều kiện lưu Form đề. Vui lòng kiểm tra bài đã chọn và số câu lấy.');
             }
         }
     }
@@ -2203,7 +2233,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     addBaiGiangToTest(test: PlanActivityCdr) {
-        this.notificationService.openSideNavigationMenu({ template: this.templateAddBaigiang, size: 500, offsetTop: '0px' });
+        this.addWeekDrawerVisible.set(true);
 
         this.selectedTestTx = test;
 
@@ -2459,7 +2489,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                         this.selectedTestTx['weeks_test'].splice(index, 1);
                     }
                 } else {
-                    this.notificationService.confirmDelete().then(a => {
+                    this.notificationService.confirmDelete2().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(a => {
                         if (a) {
                             this.notificationService.isProcessing(true);
                             this.courseFormTxService.deleteCourseFormTx(week['_form_tx_id']).subscribe({
@@ -2478,7 +2508,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                 break;
             case 1:
                 if (week['_form_tx_ids'] && week['_form_tx_ids'].length) {
-                    this.notificationService.confirmDelete().then(a => {
+                    this.notificationService.confirmDelete2().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(a => {
                         if (a) {
                             this.notificationService.isProcessing(true);
                             this.courseFormTxService.deleteCourseFormTx(week['_form_tx_ids'].toString()).subscribe({
@@ -2502,7 +2532,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                 break;
             case 2:
                 if (week['_form_tx_ids'] && week['_form_tx_ids'].length) {
-                    this.notificationService.confirmDelete().then(a => {
+                    this.notificationService.confirmDelete2().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(a => {
                         if (a) {
                             this.notificationService.isProcessing(true);
                             this.courseFormTxService.deleteCourseFormTx(week['_form_tx_ids'].toString()).subscribe({

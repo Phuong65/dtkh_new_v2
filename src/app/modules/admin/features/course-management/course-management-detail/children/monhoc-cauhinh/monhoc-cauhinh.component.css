@@ -1,258 +1,277 @@
-.layout_component_container {
-    background-color: #f2f2f2;
-}
-
-.layout_component_container .document-type-a4-vertical {
-    background: transparent;
-    margin: 0px auto;
-    padding: 10px;
-    width: 800px;
-}
-
-.box-span {
-    padding: 5px 8px;
-    border-radius: 6px;
-    margin-left: 5px;
-}
-
-.cho-duyet-box {
-    background-color: var(--gray-300);
-    color: var(--gray-600);
-    font-weight: 600;
-}
-
-.dat-box {
-    background-color: var(--green-100);
-    color: var(--green-700);
-    font-weight: 600;
-}
-
-.box-panel-setting {
-    margin-bottom: 10px;
-}
-
-.box-panel-setting:last-child {
-    margin-bottom: 0px;
-}
-
-.flex {
-    display: flex;
-}
-
-.span-box-input {
-    height: 100%;
-    /* padding: 5px; */
-    border: 1px solid #ced4da;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 0px 5px;
-    background: #e9ecef;
-}
-
-.input-group-span {
-    width: 50% !important;
-    flex: 1
-}
-
-.no-border-right {
-    border-right: 0px;
-}
-
-.no-border-left {
-    border-left: 0px;
-}
-
-.width-30px {
-    width: 30px;
-}
-
-.text-align-center {
-    text-align: center;
-}
-
-.layout-setting-course .form-row-flex-row {
-    margin-top: 30px;
-}
-
-.layout-setting-course .form-row-flex-row:first-child {
-    margin-top: 0px;
-}
-
-/* ----- */
-.layout-setting-course * {
-    box-sizing: border-box;
-    /*  */
-}
-
-.layout-setting-course {
-    /* background: #f4f6f8;
-    padding: 40px 0; */
-}
-
-.layout-setting-course .container {
-    padding: 0px;
-    margin: auto;
-}
-
-.layout-setting-course .card {
-    background: #fff;
-    border-radius: 8px;
-    padding: 0px 24px;
-    border: 0px;
-}
-
-.layout-setting-course .row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 0;
-    border-bottom: 1px solid #eee;
-}
-
-.layout-setting-course .row:last-child {
-    border-bottom: none;
-}
-
-.layout-setting-course label {
-    font-weight: 600;
+:host {
     display: block;
+    height: 100%;
+    min-height: 0;
+    color: #334155;
+    font-family: var(--primary-font-family), 'Be Vietnam Pro', 'Noto Sans', sans-serif;
+    font-size: 14px;
 }
 
-.layout-setting-course .value {
-    margin: 6px 0;
-}
-
-.layout-setting-course small {
-    color: #777;
-}
-
-.layout-setting-course .edit {
-    cursor: pointer;
-    color: #888;
-}
-
-.layout-setting-course .pending {
-    background: #f5f7f9;
-    border-radius: 6px;
-    padding: 16px;
-    margin: 16px 0;
-}
-
-.layout-setting-course .pending a {
-    color: #2e7d32;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.layout-setting-course select {
-    padding: 6px 10px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-}
-
-/* Toggle Switch */
-.layout-setting-course .switch {
+.config-shell {
     position: relative;
-    width: 42px;
-    height: 22px;
+    height: 100%;
+    min-height: 100%;
+    background: #f3f4f6;
 }
 
-.layout-setting-course .switch input {
-    display: none;
+.config-shell > app-loading-progress {
+    z-index: 30;
 }
 
-.layout-setting-course .slider {
-    position: absolute;
-    inset: 0;
-    background: #ccc;
-    border-radius: 22px;
-    transition: .3s;
+.config-workspace {
+    width: min(1180px, 100%);
+    margin: 0 auto;
+    padding: 12px 14px 36px;
+    box-sizing: border-box;
 }
 
-.layout-setting-course .slider::before {
-    content: "";
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    left: 2px;
-    top: 2px;
-    background: white;
-    border-radius: 50%;
-    transition: .3s;
+.config-table-card.ictu-admin-table-shell {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--admin-wrap-table-element-radius, 4px);
+    background: #fff;
+    box-shadow: none;
 }
 
-.layout-setting-course .switch input:checked+.slider {
-    background: #4caf50;
-}
-
-.layout-setting-course .switch input:checked+.slider::before {
-    transform: translateX(20px);
-}
-
-/* Buttons */
-.layout-setting-course .actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 24px;
-}
-
-.layout-setting-course .accept {
-    background: #2e7d32;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.layout-setting-course .dismiss {
-    background: #eee;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.layout-setting-course .item-child {
+.config-card-header.admin-wrap-table__head {
     display: flex;
     align-items: center;
-    width: 100%;
-    margin-top: 15px;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 68px;
+    padding: 10px 16px;
+    border: 0;
+    border-bottom: 1px solid #dbe3ec;
+    background: #fff;
 }
 
-.layout-setting-course .item-child:first-child {
-    margin-top: 0px;
+.config-card-header .admin-wrap-table__heading {
+    color: #334155;
+    font-size: 14.5px;
+    font-weight: 600;
+    letter-spacing: .02em;
 }
 
-.layout-setting-course .item-child-title {
-    flex: 1;
+.config-card-subtitle,
+.config-section-heading p,
+.config-setting-card header p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.45;
 }
 
-.layout-setting-course .item-child input {
+.config-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 8px;
+}
+
+.config-table-scroll.ictu-admin-table-scroll {
+    overflow-x: auto;
+    overflow-y: visible;
+}
+
+:host ::ng-deep .config-grid-table {
+    min-width: 780px;
+}
+
+:host ::ng-deep .config-grid-table .col-order { width: 68px; }
+:host ::ng-deep .config-grid-table .col-test-title { min-width: 230px; }
+:host ::ng-deep .config-grid-table .col-test-type { width: 280px; }
+:host ::ng-deep .config-grid-table .col-status { width: 130px; }
+:host ::ng-deep .config-grid-table .col-actions { width: 100px; }
+
+:host ::ng-deep .config-grid-table th,
+:host ::ng-deep .config-grid-table td {
+    vertical-align: middle;
+}
+
+.cell-center { text-align: center; }
+
+.order-badge {
+    display: inline-grid;
+    width: 26px;
+    height: 26px;
+    place-items: center;
+    border-radius: 50%;
+    background: #eef2ff;
+    color: #4f46e5;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-badge--saved {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.config-empty {
+    padding: 28px 16px !important;
+    color: #64748b;
     text-align: center;
-    /* background: var(--gray-200); */
-    width: 100px;
-    border-bottom: 1px solid #c8c8c8;
 }
 
-.width-60px {
-    width: 60px;
+.config-settings { margin-top: 22px; }
+
+.config-section-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 0 0 12px;
+    padding: 14px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--admin-wrap-table-element-radius, 4px);
+    background: #fff;
 }
 
-.setting-date-test-weeks {
-    transition: all 0.3s;
-    max-height: 0px;
+.section-kicker {
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .09em;
+}
+
+.config-section-heading h2 {
+    margin: 2px 0 0;
+    color: #334155;
+    font-size: 19px;
+    font-weight: 650;
+}
+
+.config-card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.config-setting-card {
+    min-width: 0;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--admin-wrap-table-element-radius, 4px);
+    background: #fff;
     overflow: hidden;
 }
 
-.activity-setting-date-weeks.setting-date-test-weeks {
-    max-height: 500px;
+.config-setting-card--wide { grid-column: span 2; }
+
+.config-setting-card > header {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-height: 68px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #edf2f7;
 }
 
-.box-time-for-weeks {
-    padding: 15px;
-    background: var(--gray-200);
-    border-radius: 6px;
-    margin-top: 15px;
+.config-setting-card h3 {
+    margin: 0;
+    color: #334155;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.setting-icon {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    place-items: center;
+    border-radius: 4px;
+    font-size: 18px;
+}
+
+.setting-icon--blue { background: #dbeafe; color: #2563eb; }
+.setting-icon--violet { background: #ede9fe; color: #7c3aed; }
+.setting-icon--amber { background: #fef3c7; color: #b45309; }
+.setting-icon--teal { background: #ccfbf1; color: #0f766e; }
+
+.setting-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 108px;
+    align-items: center;
+    gap: 14px;
+    min-height: 56px;
+    padding: 9px 16px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.setting-row:last-child { border-bottom: 0; }
+
+.setting-row label,
+.week-item label {
+    color: #475569;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+:host ::ng-deep input.admin-wrap-table__input.setting-input {
+    width: 100%;
+    min-width: 0;
+    height: 36px !important;
+    text-align: center;
+}
+
+.week-setting {
+    padding: 14px 16px 16px;
+    background: #fafcff;
+}
+
+.week-setting > strong {
+    display: block;
+    margin-bottom: 12px;
+    color: #475569;
+    font-size: 13px;
+}
+
+.week-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+}
+
+.week-item {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 5px;
+    padding: 9px;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    background: #fff;
+}
+
+.week-item label { color: #64748b; font-size: 12px; }
+
+@media (max-width: 720px) {
+    .config-workspace { padding: 10px 10px 28px; }
+    .config-card-header,
+    .config-section-heading { align-items: stretch; flex-direction: column; }
+    .config-section-heading > button { align-self: flex-start; }
+    .config-card-grid { grid-template-columns: minmax(0, 1fr); }
+    .config-setting-card--wide { grid-column: auto; }
+}
+
+@media (max-width: 460px) {
+    .config-card-header { padding: 12px; }
+    .config-actions { width: 100%; }
+    .config-actions button { flex: 1; }
+    .setting-row { grid-template-columns: 1fr; gap: 7px; }
+    :host ::ng-deep input.admin-wrap-table__input.setting-input { max-width: 100%; }
 }

@@ -1,7 +1,69 @@
-.duan-layout {
-    width: 100%;
-    height: 100%;
+:host {
+    display: block;
+    min-height: 100%;
+    font-size: 14px;
+    color: #334155;
+    font-family: var(--primary-font-family), 'Be Vietnam Pro', 'Noto Sans', sans-serif;
 }
+
+:host ::ng-deep .ovic-over-right-section,
+:host ::ng-deep .ictu-p-drawer .p-drawer-content {
+    background: #fff;
+    color: #334155;
+    font-size: 14px;
+}
+
+:host ::ng-deep .ovic-over-right-section__head {
+    min-height: 56px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #fff;
+}
+
+:host ::ng-deep .ovic-over-right-section__body { background: #fff; }
+:host ::ng-deep .ovic-input-field,
+:host ::ng-deep .admin-wrap-table__input { border-color: #cbd5e1 !important; font-size: 14px !important; }
+:host ::ng-deep .btn-success,
+:host ::ng-deep .btn-primary,
+:host ::ng-deep .btn-danger { border-radius: 4px; font-size: 14px; }
+
+
+.duan-layout {
+    position: relative;
+    min-height: 100%;
+    padding: 14px;
+    background: #f8fafc;
+}
+
+.duan-table-card.ictu-admin-table-shell {
+    height: auto !important;
+    min-height: 0 !important;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--admin-wrap-table-element-radius, 4px);
+    background: #fff;
+    overflow: visible;
+}
+
+.duan-table-head.admin-wrap-table__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 58px;
+    padding: 10px 16px;
+    border: 0;
+    border-bottom: 1px solid #e2e8f0;
+    background: #fff;
+}
+
+:host ::ng-deep .duan-table-card .admin-table { min-width: 780px; }
+:host ::ng-deep .duan-table-card th,
+:host ::ng-deep .duan-table-card td { vertical-align: middle; }
+.duan-title-cell { display: flex; align-items: center; gap: 10px; }
+.duan-title-cell > strong { flex: 1; min-width: 0; }
+.duan-action-group { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
+.assessment-drawer-body { position: relative; min-height: 100%; background: #fff; font-size: 14px; }
+.assessment-drawer-body > app-loading-progress { z-index: 40; }
+
 
 .activity-row {
     background-color: #bfdbfe !important;

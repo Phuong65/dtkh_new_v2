@@ -1,7 +1,144 @@
-.tuluan-layout {
-    height: 100%;
-    background-color: #fff;
+:host {
+    display: block;
+    min-height: 100%;
+    font-size: 14px;
+    color: #334155;
+    font-family: var(--primary-font-family), 'Be Vietnam Pro', 'Noto Sans', sans-serif;
 }
+
+:host ::ng-deep .ovic-over-right-section,
+:host ::ng-deep .ictu-p-drawer .p-drawer-content {
+    background: #fff;
+    color: #334155;
+    font-size: 14px;
+}
+
+:host ::ng-deep .ovic-over-right-section__head {
+    min-height: 56px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #fff;
+}
+
+:host ::ng-deep .ovic-over-right-section__body { background: #fff; }
+:host ::ng-deep .ovic-input-field,
+:host ::ng-deep .admin-wrap-table__input { border-color: #cbd5e1 !important; font-size: 14px !important; }
+:host ::ng-deep .btn-success,
+:host ::ng-deep .btn-primary,
+:host ::ng-deep .btn-danger { border-radius: 4px; font-size: 14px; }
+
+
+.tuluan-layout {
+    position: relative;
+    min-height: 100%;
+    padding: 14px;
+    background: #f8fafc;
+}
+
+.tuluan-table-card.ictu-admin-table-shell {
+    height: auto !important;
+    min-height: 0 !important;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--admin-wrap-table-element-radius, 4px);
+    background: #fff;
+    overflow: visible;
+}
+
+.top-tuluan-layout.admin-wrap-table__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    min-height: 58px;
+    padding: 10px 16px;
+    border: 0;
+    border-bottom: 1px solid #e2e8f0;
+    background: #fff;
+}
+
+.body-tuluan-layout { background: #fff; }
+.tuluan-legacy-caption { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; font-size: 14px; }
+.tuluan-title-cell { display: flex; align-items: center; gap: 10px; }
+.tuluan-title-cell > strong { flex: 1; min-width: 0; }
+.action-button-tuluan { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
+
+:host ::ng-deep .tuluan-table-card .admin-table { min-width: 780px; }
+:host ::ng-deep .tuluan-table-card th,
+:host ::ng-deep .tuluan-table-card td { vertical-align: middle; }
+.activity-row { background: #eff6ff !important; }
+
+.assessment-drawer-body { position: relative; width: 100%; height: 100%; min-height: 0; background: #fff; font-size: 14px; overflow: hidden; }
+.assessment-drawer-body > app-loading-progress { z-index: 40; }
+.assessment-drawer-body__content { width: 100%; height: 100%; min-height: 0; }
+
+.essay-drawer { display: flex; width: 100%; height: 100%; min-height: 100%; flex-direction: column; background: #fff; color: #334155; }
+.essay-drawer__header { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 70px; padding: 12px 18px; border-bottom: 1px solid #e2e8f0; background: #fff; }
+.essay-drawer__heading { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.essay-drawer__icon { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 8px; background: #dbeafe; color: #2563eb; font-size: 20px; }
+.essay-drawer__eyebrow { display: block; margin-bottom: 2px; color: #64748b; font-size: 12px; }
+.essay-drawer h2 { margin: 0; color: #1e293b; font-size: 17px; font-weight: 650; }
+::ng-deep .essay-form-drawer .p-drawer-content { height: 100%; padding: 0; overflow: hidden; }
+.essay-drawer__form { flex: 1 1 0; min-height: 0; overflow-y: auto; background: #f8fafc; }
+.essay-drawer__ictu-form { gap: 0; padding: 0; background: transparent; }
+.essay-drawer__ictu-form .essay-drawer__section { margin: 0; }
+.essay-drawer__ictu-form .ictu-form__label { margin: 0; position: static; padding: 0; background: transparent; line-height: 1.5; }
+.essay-drawer__ictu-form input.ictu-form__input-field { width: 100%; height: 43px !important; }
+.essay-drawer__ictu-form .p-multiselect { height: 43px; }
+
+.essay-drawer__section { padding: 18px; border-bottom: 1px solid #edf2f7; background: #fff; }
+.essay-form-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.essay-form-grid--program { grid-template-columns: minmax(0, 3fr) minmax(230px, 1fr); align-items: start; }
+.essay-field--cdr { min-width: 0; }
+.essay-field--access { min-width: 0; }
+:host ::ng-deep .essay-access-radio .group-radio-v2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 18px;
+}
+:host ::ng-deep .essay-access-radio .radio-item-v2,
+:host ::ng-deep .essay-cdr-radio .hoziron-radio-6 {
+    width: auto !important;
+    min-width: 0;
+    margin: 0 !important;
+}
+:host ::ng-deep .essay-access-radio .radio-item-item-v2,
+:host ::ng-deep .essay-cdr-radio .radio-item-item-v2 {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+:host ::ng-deep .essay-cdr-radio .hoziron-radio-6 {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 10px;
+}
+:host ::ng-deep .essay-cdr-radio .hoziron-radio-6 .radio-item-item-v2 {
+    justify-content: flex-start;
+}
+:host ::ng-deep .essay-access-radio .group-radio-text-v2,
+:host ::ng-deep .essay-cdr-radio .group-radio-text-v2 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.essay-field { display: flex; min-width: 0; flex-direction: column; gap: 7px; }
+.essay-field--wide { grid-column: span 2; }
+.essay-field > span { color: #334155; font-size: 14px; font-weight: 600; }
+.essay-field > span b { color: #dc2626; }
+.essay-field .p-multiselect { width: 100%; min-height: 42px; border-color: #cbd5e1; }
+.essay-drawer__editor { min-height: 0; flex: 1 1 auto; padding-bottom: 24px; }
+.essay-drawer__editor .essay-field { height: 100%; }
+:host ::ng-deep .essay-drawer__editor ovic-ckeditor-document,
+:host ::ng-deep .essay-drawer__editor .document-editor_basic,
+:host ::ng-deep .essay-drawer__editor .document-editor__editable { display: block; min-height: 560px; }
+:host ::ng-deep .essay-drawer__editor .ck-editor__editable_inline { min-height: 500px; }
+
+.essay-drawer__editor .essay-field { gap: 10px; }
+.essay-drawer__footer { display: flex; min-height: 64px; align-items: center; justify-content: flex-end; gap: 8px; padding: 10px 18px; border-top: 1px solid #dbe3ec; background: #fff; }
+@media (max-width: 760px) { .essay-form-grid, .essay-form-grid--program { grid-template-columns: 1fr; } .essay-field--wide { grid-column: auto; } .essay-drawer__header { padding: 12px; } .essay-drawer__section { padding: 14px 12px; } .essay-drawer__footer { padding: 10px 12px; } :host ::ng-deep .essay-access-radio .group-radio-v2, :host ::ng-deep .essay-cdr-radio .hoziron-radio-6 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
 
 .activity-row {
     background-color: #bfdbfe !important;

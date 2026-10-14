@@ -1,4 +1,14 @@
-<div class="layout-form-details">
+<main class="kthp-shell" [attr.aria-busy]="state() === 'loading'">
+    @if (state() === 'loading' || displayModal) {
+    <app-loading-progress [heading]="displayModal ? 'Đang lưu Form KTHP...' : loadingHeading()" backdropFilter="blur(2px)"></app-loading-progress>
+    }
+    @if (state() === 'error') {
+    <div class="admin-table__alert-danger text-center w-100">{{ errorMessage() }}
+        <a (click)="initFormDetail()" href="javascript:" class="admin-table__alert-danger__btn-reload">Tải lại</a>
+    </div>
+    }
+    @if (state() === 'success') {
+    <div class="layout-form-details">
     <div class="layout-form-details-body">
         @if (_course) {
 <div class="layout-form-details-body-table">
@@ -425,18 +435,12 @@
     <!-- <p style="font-size: 14px; color: red; text-align: left; margin-left: 10px; margin-bottom: 5px; margin-top: 5px;">
         Lưu ý: Kiểm tra lại cấu trúc đề trước và sau khi <span style="font-weight: bold;">Lưu lại</span></p> -->
     <div class="layout-form-details-footer">
-        <button [disabled]="false" (click)="saveFormDetail()" class="btn btn-primary">
-            <i class="fa fa-floppy-o"></i>Lưu lại
+        <button type="button" mat-flat-button [disabled]="displayModal || !list_course_plan?.length"
+            (click)="saveFormDetail()" class="btn ictu-badge-btn--primary-reverse kthp-save-button">
+            <i class="ti ti-device-floppy" aria-hidden="true"></i>Lưu lại
         </button>
     </div>
-</div>
-
-<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
-    [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
-    <div class="popup-waiting-loading">
-        <label style="width: 100%;">{{waitting_title}}</label>
-        <div class="tn-import-student-progressbar">
-            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
-        </div>
     </div>
-</p-dialog>
+    }
+</main>
+

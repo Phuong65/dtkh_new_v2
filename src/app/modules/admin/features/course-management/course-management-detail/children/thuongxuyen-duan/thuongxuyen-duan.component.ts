@@ -1,5 +1,5 @@
 import { request } from 'http';
-import { Component, Input, OnInit, QueryList, SimpleChanges, TemplateRef, ViewChild, ViewChildren, inject } from '@angular/core';
+import { Component, Input, OnInit, QueryList, SimpleChanges, TemplateRef, ViewChild, ViewChildren, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from '@modules/shared/shared.module';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -8,7 +8,11 @@ import { ElnKhoaHoc } from '@modules/shared/models/elng-khoa-hoc';
 import { CoursePlanActivityTuluan } from '@modules/shared/models/course-plan-activity-tuluan';
 import { AuthService } from '@core/services/auth.service';
 import { HelperService } from '@core/services/helper.service';
-import { NotificationService } from '@core/services/notification.service';
+import { NotificationService } from '@core-new/service/notification.service';
+import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
+import { AppState } from '@core-new/models/app-state';
+import { Drawer } from 'primeng/drawer';
+import { MatButtonModule } from '@angular/material/button';
 import { CoursePlanActivitiesService } from '@modules/shared/services/course-plan-activities.service';
 import { CoursePlanActivityTuluanTieuchichamService } from '@modules/shared/services/course-plan-activity-tuluan-tieuchicham.service';
 import { CoursePlanActivityTuluanService } from '@modules/shared/services/course-plan-activity-tuluan.service';
@@ -22,9 +26,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { CHUAN_DAU_RA } from '@modules/shared/utils/syscat';
 import { ButtonModule } from 'primeng/button';
 import { CoursePlanActivityTuluanTieuchicham } from '@modules/shared/models/course-plan-activity-tuluan-tieuchicham';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { AccordionModule } from 'primeng/accordion';
-import { DialogModule } from 'primeng/dialog';
 import { SelectModule } from 'primeng/select';
 import { PanelModule } from 'primeng/panel';
 import { SplitterModule } from 'primeng/splitter';
@@ -50,8 +52,6 @@ import { OvicDateTimePipe } from '@modules/shared/pipes/ovic-date-time.pipe';
         MultiSelectModule,
         ButtonModule,
         AccordionModule,
-        DialogModule,
-        MatProgressBarModule,
         PanelModule,
         SelectModule,
         SplitterModule,
@@ -63,7 +63,10 @@ import { OvicDateTimePipe } from '@modules/shared/pipes/ovic-date-time.pipe';
         OvicCkeditorDocumentComponent,
         ViewThuongxuyenTuluanComponent,
         SafeHtmlPipe,
-        OvicDateTimePipe
+        OvicDateTimePipe,
+        LoadingProgressComponent,
+        Drawer,
+        MatButtonModule
     ],
     templateUrl: './thuongxuyen-duan.component.html',
     styleUrls: ['./thuongxuyen-duan.component.css']
@@ -128,6 +131,12 @@ export class ThuongxuyenDuanComponent implements OnInit {
     progressValue: number = 0;
 
     displayModal: boolean = false;
+    readonly state = signal<AppState>('success');
+    readonly isSaving = signal(false);
+    loadingHeading = 'Đang tải dự án...';
+    drawerVisible = false;
+    drawerTemplate: TemplateRef<any> | null = null;
+    drawerTitle = '';
 
     waitting_title: string;
 
@@ -140,6 +149,25 @@ export class ThuongxuyenDuanComponent implements OnInit {
     /** Inserted by Angular inject() migration for backwards compatibility */
     constructor(...args: unknown[]);
     constructor() { }
+
+    get busy(): boolean {
+        return this.state() === 'loading' || this.isSaving() || this.displayModal;
+    }
+
+    get progressHeading(): string {
+        return this.displayModal ? `${this.waitting_title || 'Đang lưu tiêu chí...'} (${Math.round(this.progressValue)}%)` : this.loadingHeading;
+    }
+
+    openDrawer(template: TemplateRef<any>, title: string): void {
+        this.drawerTemplate = template;
+        this.drawerTitle = title;
+        this.drawerVisible = true;
+    }
+
+    closeDrawer(): void {
+        this.drawerVisible = false;
+        this.drawerTemplate = null;
+    }
 
     ngOnInit(): void {
         this.formData = this.formBuilder.group({
@@ -238,7 +266,7 @@ export class ThuongxuyenDuanComponent implements OnInit {
             page: null
         }
 
-        this.notificationService.isProcessing(true);
+        this.state.set('loading');
 
         const condition_plan_0: ConditionOption = {
             condition: [
@@ -268,7 +296,7 @@ export class ThuongxuyenDuanComponent implements OnInit {
             this.coursePlanActivityTuluanTieuchichamService.getCoursePlanActivityTuluanTieuchichamByPageNew(condition_tieuchicham)
         ]).subscribe({
             next: ([_tuluan, _cdr, _tieuchicham]) => {
-                this.notificationService.isProcessing(false);
+                this.state.set('success');
                 const _re_kyhieu_cdr = _cdr.data.map(m => {
                     m['label'] = m.kyhieu.concat(". ", m.title);
                     m['re_kyhieu'] = parseFloat(m.kyhieu.replace(/\D/g, ""));
@@ -291,7 +319,7 @@ export class ThuongxuyenDuanComponent implements OnInit {
             },
 
             error: () => {
-                this.notificationService.isProcessing(false);
+                this.state.set('success');
                 this.notificationService.toastWarning('Lỗi kết nối, vui lòng thử lại')
             }
         })
@@ -317,7 +345,7 @@ export class ThuongxuyenDuanComponent implements OnInit {
     createCodeTuluan() {
         this.formTitle = "Thêm dự án mới";
         this.formReset();
-        this.notificationService.openSideNavigationMenu({ template: this.templateFormAddTuluanV2, size: 1024, offsetTop: '0px' })
+        this.openDrawer(this.templateFormAddTuluanV2, this.formTitle);
     }
 
     editCodeTuluan(tuluan: CoursePlanActivityTuluan) {
@@ -332,16 +360,16 @@ export class ThuongxuyenDuanComponent implements OnInit {
         this.f['activity_cdr_ids'].setValue(tuluan.activity_cdr_ids);
         this.f['private'].setValue(tuluan.private);
         this.isUpdate = true;
-        this.notificationService.openSideNavigationMenu({ template: this.templateFormAddTuluanV2, size: 1024, offsetTop: '0px' })
+        this.openDrawer(this.templateFormAddTuluanV2, this.formTitle);
     }
 
     closeForm() {
-        this.notificationService.closeSideNavigationMenu();
+        this.closeDrawer();
     }
 
     saveCourseTuluan(yeucauduyet: boolean = false) {
         if (this.formData.valid) {
-            this.notificationService.isProcessing(true);
+            this.state.set('loading');
             const data = this.formData.getRawValue();
 
             if (yeucauduyet === true) {
@@ -351,26 +379,26 @@ export class ThuongxuyenDuanComponent implements OnInit {
             if (this.isUpdate) {
                 this.coursePlanActivityTuluanService.updateCoursePlanActivityTuluan(this.selectedTuluan.id, data).subscribe({
                     next: () => {
-                        this.notificationService.isProcessing(false);
+                        this.state.set('success');
                         this.selectedTuluan = null;
                         this.formReset();
                         this.loadTuluan();
                         this.closeForm();
                     },
                     error: () => {
-                        this.notificationService.isProcessing(false);
+                        this.state.set('success');
                     }
                 })
             } else {
                 this.coursePlanActivityTuluanService.addCoursePlanActivityTuluan(data).subscribe({
                     next: () => {
-                        this.notificationService.isProcessing(false);
+                        this.state.set('success');
                         this.selectedTuluan = null;
                         this.formReset();
                         this.loadTuluan();
                     },
                     error: () => {
-                        this.notificationService.isProcessing(false);
+                        this.state.set('success');
                     }
                 })
             }
@@ -379,15 +407,15 @@ export class ThuongxuyenDuanComponent implements OnInit {
 
     deleteTuluan(tuluan: CoursePlanActivityTuluan) {
         this.selectedTuluan = tuluan;
-        this.notificationService.confirmDelete().then(a => {
+        firstValueFrom(this.notificationService.confirmDelete2({ heading: 'Xác nhận xóa' })).then(a => {
             if (a) {
                 this.coursePlanActivityTuluanService.deleteCoursePlanActivityTuluan(tuluan.id).subscribe({
                     next: () => {
-                        this.notificationService.isProcessing(false);
+                        this.state.set('success');
                         this.loadTuluan();
                     },
                     error: () => {
-                        this.notificationService.isProcessing(false);
+                        this.state.set('success');
                     }
                 })
             }
@@ -469,7 +497,7 @@ export class ThuongxuyenDuanComponent implements OnInit {
 
 
 
-        this.notificationService.isProcessing(true);
+        this.state.set('loading');
 
         if (this.selectedActivity.ordering === 0) {
 
@@ -557,12 +585,13 @@ export class ThuongxuyenDuanComponent implements OnInit {
                     }
                 );
 
-                this.notificationService.isProcessing(false);
+                this.state.set('success');
 
-                this.notificationService.openSideNavigationMenu({ template: this.templateFormViewTuluan, size: window.innerWidth, offsetTop: '0px' });
+                this.openDrawer(this.templateFormViewTuluan, this.selectedTuluan?.title || 'Xem dự án');
             },
             error: () => {
-
+                this.state.set('success');
+                this.notificationService.toastError('Không thể tải nhận xét. Vui lòng thử lại.');
             }
         })
     }
@@ -668,7 +697,7 @@ export class ThuongxuyenDuanComponent implements OnInit {
         this.formTitle = "".concat(tuluan.title, " - Nhập tiêu chí chấm");
         this.selectedTuluan = tuluan;
         this.activityTieuChiIndex = 0;
-        this.notificationService.openSideNavigationMenu({ template: this.templateFormAddTieuchicham, size: window.innerWidth, offsetTop: "0px" });
+        this.openDrawer(this.templateFormAddTieuchicham, this.formTitle);
         this.loadTieuchicham();
     }
 
@@ -687,7 +716,7 @@ export class ThuongxuyenDuanComponent implements OnInit {
             page: null
         }
 
-        this.notificationService.isProcessing(true);
+        this.state.set('loading');
 
         this.coursePlanActivityTuluanTieuchichamService.getCoursePlanActivityTuluanTieuchichamByPageNew(condition_tieuchicham).subscribe({
             next: (tieuchi_cham) => {
@@ -719,7 +748,7 @@ export class ThuongxuyenDuanComponent implements OnInit {
                 //     this.list_tieuchi_chamdiem = tieuchis;
                 // }
 
-                this.notificationService.isProcessing(false);
+                this.state.set('success');
             }
         })
     }
@@ -740,7 +769,7 @@ export class ThuongxuyenDuanComponent implements OnInit {
     saveTieuChicham() {
         if (this.formTieuchicham.valid) {
             const data = { ...this.formTieuchicham.getRawValue() };
-            this.notificationService.isProcessing(true);
+            this.state.set('loading');
             if (!this.isUpdate) {
                 this.coursePlanActivityTuluanTieuchichamService.addCoursePlanActivityTuluanTieuchicham(data).subscribe({
                     next: () => {
@@ -832,7 +861,7 @@ export class ThuongxuyenDuanComponent implements OnInit {
             ordering: this.list_tieuchi_chamdiem && this.list_tieuchi_chamdiem.length ? this.list_tieuchi_chamdiem[this.list_tieuchi_chamdiem.length - 1].ordering + 1 : 1
         }
 
-        this.notificationService.isProcessing(true);
+        this.state.set('loading');
 
         this.coursePlanActivityTuluanTieuchichamService.addCoursePlanActivityTuluanTieuchicham(data).subscribe({
             next: () => {
@@ -840,7 +869,7 @@ export class ThuongxuyenDuanComponent implements OnInit {
                 this.loadTieuchicham();
             },
             error: () => {
-                this.notificationService.isProcessing(false);
+                this.state.set('success');
                 this.notificationService.toastError("Tạo thất bại, vui lòng thử lại")
             }
         })
@@ -880,16 +909,16 @@ export class ThuongxuyenDuanComponent implements OnInit {
     }
 
     deleteTieuchi(id: number) {
-        this.notificationService.confirmDelete().then(a => {
+        firstValueFrom(this.notificationService.confirmDelete2({ heading: 'Xác nhận xóa' })).then(a => {
             if (a) {
-                this.notificationService.isProcessing(true);
+                this.state.set('loading');
                 this.coursePlanActivityTuluanTieuchichamService.deleteCoursePlanActivityTuluanTieuchicham(id).subscribe({
                     next: () => {
                         this.notificationService.toastSuccess("Xóa thành công");
                         this.loadTieuchicham();
                     },
                     error: () => {
-                        this.notificationService.isProcessing(false);
+                        this.state.set('success');
                         this.notificationService.toastError("Xóa thất bại");
                     }
                 })
@@ -922,7 +951,7 @@ export class ThuongxuyenDuanComponent implements OnInit {
                 f['hasTieuchi'] = false;
             }
         })
-        this.notificationService.openSideNavigationMenu({ template: this.templatePmsDuan, size: 600, offsetTop: '0px' });
+        this.openDrawer(this.templatePmsDuan, 'Sao chép tiêu chí dự án');
     }
 
     saveTieuchiChamCopy() {
@@ -953,7 +982,8 @@ export class ThuongxuyenDuanComponent implements OnInit {
                         this.loadTuluan();
                     },
                     error: () => {
-                        this.notificationService.toastSuccess("Sao chép thất bại, vui lòng thử lại");
+                        this.displayModal = false;
+                        this.notificationService.toastError("Sao chép thất bại, vui lòng thử lại");
                     }
                 })
             }

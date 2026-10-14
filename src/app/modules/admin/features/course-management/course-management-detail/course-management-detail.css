@@ -224,6 +224,18 @@
     overflow: hidden;
 }
 
+.course-detail-body > app-loading-progress {
+    position: absolute !important;
+    inset: 0;
+    z-index: 30;
+    display: flex !important;
+    width: 100% !important;
+    height: 100% !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box;
+}
+
 .course-detail-tab-panel {
     display: block;
     width: 100%;

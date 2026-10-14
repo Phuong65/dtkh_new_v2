@@ -1,4 +1,7 @@
-﻿<div class="layout_component_container cauhoi-tuluan-15p">
+﻿<main class="layout_component_container cauhoi-tuluan-15p admin-assessment-child" [attr.aria-busy]="busy">
+    @if (busy) {
+    <app-loading-progress [heading]="progressHeading" backdropFilter="blur(2px)"></app-loading-progress>
+    }
     <div class="lesson-baihocv2 cauhoi-15p-layout" [ngClass]="closeLeft ? 'close-left-body' : ''">
         <aside class="menu-lesson-baihocv2 cauhoi-15p-sidebar">
             <div class="cauhoi-15p-sidebar-header">
@@ -64,7 +67,14 @@
 }
         </main>
     </div>
-</div>
+
+<p-drawer [(visible)]="drawerVisible" position="right" [style]="{ width: 'min(1024px, 100vw)' }" appendTo="body"
+    [blockScroll]="true" [closable]="!busy" [dismissible]="!busy" [closeOnEscape]="!busy" styleClass="ictu-p-drawer">
+    <div class="assessment-drawer-body">
+        @if (busy) { <app-loading-progress [heading]="progressHeading" backdropFilter="blur(2px)"></app-loading-progress> }
+        <div [attr.inert]="busy ? '' : null">@if (drawerTemplate) { <ng-container [ngTemplateOutlet]="drawerTemplate"></ng-container> }</div>
+    </div>
+</p-drawer>
 
 <ng-template #templateListCauhoi>
     <section class="layout-tuluan-right cauhoi-15p-workspace">
@@ -703,7 +713,7 @@
                                                             [disabled]="selectedCauhoi && selectedCauhoi.status === 1? true: false"
                                                             style="width: 100%; resize: none; height: -webkit-fill-available;"
                                                             cols="2" placeholder="Nhập tiêu đề cho tiêu chí {{i + 1}}"
-                                                            class="ovic-input-field" [(ngModel)]="item.title">
+                                                            class="admin-wrap-table__input" [(ngModel)]="item.title">
                                                         </textarea>
                                                     </div>
                                                     <div class="col-3">
@@ -714,7 +724,7 @@
                                                                 [disabled]="selectedCauhoi && selectedCauhoi.status === 1? true: false"
                                                                 #input_point_tieuchi
                                                                 (keydown)="pointQuestionKeyDown($event,input_point_tieuchi)"
-                                                                type="text" class="ovic-input-field"
+                                                                type="text" class="admin-wrap-table__input"
                                                                 [(ngModel)]="item.point"
                                                                 (ngModelChange)="updateTotalPointTieuChi()">
                                                         </div>
@@ -784,7 +794,7 @@
             <div style="height: 100%;" class="phanquyen-dulieu-content-left ovic-vertical__inputs">
                 <div class="form-row row">
                     <div class="col-12">
-                        <input class="ovic-input-field" type="text" [(ngModel)]="searchCauhoi" placeholder="Search">
+                        <input class="admin-wrap-table__input" type="text" [(ngModel)]="searchCauhoi" placeholder="Search">
                     </div>
                 </div>
                 @if ((list_cauhoi | filter: searchCauhoi : ['ordering','id']).length > 0) {
@@ -1001,13 +1011,4 @@
     </div>
 </ng-template>
 
-<p-dialog styleClass="dialog-waiting cauhoi-15p-dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false"
-    [(visible)]="displayModal" [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false"
-    [resizable]="false">
-    <div class="popup-waiting-loading">
-        <label style="width: 100%;">{{waitting_title}}</label>
-        <div class="tn-import-student-progressbar">
-            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
-        </div>
-    </div>
-</p-dialog>
+</main>

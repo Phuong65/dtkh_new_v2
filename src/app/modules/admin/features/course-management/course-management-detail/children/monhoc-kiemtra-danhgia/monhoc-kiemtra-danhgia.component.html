@@ -1,282 +1,174 @@
-<div class="layout_component_container">
-    <div style="height: 100%;" class="form-de-layout-right form-tracnghiem">
-        <div class="assessment-tabs">
-            <ul class="nav nav-tabs assessment-tab-list">
-                <li class="nav-item">
-                    <a class="nav-link" [class.active]="tabIndex === 0" (click)="onTabIndexChange(0)"
-                        href="javascript:void(0)">Luyện tập tại nhà{{!isDttx && key_server !== 'hvu'?'/15p':''}}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" [class.active]="tabIndex === 1" (click)="onTabIndexChange(1)"
-                        href="javascript:void(0)">{{isDttx && key_server !== 'hvu'?'Kiểm tra giữa kỳ':'Kiểm tra thường xuyên'}}</a>
-                </li>
-                @if (key_server === 'ictu') {
-                    <li class="nav-item">
-                        <a class="nav-link" [class.active]="tabIndex === 2" (click)="onTabIndexChange(2)"
-                            href="javascript:void(0)">Nhập câu hỏi KT tự luận 15P</a>
-                    </li>
-                }
-            </ul>
-            <div class="assessment-tab-panels">
-            <div class="assessment-tab-panel" [hidden]="tabIndex !== 0">
-                <div class="document-type-a4-vertical" style="position: relative;">
-                    <div class="layout-test-dg-cc" style="margin-bottom: 20px;">
-                        <p-table [value]="list_week" styleClass="tbl-danhSachUser table-reBorder">
+<main class="assessment-shell" aria-label="Kiểm tra và đánh giá học phần" [attr.aria-busy]="busy">
+    @if (state() === 'loading' || isSaving()) {
+    <app-loading-progress [heading]="loadingHeading" backdropFilter="blur(2px)"></app-loading-progress>
+    }
+
+    @if (state() === 'error') {
+    <div class="admin-table__alert-danger text-center w-100">
+        {{ errorMessage() || 'Tải dữ liệu thất bại.' }} Vui lòng chọn
+        <a href="javascript:" (click)="reloadData()" class="admin-table__alert-danger__btn-reload">tải lại</a>.
+    </div>
+    } @else if (selectedCourse) {
+    <div class="assessment-workspace">
+        <nav class="assessment-tabs" role="tablist" aria-label="Nhóm kiểm tra và đánh giá">
+            <button type="button" role="tab" [class.is-active]="tabIndex === 0" [attr.aria-selected]="tabIndex === 0"
+                aria-controls="assessment-panel-practice" (click)="onTabIndexChange(0)" [disabled]="busy">
+                <i class="ti ti-home" aria-hidden="true"></i>
+                <span>Luyện tập tại nhà{{ !isDttx && key_server !== 'hvu' ? ' / 15p' : '' }}</span>
+            </button>
+            <button type="button" role="tab" [class.is-active]="tabIndex === 1" [attr.aria-selected]="tabIndex === 1"
+                aria-controls="assessment-panel-regular" (click)="onTabIndexChange(1)" [disabled]="busy">
+                <i class="ti ti-clipboard-check" aria-hidden="true"></i>
+                <span>{{ isDttx && key_server !== 'hvu' ? 'Kiểm tra giữa kỳ' : 'Kiểm tra thường xuyên' }}</span>
+            </button>
+            @if (key_server === 'ictu') {
+            <button type="button" role="tab" [class.is-active]="tabIndex === 2" [attr.aria-selected]="tabIndex === 2"
+                aria-controls="assessment-panel-essay" (click)="onTabIndexChange(2)" [disabled]="busy">
+                <i class="ti ti-writing" aria-hidden="true"></i>
+                <span>Nhập câu hỏi tự luận 15P</span>
+            </button>
+            }
+        </nav>
+
+        <section id="assessment-panel-practice" class="assessment-panel" role="tabpanel" [hidden]="tabIndex !== 0">
+            <div class="admin-wrap-table ictu-admin-table-shell assessment-table-card">
+                <header class="admin-wrap-table__head assessment-card-head">
+                    <div>
+                        <span class="admin-wrap-table__heading">LUYỆN TẬP TẠI NHÀ{{ !isDttx && key_server !== 'hvu' ? ' VÀ KIỂM TRA 15 PHÚT' : '' }}</span>
+                        <p>Quản lý form đề, câu hỏi đã duyệt và ngân hàng đề theo từng {{ label_week.toLowerCase() }}.</p>
+                    </div>
+                </header>
+                <div class="admin-wrap-table__body ictu-admin-table-shell__body">
+                    <div class="ictu-admin-table-scroll assessment-table-scroll">
+                        <p-table [value]="list_week" tableStyleClass="admin-table assessment-grid-table">
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th rowspan="2" style="width: 80px;"></th>
-                                    <th rowspan="2" style="width: 150px; text-align: center;">Câu hỏi đã duyệt</th>
-                                    <th colspan="2" style="text-align: center;">Luyện tập tại nhà</th>
+                                    <th rowspan="2" class="col-week">{{ label_week }}</th>
+                                    <th rowspan="2" class="col-question">Câu hỏi đã duyệt</th>
+                                    <th colspan="2" class="cell-center">Luyện tập tại nhà</th>
                                     @if (!isDttx && key_server !== 'hvu') {
-<th colspan="2" style="text-align: center;">
-                                        15p</th>
-}
+                                    <th colspan="2" class="cell-center">Kiểm tra 15 phút</th>
+                                    }
                                 </tr>
                                 <tr>
-                                    <th style="text-align: center;">Có đề</th>
-                                    <th style="text-align: center;">Thao tác</th>
+                                    <th class="cell-center">Có đề</th>
+                                    <th class="col-actions cell-center">Thao tác</th>
                                     @if (!isDttx && key_server !== 'hvu') {
-<th style="text-align: center;">Có đề</th>
-}
-                                    @if (!isDttx && key_server !== 'hvu') {
-<th style="text-align: center;">Thao tác
-                                    </th>
-}
+                                    <th class="cell-center">Có đề</th>
+                                    <th class="col-actions cell-center">Thao tác</th>
+                                    }
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-row>
                                 <tr>
-                                    <td>
-                                        <span style="font-weight: 600;">{{this.label_week + ' ' + row['week']}}</span>
-                                    </td>
-                                    <td style="text-align: center;">{{row['datuyet_question']}}</td>
-                                    <td style="text-align: center;">
-                                        @if (row['has_test_cc']) {
-<span><i class="fa fa-check blue"></i></span>
-}
-                                        @if (!row['has_test_cc']) {
-<span>-</span>
-}
-                                    </td>
-                                    <td style="text-align: center;">
-                                        @if (row['has_form_cc'] === false || row['datuyet_question'] === 0) {
-<div
-                                           >
-                                            <span class="red">
-                                                Chưa tạo form đề, không thể sinh đề kiểm tra
-                                            </span>
+                                    <td><span class="assessment-week-badge">{{ label_week }} {{ row.week }}</span></td>
+                                    <td class="cell-center"><strong>{{ row['datuyet_question'] }}</strong></td>
+                                    <td class="cell-center"><span class="assessment-status" [class.is-ready]="row['has_test_cc']">
+                                        <i [class]="row['has_test_cc'] ? 'ti ti-check' : 'ti ti-minus'" aria-hidden="true"></i>
+                                        {{ row['has_test_cc'] ? 'Đã có' : 'Chưa có' }}</span></td>
+                                    <td class="cell-center">
+                                        @if (!row['has_form_cc'] || row['datuyet_question'] === 0) {
+                                        <span class="assessment-warning">Chưa đủ form đề hoặc câu hỏi duyệt</span>
+                                        } @else {
+                                        <div class="assessment-action-group">
+                                            <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse"
+                                                (click)="sinhDeByWeek(row)" [disabled]="busy || !canAdded"><i class="ti ti-sparkles" aria-hidden="true"></i>Sinh đề</button>
+                                            @if (row['has_test_cc']) {
+                                            <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
+                                                (click)="deleteDeWeek(row)" [disabled]="busy || !canAdded" aria-label="Xóa toàn bộ đề luyện tập"
+                                                pTooltip="Xóa toàn bộ đề" tooltipPosition="top" appendTo="body"><i class="ti ti-trash" aria-hidden="true"></i></button>
+                                            }
                                         </div>
-} @else {
-
-                                            <div style="text-align: center;">
-                                                <button (click)="sinhDeByWeek(row)" style="line-height: 1;"
-                                                    class="btn btn-success">
-                                                    Sinh đề tại đây
-                                                </button>
-                                                @if (row['has_test_cc']) {
-<button pTooltip="Xóa tất cả đề"
-                                                    tooltipPosition="left" (click)="deleteDeWeek(row)"
-                                                    style="line-height: 1; margin-left: 10px;"
-                                                    class="btn btn-danger btn-icon">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
-}
-                                            </div>
-                                        
-}
-                                        
+                                        }
                                     </td>
                                     @if (!isDttx && key_server !== 'hvu') {
-<td style="text-align: center;">
-                                        @if (row['has_test_dg']) {
-<span><i class="fa fa-check blue"></i></span>
-}
-                                        @if (!row['has_test_dg']) {
-<span>-</span>
-}
-                                    </td>
-}
-                                    @if (!isDttx && key_server !== 'hvu') {
-<td style="text-align: center;">
-                                        @if (row['has_form_dg'] === false || row['datuyet_question'] === 0) {
-<div
-                                           >
-                                            <span class="red">
-                                                Chưa tạo form đề, không thể sinh đề kiểm tra
-                                            </span>
+                                    <td class="cell-center"><span class="assessment-status" [class.is-ready]="row['has_test_dg']">
+                                        <i [class]="row['has_test_dg'] ? 'ti ti-check' : 'ti ti-minus'" aria-hidden="true"></i>
+                                        {{ row['has_test_dg'] ? 'Đã có' : 'Chưa có' }}</span></td>
+                                    <td class="cell-center">
+                                        @if (!row['has_form_dg'] || row['datuyet_question'] === 0) {
+                                        <span class="assessment-warning">Chưa đủ form đề hoặc câu hỏi duyệt</span>
+                                        } @else {
+                                        <div class="assessment-action-group">
+                                            <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse"
+                                                (click)="sinhDe15pByWeek(row)" [disabled]="busy || !canAdded"><i class="ti ti-sparkles" aria-hidden="true"></i>Sinh đề</button>
+                                            @if (row['has_test_dg']) {
+                                            <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
+                                                (click)="delete15pDeByWeek(row)" [disabled]="busy || !canAdded" aria-label="Xóa toàn bộ đề kiểm tra 15 phút"
+                                                pTooltip="Xóa toàn bộ đề" tooltipPosition="top" appendTo="body"><i class="ti ti-trash" aria-hidden="true"></i></button>
+                                            }
                                         </div>
-} @else {
-
-                                            <div style="text-align: center;">
-                                                <!-- <span style="margin-right: 10px;" class="blue">
-                                        Đã sẵn sàng sinh đề kiểm tra
-                                    </span> -->
-                                                <button (click)="sinhDe15pByWeek(row)" style="line-height: 1;"
-                                                    class="btn btn-success">Sinh đề tại đây</button>
-                                                @if (row['has_test_dg']) {
-<button pTooltip="Xóa tất cả đề"
-                                                    tooltipPosition="left" (click)="delete15pDeByWeek(row)"
-                                                    style="line-height: 1; margin-left: 10px;"
-                                                    class="btn btn-danger btn-icon">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
-}
-                                            </div>
-                                        
-}
-                                        
+                                        }
                                     </td>
-}
+                                    }
                                 </tr>
                             </ng-template>
+                            <ng-template pTemplate="emptymessage"><tr><td [attr.colspan]="!isDttx && key_server !== 'hvu' ? 6 : 4" class="assessment-empty">Chưa có bài học để tạo đề.</td></tr></ng-template>
                         </p-table>
                     </div>
                 </div>
             </div>
-            <div class="assessment-tab-panel" [hidden]="tabIndex !== 1">
-                @if (list_plan && list_plan.length && showTests) {
-<div class="lesson-baihocv2"
-                    [ngClass]="closeLeft?'close-left-body':''" style="transition: all 0.3s;">
-                    <div class="menu-lesson-baihocv2">
-                        <button style="margin-left: 5px; padding: 0px; min-width: 0px; z-index: 50;"
-                            (click)="closeLeftBody()" class="btn btn-success button-close-left-body">
-                            <i style="margin: 0px;vertical-align: middle; font-size: 13px;"
-                                [ngClass]="closeLeft?'pi pi-angle-double-right':'pi pi-angle-double-left'"></i>
-                        </button>
-                        <div class="menu-list-lessonv2">
-                            @for (parent of list_plan; track parent; let keyParent = $index) {
-<div class="parent-lesson-layout">
-                                <div class="parent-name"
-                                    [ngClass]="selectPlan && parent.id === selectPlan.id ?'activity':''">
-                                    <div class="parent-name-layout">
-                                        @if (parent.week === 0 || parent.week >= 1000) {
-<span
-                                            class="parent-title">{{parent.title}}</span>
-}
-                                    </div>
-                                </div>
-                                @if (parent['desc']) {
-<div class="parent-desc" style="padding: 5px;">
-                                    <div class="parent-desc-content" style="padding: 10px; font-size: 14px;"
-                                        [innerHtml]="parent['desc'] | safeHtmlDecode">
-                                    </div>
-                                </div>
-}
-                                @for (children of parent['children']; track children; let index = $index) {
-<div>
-                                    @if (children.type !== 'ACTIVITY_TEST') {
-<div
-                                        [ngClass]="selectPlan && children.id === selectPlan.id?'activity':''"
-                                        class="child-lesson-layout">
-                                        <div (click)="onChangePlan(children)" class="child-lesson-layout-title">
-                                            <i class="{{children['icon']}}"></i>
-                                            <span style="margin-left: 10px;"
-                                                class="child-title">{{children.title}}</span>
-                                        </div>
-                                        <div style="height: 100%; display: flex; align-items: center;">
-                                            <span style="margin: 0 10px;">
-                                                {{children['created_at'] | date: 'dd/MM/yyyy'}}
-                                            </span>
-                                        </div>
-                                    </div>
-}
-                                </div>
-}
-                            </div>
-}
-                        </div>
-                    </div>
-                    <div class="lesson-content-right">
-                        @if (selectPlan) {
-<div style="height: 100%; overflow: auto;">
-                            <ng-container>
-@switch (selectPlan.type) {
-                                @case ('THUONGXUYEN_TULUAN') {
-<div
-                                    class="content-form-lesson-right form-setting-lesson">
-                                    <app-thuongxuyen-tuluan-v2 style="height:100%" [courseSelected]="selectedCourse"
-                                        [activity]="selectPlan">
-                                    </app-thuongxuyen-tuluan-v2>
-                                </div>
-}
+        </section>
 
-                                @case ('THUONGXUYEN_DUAN') {
-<div
-                                    class="content-form-lesson-right form-setting-lesson">
-                                    <app-thuongxuyen-duan [courseSelected]="selectedCourse" [activity]="selectPlan">
-                                    </app-thuongxuyen-duan>
-                                </div>
-}
-                                @case ('THUONGXUYEN_TRACNGHIEM') {
-<div
-                                    class="content-form-lesson-right form-setting-lesson">
-                                    <div
-                                        style="line-height: 1.25;height: 100%;width: 100%;display: flex; align-items: center;">
-                                        <div
-                                            style="display: flex;align-items: center;justify-content: center; flex-direction: column; margin: 0 auto; background-color: #fff; padding:15px; width:500px; margin-top: -30px;">
-                                            <div style="padding: 5px; font-size: 18px;">
-                                                <span><strong>{{selectPlan.title}}</strong></span>
-                                            </div>
-                                            <div style="padding: 5px">
-                                                <span class="box-span info-cauhoi">
-                                                    Câu hỏi đã duyệt: {{selectPlan['has_question']}}
-                                                </span>
-                                                <span class="box-span"
-                                                    [ngClass]="selectPlan['has_form_test']?'dat-box':'yeu-cau-sua-box'">
-                                                    {{selectPlan['has_form_test']?'Đã tạo form đề':'Chưa tạo form đề'}}
-                                                </span>
-                                                <span class="box-span"
-                                                    [ngClass]="selectPlan['has_test']?'dat-box':'yeu-cau-sua-box'">
-                                                    {{selectPlan['has_test']?'Có đề':'Chưa có đề'}}
-                                                </span>
-                                            </div>
-                                            @if (selectPlan['has_form_test'] && selectPlan['_question_dat'] > 0) {
-<div style="padding: 5px; margin-top:5px"
-                                               >
-                                                @if (!selectPlan['has_test']) {
-<button
-                                                    (click)="sinhDeByKynang(selectPlan)" style="line-height: 1;"
-                                                    class="btn btn-success">Sinh đề tại đây</button>
-}
-                                                @if (selectPlan['has_test']) {
-<button
-                                                    (click)="deleteDeKynang(selectPlan)"
-                                                    style="line-height: 1; margin-left: 10px;" class="btn btn-danger">
-                                                    <i class="fa fa-trash"></i>
-                                                    Xóa tất cả đề
-                                                </button>
-}
-                                            </div>
-}
-                                        </div>
-                                    </div>
-                                </div>
-}
+        <section id="assessment-panel-regular" class="assessment-panel" role="tabpanel" [hidden]="tabIndex !== 1">
+            @if (showTests) {
+            <div class="assessment-test-workspace" [class.is-collapsed]="closeLeft">
+                <aside class="assessment-test-sidebar" aria-label="Danh sách bài kiểm tra">
+                    <header><span>Danh sách bài kiểm tra</span><button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
+                        (click)="closeLeftBody()" [attr.aria-label]="closeLeft ? 'Mở danh sách' : 'Thu gọn danh sách'">
+                        <i [class]="closeLeft ? 'ti ti-layout-sidebar-right-expand' : 'ti ti-layout-sidebar-left-collapse'" aria-hidden="true"></i></button></header>
+                    <div class="assessment-test-list">
+                        @for (parent of list_plan; track parent.id) {
+                        <section class="assessment-test-group">
+                            @if (parent.title) { <h3>{{ parent.title }}</h3> }
+                            @for (child of parent.children ?? []; track child.id) {
+                            @if (child.type !== 'ACTIVITY_TEST') {
+                            <button type="button" class="assessment-test-item" [class.is-active]="selectPlan?.id === child.id" (click)="onChangePlan(child)" [disabled]="busy">
+                                <i [class]="child.icon" aria-hidden="true"></i><span>{{ child.title }}</span>
+                                @if (child['created_at']) { <small>{{ child['created_at'] | date:'dd/MM/yyyy' }}</small> }
+                            </button>
                             }
-</ng-container>
-                        </div>
-}
+                            }
+                        </section>
+                        }
                     </div>
+                </aside>
+                <div class="assessment-test-content">
+                    @if (selectPlan) {
+                    @switch (selectPlan.type) {
+                    @case ('THUONGXUYEN_TULUAN') { <app-thuongxuyen-tuluan-v2 [courseSelected]="selectedCourse" [activity]="selectPlan"></app-thuongxuyen-tuluan-v2> }
+                    @case ('THUONGXUYEN_DUAN') { <app-thuongxuyen-duan [courseSelected]="selectedCourse" [activity]="selectPlan"></app-thuongxuyen-duan> }
+                    @case ('THUONGXUYEN_TRACNGHIEM') {
+                    <div class="assessment-mcq-card">
+                        <span class="assessment-mcq-icon"><i class="ti ti-notebook" aria-hidden="true"></i></span>
+                        <h2>{{ selectPlan.title }}</h2>
+                        <div class="assessment-mcq-statuses">
+                            <span class="assessment-chip assessment-chip--info">Câu hỏi duyệt: {{ selectPlan['has_question'] }}</span>
+                            <span class="assessment-chip" [class.is-ready]="selectPlan['has_form_test']">{{ selectPlan['has_form_test'] ? 'Đã tạo form đề' : 'Chưa tạo form đề' }}</span>
+                            <span class="assessment-chip" [class.is-ready]="selectPlan['has_test']">{{ selectPlan['has_test'] ? 'Đã có đề' : 'Chưa có đề' }}</span>
+                        </div>
+                        @if (selectPlan['has_form_test'] && selectPlan['_question_dat'] > 0) {
+                        <div class="assessment-mcq-actions">
+                            @if (!selectPlan['has_test']) { <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse" (click)="sinhDeByKynang(selectPlan)" [disabled]="busy || !canAdded"><i class="ti ti-sparkles" aria-hidden="true"></i>Sinh đề</button> }
+                            @if (selectPlan['has_test']) { <button type="button" mat-flat-button class="btn ictu-badge-btn--danger" (click)="deleteDeKynang(selectPlan)" [disabled]="busy || !canAdded"><i class="ti ti-trash" aria-hidden="true"></i>Xóa toàn bộ đề</button> }
+                        </div>
+                        } @else { <p class="assessment-warning">Cần tạo form đề và có ít nhất một câu hỏi đã duyệt để sinh đề.</p> }
+                    </div>
+                    }
+                    }
+                    } @else { <div class="assessment-placeholder"><i class="ti ti-click" aria-hidden="true"></i><span>Chọn một bài kiểm tra để tiếp tục.</span></div> }
                 </div>
-}
-                @if (!showTests) {
-<div
-                    style="display:flex; align-items: center; justify-content: center; font-size: 20px; height: 100%; width: 100%;">
-                    <span style="color: #f97316; text-align: center;">
-                        Bài kiểm tra thường xuyên chưa được <strong>tạo</strong><br>
-                        Thầy/Cô vào chức năng <strong>cấu hình</strong> để <strong>thết lập</strong> tạo bài kiểm tra
-                    </span>
-                </div>
-}
             </div>
-            @if (key_server === 'ictu') {
-<div class="assessment-tab-panel" [hidden]="tabIndex !== 2">
-                @if (tabIndex === 2) {
-<app-cauhoi-tuluan-15p [courseSelected]="selectedCourse"></app-cauhoi-tuluan-15p>
-}
-            </div>
-}
-            </div>
-        </div>
+            } @else {
+            <div class="assessment-empty-state"><i class="ti ti-clipboard-x" aria-hidden="true"></i><strong>Chưa tạo bài kiểm tra thường xuyên</strong><p>Vào tab <b>Cấu hình</b> để thiết lập bài kiểm tra cho học phần.</p></div>
+            }
+        </section>
+
+        @if (key_server === 'ictu') {
+        <section id="assessment-panel-essay" class="assessment-panel" role="tabpanel" [hidden]="tabIndex !== 2">
+            @if (tabIndex === 2) { <div class="assessment-child-card"><app-cauhoi-tuluan-15p [courseSelected]="selectedCourse"></app-cauhoi-tuluan-15p></div> }
+        </section>
+        }
     </div>
-</div>
+    }
+</main>

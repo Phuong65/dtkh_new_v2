@@ -1,21 +1,27 @@
-<div class="tuluan-layout">
-    <div class="top-tuluan-layout" style="display: flex; align-items: center;">
-        <span style="font-size: 14px; flex: 1;">
-            <strong>{{activity.title}}</strong>
-        </span>
+<main class="tuluan-layout" [attr.aria-busy]="busy">
+    @if (busy) {
+    <app-loading-progress [heading]="progressHeading" backdropFilter="blur(2px)"></app-loading-progress>
+    }
+    @if (state() === 'error') {
+    <div class="admin-table__alert-danger text-center w-100">Không thể tải danh sách đề. <button type="button" (click)="loadTuluan()" class="admin-table__alert-danger__btn-reload">Tải lại</button>.</div>
+    }
+    <section class="admin-wrap-table ictu-admin-table-shell tuluan-table-card">
+    <header class="admin-wrap-table__head top-tuluan-layout">
+        <span class="admin-wrap-table__heading">{{ activity.title }}</span>
         @if (!hideAddButton) {
-<button (click)="createCodeTuluan()" style="line-height: 1;" class="btn btn-success">
-            <i class="fa fa-plus"></i>Tạo câu hỏi mới
+        <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse" (click)="createCodeTuluan()" [disabled]="state() === 'loading' || isSaving()">
+            <i class="ti ti-plus" aria-hidden="true"></i>Tạo câu hỏi mới
         </button>
-}
-    </div>
-    <div class="body-tuluan-layout">
-        <p-table [value]="list_tuluan" styleClass="table-reBorder">
+        }
+    </header>
+    <div class="admin-wrap-table__body ictu-admin-table-shell__body body-tuluan-layout">
+        <div class="ictu-admin-table-scroll">
+        <p-table [value]="list_tuluan" tableStyleClass="admin-table">
             <!-- <ng-template pTemplate="caption">
-                <div style="display: flex; align-items: center;">
-                    <span style="font-size: 14px; flex: 1;">Danh sách đề: {{activity.title}}</span>
-                    <button (click)="createCodeTuluan()" style="line-height: 1;" class="btn btn-success">
-                        <i class="fa fa-plus"></i>Tạo đề mới
+                <div class="tuluan-legacy-caption">
+                    <span>Danh sách đề: {{activity.title}}</span>
+                    <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse" (click)="createCodeTuluan()">
+                        <i class="ti ti-plus" aria-hidden="true"></i>Tạo đề mới
                     </button>
                 </div>
             </ng-template> -->
@@ -35,9 +41,8 @@
                     <td style="width: 80px;text-align: center;">
                         {{test['id']}}
                     </td>
-                    <td style="cursor: pointer;">
-                        <div style="display: flex; align-items: center; justify-content: center;">
-                            <span style="flex:1">{{test['title']}}</span>
+                    <td class="tuluan-title-cell">
+                        <strong>{{test['title']}}</strong>
                             <div class="action-button-tuluan">
                                 <!-- <button *ngIf="test['status'] !== 1" style="margin-right: 5px;"
                                 class="btn btn-primary btn-icon btn-transparent">
@@ -48,40 +53,24 @@
                                 <i class="fa fa-trash"></i>
                             </button> -->
                                 @if (test['status'] !== 1 && selectedActivity['ordering'] !== 0 && test['list_tieuchi'] && test['list_tieuchi'].length === 0) {
-<button
-                                   
-                                    (click)="openListDuanTuCopyTieuchi(test)"
-                                    ngbTooltip="Sao chép tiêu chí từ dự án khác" container="body" placement="left"
-                                    style="margin-right: 5px;" pButton pRipple type="button" icon="pi pi-copy"
-                                    class="p-button-rounded p-button-text p-button-success">
-                                </button>
+<button type="button" class="btn ictu-button-info-light ictu-admin-icon-button" (click)="openListDuanTuCopyTieuchi(test)"
+                                    aria-label="Sao chép tiêu chí" pTooltip="Sao chép tiêu chí từ dự án khác" tooltipPosition="top" appendTo="body"><i class="ti ti-copy" aria-hidden="true"></i></button>
 }
-                                <button ngbTooltip="Xem đề" container="body" placement="left" style="margin-right: 5px;"
-                                    (click)="onViewTuluan(test)" pButton pRipple type="button" icon="pi pi-eye"
-                                    class="p-button-rounded p-button-text p-button-plain">
-                                </button>
+                                <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button" (click)="onViewTuluan(test)"
+                                    aria-label="Xem đề" pTooltip="Xem đề" tooltipPosition="top" appendTo="body"><i class="ti ti-eye" aria-hidden="true"></i></button>
                                 @if (test['status'] !== 1) {
-<button (click)="openAddTieuchicham(test)"
-                                    ngbTooltip="Nhập tiêu chí chấm" container="body" placement="left"
-                                    style="margin-right: 5px;" pButton pRipple type="button" icon="pi pi-list"
-                                    class="p-button-rounded p-button-text p-button-help">
-                                </button>
+<button type="button" class="btn ictu-button-info-light ictu-admin-icon-button" (click)="openAddTieuchicham(test)"
+                                    aria-label="Nhập tiêu chí chấm" pTooltip="Nhập tiêu chí chấm" tooltipPosition="top" appendTo="body"><i class="ti ti-list-check" aria-hidden="true"></i></button>
 }
                                 @if (test['status'] !== 1) {
-<button ngbTooltip="Sửa đề" container="body" placement="left" style="margin-right: 5px;"
-                                    (click)="editCodeTuluan(test)" pButton pRipple
-                                    type="button" icon="pi pi-file-edit" class="p-button-rounded p-button-text">
-                                </button>
+<button type="button" class="btn ictu-button-info-light ictu-admin-icon-button" (click)="editCodeTuluan(test)"
+                                    aria-label="Sửa đề" pTooltip="Sửa đề" tooltipPosition="top" appendTo="body"><i class="ti ti-edit" aria-hidden="true"></i></button>
 }
                                 @if (test['status'] !== 1) {
-<button ngbTooltip="Xóa đề" container="body" placement="left"
-                                    (click)="deleteTuluan(test)" pButton pRipple
-                                    type="button" icon="pi pi-trash"
-                                    class="p-button-rounded p-button-danger p-button-text">
-                                </button>
+<button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button" (click)="deleteTuluan(test)"
+                                    aria-label="Xóa đề" pTooltip="Xóa đề" tooltipPosition="top" appendTo="body"><i class="ti ti-trash" aria-hidden="true"></i></button>
 }
                             </div>
-                        </div>
                     </td>
                     <td style="width: 150px; text-align: center;">
                         {{test['list_tieuchi'].length}}
@@ -136,9 +125,22 @@
                 </tr>
             </ng-template>
         </p-table>
+        </div>
     </div>
-</div>
+    </section>
 
+<p-drawer [(visible)]="drawerVisible" position="right" [style]="{ width: 'min(1024px, 100vw)' }" appendTo="body"
+    [blockScroll]="true" [closable]="!busy" [dismissible]="!busy" [closeOnEscape]="!busy"
+    styleClass="ictu-p-drawer essay-form-drawer">
+    <ng-template pTemplate="headless">
+        <div class="assessment-drawer-body">
+            @if (busy) { <app-loading-progress [heading]="progressHeading" backdropFilter="blur(2px)"></app-loading-progress> }
+            <div class="assessment-drawer-body__content" [attr.inert]="busy ? '' : null">
+                @if (drawerTemplate) { <ng-container [ngTemplateOutlet]="drawerTemplate"></ng-container> }
+            </div>
+        </div>
+    </ng-template>
+</p-drawer>
 
 <ng-template #templateFormAddTuluan let-c="close" let-d="dismiss">
     <div class="ovic-over-right-section right-slide-class">
@@ -154,13 +156,13 @@
                     <div class="row form-row form-row-flex-row">
                         <div class="col-12">
                             <label>Tiêu đề:<span class="ovic-mark">*</span></label>
-                            <input type="text" class="ovic-input-field" formControlName="title">
+                            <input type="text" class="admin-wrap-table__input" formControlName="title">
                         </div>
                     </div>
                     <div class="row form-row form-row-flex-row">
                         <div class="col-12">
                             <label>Thời gian làm bài (phút):<span class="ovic-mark">*</span></label>
-                            <input type="number" class="ovic-input-field" formControlName="time_duration">
+                            <input type="number" class="admin-wrap-table__input" formControlName="time_duration">
                         </div>
                     </div>
                     <div class="row form-row form-row-flex-row">
@@ -325,87 +327,36 @@
 </ng-template>
 
 <ng-template #templateFormAddTuluanV2 let-c="close" let-d="dismiss">
-    <div class="ovic-over-right-section right-slide-class">
-        <div class="ovic-over-right-section__head" style="display: flex; align-items: center;">
-            <h3 style="flex: 1;" class="ovic-over-right-section__header">
-                {{selectedActivity?selectedActivity.title:""}} - {{formTitle}}
-            </h3>
-            <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
-                (click)="closeForm()">
-            </button>
-        </div>
-        <div style="line-height: 1.25; padding: 0px; height: calc(100vh - 57px - 50px);"
-            class="ovic-over-right-section__body footer-no-hint">
-            <div class="ovic-vertical__inputs form-setting-lesson edit-hight-500">
-                <form [formGroup]="formData">
-                    <div class="row form-row form-row-flex-row">
-                        <div class="col-6">
-                            <label>Tiêu đề:<span class="ovic-mark">*</span></label>
-                            <input type="text" class="ovic-input-field" formControlName="title">
-                        </div>
-                        <div class="col-3">
-                            <label>Điểm:<span class="ovic-mark">*</span></label>
-                            <input formControlName="point" #input_point type="text" class="ovic-input-field"
-                                (keydown)="pointQuestionKeyDown($event,input_point)"
-                                (keyup)="pointQuestionKeyup($event,input_point)">
-                        </div>
-                        <div class="col-3">
-                            <label>Thời gian làm bài (phút):<span class="ovic-mark">*</span></label>
-                            <input (keydown)="pointQuestionKeyDown($event,input_point)" type="number"
-                                class="ovic-input-field" formControlName="time_duration">
-                        </div>
-                    </div>
-                    <div class="row form-row form-row-flex-row">
-                        <div class="col-9">
-                            <label>CĐR liên quan:<span class="ovic-mark">*</span></label>
-                            <p-multiSelect [overlayOptions]="{ baseZIndex: 1099 }" appendTo="body" (onChange)="onSelectCDR()"
-                                selectedItemsLabel="{0} items selected" formControlName="activity_cdr_ids"
-                                [showClear]="true" [options]="list_activity_cdr" optionValue="id">
-                            </p-multiSelect>
-                        </div>
-                        <div class="col-3">
-                            <label>Mức độ truy cập:<span class="ovic-mark"></span></label>
-                            <ovic-groups-radio-v2 group_name="select_private" [columns]="2" [formField]="f['private']"
-                                [options]="select_private" optionId="id" optionLabel="label"
-                                [defaultValue]="f['private'].value">
-                            </ovic-groups-radio-v2>
-                        </div>
-                    </div>
-                    <div class="row form-row form-row-flex-row">
-                        <div class="col-12">
-                            <label>CĐR của câu hỏi:<span class="ovic-mark">*</span></label>
-                            <ovic-groups-radio-v2 [disabled_item]="true" group_name="CHUAN_DAU_RA" optionLabel="label"
-                                [columns]="6" [options]="chuandaura" [defaultValue]="f['cdr']['value']"
-                                [formField]="f['cdr']" optionId="id">
-                            </ovic-groups-radio-v2>
-                        </div>
-                    </div>
-                    <div class="row form-row form-row-flex-row">
-                        <div class="col-12">
-                            <label>Nội dung:<span class="ovic-mark">*</span></label>
-                            <ovic-ckeditor-document [changeId]="selectedTuluan?selectedTuluan.id:0" [autoSave]="true"
-                                [formField]="f['desc']" [default]="f['desc'].value"
-                                styleClass="vietbaocao-doctument-content">
-                            </ovic-ckeditor-document>
-                        </div>
-                    </div>
-                </form>
+    <section class="essay-drawer">
+        <header class="essay-drawer__header">
+            <div class="essay-drawer__heading"><span class="essay-drawer__icon"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></span>
+                <div><span class="essay-drawer__eyebrow">{{ selectedActivity?.title }}</span><h2>{{ formTitle }}</h2></div>
             </div>
-        </div>
-        <div class="ovic-dynamic-right-section__foot">
-            <p class="ovic-over-right-section__foot-wrap-buttons">
-                @if (selectedTuluan && selectedTuluan.status === -1) {
-<button (click)="saveCourseTuluan(true)"
-                    type="button" class="btn ovic-over-right-section__foot-btn btn-primary"><i
-                        class="fa fa-floppy-o"></i>Lưu lại và yêu cầu duyệt
-                </button>
-}
-                <button (click)="saveCourseTuluan()" type="button"
-                    class="btn ovic-over-right-section__foot-btn btn-primary"><i class="fa fa-floppy-o"></i>Lưu lại
-                </button>
-            </p>
-        </div>
-    </div>
+            <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button" (click)="closeForm()" aria-label="Đóng biểu mẫu"><i class="fa fa-times" aria-hidden="true"></i></button>
+        </header>
+        <form id="essay-form" [formGroup]="formData" class="essay-drawer__form">
+            <div class="ictu-form essay-drawer__ictu-form">
+            <section class="essay-drawer__section ictu-form__row">
+                <div class="essay-form-grid">
+                    <label class="essay-field essay-field--wide"><span class="ictu-form__label ictu-form__label--required">Tiêu đề</span><input type="text" class="ictu-form__input-field" formControlName="title" placeholder="Nhập tiêu đề đề"></label>
+                    <label class="essay-field"><span class="ictu-form__label ictu-form__label--required">Điểm</span><input formControlName="point" #input_point type="text" class="ictu-form__input-field" (keydown)="pointQuestionKeyDown($event,input_point)" (keyup)="pointQuestionKeyup($event,input_point)"></label>
+                    <label class="essay-field"><span class="ictu-form__label ictu-form__label--required">Thời gian làm bài</span><input (keydown)="pointQuestionKeyDown($event,input_point)" type="number" class="ictu-form__input-field" formControlName="time_duration" inputmode="numeric"></label>
+                </div>
+            </section>
+            <section class="essay-drawer__section ictu-form__row essay-form-grid essay-form-grid--program">
+                <div class="essay-field essay-field--cdr"><label class="ictu-form__label ictu-form__label--required" for="essay-cdr-related">CĐR liên quan</label><p-multiSelect inputId="essay-cdr-related" [overlayOptions]="{ baseZIndex: 1099 }" appendTo="body" (onChange)="onSelectCDR()" selectedItemsLabel="{0} CĐR" formControlName="activity_cdr_ids" [showClear]="true" [options]="list_activity_cdr" optionValue="id"></p-multiSelect></div>
+                <div class="essay-field essay-field--access"><span class="ictu-form__label">Mức độ truy cập</span><ovic-groups-radio-v2 styleClass="essay-access-radio" group_name="select_private" [columns]="2" [formField]="f['private']" [options]="select_private" optionId="id" optionLabel="label" [defaultValue]="f['private'].value"></ovic-groups-radio-v2></div>
+            </section>
+            <section class="essay-drawer__section ictu-form__row"><div class="essay-field"><span class="ictu-form__label ictu-form__label--required">CĐR của câu hỏi</span><ovic-groups-radio-v2 styleClass="essay-cdr-radio" [disabled_item]="true" group_name="CHUAN_DAU_RA" optionLabel="label" [columns]="6" [options]="chuandaura" [defaultValue]="f['cdr']['value']" [formField]="f['cdr']" optionId="id"></ovic-groups-radio-v2></div></section>
+            <section class="essay-drawer__section ictu-form__row essay-drawer__editor"><div class="essay-field"><span class="ictu-form__label ictu-form__label--required">Nội dung</span><ovic-ckeditor-document [changeId]="selectedTuluan ? selectedTuluan.id : 0" [autoSave]="true" [formField]="f['desc']" [default]="f['desc'].value" styleClass="vietbaocao-doctument-content"></ovic-ckeditor-document></div></section>
+            </div>
+        </form>
+        <footer class="essay-drawer__footer">
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button" (click)="closeForm()" [disabled]="busy">Hủy</button>
+            @if (selectedTuluan && selectedTuluan.status === -1) {<button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button" (click)="saveCourseTuluan(true)" [disabled]="busy"><i class="ti ti-send" aria-hidden="true"></i>Lưu và yêu cầu duyệt</button>}
+            <button type="submit" form="essay-form" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button" (click)="saveCourseTuluan()" [disabled]="busy"><i class="ti ti-device-floppy" aria-hidden="true"></i>Lưu đề</button>
+        </footer>
+    </section>
 </ng-template>
 
 <ng-template #templateFormAddTieuchicham let-c="close" let-d="dismiss">
@@ -464,7 +415,7 @@
                                                             [disabled]="selectedTuluan && selectedTuluan.status === 1? true: false"
                                                             style="width: 100%; resize: none; height: -webkit-fill-available;"
                                                             cols="2" placeholder="Nhập tiêu đề cho tiêu chí {{i + 1}}"
-                                                            class="ovic-input-field" [(ngModel)]="item.title">
+                                                            class="admin-wrap-table__input" [(ngModel)]="item.title">
                                                         </textarea>
                                                     </div>
                                                     <div class="col-3">
@@ -475,7 +426,7 @@
                                                                 [disabled]="selectedTuluan && selectedTuluan.status === 1? true: false"
                                                                 #input_point_tieuchi
                                                                 (keydown)="pointQuestionKeyDown($event,input_point_tieuchi)"
-                                                                type="text" class="ovic-input-field"
+                                                                type="text" class="admin-wrap-table__input"
                                                                 [(ngModel)]="item.point">
                                                         </div>
                                                         <div>
@@ -543,7 +494,7 @@
             <div style="height: 100%;" class="phanquyen-dulieu-content-left ovic-vertical__inputs">
                 <div class="form-row row">
                     <div class="col-12">
-                        <input class="ovic-input-field" type="text" [(ngModel)]="searchDuan" placeholder="Search">
+                        <input class="admin-wrap-table__input" type="text" [(ngModel)]="searchDuan" placeholder="Search">
                     </div>
                 </div>
                 @if ((list_tuluan | filter: true : ['hasTieuchi'] | filter: searchDuan : ['title']).length > 0) {
@@ -582,16 +533,7 @@
     </div>
 </ng-template>
 
-<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
-    [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
-    <div class="popup-waiting-loading">
-        <label style="width: 100%;">{{waitting_title}}</label>
-        <div class="tn-import-student-progressbar">
-            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
-        </div>
-    </div>
-</p-dialog>
-
 <ng-template #templateCauhoi>
 
 </ng-template>
+</main>

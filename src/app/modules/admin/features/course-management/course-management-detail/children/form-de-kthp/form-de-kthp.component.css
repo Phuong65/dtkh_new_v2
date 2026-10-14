@@ -1,82 +1,157 @@
-.layout-form-details {
+:host {
+    display: block;
+    width: 100%;
     height: 100%;
+    min-height: 0;
+    color: #334155;
+    font-family: var(--primary-font-family), 'Be Vietnam Pro', 'Noto Sans', 'Segoe UI', sans-serif;
 }
+
+.kthp-shell,
+.layout-form-details {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    flex-direction: column;
+    overflow: hidden;
+    background: #f3f4f6;
+}
+
+.kthp-shell > app-loading-progress { z-index: 30; }
 
 .layout-form-details-body {
-    height: calc(100% - 51px);
+    flex: 1 1 auto;
+    min-height: 0;
     overflow: auto;
-    background-color: #eaeaea;
-}
-
-.layout-form-details-footer {
-    padding: 10px;
-    text-align: right;
-    border-top: 1px solid #c8c8c8;
-}
-
-.form-detail-summary {
-    text-align: right;
-}
-
-
-.display-none {
-    display: none;
-}
-
-.tag-cdr-cauhoi-percent {
-    padding: 0px;
-    border-radius: 0px;
-    border-left: none;
-    width: 60px;
-}
-
-.require-cdr-backgroud-color th,
-.require-cdr-backgroud-color input,
-.require-cdr-backgroud-color span,
-.require-cdr-backgroud-color td {
-    color: red !important;
-}
-
-.no-question-input {
-    display: flex;
-    height: 30px;
-    justify-content: center;
-    align-items: center;
-}
-
-.public-class-question {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    background: #e9ecef;
-    min-width: 70px;
-    justify-content: center;
-}
-
-.private-class-question {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    background: #fa8e42;
-    justify-content: center;
-    min-width: 70px;
-}
-
-.private-color {
-    background-color: #fa8e42;
-    color: #333;
-}
-
-.question_take_total {
-    display: flex;
-    height: 30px;
-    align-items: center;
-    justify-content: center;
+    padding: 12px;
+    background: #f3f4f6;
 }
 
 .layout-form-details-body-table {
-    height: 100%;
-    width: min-content;
-    margin: 0 auto;
-    min-width: 1024px;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    overflow: auto;
+    border: 1px solid #edf2f7;
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+.layout-form-details-footer {
+    display: flex;
+    flex: 0 0 52px;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 12px;
+    border-top: 1px solid #e2e8f0;
+    background: #ffffff;
+}
+
+.layout-form-details-footer .kthp-save-button {
+    display: inline-flex;
+    min-width: 108px;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border-radius: 4px !important;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.display-none { display: none; }
+
+:host ::ng-deep .layout-form-details-body-table .p-datatable,
+:host ::ng-deep .layout-form-details-body-table .tbl-danhSachUser {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+:host ::ng-deep .layout-form-details-body-table th,
+:host ::ng-deep .layout-form-details-body-table td {
+    padding: 7px 9px;
+    border: 1px solid #edf2f7;
+    vertical-align: middle;
+}
+
+:host ::ng-deep .layout-form-details-body-table th {
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+}
+
+:host ::ng-deep .layout-form-details-body-table tbody tr:hover td { background: #f8fafc; }
+:host ::ng-deep .layout-form-details-body-table tbody tr:not(.require-cdr-backgroud-color) > :is(th, td):first-child { background: #eff6ff !important; }
+
+:host ::ng-deep .layout-form-details-body-table .p-inputgroup {
+    display: inline-flex;
+    width: 116px;
+    min-width: 116px;
+    height: 32px;
+    align-items: stretch;
+}
+
+:host ::ng-deep .layout-form-details-body-table .ovic-input-field {
+    flex: 1 1 auto;
+    width: 62px !important;
+    min-width: 0;
+    max-width: 62px;
+    height: 32px !important;
+    margin: 0;
+    padding: 4px 6px !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 4px 0 0 4px !important;
+    background: #ffffff;
+    color: #334155;
+    font-size: 13px !important;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+:host ::ng-deep .layout-form-details-body-table .p-inputgroup-addon {
+    display: inline-flex;
+    flex: 0 0 54px;
+    width: 54px;
+    height: 32px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 1px solid #cbd5e1;
+    border-left: 0;
+    border-radius: 0 4px 4px 0;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 12px;
+    box-sizing: border-box;
+}
+
+.no-question-input,
+.cant-edit-question {
+    display: inline-flex;
+    width: 116px;
+    min-width: 116px;
+    height: 32px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    background: #f8fafc;
+    color: #64748b;
+    box-sizing: border-box;
+}
+
+.tag-cdr-cauhoi-percent { width: 54px; }
+.private-color { background: #fef3c7 !important; color: #92400e !important; }
+.require-cdr-backgroud-color :is(th, td, input, span) { color: #b91c1c !important; }
+
+.form-detail-summary { text-align: right; }
+
+@media (max-width: 768px) {
+    .layout-form-details-body { padding: 8px; }
 }

@@ -1,7 +1,35 @@
+:host {
+    display: block;
+    min-height: 100%;
+    color: #334155;
+    font-family: var(--primary-font-family), 'Be Vietnam Pro', 'Noto Sans', sans-serif;
+    font-size: 14px;
+}
+
 .layout_component_container {
-    background-color: #f2f2f2;
+    position: relative;
+    background-color: #f3f4f6;
     height: 100% !important;
 }
+
+.cauhoi-15p-sidebar,
+.cauhoi-15p-page-header,
+.cauhoi-15p-question-card,
+.cauhoi-15p-form-panel {
+    background: #fff;
+}
+
+.cauhoi-15p-search__input,
+.cauhoi-15p-cdr-filter__select,
+.cauhoi-15p-lesson-form-control,
+.cauhoi-15p-note-input {
+    border-color: #cbd5e1 !important;
+    font-size: 14px !important;
+}
+
+.cauhoi-15p-button { font-size: 14px; }
+.assessment-drawer-body { position: relative; min-height: 100%; background: #fff; font-size: 14px; }
+.assessment-drawer-body > app-loading-progress { z-index: 40; }
 
 .lesson-baihocv2 {
     line-height: 1.25;
