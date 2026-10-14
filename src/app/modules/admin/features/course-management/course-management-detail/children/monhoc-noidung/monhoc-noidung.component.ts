@@ -3,7 +3,8 @@ import { request } from 'http';
 import { CourseCloService } from '@modules/shared/services/course-clo.service';
 import { CoursePlanCommentService } from '@modules/shared/services/course-plan-comment.service';
 import { CoursePlanActivitiesService } from '@modules/shared/services/course-plan-activities.service';
-import { AfterViewChecked, AfterViewInit, Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, DestroyRef, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { CHUAN_DAU_RA, ROLES, ROUTERS } from '@modules/shared/utils/syscat';
 import { AuthService } from '@core/services/auth.service';
@@ -11,7 +12,7 @@ import { SharedModule } from '@modules/shared/shared.module';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { OvicQueryCondition } from '@core/models/dto';
 import { ConditionOption } from '@modules/shared/models/condition-option';
-import { firstValueFrom, forkJoin, mergeMap, Observable, of } from 'rxjs';
+import { distinctUntilChanged, firstValueFrom, forkJoin, mergeMap, Observable, of } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NotificationService } from '@core/services/notification.service';
 import { ElngUserProfileService } from '@modules/shared/services/elearning-user-profile.service';
@@ -75,6 +76,7 @@ import { ShowLabelData } from '@modules/shared/pipes/show-label-data.pipe';
     styleUrls: ['./monhoc-noidung.component.css']
 })
 export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterViewInit {
+    private readonly destroyRef = inject(DestroyRef);
     private auth = inject(AuthService);
     private notificationService = inject(NotificationService);
     private activatedRoute = inject(ActivatedRoute);
@@ -254,7 +256,10 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
     }
 
     ngOnInit(): void {
-        this.activatedRoute.queryParams.subscribe(async (params) => {
+        this.activatedRoute.queryParams.pipe(
+            distinctUntilChanged((previous, current) => previous['code'] === current['code']),
+            takeUntilDestroyed(this.destroyRef)
+        ).subscribe(async (params) => {
             if (params && params['code']) {
                 this.notificationService.isProcessing(true);
 
@@ -343,7 +348,16 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
                     page: null
                 }
 
-                const class_ = await firstValueFrom(this.classesService.getClassesByPageNew(condition_class))
+                let class_;
+                try {
+                    class_ = await firstValueFrom(this.classesService.getClassesByPageNew(condition_class).pipe(takeUntilDestroyed(this.destroyRef)));
+                } catch {
+                    if (this.destroyRef.destroyed) return;
+                    this.notificationService.isProcessing(false);
+                    this.notificationService.toastError('Lỗi kết nối, vui lòng thử lại');
+                    return;
+                }
+                if (this.destroyRef.destroyed) return;
 
                 if (class_ && class_.recordsFiltered === 0 && APP_CONFIGS.dragDropLesson) {
                     this.dragDropLesson = true;
@@ -356,7 +370,7 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
                     this.coursePlanCommentService.getCoursePlanCommentByPageNew(condition_comment),
                     this.coursePlanCommentService.getCoursePlanCommentByPageNew(condition_reply_comment),
                     this.courseCloService.getCourseCloByPageNew(condition_clo)
-                ]).subscribe({
+                ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
                     next: async ([_course, _user_profile, _plan, _comment, _comment_child, _course_clo]) => {
                         if (_course.recordsFiltered) {
 

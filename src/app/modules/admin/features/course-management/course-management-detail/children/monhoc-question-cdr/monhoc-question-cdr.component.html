@@ -2,6 +2,10 @@
 <app-loading-progress heading="Đang tải ma trận câu hỏi/CĐR..." backdropFilter="none"></app-loading-progress>
 }
 
+@if (saving()) {
+<app-loading-progress [heading]="saveHeading()" backdropFilter="blur(2px)"></app-loading-progress>
+}
+
 @if (state() === 'error') {
 <div class="admin-table__alert-danger text-center w-100">
     {{ errorMessage() }}
@@ -94,7 +98,7 @@
                         </button>
                     </div>
                 </header>
-                <div class="admin-wrap-table__body cdr-question-table-shell__body">
+                <div #matrixScroll class="admin-wrap-table__body cdr-question-table-shell__body">
                     <p-table [value]="list_cdr_cauhoi"
                         styleClass="tbl-danhSachUser table-reBorder table-scroll-able table-able-dropdown-p-table cdr-question-table">
                         <ng-template pTemplate="header">
@@ -150,6 +154,9 @@
                         </ng-template>
                     </p-table>
                 </div>
+                <div #matrixScrollbar class="cdr-question-matrix-scrollbar" aria-label="Cuộn ngang ma trận" role="scrollbar" tabindex="0">
+                    <div #matrixScrollbarSpacer class="cdr-question-matrix-scrollbar__spacer"></div>
+                </div>
             </section>
         </div>
     </div>
@@ -197,15 +204,3 @@
         </div>
     </div>
 </ng-template>
-
-
-
-<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
-    [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
-    <div class="popup-waiting-loading">
-        <label style="width: 100%;">{{waitingTitle}}</label>
-        <div class="tn-import-student-progressbar">
-            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
-        </div>
-    </div>
-</p-dialog>

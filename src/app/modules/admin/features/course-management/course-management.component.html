@@ -35,6 +35,14 @@
         </div>
         }
 
+        @if (downloadingCourseId() !== null) {
+        <div class="course-management-download-status" role="status" aria-live="polite">
+            <span>{{ downloadMessage() }}</span>
+            <progress [value]="downloadProgress()" max="100" aria-label="Tiến độ tải tài liệu giảng dạy"></progress>
+            <span>{{ downloadProgress() | number:'1.0-0' }}%</span>
+        </div>
+        }
+
         <div class="admin-wrap-table__body ictu-admin-table-shell__body">
             <div class="ictu-admin-table-scroll course-management-table-scroll">
                 <table class="tbl admin-table course-management-table">
@@ -48,6 +56,7 @@
                             <th class="course-management-col-number text-center">TCTH</th>
                             <th class="course-management-col-category text-center">Khoa quản lý</th>
                             <th class="course-management-col-programme text-center">Chương trình đào tạo</th>
+                            <th class="course-management-col-actions text-center">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -58,15 +67,41 @@
                             <td class="text-left">
                                 <a class="course-management-title" [routerLink]="['/hoc-phan']"
                                     [queryParams]="{ code: course.id }">{{ course.title || 'Chưa đặt tên' }}</a>
+                                <div class="course-management-subtitle">{{ course.teacherName }} - TC: {{ course.params?.sotinchi ?? 0 }} - {{ course.examFormatLabel }}</div>
                             </td>
                             <td class="text-center">{{ course.params?.sotinchi || 0 }}</td>
                             <td class="text-center">{{ course.params?.sotinchi_th || 0 }}</td>
                             <td class="text-center">{{ categoryName(course.category_ids) }}</td>
                             <td class="text-center">{{ programmeName(course.ctdt_id) }}</td>
+                            <td class="text-center course-management-actions">
+                                @if (canDownload) {
+                                <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
+                                    (click)="downloadDocuments(course)" [disabled]="downloadingCourseId() !== null"
+                                    [attr.aria-label]="'Tải tài liệu giảng dạy ' + (course.title || '')"
+                                    title="Tải tài liệu giảng dạy">
+                                    <i class="ti ti-file-download" aria-hidden="true"></i>
+                                </button>
+                                }
+                                @if (canClone) {
+                                <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
+                                    (click)="openClone(course)" [disabled]="cloneDrawerVisible()"
+                                    [attr.aria-label]="'Sao chép môn học ' + (course.title || '')"
+                                    title="Sao chép môn học">
+                                    <i class="ti ti-copy" aria-hidden="true"></i>
+                                </button>
+                                }
+                                @if (canDelete) {
+                                <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
+                                    (click)="deleteCourse(course)" [disabled]="deletingCourseId() !== null"
+                                    [attr.aria-label]="'Xóa học phần ' + (course.title || '')" title="Xóa học phần">
+                                    <i class="ti ti-trash" aria-hidden="true"></i>
+                                </button>
+                                }
+                            </td>
                         </tr>
                         } @empty {
                         <tr>
-                            <td colspan="7" class="course-management-empty">Không có học phần thuộc chương trình đào
+                            <td colspan="8" class="course-management-empty">Không có học phần thuộc chương trình đào
                                 tạo.</td>
                         </tr>
                         }
@@ -77,6 +112,16 @@
         <footer class="admin-wrap-table__foot course-management-footer">
             <ictu-paginator [control]="table.paginator" (onChangePage)="loadCourses($event, false)"></ictu-paginator>
         </footer>
+
+        <p-drawer [visible]="cloneDrawerVisible()" (visibleChange)="cloneDrawerVisible.set($event)" position="right"
+            [style]="{ width: '800px', maxWidth: '100vw' }" (onHide)="onCloneDrawerHide()" ariaLabel="Sao chép môn học">
+            <ng-template #header>
+                <span class="course-management-drawer-title">Sao chép nội dung từ môn học khác</span>
+            </ng-template>
+            @if (selectedCourse(); as course) {
+            <app-clone-course [courseSelected]="course"></app-clone-course>
+            }
+        </p-drawer>
         }
     </div>
 </section>

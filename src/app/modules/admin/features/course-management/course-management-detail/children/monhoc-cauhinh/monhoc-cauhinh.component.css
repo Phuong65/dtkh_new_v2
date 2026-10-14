@@ -12,9 +12,10 @@
     height: 100%;
     min-height: 100%;
     background: #f3f4f6;
+    overflow: auto;
 }
 
-.config-shell > app-loading-progress {
+.config-shell>app-loading-progress {
     z-index: 30;
 }
 
@@ -59,7 +60,6 @@
 .config-setting-card header p {
     margin: 4px 0 0;
     color: #64748b;
-    font-size: 13px;
     line-height: 1.45;
 }
 
@@ -79,18 +79,34 @@
     min-width: 780px;
 }
 
-:host ::ng-deep .config-grid-table .col-order { width: 68px; }
-:host ::ng-deep .config-grid-table .col-test-title { min-width: 230px; }
-:host ::ng-deep .config-grid-table .col-test-type { width: 280px; }
-:host ::ng-deep .config-grid-table .col-status { width: 130px; }
-:host ::ng-deep .config-grid-table .col-actions { width: 100px; }
+:host ::ng-deep .config-grid-table .col-order {
+    width: 68px;
+}
+
+:host ::ng-deep .config-grid-table .col-test-title {
+    min-width: 230px;
+}
+
+:host ::ng-deep .config-grid-table .col-test-type {
+    width: 280px;
+}
+
+:host ::ng-deep .config-grid-table .col-status {
+    width: 130px;
+}
+
+:host ::ng-deep .config-grid-table .col-actions {
+    width: 100px;
+}
 
 :host ::ng-deep .config-grid-table th,
 :host ::ng-deep .config-grid-table td {
     vertical-align: middle;
 }
 
-.cell-center { text-align: center; }
+.cell-center {
+    text-align: center;
+}
 
 .order-badge {
     display: inline-grid;
@@ -128,18 +144,20 @@
     text-align: center;
 }
 
-.config-settings { margin-top: 22px; }
+.config-settings {
+    margin-top: 22px;
+}
 
 .config-section-heading {
     display: flex;
     align-items: end;
     justify-content: space-between;
     gap: 16px;
-    margin: 0 0 12px;
     padding: 14px 16px;
     border: 1px solid #e2e8f0;
     border-radius: var(--admin-wrap-table-element-radius, 4px);
     background: #fff;
+    border-top: none;
 }
 
 .section-kicker {
@@ -159,7 +177,6 @@
 .config-card-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
 }
 
 .config-setting-card {
@@ -168,11 +185,14 @@
     border-radius: var(--admin-wrap-table-element-radius, 4px);
     background: #fff;
     overflow: hidden;
+    grid-column: span 2
 }
 
-.config-setting-card--wide { grid-column: span 2; }
+.config-setting-card--wide {
+    grid-column: span 2;
+}
 
-.config-setting-card > header {
+.config-setting-card>header {
     display: flex;
     align-items: center;
     gap: 11px;
@@ -198,10 +218,25 @@
     font-size: 18px;
 }
 
-.setting-icon--blue { background: #dbeafe; color: #2563eb; }
-.setting-icon--violet { background: #ede9fe; color: #7c3aed; }
-.setting-icon--amber { background: #fef3c7; color: #b45309; }
-.setting-icon--teal { background: #ccfbf1; color: #0f766e; }
+.setting-icon--blue {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.setting-icon--violet {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+.setting-icon--amber {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.setting-icon--teal {
+    background: #ccfbf1;
+    color: #0f766e;
+}
 
 .setting-row {
     display: grid;
@@ -213,13 +248,17 @@
     border-bottom: 1px solid #f1f5f9;
 }
 
-.setting-row:last-child { border-bottom: 0; }
+.setting-row:last-child {
+    border-bottom: 0;
+}
 
 .setting-row label,
 .week-item label {
     color: #475569;
-    font-size: 13px;
     line-height: 1.4;
+    font-weight: 500;
+    font-size: 14px;
+
 }
 
 :host ::ng-deep input.admin-wrap-table__input.setting-input {
@@ -234,11 +273,10 @@
     background: #fafcff;
 }
 
-.week-setting > strong {
+.week-setting>strong {
     display: block;
     margin-bottom: 12px;
     color: #475569;
-    font-size: 13px;
 }
 
 .week-grid {
@@ -257,21 +295,61 @@
     background: #fff;
 }
 
-.week-item label { color: #64748b; font-size: 12px; }
+.week-item label {
+    color: #64748b;
+    font-size: 12px;
+}
 
 @media (max-width: 720px) {
-    .config-workspace { padding: 10px 10px 28px; }
+    .config-workspace {
+        padding: 10px 10px 28px;
+    }
+
     .config-card-header,
-    .config-section-heading { align-items: stretch; flex-direction: column; }
-    .config-section-heading > button { align-self: flex-start; }
-    .config-card-grid { grid-template-columns: minmax(0, 1fr); }
-    .config-setting-card--wide { grid-column: auto; }
+    .config-section-heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .config-section-heading>button {
+        align-self: flex-start;
+    }
+
+    .config-card-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .config-setting-card--wide {
+        grid-column: auto;
+    }
 }
 
 @media (max-width: 460px) {
-    .config-card-header { padding: 12px; }
-    .config-actions { width: 100%; }
-    .config-actions button { flex: 1; }
-    .setting-row { grid-template-columns: 1fr; gap: 7px; }
-    :host ::ng-deep input.admin-wrap-table__input.setting-input { max-width: 100%; }
+    .config-card-header {
+        padding: 12px;
+    }
+
+    .config-actions {
+        width: 100%;
+    }
+
+    .config-actions button {
+        flex: 1;
+    }
+
+    .setting-row {
+        grid-template-columns: 1fr;
+        gap: 7px;
+    }
+
+    :host ::ng-deep input.admin-wrap-table__input.setting-input {
+        max-width: 100%;
+    }
+}
+
+
+
+.label-setting-row {
+    font-weight: 500;
+    font-size: 14px;
 }

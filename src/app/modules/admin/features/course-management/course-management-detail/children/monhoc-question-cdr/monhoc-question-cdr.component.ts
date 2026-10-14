@@ -1,4 +1,5 @@
-import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren, inject, signal, WritableSignal } from '@angular/core';
+import { AfterViewChecked, Component, DestroyRef, ElementRef, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren, inject, signal, WritableSignal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { CHUAN_DAU_RA, NORMAL_MODAL_OPTIONS, ROLES, ROUTERS } from '@modules/shared/utils/syscat';
 import { AuthService } from '@core/services/auth.service';
@@ -7,7 +8,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { OvicQueryCondition } from '@core/models/dto';
 import { key_server } from '@env';
 import { ConditionOption } from '@modules/shared/models/condition-option';
-import { forkJoin, mergeMap, Observable, of } from 'rxjs';
+import { distinctUntilChanged, finalize, forkJoin, mergeMap, Observable, of } from 'rxjs';
 import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
 import { ElngUserProfileService } from '@modules/shared/services/elearning-user-profile.service';
 import { CoursePlanActivitiesService } from '@modules/shared/services/course-plan-activities.service';
@@ -15,9 +16,7 @@ import { ElnKhoaHoc, EXAMFORMAT } from '@modules/shared/models/elng-khoa-hoc';
 import { CoursePlanActivities } from '@modules/shared/models/course-plan-activities';
 import { SharedModule } from '@modules/shared/shared.module';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { NgbModal, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
-import { DialogModule } from 'primeng/dialog';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { InputTextModule } from 'primeng/inputtext';
@@ -76,8 +75,6 @@ export interface CoursesCdr extends ElnKhoaHoc {
         ReactiveFormsModule,
         FormsModule,
         SharedModule,
-        DialogModule,
-        MatProgressBarModule,
         NgbTooltipModule,
         TooltipModule,
         InputTextModule,
@@ -86,7 +83,8 @@ export interface CoursesCdr extends ElnKhoaHoc {
     templateUrl: './monhoc-question-cdr.component.html',
     styleUrls: ['./monhoc-question-cdr.component.css']
 })
-export class MonhocQuestionCdrComponent implements OnInit {
+export class MonhocQuestionCdrComponent implements OnInit, AfterViewChecked, OnDestroy {
+    private readonly destroyRef = inject(DestroyRef);
     private auth = inject(AuthService);
     private notificationService = inject(NotificationService);
     private activatedRoute = inject(ActivatedRoute);
@@ -101,6 +99,12 @@ export class MonhocQuestionCdrComponent implements OnInit {
     @ViewChildren('inputNumberQuestion') inputNumberQuestion: QueryList<any>;
 
     @ViewChild("autoCdrQuestion") autoCdrQuestion: ElementRef;
+
+    @ViewChild('matrixScroll') matrixScroll?: ElementRef<HTMLElement>;
+
+    @ViewChild('matrixScrollbar') matrixScrollbar?: ElementRef<HTMLElement>;
+
+    @ViewChild('matrixScrollbarSpacer') matrixScrollbarSpacer?: ElementRef<HTMLElement>;
 
     isManager: boolean = false;
 
@@ -130,10 +134,6 @@ export class MonhocQuestionCdrComponent implements OnInit {
 
     list_cdr_cauhoi_clone: PlanActivityCdr[];
 
-    displayModal: boolean = false;
-
-    progressValue: number = 0;
-
     closeLeft: boolean = false;
 
     selectedCdr: PlanActivityCdr;
@@ -146,9 +146,17 @@ export class MonhocQuestionCdrComponent implements OnInit {
 
     label_week = "Bài";
 
-    waitingTitle: string = "Đang cập nhật dữ liệu, vui lòng chờ";
-
     readonly state: WritableSignal<AppState> = signal('loading');
+
+    readonly saving = signal(false);
+
+    readonly saveProgress = signal(0);
+
+    readonly saveHeading = signal('Đang lưu phân bổ câu hỏi... 0%');
+
+    private observedMatrixScroll?: HTMLElement;
+
+    private matrixResizeObserver?: ResizeObserver;
 
     readonly errorMessage = signal('');
 
@@ -179,15 +187,62 @@ export class MonhocQuestionCdrComponent implements OnInit {
         this.userId = this.auth.user.id;
     }
 
+    ngAfterViewChecked(): void {
+        this.connectMatrixScrollbar();
+    }
+
+    private readonly syncScrollbarFromMatrix = (): void => {
+        const matrix = this.matrixScroll?.nativeElement;
+        const scrollbar = this.matrixScrollbar?.nativeElement;
+        if (matrix && scrollbar && scrollbar.scrollLeft !== matrix.scrollLeft) {
+            scrollbar.scrollLeft = matrix.scrollLeft;
+        }
+    };
+
+    private readonly syncMatrixFromScrollbar = (): void => {
+        const matrix = this.matrixScroll?.nativeElement;
+        const scrollbar = this.matrixScrollbar?.nativeElement;
+        if (matrix && scrollbar && matrix.scrollLeft !== scrollbar.scrollLeft) {
+            matrix.scrollLeft = scrollbar.scrollLeft;
+        }
+    };
+
+    private connectMatrixScrollbar(): void {
+        const matrix = this.matrixScroll?.nativeElement;
+        const scrollbar = this.matrixScrollbar?.nativeElement;
+        const spacer = this.matrixScrollbarSpacer?.nativeElement;
+        if (!matrix || !scrollbar || !spacer || this.observedMatrixScroll === matrix) {
+            return;
+        }
+
+        this.observedMatrixScroll = matrix;
+        matrix.addEventListener('scroll', this.syncScrollbarFromMatrix, { passive: true });
+        scrollbar.addEventListener('scroll', this.syncMatrixFromScrollbar, { passive: true });
+        this.matrixResizeObserver = new ResizeObserver(() => {
+            spacer.style.width = `${matrix.scrollWidth}px`;
+        });
+        this.matrixResizeObserver.observe(matrix);
+        spacer.style.width = `${matrix.scrollWidth}px`;
+        this.syncScrollbarFromMatrix();
+    }
+
+    ngOnDestroy(): void {
+        this.matrixResizeObserver?.disconnect();
+        this.observedMatrixScroll?.removeEventListener('scroll', this.syncScrollbarFromMatrix);
+        this.matrixScrollbar?.nativeElement.removeEventListener('scroll', this.syncMatrixFromScrollbar);
+    }
+
     ngOnInit(): void {
-        this.activatedRoute.queryParams.subscribe((params) => {
+        this.activatedRoute.queryParams.pipe(
+            distinctUntilChanged((previous, current) => previous['code'] === current['code']),
+            takeUntilDestroyed(this.destroyRef)
+        ).subscribe((params) => {
             if (params && params['code']) {
                 this.courseId = params['code'].toString();
                 this.reloadData();
             } else {
                 this.courseId = null;
                 this.loadRequestId++;
-                this.notificationService.isProcessing(false);
                 this.errorMessage.set('ID học phần không hợp lệ.');
                 this.state.set('error');
                 this.router.navigate(['/admin/content-none']);
@@ -203,7 +258,6 @@ export class MonhocQuestionCdrComponent implements OnInit {
         const requestId = ++this.loadRequestId;
         this.state.set('loading');
         this.errorMessage.set('');
-        this.notificationService.isProcessing(true);
 
         const course_id = this.courseId;
 
@@ -235,7 +289,7 @@ export class MonhocQuestionCdrComponent implements OnInit {
                 forkJoin([
                     this.elnKhoaHocService.getKhoaHocByPageNew_2(contition_course),
                     this.elngUserProfileService.getUserProfileByPageNewV2(condition_user),
-                ]).subscribe({
+                ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
                     next: ([_course, _user_profile]) => {
                         if (requestId !== this.loadRequestId) {
                             return;
@@ -247,7 +301,7 @@ export class MonhocQuestionCdrComponent implements OnInit {
 
                             if (this.routerLanhdaokhoa) {
                                 if (_user_profile.recordsFiltered === 0 || this.selectedCourse.category_ids !== _user_profile.data[0].donvi_chuyenmon_id) {
-                                    this.notificationService.isProcessing(false);
+
                                     this.errorMessage.set('Không tìm thấy môn học');
                                     this.state.set('error');
                                     this.notificationService.toastError("Không tìm thấy môn học");
@@ -258,7 +312,7 @@ export class MonhocQuestionCdrComponent implements OnInit {
 
                             if (this.routerLanhdaobomon) {
                                 if (_user_profile.recordsFiltered === 0 || this.selectedCourse.nganh_bomon_id !== _user_profile.data[0].bomon_id) {
-                                    this.notificationService.isProcessing(false);
+
                                     this.errorMessage.set('Không tìm thấy môn học');
                                     this.state.set('error');
                                     this.notificationService.toastError("Không tìm thấy môn học");
@@ -276,7 +330,6 @@ export class MonhocQuestionCdrComponent implements OnInit {
                             this.loadCDRCauhoi(requestId)
 
                         } else {
-                            this.notificationService.isProcessing(false);
                             this.errorMessage.set('Không tìm thấy môn học');
                             this.state.set('error');
                             this.notificationService.toastError("Không tìm thấy môn học");
@@ -287,8 +340,6 @@ export class MonhocQuestionCdrComponent implements OnInit {
                         if (requestId !== this.loadRequestId) {
                             return;
                         }
-
-                        this.notificationService.isProcessing(false);
                         this.errorMessage.set('Không thể tải học phần. Vui lòng thử lại.');
                         this.state.set('error');
                         this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
@@ -363,8 +414,6 @@ export class MonhocQuestionCdrComponent implements OnInit {
             page: null
         }
 
-        this.notificationService.isProcessing(true);
-
         forkJoin([
             this.coursePlanActivitiesService.getCoursePlanActivitiesByPageNew(condition_lesson),
             this.courseQuestionsService.getCourseQuestionsByPageNew(condition_question).pipe(mergeMap(_question => {
@@ -402,13 +451,11 @@ export class MonhocQuestionCdrComponent implements OnInit {
                 }
                 return of(_question);
             }))
-        ]).subscribe({
+        ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
             next: ([_plan_activity, _question]) => {
                 if (activeRequestId !== this.loadRequestId) {
                     return;
                 }
-
-                this.notificationService.isProcessing(false);
                 const parent = _plan_activity.data.filter(m => m.parent_id === 0);
                 parent.forEach(f => {
                     const children = _plan_activity.data.filter(m => m.parent_id === f.id);
@@ -468,8 +515,6 @@ export class MonhocQuestionCdrComponent implements OnInit {
                 if (activeRequestId !== this.loadRequestId) {
                     return;
                 }
-
-                this.notificationService.isProcessing(false);
                 this.errorMessage.set('Không thể tải ma trận câu hỏi/CĐR. Vui lòng thử lại.');
                 this.state.set('error');
                 this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
@@ -802,17 +847,19 @@ export class MonhocQuestionCdrComponent implements OnInit {
                 })
 
                 if (request.length) {
-                    this.displayModal = true;
-                    this.progressValue = 0;
-                    this.loopSaveCdrQuestion(request, 0).subscribe({
+                    this.saving.set(true);
+                    this.saveProgress.set(0);
+                    this.saveHeading.set('Đang lưu phân bổ câu hỏi... 0%');
+                    this.loopSaveCdrQuestion(request, 0).pipe(
+                        finalize(() => this.saving.set(false)),
+                        takeUntilDestroyed(this.destroyRef)
+                    ).subscribe({
                         next: () => {
-                            this.displayModal = false;
-                            this.progressValue = 0;
                             this.notificationService.toastSuccess("Lưu thành công, vui lòng kiểm tra lại");
                             this.loadCDRCauhoi();
                         },
                         error: () => {
-
+                            this.notificationService.toastError("Không thể lưu phân bổ câu hỏi, vui lòng thử lại");
                         }
                     })
                 }
@@ -826,7 +873,9 @@ export class MonhocQuestionCdrComponent implements OnInit {
 
     loopSaveCdrQuestion(request: Observable<any>[], key: number): Observable<any> {
         return request[key].pipe(mergeMap(a => {
-            this.progressValue = (key + 1) / request.length * 100;
+            const percent = Math.round((key + 1) / request.length * 100);
+            this.saveProgress.set(percent);
+            this.saveHeading.set(`Đang lưu phân bổ câu hỏi... ${percent}%`);
             if (request[key + 1]) {
                 return this.loopSaveCdrQuestion(request, key + 1);
             } else {
