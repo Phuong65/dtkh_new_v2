@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
+import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren, inject, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CHUAN_DAU_RA, NORMAL_MODAL_OPTIONS, ROLES, ROUTERS } from '@modules/shared/utils/syscat';
 import { AuthService } from '@core/services/auth.service';
@@ -20,6 +20,9 @@ import { NgbModal, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { DialogModule } from 'primeng/dialog';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
+import { InputTextModule } from 'primeng/inputtext';
+import { AppState } from '@core-new/models/app-state';
+import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 import { BUTTON_YES, BUTTON_NO } from '@core/models/buttons';
 import { CourseQuestionsService } from '@modules/shared/services/course-questions.service';
 import { HelperService } from '@core/services/helper.service';
@@ -76,7 +79,9 @@ export interface CoursesCdr extends ElnKhoaHoc {
         DialogModule,
         MatProgressBarModule,
         NgbTooltipModule,
-        TooltipModule
+        TooltipModule,
+        InputTextModule,
+        LoadingProgressComponent
     ],
     templateUrl: './monhoc-question-cdr.component.html',
     styleUrls: ['./monhoc-question-cdr.component.css']
@@ -143,6 +148,14 @@ export class MonhocQuestionCdrComponent implements OnInit {
 
     waitingTitle: string = "Đang cập nhật dữ liệu, vui lòng chờ";
 
+    readonly state: WritableSignal<AppState> = signal('loading');
+
+    readonly errorMessage = signal('');
+
+    private courseId: string | null = null;
+
+    private loadRequestId = 0;
+
     /** Inserted by Angular inject() migration for backwards compatibility */
     constructor(...args: unknown[]);
 
@@ -169,11 +182,32 @@ export class MonhocQuestionCdrComponent implements OnInit {
     ngOnInit(): void {
         this.activatedRoute.queryParams.subscribe((params) => {
             if (params && params['code']) {
-                this.notificationService.isProcessing(true);
+                this.courseId = params['code'].toString();
+                this.reloadData();
+            } else {
+                this.courseId = null;
+                this.loadRequestId++;
+                this.notificationService.isProcessing(false);
+                this.errorMessage.set('ID học phần không hợp lệ.');
+                this.state.set('error');
+                this.router.navigate(['/admin/content-none']);
+            }
+        })
+    }
 
-                const course_id = params['code'];
+    reloadData(): void {
+        if (!this.courseId) {
+            return;
+        }
 
-                const contition_course: ConditionOption = {
+        const requestId = ++this.loadRequestId;
+        this.state.set('loading');
+        this.errorMessage.set('');
+        this.notificationService.isProcessing(true);
+
+        const course_id = this.courseId;
+
+        const contition_course: ConditionOption = {
                     condition: [
                         { conditionName: 'id', condition: OvicQueryCondition.equal, value: course_id.toString(), orWhere: 'and' },
                     ],
@@ -203,21 +237,33 @@ export class MonhocQuestionCdrComponent implements OnInit {
                     this.elngUserProfileService.getUserProfileByPageNewV2(condition_user),
                 ]).subscribe({
                     next: ([_course, _user_profile]) => {
+                        if (requestId !== this.loadRequestId) {
+                            return;
+                        }
+
                         if (_course.recordsFiltered) {
 
                             this.selectedCourse = _course.data[0];
 
                             if (this.routerLanhdaokhoa) {
                                 if (_user_profile.recordsFiltered === 0 || this.selectedCourse.category_ids !== _user_profile.data[0].donvi_chuyenmon_id) {
+                                    this.notificationService.isProcessing(false);
+                                    this.errorMessage.set('Không tìm thấy môn học');
+                                    this.state.set('error');
                                     this.notificationService.toastError("Không tìm thấy môn học");
                                     this.router.navigate(['/admin/content-none']);
+                                    return;
                                 }
                             }
 
                             if (this.routerLanhdaobomon) {
                                 if (_user_profile.recordsFiltered === 0 || this.selectedCourse.nganh_bomon_id !== _user_profile.data[0].bomon_id) {
+                                    this.notificationService.isProcessing(false);
+                                    this.errorMessage.set('Không tìm thấy môn học');
+                                    this.state.set('error');
                                     this.notificationService.toastError("Không tìm thấy môn học");
                                     this.router.navigate(['/admin/content-none']);
+                                    return;
                                 }
                             }
 
@@ -227,21 +273,27 @@ export class MonhocQuestionCdrComponent implements OnInit {
                                 this.canAdded = false;
                             }
 
-                            this.loadCDRCauhoi()
+                            this.loadCDRCauhoi(requestId)
 
                         } else {
+                            this.notificationService.isProcessing(false);
+                            this.errorMessage.set('Không tìm thấy môn học');
+                            this.state.set('error');
                             this.notificationService.toastError("Không tìm thấy môn học");
                             this.router.navigate(['/admin/content-none']);
                         }
                     },
                     error: () => {
+                        if (requestId !== this.loadRequestId) {
+                            return;
+                        }
+
+                        this.notificationService.isProcessing(false);
+                        this.errorMessage.set('Không thể tải học phần. Vui lòng thử lại.');
+                        this.state.set('error');
                         this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
                     }
                 })
-            } else {
-                this.router.navigate(['/admin/content-none']);
-            }
-        })
     }
 
     pointQuestionKeyDown(event, inputPoint_quest) {
@@ -260,7 +312,11 @@ export class MonhocQuestionCdrComponent implements OnInit {
         }
     }
 
-    loadCDRCauhoi() {
+    loadCDRCauhoi(requestId?: number) {
+        const activeRequestId = requestId ?? this.loadRequestId;
+        this.state.set('loading');
+        this.errorMessage.set('');
+
         const condition_lesson: ConditionOption = {
             condition: [
                 {
@@ -348,6 +404,10 @@ export class MonhocQuestionCdrComponent implements OnInit {
             }))
         ]).subscribe({
             next: ([_plan_activity, _question]) => {
+                if (activeRequestId !== this.loadRequestId) {
+                    return;
+                }
+
                 this.notificationService.isProcessing(false);
                 const parent = _plan_activity.data.filter(m => m.parent_id === 0);
                 parent.forEach(f => {
@@ -401,10 +461,17 @@ export class MonhocQuestionCdrComponent implements OnInit {
                 this.list_cdr_cauhoi_clone = [...parent];
 
                 this.checkCdrCourse();
+                this.state.set('success');
             },
 
             error: () => {
+                if (activeRequestId !== this.loadRequestId) {
+                    return;
+                }
+
                 this.notificationService.isProcessing(false);
+                this.errorMessage.set('Không thể tải ma trận câu hỏi/CĐR. Vui lòng thử lại.');
+                this.state.set('error');
                 this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
             }
         })

@@ -47,15 +47,15 @@
 .form-de-tab-list {
     display: flex;
     flex: 0 0 auto;
-    min-height: 62px;
+    min-height: 54px;
     align-items: stretch;
-    justify-content: flex-start;
-    gap: 4px;
+    justify-content: center;
+    gap: 2px;
     margin: 0;
-    padding: 8px 12px;
+    padding: 0 14px;
     overflow-x: auto;
     border-bottom: 1px solid #dbe3ec;
-    background: #f8fafc;
+    background: #fff;
     list-style: none;
     scrollbar-width: none;
 }
@@ -65,43 +65,58 @@
 .form-de-tab {
     position: relative;
     display: inline-flex;
-    flex: 1 1 0;
-    min-width: 154px;
-    min-height: 46px;
+    flex: 0 0 auto;
+    min-width: 190px;
+    min-height: 54px;
     align-items: center;
     justify-content: center;
-    padding: 6px 14px;
-    border: 1px solid transparent !important;
-    border-radius: 4px 4px 0 0 !important;
+    gap: 8px;
+    padding: 0 18px;
+    border: 0 !important;
+    border-bottom: 3px solid transparent !important;
+    border-radius: 0 !important;
     background: transparent !important;
     color: #64748b;
     font-family: inherit;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     line-height: 1.3;
     cursor: pointer;
     transition: background-color .15s ease, border-color .15s ease, color .15s ease;
 }
 
-.form-de-tab:hover:not(.active) { background: #ffffff !important; color: #334155; }
-.form-de-tab.active {
-    border-color: #cbd5e1 !important;
-    border-bottom-color: #334155 !important;
-    background: #ffffff !important;
-    color: #0f172a;
-    box-shadow: 0 -2px 0 #64748b inset;
+.form-de-tab .assessment-tab__icon { color: #2563eb; font-size: 17px; }
+.form-de-tab .assessment-tab__label { display: inline-flex; align-items: center; }
+.form-de-tab .name-tab-panel { font-size: 14px; }
+.form-de-tab .header-panel { display: inline-flex; align-items: center; gap: 8px; }
+.form-de-tab .date-tab-panel { color: #64748b; font-size: 12px; }
+.form-de-tab .lock-form { display: inline-flex; margin-left: 4px; }
+.form-de-tab .noiti-comment { vertical-align: top; }
+.form-de-tab:hover:not(.active):not(.is-active) { background: #f8fafc !important; color: #1d4ed8; }
+.form-de-tab.active,
+.form-de-tab.is-active {
+    border-bottom-color: #1d4ed8 !important;
+    background: #fff !important;
+    color: #1d4ed8;
 }
+.form-de-tab.active .assessment-tab__icon,
+.form-de-tab.is-active .assessment-tab__icon { color: #1d4ed8; }
+
 .form-de-tab:focus-visible { outline: 2px solid #64748b; outline-offset: -2px; }
 
 .form-de-tab-panels {
     flex: 1 1 auto;
     min-height: 0;
     overflow: auto;
-    padding: 12px;
+    padding: 14px;
     background: #f3f4f6;
 }
 
 .form-de-tab-panel { min-height: 100%; }
+.form-de-tab-panel--kthp { height: 100%; min-height: 100%; }
+.form-de-tab-panel--kthp .container-form-tracnghiem,
+.form-de-tab-panel--kthp .form-tracnghiem-panel-content,
+.form-de-tab-panel--kthp app-form-de-kthp { display: block; height: 100%; min-height: 0; }
 
 .container-form-tracnghiem,
 .form-tracnghiem-panel-content,
@@ -391,39 +406,155 @@
     border-radius: 4px !important;
 }
 
+:host ::ng-deep .formde-week-drawer {
+    --p-drawer-header-padding: 0 16px;
+    --p-drawer-content-padding: 0;
+    --p-drawer-footer-padding: 0;
+    font-family: var(--primary-font-family), 'Be Vietnam Pro', sans-serif;
+    font-size: 14px;
+}
+
 :host ::ng-deep .formde-week-drawer .p-drawer-header {
-    height: 48px;
-    padding: 0 14px;
-    border-bottom: 1px solid #e2e8f0;
+    min-height: 58px;
+    height: 58px;
+    padding: 0 16px;
+    border-bottom: 1px solid #dbe3ec;
     background: #ffffff;
+    color: #1e293b;
+    font-size: 15px;
+    font-weight: 650;
+}
+
+:host ::ng-deep .formde-week-drawer .p-drawer-title {
+    line-height: 1.35;
+}
+
+:host ::ng-deep .formde-week-drawer .p-drawer-close-button {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    color: #64748b;
+}
+
+:host ::ng-deep .formde-week-drawer .p-drawer-close-button:hover {
+    background: #eff6ff;
+    color: #2563eb;
 }
 
 :host ::ng-deep .formde-week-drawer .p-drawer-content {
     display: flex;
     min-height: 0;
+    flex: 1 1 auto;
     flex-direction: column;
     padding: 0;
+    overflow: hidden;
+}
+
+:host ::ng-deep .formde-week-drawer .ictu-p-drawer__content {
+    min-height: 0;
+    flex: 1 1 auto;
 }
 
 .formde-week-drawer__body {
     flex: 1 1 auto;
     min-height: 0;
-    padding: 10px 14px;
+    padding: 12px 14px;
     overflow-y: auto;
     background: #f8fafc;
 }
 
-:host ::ng-deep .formde-week-drawer .mat-mdc-list-option {
-    min-height: 44px;
-    margin-bottom: 6px;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
-    background: #ffffff;
+.formde-week-drawer__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border: 1px solid #dbeafe;
+    border-radius: 6px;
+    background: #eff6ff;
+    color: #1e3a8a;
 }
 
+.formde-week-drawer__summary strong { font-size: 14px; font-weight: 650; }
+.formde-week-drawer__summary span { font-size: 12px; font-weight: 600; }
+
+.formde-week-drawer__body .selection-list-mat {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 0;
+}
+
+.formde-week-option {
+    display: flex;
+    min-height: 68px;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fff;
+    color: #334155;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.formde-week-option:hover {
+    border-color: #93c5fd;
+    background: #f8fbff;
+    box-shadow: 0 2px 6px rgb(37 99 235 / 8%);
+    transform: translateY(-1px);
+}
+
+.formde-week-option.is-selected {
+    border-color: #2563eb;
+    background: #eff6ff;
+    box-shadow: inset 3px 0 #2563eb;
+}
+
+.formde-week-option__checkbox {
+    display: grid;
+    width: 21px;
+    height: 21px;
+    flex: 0 0 21px;
+    place-items: center;
+    border: 2px solid #94a3b8;
+    border-radius: 5px;
+    background: #fff;
+    color: #fff;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.formde-week-option.is-selected .formde-week-option__checkbox {
+    border-color: #2563eb;
+    background: #2563eb;
+}
+
+.formde-week-option__label {
+    flex: 1;
+    min-width: 0;
+    color: #334155;
+    font-size: 14px;
+    font-weight: 650;
+}
+
+.formde-week-option__state {
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.formde-week-option.is-selected .formde-week-option__state { color: #2563eb; }
+
+
 :host ::ng-deep .formde-week-drawer .ictu-p-drawer__content__footer {
-    height: 48px;
-    min-height: 48px;
+    height: 58px;
+    min-height: 58px;
     padding: 0 14px;
     border-top: 1px solid #e2e8f0;
     background: #ffffff;
@@ -433,4 +564,5 @@
     .form-de-tab-list { justify-content: flex-start; padding: 0; }
     .form-de-tab { min-width: 135px; padding: 0 12px; font-size: 12px; }
     .form-de-tab-panels { padding: 8px; }
+    .formde-week-drawer__body .selection-list-mat { grid-template-columns: 1fr; }
 }

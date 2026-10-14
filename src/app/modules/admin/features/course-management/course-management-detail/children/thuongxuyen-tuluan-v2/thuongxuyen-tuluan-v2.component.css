@@ -90,37 +90,42 @@
 .essay-form-grid--program { grid-template-columns: minmax(0, 3fr) minmax(230px, 1fr); align-items: start; }
 .essay-field--cdr { min-width: 0; }
 .essay-field--access { min-width: 0; }
-:host ::ng-deep .essay-access-radio .group-radio-v2 {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px 18px;
+/* Drawer is appended to body, outside the component host. */
+::ng-deep .essay-form-drawer .group-radio-v2:is(.essay-access-radio, .essay-cdr-radio) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 24px;
+    min-height: 43px;
+    line-height: 22px;
 }
-:host ::ng-deep .essay-access-radio .radio-item-v2,
-:host ::ng-deep .essay-cdr-radio .hoziron-radio-6 {
+::ng-deep .essay-form-drawer :is(.essay-access-radio, .essay-cdr-radio) .radio-item-v2 {
+    flex: 0 0 auto;
     width: auto !important;
     min-width: 0;
     margin: 0 !important;
+    padding: 0;
 }
-:host ::ng-deep .essay-access-radio .radio-item-item-v2,
-:host ::ng-deep .essay-cdr-radio .radio-item-item-v2 {
-    display: flex;
-    min-width: 0;
+::ng-deep .essay-form-drawer :is(.essay-access-radio, .essay-cdr-radio) .radio-item-item-v2 {
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
-    white-space: nowrap;
+    gap: 8px;
+    min-height: 22px;
+    line-height: 22px;
 }
-:host ::ng-deep .essay-cdr-radio .hoziron-radio-6 {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 10px;
+::ng-deep .essay-form-drawer :is(.essay-access-radio, .essay-cdr-radio) input[type="radio"] {
+    flex: 0 0 18px;
+    margin: 0 !important;
+    align-self: center;
 }
-:host ::ng-deep .essay-cdr-radio .hoziron-radio-6 .radio-item-item-v2 {
-    justify-content: flex-start;
+::ng-deep .essay-form-drawer :is(.essay-access-radio, .essay-cdr-radio) .group-radio-text-v2 {
+    flex: 0 1 auto;
+    font-size: 14px;
+    line-height: 22px;
 }
-:host ::ng-deep .essay-access-radio .group-radio-text-v2,
-:host ::ng-deep .essay-cdr-radio .group-radio-text-v2 {
-    overflow: hidden;
-    text-overflow: ellipsis;
+::ng-deep .essay-form-drawer :is(.essay-access-radio, .essay-cdr-radio) .group-radio-text-v2 p {
+    margin: 0;
+    line-height: inherit;
 }
 
 .essay-field { display: flex; min-width: 0; flex-direction: column; gap: 7px; }
@@ -130,14 +135,24 @@
 .essay-field .p-multiselect { width: 100%; min-height: 42px; border-color: #cbd5e1; }
 .essay-drawer__editor { min-height: 0; flex: 1 1 auto; padding-bottom: 24px; }
 .essay-drawer__editor .essay-field { height: 100%; }
-:host ::ng-deep .essay-drawer__editor ovic-ckeditor-document,
-:host ::ng-deep .essay-drawer__editor .document-editor_basic,
-:host ::ng-deep .essay-drawer__editor .document-editor__editable { display: block; min-height: 560px; }
-:host ::ng-deep .essay-drawer__editor .ck-editor__editable_inline { min-height: 500px; }
+::ng-deep .essay-form-drawer .essay-drawer__editor ovic-ckeditor-document,
+::ng-deep .essay-form-drawer .essay-drawer__editor .document-editor_basic {
+    display: block;
+    width: 100%;
+    line-height: 1.5;
+}
+::ng-deep .essay-form-drawer .essay-drawer__editor .document-editor_basic:not(.maximize-editor-mode) .ck-editor__editable_inline {
+    min-height: 500px !important;
+    padding: 16px 20px;
+    font-size: 14px;
+    line-height: 1.6;
+}
 
 .essay-drawer__editor .essay-field { gap: 10px; }
+.essay-drawer__header,
+.essay-drawer__footer { flex-shrink: 0; }
 .essay-drawer__footer { display: flex; min-height: 64px; align-items: center; justify-content: flex-end; gap: 8px; padding: 10px 18px; border-top: 1px solid #dbe3ec; background: #fff; }
-@media (max-width: 760px) { .essay-form-grid, .essay-form-grid--program { grid-template-columns: 1fr; } .essay-field--wide { grid-column: auto; } .essay-drawer__header { padding: 12px; } .essay-drawer__section { padding: 14px 12px; } .essay-drawer__footer { padding: 10px 12px; } :host ::ng-deep .essay-access-radio .group-radio-v2, :host ::ng-deep .essay-cdr-radio .hoziron-radio-6 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .essay-form-grid, .essay-form-grid--program { grid-template-columns: 1fr; } .essay-field--wide { grid-column: auto; } .essay-drawer__header { padding: 12px; } .essay-drawer__section { padding: 14px 12px; } .essay-drawer__footer { padding: 10px 12px; } ::ng-deep .essay-form-drawer .group-radio-v2:is(.essay-access-radio, .essay-cdr-radio) { gap: 10px 16px; } }
 
 
 .activity-row {

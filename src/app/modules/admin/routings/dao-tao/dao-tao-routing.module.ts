@@ -23,7 +23,8 @@ const routes: Routes = [
     },
     {
         path: 'chuongtrinh-daotao',
-        loadChildren: () => import('@modules/admin/features/chuongtrinh-daotao/ctdt.module').then(m => m.CtdtModule)
+         loadComponent: () => import('@modules/admin/features/bo-ctdt/bo-ctdt-management.component').then(c => c.BoCtdtManagementComponent),
+        // loadChildren: () => import('@modules/admin/features/chuongtrinh-daotao/ctdt.module').then(m => m.CtdtModule)
     },
     {
         path: 'course-management',
@@ -32,7 +33,8 @@ const routes: Routes = [
     },
     {
         path: 'quanly-monhoc',
-        loadChildren: () => import('@modules/admin/features/quanly-monhoc/quanly-monhoc.module').then(m => m.QuanlyMonhocModule)
+        loadComponent: () => import('@modules/admin/features/subject-management/subject-management.component').then(c => c.SubjectManagementComponent),
+        //loadChildren: () => import('@modules/admin/features/quanly-monhoc/quanly-monhoc.module').then(m => m.QuanlyMonhocModule)
     },
     {
         path: 'kehoach-hoctap',

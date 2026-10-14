@@ -1,10 +1,11 @@
 <main class="formde-shell">
-    @if (state() === 'loading') {
-    <app-loading-progress [heading]="loadingHeading()"></app-loading-progress>
+    @if (state() === 'loading' || isLoading()) {
+    <app-loading-progress [heading]="loadingHeading()" backdropFilter="blur(2px)"></app-loading-progress>
     }
     @if (state() === 'error') {
-    <div class="admin-table__alert-danger text-center w-100">{{ errorMessage() }}
-        <a (click)="reloadData()" href="javascript:" class="admin-table__alert-danger__btn-reload">Tải lại</a>
+    <div class="admin-table__alert-danger text-center w-100">
+        Tải dữ liệu thất bại. Vui lòng chọn
+        <a (click)="reloadData()" href="javascript:" class="admin-table__alert-danger__btn-reload">tải lại</a>.
     </div>
     }
     @if (state() === 'success') {
@@ -14,18 +15,21 @@
             @if (selectedCourse) {
             <div class="form-de-tab-view"
                 [ngClass]="!isEmptyObject(course_form_duyet)? 'layout-tab-form-duyet-panel' :''">
-                <nav class="form-de-tab-list" role="tablist" aria-label="Các loại Form đề">
+                <nav class="form-de-tab-list assessment-tabs" role="tablist" aria-label="Các loại Form đề">
                     @for (panel of list_tab; track panel.key; let tabIndex = $index) {
-                    <button type="button" class="form-de-tab" role="tab" [class.active]="activeIndexTab === tabIndex"
-                        [attr.aria-selected]="activeIndexTab === tabIndex" (click)="onTabIndexChange(tabIndex)">
-                        <ng-container [ngTemplateOutlet]="panelHeader"
-                            [ngTemplateOutletContext]="{ type: panel.key}"></ng-container>
+                    <button type="button" class="form-de-tab assessment-tab" role="tab" [class.active]="activeIndexTab === tabIndex"
+                        [class.is-active]="activeIndexTab === tabIndex" [attr.aria-selected]="activeIndexTab === tabIndex"
+                        [attr.aria-controls]="'formde-panel-' + panel.key" (click)="onTabIndexChange(tabIndex)">
+                        <span class="assessment-tab__icon" aria-hidden="true"><i [class]="tabIcon(panel.key)"></i></span>
+                        <span class="assessment-tab__label"><ng-container [ngTemplateOutlet]="panelHeader"
+                            [ngTemplateOutletContext]="{ type: panel.key}"></ng-container></span>
                     </button>
                     }
                 </nav>
                 <div class="form-de-tab-panels">
                     @for (panel of list_tab; track panel; let tabIndex = $index) {
-                    <div class="form-de-tab-panel" [hidden]="activeIndexTab !== tabIndex">
+                    <div class="form-de-tab-panel" role="tabpanel" [id]="'formde-panel-' + panel.key"
+                        [class.form-de-tab-panel--kthp]="panel.key === 'TN_KTHP'" [hidden]="activeIndexTab !== tabIndex">
                         @if (panel.key !== 'TNTX' && selectTab && selectTab.key === panel.key) {
                         <ng-container [ngTemplateOutlet]="panel.component"
                             [ngTemplateOutletContext]="{ typeTest: panel.key}">
@@ -1221,17 +1225,23 @@
 
 <p-drawer [visible]="addWeekDrawerVisible()" (visibleChange)="addWeekDrawerVisible.set($event)"
     [header]="'Chọn ' + label_week + ' cho ' + (selectedTestTx?.title || '')" appendTo="body" position="right"
+    [closable]="true" [dismissible]="true" [closeOnEscape]="true"
     [style]="{ width: 'min(500px, 100vw)' }" styleClass="ictu-p-drawer formde-week-drawer">
     <div class="ictu-p-drawer__content">
         <div class="ictu-p-drawer__content__body formde-week-drawer__body">
-            <mat-selection-list [multiple]="false" class="selection-list-mat">
-                @for (week of list_week; track week.id) {
-                <mat-list-option (click)="onSelectWeek(week)" [value]="week">
-                    <span>{{ label_week }} {{ week.week }}</span>
-                    @if (week['checked']) { <i class="ti ti-check" aria-hidden="true"></i> }
-                </mat-list-option>
+            <div class="formde-week-drawer__summary"><strong>Chọn các bài áp dụng</strong><span>{{ selectedWeekCount() }} / {{ list_week?.length || 0 }} đã chọn</span></div>
+            <div class="selection-list-mat">
+                @for (week of list_week || []; track week.id) {
+                <button type="button" class="formde-week-option" [class.is-selected]="week['checked']"
+                    [attr.aria-pressed]="!!week['checked']" (click)="onSelectWeek(week)">
+                    <span class="formde-week-option__checkbox" aria-hidden="true">
+                        @if (week['checked']) { <i class="ti ti-check"></i> }
+                    </span>
+                    <span class="formde-week-option__label">{{ label_week }} {{ week.week }}</span>
+                    <span class="formde-week-option__state">{{ week['checked'] ? 'Đã chọn' : 'Chưa chọn' }}</span>
+                </button>
                 }
-            </mat-selection-list>
+            </div>
         </div>
         <div class="ictu-p-drawer__content__footer ictu-admin-drawer-footer">
             <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button"

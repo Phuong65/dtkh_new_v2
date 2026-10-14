@@ -101,7 +101,11 @@ export class FormDeKthpComponent implements OnInit, OnChanges {
     }
 
     initFormDetail() {
-        console.log('initFormDetail');
+        if (!this._course) {
+            this.errorMessage.set('Không tìm thấy học phần để tải Form KTHP.');
+            this.state.set('error');
+            return;
+        }
         this._course['question_take_total'] = null;
         this.list_course_plan = null;
         this.state.set('loading');
@@ -732,6 +736,10 @@ export class FormDeKthpComponent implements OnInit, OnChanges {
                 this.setNumberQuestiontype1();
 
                 this.state.set('success');
+            },
+            error: () => {
+                this.errorMessage.set('Không thể tải Form KTHP. Vui lòng thử lại.');
+                this.state.set('error');
             }
         })
     }

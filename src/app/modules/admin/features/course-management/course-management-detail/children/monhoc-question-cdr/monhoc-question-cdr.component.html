@@ -1,3 +1,15 @@
+@if (state() === 'loading') {
+<app-loading-progress heading="Đang tải ma trận câu hỏi/CĐR..." backdropFilter="none"></app-loading-progress>
+}
+
+@if (state() === 'error') {
+<div class="admin-table__alert-danger text-center w-100">
+    {{ errorMessage() }}
+    <a (click)="reloadData()" href="javascript:" class="admin-table__alert-danger__btn-reload">Tải lại</a>
+</div>
+}
+
+@if (state() === 'success') {
 <div class="layout_component_container">
     <div class="phanbo-cdr-layout" [ngClass]="closeLeft?'close-left-body':''">
         <div class="phanbo-cdr-layout-left">
@@ -65,85 +77,84 @@
 }
         </div>
         <div class="phanbo-cdr-layout-right">
-            <p-table [value]="list_cdr_cauhoi"
-                styleClass="tbl-danhSachUser table-reBorder table-scroll-able table-has-caption table-able-dropdown-p-table">
-                <ng-template pTemplate="caption">
-                    <div class="flex caption-table" style="text-align: right;">
+            <section class="admin-wrap-table cdr-question-table-shell" aria-label="Ma trận câu hỏi theo CDR">
+                <header class="admin-wrap-table__head cdr-question-table-shell__head">
+                    <div>
+                        <h2 class="admin-wrap-table__heading">Ma trận câu hỏi/CĐR</h2>
+                        <p class="cdr-question-table-shell__description">Phân bổ số câu hỏi theo từng chuẩn đầu ra.</p>
+                    </div>
+                    <div class="cdr-question-table-actions">
                         <button [disabled]="list_cdr_cauhoi && list_cdr_cauhoi.length ? false : true"
                             ngbTooltip="Phân bổ thêm số lượng câu hỏi" container="body" placement="left"
-                            style="line-height: 1;" (click)="openAutoCdr()" class="btn btn-success btn-icon">
+                            (click)="openAutoCdr()" class="btn btn-outline-primary btn-icon">
                             <i class="fa fa-server"></i>
                         </button>
-                        <button style="line-height: 1; margin-left: 5px;" (click)="saveCdrQuestion()"
-                            class="btn btn-primary">
+                        <button (click)="saveCdrQuestion()" class="btn btn-primary">
                             <i class="fa fa-floppy-o"></i>Lưu lại
                         </button>
                     </div>
-                </ng-template>
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th style="width: 150px;"></th>
-                        @for (cdr of chuandaura; track cdr) {
-<th style="width: 150px; text-align: center;" [ngClass]="cdr.disabled ?'disabled-cdr':''"
-                           >
-                            {{cdr.label}}
-                        </th>
+                </header>
+                <div class="admin-wrap-table__body cdr-question-table-shell__body">
+                    <p-table [value]="list_cdr_cauhoi"
+                        styleClass="tbl-danhSachUser table-reBorder table-scroll-able table-able-dropdown-p-table cdr-question-table">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th style="width: 150px;"></th>
+                                @for (cdr of chuandaura; track cdr) {
+<th style="width: 150px; text-align: center;" [ngClass]="cdr.disabled ?'disabled-cdr':''">
+                                    {{cdr.label}}
+                                </th>
 }
-                        <th style="text-align: center; width: 80px;">Tổng</th>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-row>
-                    <tr [ngClass]="!row['children'] || row['children'].length === 0?'require-cdr-backgroud-color':''">
-                        <th style="text-align: left; background-color: #f8f9fa;" [colSpan]="8">
-
-                            <span> {{label_week +' '+row['week']}}</span>
-                            @if (!row['children'] || row['children'].length === 0) {
-<span>
-                                {{' - Chưa cập nhật CDR'}}
-                            </span>
+                                <th style="text-align: center; width: 80px;">Tổng</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-row>
+                            <tr [ngClass]="!row['children'] || row['children'].length === 0?'require-cdr-backgroud-color':''">
+                                <th class="cdr-question-table__group-row" [colSpan]="8">
+                                    <span>{{label_week +' '+row['week']}}</span>
+                                    @if (!row['children'] || row['children'].length === 0) {
+<span>{{' - Chưa cập nhật CDR'}}</span>
 }
-                        </th>
-                    </tr>
-                    @for (child of row['children']; track child) {
-<tr (click)="cdrGet(child)" [ngClass]="child.require_cdr?'require-cdr-backgroud-color':''"
-                       >
-                        <td style="text-align: left; color: #3B82F6;">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span>{{child['kyhieu']+' - '+child['cdr_name']}}</span>
-                                <!--                                <span class="reset-btn-st"> <i class="pi pi-replay" style="color: red;" pTooltip="Reset" (click)="btnReset(child,row['children'])" ></i></span>-->
-                            </div>
-
-
-                        </td>
-                        @for (cdr of chuandaura; track cdr) {
-<td style="text-align: center;">
-                            @if (child.cdr_cauhoi && !cdr.disabled) {
-                            <div class="p-inputgroup">
-                                <span style="border-left: 1px solid #ced4da; border-right: 0px;"
-                                    class="p-inputgroup-addon tag-cdr-cauhoi-percent">
-                                    {{child['min_cdr_question'][cdr.id] ? child['min_cdr_question'][cdr.id] : 0 }}
-                                    &#8804;
-                                </span>
-                                <input (keyup)="setNumberCdrCauhoi(child,true)" #inputNumberQuestion
-                                    class="ovic-input-field"
-                                    (keydown)="pointQuestionKeyDown($event,inputNumberQuestion)"
-                                    style="text-align: center; flex:1; width: 100%; min-width: 50px;" type="number"
-                                    [(ngModel)]="child.cdr_cauhoi[cdr.id]">
-                                <span class="p-inputgroup-addon tag-cdr-cauhoi-percent">
-                                    = {{child['cdr_percent'][cdr.id] ? child['cdr_percent'][cdr.id] : 0}}%
-                                </span>
-                            </div>
+                                </th>
+                            </tr>
+                            @for (child of row['children']; track child) {
+<tr (click)="cdrGet(child)" [ngClass]="child.require_cdr?'require-cdr-backgroud-color':''">
+                                <td class="cdr-question-table__outcome">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>{{child['kyhieu']+' - '+child['cdr_name']}}</span>
+                                    </div>
+                                </td>
+                                @for (cdr of chuandaura; track cdr) {
+<td class="cdr-question-table__cell">
+                                    @if (child.cdr_cauhoi && !cdr.disabled) {
+                                    <div class="p-inputgroup cdr-question-inputgroup">
+                                        <span class="p-inputgroup-addon tag-cdr-cauhoi-percent cdr-question-addon--minimum">
+                                            {{child['min_cdr_question'][cdr.id] ? child['min_cdr_question'][cdr.id] : 0 }}
+                                            &#8804;
+                                        </span>
+                                        <input pInputText (keyup)="setNumberCdrCauhoi(child,true)" #inputNumberQuestion
+                                            class="ovic-input-field cdr-question-input"
+                                            [attr.aria-label]="'Số câu hỏi ' + cdr.label + ' cho ' + child['kyhieu']"
+                                            (keydown)="pointQuestionKeyDown($event,inputNumberQuestion)" type="number"
+                                            [(ngModel)]="child.cdr_cauhoi[cdr.id]">
+                                        <span class="p-inputgroup-addon tag-cdr-cauhoi-percent cdr-question-addon--percent">
+                                            = {{child['cdr_percent'][cdr.id] ? child['cdr_percent'][cdr.id] : 0}}%
+                                        </span>
+                                    </div>
 }
-                        </td>
+                                </td>
 }
-                        <td style="text-align: center;">{{child['total_question']}}</td>
-                    </tr>
+                                <td class="cdr-question-table__total">{{child['total_question']}}</td>
+                            </tr>
 }
-                </ng-template>
-            </p-table>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </section>
         </div>
     </div>
 </div>
+}
 
 <ng-template #autoCdrQuestion let-c="close" let-d="dismiss">
     <div class="ovic-over-right-section">

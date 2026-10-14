@@ -150,16 +150,19 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
     progressValue: number = 0;
 
-    displayModal: boolean = false;
+    readonly isLoading = signal(false);
     readonly state = signal<AppState>('loading');
     readonly errorMessage = signal('');
     readonly loadingHeading = signal('Đang tải Form đề...');
     readonly addWeekDrawerVisible = signal(false);
     private readonly cancelCourseLoad$ = new Subject<void>();
+    private readonly cancelTabLoad$ = new Subject<void>();
+    private courseLoadVersion = 0;
+    private tabLoadVersion = 0;
 
     list_course_plan: PlanActivityCdr[];
 
-    list_week: PlanActivityCdr[];
+    list_week: PlanActivityCdr[] = [];
 
     list_question_txt1: CourseQuestions[];
 
@@ -225,7 +228,9 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     private loadCourseData(code: string | null): void {
+            const version = ++this.courseLoadVersion;
             this.cancelCourseLoad$.next();
+            this.cancelTabLoad$.next();
             this.selectedCourse = null;
             if (code && Number.isSafeInteger(Number(code)) && Number(code) > 0) {
                 this.state.set('loading');
@@ -325,6 +330,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                     this.courseFormCommentService.getCourseFormCommentByPageNew(condition_form_comment)
                 ]).pipe(takeUntil(this.cancelCourseLoad$), takeUntilDestroyed(this.destroyRef)).subscribe({
                     next: ([_course, _user_profile, _course_form_duyet, _hoidong_thanhvien, _comment]) => {
+                        if (version !== this.courseLoadVersion) return;
                         if (_course.recordsFiltered) {
 
                             this.selectedCourse = _course.data[0];
@@ -364,9 +370,8 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                             }
 
                             this.createListTab(_course_form_duyet.data);
-
-                            this.loadFormCcCauhoi();
                             this.state.set('success');
+                            this.loadFormCcCauhoi();
 
                         } else {
                             this.errorMessage.set('Không tìm thấy học phần.');
@@ -374,6 +379,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                         }
                     },
                     error: () => {
+                        if (version !== this.courseLoadVersion) return;
                         this.errorMessage.set('Không thể tải Form đề. Vui lòng thử lại.');
                         this.state.set('error');
                     }
@@ -385,7 +391,12 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit(): void {
-
+        this.destroyRef.onDestroy(() => {
+            this.cancelCourseLoad$.next();
+            this.cancelCourseLoad$.complete();
+            this.cancelTabLoad$.next();
+            this.cancelTabLoad$.complete();
+        });
     }
 
     reloadData(): void {
@@ -463,6 +474,29 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
         this.selectTab = this.list_tab[this.activeIndexTab];
     }
 
+    tabIcon(type: string): string {
+        switch (type) {
+            case 'CC': return 'ti ti-home';
+            case 'DG': return 'ti ti-clock';
+            case 'TNTX': return 'ti ti-clipboard-check';
+            case 'TN_KTHP': return 'ti ti-school';
+            default: return 'ti ti-file-description';
+        }
+    }
+
+    selectedWeekCount(): number {
+        return this.list_week?.filter(week => !!week['checked']).length || 0;
+    }
+
+    private startLoading(heading: string): void {
+        this.loadingHeading.set(heading);
+        this.isLoading.set(true);
+    }
+
+    private stopLoading(): void {
+        this.isLoading.set(false);
+    }
+
     onOpenComment() {
         this.openComment = !this.openComment;
     }
@@ -470,6 +504,8 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
 
     changeTabView() {
+        this.tabLoadVersion++;
+        this.cancelTabLoad$.next();
         this.list_cdr_cauhoi = [];
         this.list_part = [];
         this.list_test_tx = [];
@@ -548,6 +584,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     //** load form cc */
 
     loadFormCcCauhoi() {
+        if (!this.selectedCourse) return;
         switch (this.selectedCourse.av) {
             case 0:
                 this.loadFormCcCauhoiType0();
@@ -716,17 +753,17 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
             page: null
         }
 
-        this.notificationService.isProcessing(true);
+        this.startLoading('Đang tải Form đề...');
 
         forkJoin([
             this.coursePlanActivitiesService.getCoursePlanActivitiesByPageNew(condition_lesson),
             this.courseFormCcService.getCourseFormCcByPage(condition_form_cc),
             this.coursePlanBankService.getCoursePlanBankByPageNew(condition_plan_bank),
             this.courseQuestionsService.getCourseQuestionsByPageNew(condition_question)
-        ]).subscribe({
+        ]).pipe(takeUntil(this.cancelTabLoad$), takeUntilDestroyed(this.destroyRef)).subscribe({
             next: ([_plan_activity, _form_cc, _plan_bank, _question]) => {
 
-                this.notificationService.isProcessing(false);
+                this.stopLoading();
 
                 this.hasFormCcData = _form_cc.data.length > 0;
 
@@ -802,7 +839,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
             },
 
             error: () => {
-                this.notificationService.isProcessing(false);
+                this.stopLoading();
                 this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
             }
         })
@@ -894,15 +931,15 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
         } else {
             if (request.length > 0) {
                 this.progressValue = 0;
-                this.displayModal = true;
+                this.startLoading(this.waitingTitle);
                 this.loopAddForm(request, 0).subscribe({
                     next: () => {
-                        this.displayModal = false;
+                        this.stopLoading();
                         this.notificationService.toastSuccess("Lưu thành công")
                         this.loadFormCcCauhoi();
                     },
                     error: () => {
-                        this.displayModal = false;
+                        this.stopLoading();
                         this.notificationService.toastError("Lưu thất bại, vui lòng thử lại")
                     }
                 })
@@ -969,17 +1006,17 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
             page: null
         }
 
-        this.notificationService.isProcessing(true);
+        this.startLoading('Đang tải Form đề...');
 
         forkJoin([
             this.coursePlanActivitiesService.getCoursePlanActivitiesByPageNew(condition_lesson),
             this.courseFormCcService.getCourseFormCcByPage(condition_form_cc),
             this.courseQuestionsService.getCourseQuestionsByPageNew(condition_question),
             this.coursePlanBankService.getCoursePlanBankByPageNew(condition_plan_bank)
-        ]).subscribe({
+        ]).pipe(takeUntil(this.cancelTabLoad$), takeUntilDestroyed(this.destroyRef)).subscribe({
             next: ([_plan_activity, _form_cc, _question, _plan_bank]) => {
 
-                this.notificationService.isProcessing(false);
+                this.stopLoading();
 
                 this.hasFormCcData = _form_cc.data.length > 0;
 
@@ -1090,7 +1127,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
             },
 
             error: () => {
-                this.notificationService.isProcessing(false);
+                this.stopLoading();
                 this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
             }
         })
@@ -1187,15 +1224,15 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
         } else {
             if (request.length > 0) {
                 this.progressValue = 0;
-                this.displayModal = true;
+                this.startLoading(this.waitingTitle);
                 this.loopAddForm(request, 0).subscribe({
                     next: () => {
-                        this.displayModal = false;
+                        this.stopLoading();
                         this.notificationService.toastSuccess("Lưu thành công")
                         this.loadFormCcCauhoi();
                     },
                     error: () => {
-                        this.displayModal = false;
+                        this.stopLoading();
                         this.notificationService.toastError("Lưu thất bại, vui lòng thử lại")
                     }
                 })
@@ -1279,14 +1316,14 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
             page: null
         }
 
-        this.notificationService.isProcessing(true);
+        this.startLoading('Đang tải Form đề...');
 
         forkJoin([
             this.coursePlanActivitiesService.getCoursePlanActivitiesByPageNew(condition_lesson),
             this.courseFormTxService.getCoursePlansByPageNew(condition_form_Tx),
             this.coursePlanBankService.getCoursePlanBankByPageNew(condition_plan_bank),
             this.courseQuestionsService.getCourseQuestionsByPageNew(condition_question)
-        ]).subscribe({
+        ]).pipe(takeUntil(this.cancelTabLoad$), takeUntilDestroyed(this.destroyRef)).subscribe({
             next: ([_course_plan, _form_tx, _plan_bank, _course_question]) => {
 
                 this.list_course_plan = _course_plan.data;
@@ -1380,10 +1417,11 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                     this.show_test_tx = true;
                 }
 
-                this.notificationService.isProcessing(false);
+                this.stopLoading();
             },
             error: () => {
-
+                this.stopLoading();
+                this.notificationService.toastError('Không thể tải Form đề. Vui lòng thử lại.');
             }
         })
     }
@@ -1492,15 +1530,15 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
         } else {
             if (request.length > 0) {
                 this.progressValue = 0;
-                this.displayModal = true;
+                this.startLoading(this.waitingTitle);
                 this.loopAddForm(request, 0).subscribe({
                     next: () => {
-                        this.displayModal = false;
+                        this.stopLoading();
                         this.notificationService.toastSuccess("Lưu thành công")
                         this.loadFormTxCauhoi();
                     },
                     error: () => {
-                        this.displayModal = false;
+                        this.stopLoading();
                         this.notificationService.toastError("Lưu thất bại, vui lòng thử lại")
                     }
                 })
@@ -1567,14 +1605,14 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
             page: null
         }
 
-        this.notificationService.isProcessing(true);
+        this.startLoading('Đang tải Form đề...');
 
         forkJoin([
             this.coursePlanActivitiesService.getCoursePlanActivitiesByPageNew(condition_lesson),
             this.courseFormTxService.getCoursePlansByPageNew(condition_form_Tx),
             this.courseQuestionsService.getCourseQuestionsByPageNew(condition_question),
             this.coursePlanBankService.getCoursePlanBankByPageNew(condition_plan_bank)
-        ]).subscribe({
+        ]).pipe(takeUntil(this.cancelTabLoad$), takeUntilDestroyed(this.destroyRef)).subscribe({
             next: ([_course_plan, _form_tx, _question, _plan_bank]) => {
 
                 // this.list_question_txt1 = _question.data;
@@ -1761,10 +1799,11 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                     this.show_test_tx = true;
                 }
 
-                this.notificationService.isProcessing(false);
+                this.stopLoading();
             },
             error: () => {
-
+                this.stopLoading();
+                this.notificationService.toastError('Không thể tải Form đề. Vui lòng thử lại.');
             }
         })
     }
@@ -1855,15 +1894,15 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
             } else {
                 if (request.length > 0) {
                     this.progressValue = 0;
-                    this.displayModal = true;
+                    this.startLoading(this.waitingTitle);
                     this.loopAddForm(request, 0).subscribe({
                         next: () => {
-                            this.displayModal = false;
+                            this.stopLoading();
                             this.notificationService.toastSuccess("Lưu thành công")
                             this.loadFormTxCauhoi();
                         },
                         error: () => {
-                            this.displayModal = false;
+                            this.stopLoading();
                             this.notificationService.toastError("Lưu thất bại, vui lòng thử lại")
                         }
                     })
@@ -1913,15 +1952,15 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
             // } else {
             //     if (request.length > 1) {
             //         this.progressValue = 0;
-            //         this.displayModal = true;
+            //         this.startLoading(this.waitingTitle);
             //         this.loopAddForm(request, 0).subscribe({
             //             next: () => {
-            //                 this.displayModal = false;
+            //                 this.stopLoading();
             //                 this.notificationService.toastSuccess("Lưu thành công")
             //                 this.loadFormTxCauhoi();
             //             },
             //             error: () => {
-            //                 this.displayModal = false;
+            //                 this.stopLoading();
             //                 this.notificationService.toastError("Lưu thất bại, vui lòng thử lại")
             //             }
             //         })
@@ -1987,13 +2026,13 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
             page: null
         }
 
-        this.notificationService.isProcessing(true);
+        this.startLoading('Đang tải Form đề...');
         forkJoin([
             this.coursePlanActivitiesService.getCoursePlanActivitiesByPageNew(condition_lesson),
             this.courseFormTxService.getCoursePlansByPageNew(condition_form_Tx),
             this.coursePlanBankService.getCoursePlanBankByPageNew(condition_plan_bank),
             this.courseQuestionsService.getCourseQuestionsByPageNew(condition_question)
-        ]).subscribe({
+        ]).pipe(takeUntil(this.cancelTabLoad$), takeUntilDestroyed(this.destroyRef)).subscribe({
             next: ([_course_plan, _form_tx, _plan_bank, _course_question]) => {
 
                 const test_tx = _course_plan.data.filter(m => m.type === 'THUONGXUYEN_TRACNGHIEM');
@@ -2139,11 +2178,12 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                     this.show_test_tx = true;
                 }
 
-                this.notificationService.isProcessing(false);
+                this.stopLoading();
 
             },
             error: () => {
-
+                this.stopLoading();
+                this.notificationService.toastError('Không thể tải Form đề. Vui lòng thử lại.');
             }
         })
     }
@@ -2213,15 +2253,15 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
             } else {
                 if (request.length > 0) {
                     this.progressValue = 0;
-                    this.displayModal = true;
+                    this.startLoading(this.waitingTitle);
                     this.loopAddForm(request, 0).subscribe({
                         next: () => {
-                            this.displayModal = false;
+                            this.stopLoading();
                             this.notificationService.toastSuccess("Lưu thành công")
                             this.loadFormTxCauhoi();
                         },
                         error: () => {
-                            this.displayModal = false;
+                            this.stopLoading();
                             this.notificationService.toastError("Lưu thất bại, vui lòng thử lại")
                         }
                     })
@@ -2233,6 +2273,10 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     addBaiGiangToTest(test: PlanActivityCdr) {
+        if (!test || !this.list_course_plan?.length) {
+            this.notificationService.toastWarning('Chưa có danh sách bài học để chọn.');
+            return;
+        }
         this.addWeekDrawerVisible.set(true);
 
         this.selectedTestTx = test;
@@ -2257,6 +2301,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     onSelectWeek(week: PlanActivityCdr) {
+        if (!week || !this.selectedTestTx) return;
         week['checked'] = !week['checked'];
 
         if (week['checked']) {
@@ -2491,12 +2536,12 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                 } else {
                     this.notificationService.confirmDelete2().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(a => {
                         if (a) {
-                            this.notificationService.isProcessing(true);
+                            this.startLoading('Đang tải Form đề...');
                             this.courseFormTxService.deleteCourseFormTx(week['_form_tx_id']).subscribe({
                                 next: () => {
                                     this.loadFormTxCauhoi();
                                     this.notificationService.toastSuccess("Xoá thành công");
-                                    this.notificationService.isProcessing(false);
+                                    this.stopLoading();
                                 },
                                 error: () => {
                                     this.notificationService.toastSuccess("Xoá thất bại, vui lòng thử lại");
@@ -2510,12 +2555,12 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                 if (week['_form_tx_ids'] && week['_form_tx_ids'].length) {
                     this.notificationService.confirmDelete2().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(a => {
                         if (a) {
-                            this.notificationService.isProcessing(true);
+                            this.startLoading('Đang tải Form đề...');
                             this.courseFormTxService.deleteCourseFormTx(week['_form_tx_ids'].toString()).subscribe({
                                 next: () => {
                                     this.loadFormTxCauhoi();
                                     this.notificationService.toastSuccess("Xoá thành công");
-                                    this.notificationService.isProcessing(false);
+                                    this.stopLoading();
                                 },
                                 error: () => {
                                     this.notificationService.toastSuccess("Xoá thất bại, vui lòng thử lại");
@@ -2534,12 +2579,12 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                 if (week['_form_tx_ids'] && week['_form_tx_ids'].length) {
                     this.notificationService.confirmDelete2().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(a => {
                         if (a) {
-                            this.notificationService.isProcessing(true);
+                            this.startLoading('Đang tải Form đề...');
                             this.courseFormTxService.deleteCourseFormTx(week['_form_tx_ids'].toString()).subscribe({
                                 next: () => {
                                     this.loadFormTxCauhoi();
                                     this.notificationService.toastSuccess("Xoá thành công");
-                                    this.notificationService.isProcessing(false);
+                                    this.stopLoading();
                                 },
                                 error: () => {
                                     this.notificationService.toastSuccess("Xoá thất bại, vui lòng thử lại");
@@ -2652,15 +2697,15 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
                     if (request.length > 0) {
                         this.progressValue = 0;
-                        this.displayModal = true;
+                        this.startLoading(this.waitingTitle);
                         this.loopAddReupdateForm(request, 0).subscribe({
                             next: () => {
-                                this.displayModal = false;
+                                this.stopLoading();
                                 this.notificationService.toastSuccess("Lưu thành công")
                                 this.loadFormCcCauhoi();
                             },
                             error: () => {
-                                this.displayModal = false;
+                                this.stopLoading();
                                 this.notificationService.toastError("Lưu thất bại, vui lòng thử lại");
                             }
                         })
@@ -2831,7 +2876,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
             page: null
         }
 
-        this.notificationService.isProcessing(true);
+        this.startLoading('Đang tải Form đề...');
 
         forkJoin([
             this.coursePlanActivitiesService.getCoursePlanActivitiesByPageNew(condition_lesson),
@@ -2839,10 +2884,10 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
             this.coursePlanBankService.getCoursePlanBankByPageNew(condition_plan_bank),
             this.courseQuestionsService.getCourseQuestionsByPageNew(condition_question),
             this.courseFormTuluan15pService.getByPage(this.getTuluan15pCondition())
-        ]).subscribe({
+        ]).pipe(takeUntil(this.cancelTabLoad$), takeUntilDestroyed(this.destroyRef)).subscribe({
             next: ([_plan_activity, _form_cc, _plan_bank, _question, _tuluan15pForm]) => {
 
-                this.notificationService.isProcessing(false);
+                this.stopLoading();
 
                 this.hasFormDgData = _form_cc.data.length > 0;
 
@@ -2949,7 +2994,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
             },
 
             error: () => {
-                this.notificationService.isProcessing(false);
+                this.stopLoading();
                 this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
             }
         })
@@ -3029,15 +3074,15 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
         } else {
             if (request.length > 0) {
                 this.progressValue = 0;
-                this.displayModal = true;
+                this.startLoading(this.waitingTitle);
                 this.loopAddForm(request, 0).subscribe({
                     next: () => {
-                        this.displayModal = false;
+                        this.stopLoading();
                         this.notificationService.toastSuccess("Lưu thành công")
                         this.loadFormDgCauhoi();
                     },
                     error: () => {
-                        this.displayModal = false;
+                        this.stopLoading();
                         this.notificationService.toastError("Lưu thất bại, vui lòng thử lại")
                     }
                 })
@@ -3106,7 +3151,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
             page: null
         }
 
-        this.notificationService.isProcessing(true);
+        this.startLoading('Đang tải Form đề...');
 
         forkJoin([
             this.coursePlanActivitiesService.getCoursePlanActivitiesByPageNew(condition_lesson),
@@ -3114,10 +3159,10 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
             this.courseQuestionsService.getCourseQuestionsByPageNew(condition_question),
             this.coursePlanBankService.getCoursePlanBankByPageNew(condition_plan_bank),
             this.courseFormTuluan15pService.getByPage(this.getTuluan15pCondition())
-        ]).subscribe({
+        ]).pipe(takeUntil(this.cancelTabLoad$), takeUntilDestroyed(this.destroyRef)).subscribe({
             next: ([_plan_activity, _form_cc, _question, _plan_bank, _tuluan15pForm]) => {
 
-                this.notificationService.isProcessing(false);
+                this.stopLoading();
 
                 this.hasFormDgData = _form_cc.data.length > 0;
 
@@ -3260,7 +3305,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
             },
 
             error: () => {
-                this.notificationService.isProcessing(false);
+                this.stopLoading();
                 this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
             }
         })
@@ -3326,15 +3371,15 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
         } else {
             if (request.length > 0) {
                 this.progressValue = 0;
-                this.displayModal = true;
+                this.startLoading(this.waitingTitle);
                 this.loopAddForm(request, 0).subscribe({
                     next: () => {
-                        this.displayModal = false;
+                        this.stopLoading();
                         this.notificationService.toastSuccess("Lưu thành công")
                         this.loadFormDgCauhoiType1();
                     },
                     error: () => {
-                        this.displayModal = false;
+                        this.stopLoading();
                         this.notificationService.toastError("Lưu thất bại, vui lòng thử lại")
                     }
                 })

@@ -54,7 +54,7 @@
                         @for (course of table.data(); track course.id; let index = $index) {
                         <tr>
                             <td class="text-center">{{ table.paginator.startIndex() + index }}</td>
-                            <td class="text-center">{{ course.maso || '—' }}</td>
+                            <td class="text-left">{{ course.maso || '—' }}</td>
                             <td class="text-left">
                                 <a class="course-management-title" [routerLink]="['/hoc-phan']"
                                     [queryParams]="{ code: course.id }">{{ course.title || 'Chưa đặt tên' }}</a>

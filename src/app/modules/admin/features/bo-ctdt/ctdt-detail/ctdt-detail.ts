@@ -128,7 +128,7 @@ export class CtdtDetail implements OnInit, OnDestroy {
 
     goBack(): void {
         const queryParams = this.boId() ? { bo_id: this.boId() } : undefined;
-        this.router.navigate(['/admin/dao-tao/bo-ctdt'], { queryParams });
+        this.router.navigate(['/admin/dao-tao/chuongtrinh-daotao'], { queryParams });
     }
 
     retryLoadCtdt(): void {
