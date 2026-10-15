@@ -255,6 +255,19 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
         return this.formThaoLuan.controls;
     }
 
+    get hasValidCredits(): boolean {
+        const credits = Number(this.selectedCourse?.params?.sotinchi);
+        return Number.isFinite(credits) && credits > 0;
+    }
+
+    goToCourseInformation(): void {
+        this.router.navigate([], {
+            relativeTo: this.activatedRoute,
+            queryParams: { tab: 'thong-tin' },
+            queryParamsHandling: 'merge'
+        });
+    }
+
     ngOnInit(): void {
         this.activatedRoute.queryParams.pipe(
             distinctUntilChanged((previous, current) => previous['code'] === current['code']),
@@ -1015,6 +1028,12 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
     }
 
     openFormAddLesson(add_lesson: boolean = false) {
+        if (!this.unlimitLesson && !this.hasValidCredits) {
+            this.notificationService.toastWarning('Vui lòng nhập số tín chỉ trước khi khởi tạo nội dung giảng dạy');
+            this.goToCourseInformation();
+            return;
+        }
+
         this.isAddThaoLuan = false;
         if (this.unlimitLesson) {
             this.formTitle = add_lesson ? "Tạo bài giảng" : "Thêm bài giảng";
@@ -1025,13 +1044,19 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
     }
 
     firstCreatePlan(add_lesson?: number) {
+        if (!this.unlimitLesson && !this.hasValidCredits) {
+            this.notificationService.toastWarning('Vui lòng nhập số tín chỉ trước khi khởi tạo nội dung giảng dạy');
+            this.goToCourseInformation();
+            return;
+        }
+
         this.notificationService.isProcessing(false);
         this.progressValue = 0;
         this.displayModal = true;
         this.titleWaiting = 'Đang khởi tạo, vui lòng chờ';
         let lesson = add_lesson ? add_lesson : 9;
-        if (this.selectedCourse && this.selectedCourse.params && this.selectedCourse.params.sotinchi && !this.unlimitLesson) {
-            lesson = this.selectedCourse.params.sotinchi * 3;
+        if (!this.unlimitLesson) {
+            lesson = Number(this.selectedCourse.params.sotinchi) * 3;
         }
 
         let first = 1;

@@ -29,7 +29,8 @@
                 <div class="form-de-tab-panels">
                     @for (panel of list_tab; track panel; let tabIndex = $index) {
                     <div class="form-de-tab-panel" role="tabpanel" [id]="'formde-panel-' + panel.key"
-                        [class.form-de-tab-panel--kthp]="panel.key === 'TN_KTHP'" [hidden]="activeIndexTab !== tabIndex">
+                        [class.form-de-tab-panel--kthp]="panel.key === 'TN_KTHP'"
+                        [class.form-de-tab-panel--dg]="panel.key === 'DG'" [hidden]="activeIndexTab !== tabIndex">
                         @if (panel.key !== 'TNTX' && selectTab && selectTab.key === panel.key) {
                         <ng-container [ngTemplateOutlet]="panel.component"
                             [ngTemplateOutletContext]="{ typeTest: panel.key}">
@@ -174,7 +175,7 @@
                                 [ngClass]="!row['children'] || row['children'].length === 0?'require-cdr-backgroud-color':''">
                                 <th style="text-align: left; background-color: #f8f9fa;">
                                     <div style="display: flex;">
-                                        <span style="flex: 1;">{{label_week +' '+row['week']}}</span>
+                                        <span style="flex: 1; font-weight: 500">{{label_week +' '+row['week']}}</span>
                                         @if (row['has_test']) {
                                         <span style="margin-left: 10px; font-weight: 500;" class="blue">
                                             Đã có đề
@@ -259,7 +260,7 @@
                                 [ngClass]="!row['children'] || row['children'].length === 0?'require-cdr-backgroud-color':''">
                                 <th style="text-align: left; background-color: #f8f9fa;">
                                     <div style="display: flex;">
-                                        <span style="flex: 1;">{{label_week +' '+row['week']}}</span>
+                                        <span style="flex: 1; font-weight: 500">{{label_week +' '+row['week']}}</span>
                                         @if (row['has_test']) {
                                         <span style="margin-left: 10px; font-weight: normal;" class="blue">
                                             Đã có đề
@@ -326,9 +327,9 @@
             </div>
             @if (!course_form_duyet[typeTest] || course_form_duyet[typeTest]['status'] !== 1) {
             <div class="form-tracnghiem-panel-content-footer">
-                <button (click)="saveFormCc()" mat-flat-button class="btn ictu-badge-btn--info-revers">
+                <button (click)="saveFormCc()" style="padding-right: 10px" mat-flat-button class="btn ictu-badge-btn--info-reverse">
                     <i class="fa fa-floppy-o"></i>Lưu lại
-                </button>
+                </button> 
             </div>
             }
         </div>
@@ -415,7 +416,7 @@
                                 </ng-template>
                                 <ng-template pTemplate="body" let-child>
                                     <tr [ngClass]="child['require_cdr']?'background-color-red':''">
-                                        <td style="text-align: left; color: #3B82F6;">
+                                        <td style="text-align: left; color: #3B82F6; font-weight: 500;">
                                             {{child['kyhieu']+' - '+child['cdr_name']}}
                                         </td>
                                         <td style="text-align: center;">
@@ -665,8 +666,8 @@
                 }
             </div>
             @if (!course_form_duyet[typeTest] || course_form_duyet[typeTest]['status'] !== 1) {
-            <div class="form-tracnghiem-panel-content-footer">
-                <button (click)="saveFormDg()" class="btn btn-primary">
+            <div class="form-tracnghiem-panel-content-footer form-tracnghiem-panel-content-footer--dg">
+                <button (click)="saveFormDg()" mat-flat-button class="btn ictu-badge-btn--info-reverse">
                     <i class="fa fa-floppy-o"></i>Lưu lại
                 </button>
             </div>
@@ -704,7 +705,7 @@
                                     <div>
                                         @if (test['canEdit']) {
                                         <button type="button" mat-flat-button
-                                            class="btn ictu-badge-btn--secondary-reverse ictu-admin-icon-button"
+                                            class="btn ictu-badge-btn--secondary-reversee ictu-admin-icon-button"
                                             (click)="addBaiGiangToTest(test)" pTooltip="Chọn {{label_week}}"
                                             tooltipPosition="top" aria-label="Chọn {{ label_week }}"><i
                                                 class="ti ti-plus" aria-hidden="true"></i>
@@ -712,7 +713,7 @@
                                         }
                                         @if (test['canEdit']) {
                                         <button type="button" mat-flat-button
-                                            class="btn ictu-badge-btn--primary-reverse ictu-admin-icon-button"
+                                            class="btn ictu-badge-btn--primary-reversee ictu-admin-icon-button"
                                             (click)="saveFormTx(test)" pTooltip="Lưu lại" tooltipPosition="top"
                                             aria-label="Lưu Form đề"><i class="ti ti-device-floppy"
                                                 aria-hidden="true"></i>
@@ -726,11 +727,11 @@
                                 <p-table [value]="test['weeks_test']" styleClass="tbl-danhSachUser table-reBorder">
                                     <ng-template pTemplate="header">
                                         <tr>
-                                            <th style="text-align: center; width: 200px;"></th>
-                                            <th style="text-align: center;  width: 200px;">
+                                            <th style="text-align: center; width: 150px;"></th>
+                                            <th style="text-align: center;">
                                                 Tổng câu hỏi
                                             </th>
-                                            <th style="text-align: center; width: 200px;">
+                                            <th style="text-align: center;">
                                                 Số câu lấy
                                                 @if (test['total_question_take'] || test['total_question_take_private'])
                                                 {
@@ -839,7 +840,7 @@
                                     <div>
                                         @if (test['canEdit']) {
                                         <button type="button" mat-flat-button
-                                            class="btn ictu-badge-btn--secondary-reverse ictu-admin-icon-button"
+                                            class="btn ictu-badge-btn--secondary-reversee ictu-admin-icon-button"
                                             (click)="addBaiGiangToTest(test)" pTooltip="Chọn {{label_week}}"
                                             tooltipPosition="top" aria-label="Chọn {{ label_week }}"><i
                                                 class="ti ti-plus" aria-hidden="true"></i>
@@ -847,7 +848,7 @@
                                         }
                                         @if (test['canEdit']) {
                                         <button type="button" mat-flat-button
-                                            class="btn ictu-badge-btn--primary-reverse ictu-admin-icon-button"
+                                            class="btn ictu-badge-btn--primary-reversee ictu-admin-icon-button"
                                             (click)="saveFormTx(test)" pTooltip="Lưu lại" tooltipPosition="top"
                                             aria-label="Lưu Form đề"><i class="ti ti-device-floppy"
                                                 aria-hidden="true"></i>
@@ -1026,7 +1027,7 @@
                                     <div>
                                         @if (test['canEdit']) {
                                         <button type="button" mat-flat-button
-                                            class="btn ictu-badge-btn--secondary-reverse ictu-admin-icon-button"
+                                            class="btn ictu-badge-btn--secondary-reversee ictu-admin-icon-button"
                                             (click)="addBaiGiangToTest(test)" pTooltip="Chọn {{label_week}}"
                                             tooltipPosition="top" aria-label="Chọn {{ label_week }}"><i
                                                 class="ti ti-plus" aria-hidden="true"></i>
@@ -1034,7 +1035,7 @@
                                         }
                                         @if (test['canEdit']) {
                                         <button type="button" mat-flat-button
-                                            class="btn ictu-badge-btn--primary-reverse ictu-admin-icon-button"
+                                            class="btn ictu-badge-btn--primary-reversee ictu-admin-icon-button"
                                             (click)="saveFormTx(test)" pTooltip="Lưu lại" tooltipPosition="top"
                                             aria-label="Lưu Form đề"><i class="ti ti-device-floppy"
                                                 aria-hidden="true"></i>

@@ -23,42 +23,40 @@
                     [ngClass]="closeLeft?'pi pi-angle-double-right':'pi pi-angle-double-left'"></i>
             </button>
             @if (selectedCourse) {
-<div class="info-course">
+            <div class="info-course">
                 <div class="info-course-content">
                     @if (selectedCourse.params && selectedCourse.params.cdr) {
-<div class="cdr-percent-info padding-10px-all"
-                       >
+                    <div class="cdr-percent-info padding-10px-all">
                         <div class="info-course-item">
                             <label>- Tổng số câu hỏi</label>:
                             <span>{{selectedCourse.total_question}}</span>
                         </div>
                         @for (item of chuandaura; track item) {
-<div [ngClass]="item.disabled?'disabled-none':''"
-                            class="info-course-item {{selectedCourse['class_require'] && selectedCourse['class_require'][item.id] === true?'require-cdr-backgroud-color':''}}"
-                           >
+                        <div [ngClass]="item.disabled?'disabled-none':''"
+                            class="info-course-item {{selectedCourse['class_require'] && selectedCourse['class_require'][item.id] === true?'require-cdr-backgroud-color':''}}">
                             <label>- {{item.label}}</label>:
                             @if (selectedCourse.cdr_percent && selectedCourse.cdr_question) {
-<span>
+                            <span>
                                 {{selectedCourse.cdr_question[item.id]}} = {{selectedCourse.cdr_percent[item.id]}}%
                             </span>
-}
+                            }
                         </div>
-}
+                        }
                     </div>
-} @else {
+                    } @else {
 
-                        <div class="cdr-percent-info padding-10px-all"
-                            style="color: red; font-size: 16px; text-align: center;">
-                            <div style="width: 100%; margin: 0 auto;">
-                                Môn học này chưa xác định CDR, vui lòng cập nhật lại CDR hoặc liên hệ tới <strong>PHÒNG
-                                    ĐÀO TẠO</strong> để được hỗ trợ
-                            </div>
+                    <div class="cdr-percent-info padding-10px-all"
+                        style="color: red; font-size: 14px; text-align: center;">
+                        <div style="width: 100%; margin: 0 auto;">
+                            Môn học này chưa xác định CDR, vui lòng cập nhật lại CDR hoặc liên hệ tới <strong>PHÒNG
+                                ĐÀO TẠO</strong> để được hỗ trợ
                         </div>
-                    
-}
-                    
+                    </div>
+
+                    }
+
                     @if (selectedCdr) {
-<div class="cdr-condition-bottom padding-10px-all ">
+                    <div class="cdr-condition-bottom padding-10px-all ">
                         <div class="info-course-item" style="text-align: center; color: red;">
                             <strong>
                                 Tỉ lệ phân bổ câu hỏi cho: {{selectedCdr['kyhieu']+' - '+selectedCdr['cdr_name']}}
@@ -66,19 +64,19 @@
                             </strong>
                         </div>
                         @for (item of khuyennghi; track item) {
-<div class="info-course-item">
+                        <div class="info-course-item">
                             <label style="width: 250px;">- {{item.label}}</label>
                             <span [innerHTML]="item.html"></span>
                             <span>
                                 {{item['value']}}%
                             </span>
                         </div>
-}
+                        }
                     </div>
-}
+                    }
                 </div>
             </div>
-}
+            }
         </div>
         <div class="phanbo-cdr-layout-right">
             <section class="admin-wrap-table cdr-question-table-shell" aria-label="Ma trận câu hỏi theo CDR">
@@ -105,35 +103,39 @@
                             <tr>
                                 <th style="width: 150px;"></th>
                                 @for (cdr of chuandaura; track cdr) {
-<th style="width: 150px; text-align: center;" [ngClass]="cdr.disabled ?'disabled-cdr':''">
+                                <th style="width: 150px; text-align: center;"
+                                    [ngClass]="cdr.disabled ?'disabled-cdr':''">
                                     {{cdr.label}}
                                 </th>
-}
+                                }
                                 <th style="text-align: center; width: 80px;">Tổng</th>
                             </tr>
                         </ng-template>
                         <ng-template pTemplate="body" let-row>
-                            <tr [ngClass]="!row['children'] || row['children'].length === 0?'require-cdr-backgroud-color':''">
+                            <tr
+                                [ngClass]="!row['children'] || row['children'].length === 0?'require-cdr-backgroud-color':''">
                                 <th class="cdr-question-table__group-row" [colSpan]="8">
                                     <span>{{label_week +' '+row['week']}}</span>
                                     @if (!row['children'] || row['children'].length === 0) {
-<span>{{' - Chưa cập nhật CDR'}}</span>
-}
+                                    <span>{{' - Chưa cập nhật CDR'}}</span>
+                                    }
                                 </th>
                             </tr>
                             @for (child of row['children']; track child) {
-<tr (click)="cdrGet(child)" [ngClass]="child.require_cdr?'require-cdr-backgroud-color':''">
+                            <tr (click)="cdrGet(child)" [ngClass]="child.require_cdr?'require-cdr-backgroud-color':''">
                                 <td class="cdr-question-table__outcome">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <span>{{child['kyhieu']+' - '+child['cdr_name']}}</span>
                                     </div>
                                 </td>
                                 @for (cdr of chuandaura; track cdr) {
-<td class="cdr-question-table__cell">
+                                <td class="cdr-question-table__cell">
                                     @if (child.cdr_cauhoi && !cdr.disabled) {
                                     <div class="p-inputgroup cdr-question-inputgroup">
-                                        <span class="p-inputgroup-addon tag-cdr-cauhoi-percent cdr-question-addon--minimum">
-                                            {{child['min_cdr_question'][cdr.id] ? child['min_cdr_question'][cdr.id] : 0 }}
+                                        <span
+                                            class="p-inputgroup-addon tag-cdr-cauhoi-percent cdr-question-addon--minimum">
+                                            {{child['min_cdr_question'][cdr.id] ? child['min_cdr_question'][cdr.id] : 0
+                                            }}
                                             &#8804;
                                         </span>
                                         <input pInputText (keyup)="setNumberCdrCauhoi(child,true)" #inputNumberQuestion
@@ -141,20 +143,22 @@
                                             [attr.aria-label]="'Số câu hỏi ' + cdr.label + ' cho ' + child['kyhieu']"
                                             (keydown)="pointQuestionKeyDown($event,inputNumberQuestion)" type="number"
                                             [(ngModel)]="child.cdr_cauhoi[cdr.id]">
-                                        <span class="p-inputgroup-addon tag-cdr-cauhoi-percent cdr-question-addon--percent">
+                                        <span
+                                            class="p-inputgroup-addon tag-cdr-cauhoi-percent cdr-question-addon--percent">
                                             = {{child['cdr_percent'][cdr.id] ? child['cdr_percent'][cdr.id] : 0}}%
                                         </span>
                                     </div>
-}
+                                    }
                                 </td>
-}
+                                }
                                 <td class="cdr-question-table__total">{{child['total_question']}}</td>
                             </tr>
-}
+                            }
                         </ng-template>
                     </p-table>
                 </div>
-                <div #matrixScrollbar class="cdr-question-matrix-scrollbar" aria-label="Cuộn ngang ma trận" role="scrollbar" tabindex="0">
+                <div #matrixScrollbar class="cdr-question-matrix-scrollbar" aria-label="Cuộn ngang ma trận"
+                    role="scrollbar" tabindex="0">
                     <div #matrixScrollbarSpacer class="cdr-question-matrix-scrollbar__spacer"></div>
                 </div>
             </section>

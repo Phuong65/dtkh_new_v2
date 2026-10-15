@@ -61,7 +61,7 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
         { id: 'muc-tieu-cdr', label: 'Mục tiêu/CDR', icon: 'ti ti-target' },
         { id: 'noi-dung', label: 'Nội dung', icon: 'ti ti-book' },
         { id: 'phan-bo-cdr-cau-hoi', label: 'Phân bổ câu hỏi CDR', icon: 'ti ti-chart-donut' },
-        { id: 'form-de', label: 'Form đề', icon: 'ti ti-file-description' },
+        { id: 'form-de', label: 'Form đề', icon: 'ti ti-forms' },
         { id: 'kiem-tra-danh-gia', label: 'Kiểm tra - Đánh giá', icon: 'ti ti-clipboard-check' },
         { id: 'cau-hinh', label: 'Cấu hình', icon: 'ti ti-settings' }
     ];

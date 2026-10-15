@@ -2814,6 +2814,43 @@ button {
     background: var(--course-primary);
 }
 
+.course-content-empty__credit-warning {
+    display: inline-flex;
+    max-width: 440px;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px;
+    padding: 10px 14px;
+    border: 1px solid #fed7aa;
+    border-radius: 6px;
+    background: #fff7ed;
+    color: #9a3412;
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: left;
+}
+
+.course-content-empty__credit-warning .fa {
+    flex: 0 0 auto;
+    font-size: 16px;
+}
+
+.course-content-empty__credit-action {
+    display: inline-flex;
+    min-height: 38px;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border: 1px solid var(--course-primary);
+    border-radius: 6px;
+    background: #ffffff;
+    color: var(--course-primary);
+}
+
+.course-content-empty__credit-action:hover {
+    background: #eff6ff;
+}
+
 @media (max-width: 1100px) {
     .course-content-shell .menu-lesson-baihocv2 {
         flex-basis: 320px;

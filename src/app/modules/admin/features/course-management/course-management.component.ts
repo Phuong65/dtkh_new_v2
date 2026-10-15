@@ -26,6 +26,7 @@ import { AppState } from '@core-new/models/app-state';
 import { IctuDataTable2 } from '@core-new/models/datatable';
 import { IctuPaginatorComponent } from '@core-new/components/ictu-paginator/ictu-paginator.component';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
+import { NotificationService as IctuNotificationService } from '@core-new/service/notification.service';
 import { AuthService } from '@core/services/auth.service';
 import { DonVi } from '@modules/shared/models/don-vi';
 import { Ctdt } from '@modules/shared/models/ctdt';
@@ -62,6 +63,7 @@ export class CourseManagementComponent {
     private readonly auth = inject(AuthService);
     private readonly userService = inject(UserService);
     private readonly notificationService = inject(NotificationService);
+    private readonly ictuNotificationService = inject(IctuNotificationService);
     private readonly fileService = inject(FileService);
     private readonly coursePlanActivitiesService = inject(CoursePlanActivitiesService);
     private readonly hoidongThamdinhMonhocService = inject(HoidongThamdinhMonhocService);
@@ -326,33 +328,32 @@ export class CourseManagementComponent {
             }),
             takeUntilDestroyed(this.destroyRef)
         ).subscribe({
-            next: async councils => {
+            next: councils => {
                 if (councils.length) {
                     this.notificationService.toastWarning(`Không thể xóa học phần đang thuộc hội đồng thẩm định: ${councils.join(', ')}`);
                     this.deletingCourseId.set(null);
                     return;
                 }
-                let confirmed = false;
-                try {
-                    confirmed = await this.notificationService.confirmDelete(`Bạn có chắc muốn xóa học phần ${course.title}?`);
-                } catch {
-                    // Dismissed confirmation.
-                }
-                if (!confirmed) {
-                    this.deletingCourseId.set(null);
-                    return;
-                }
-                this.courseService.deleteElnKhoaHoc(course.id).pipe(
-                    takeUntilDestroyed(this.destroyRef),
-                    finalize(() => this.deletingCourseId.set(null))
-                ).subscribe({
-                    next: () => {
-                        this.notificationService.toastSuccess('Xóa học phần thành công');
-                        const page = this.table.data().length === 1 && this.table.paginator.paged() > 1
-                            ? this.table.paginator.paged() - 1 : this.table.paginator.paged();
-                        this.loadCourses(page, false);
-                    },
-                    error: () => this.notificationService.toastError('Xóa học phần thất bại')
+                this.ictuNotificationService.confirmDelete2({
+                    heading: 'Xác nhận xóa học phần',
+                    htmlMessage: `Bạn có chắc muốn xóa học phần <strong>${this.escapeHtml(course.title || '')}</strong>?`
+                }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(confirmed => {
+                    if (!confirmed) {
+                        this.deletingCourseId.set(null);
+                        return;
+                    }
+                    this.courseService.deleteElnKhoaHoc(course.id).pipe(
+                        takeUntilDestroyed(this.destroyRef),
+                        finalize(() => this.deletingCourseId.set(null))
+                    ).subscribe({
+                        next: () => {
+                            this.notificationService.toastSuccess('Xóa học phần thành công');
+                            const page = this.table.data().length === 1 && this.table.paginator.paged() > 1
+                                ? this.table.paginator.paged() - 1 : this.table.paginator.paged();
+                            this.loadCourses(page, false);
+                        },
+                        error: () => this.notificationService.toastError('Xóa học phần thất bại')
+                    });
                 });
             },
             error: () => {
@@ -373,6 +374,11 @@ export class CourseManagementComponent {
             if (programme && programme.category_id !== this.categoryId()) this.ctdtId.set(null);
         }
         this.loadCourses(1, true);
+    }
+
+    private escapeHtml(value: string): string {
+        return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/\"/g, '&quot;').replace(/'/g, '&#039;');
     }
 
     categoryName(id: number): string {
