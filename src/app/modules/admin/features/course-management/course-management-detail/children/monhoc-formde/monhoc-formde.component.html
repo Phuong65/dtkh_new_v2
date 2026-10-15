@@ -30,7 +30,8 @@
                     @for (panel of list_tab; track panel; let tabIndex = $index) {
                     <div class="form-de-tab-panel" role="tabpanel" [id]="'formde-panel-' + panel.key"
                         [class.form-de-tab-panel--kthp]="panel.key === 'TN_KTHP'"
-                        [class.form-de-tab-panel--dg]="panel.key === 'DG'" [hidden]="activeIndexTab !== tabIndex">
+                        [class.form-de-tab-panel--dg]="panel.key === 'DG'"
+                        [class.form-de-tab-panel--cc]="panel.key === 'CC'" [hidden]="activeIndexTab !== tabIndex">
                         @if (panel.key !== 'TNTX' && selectTab && selectTab.key === panel.key) {
                         <ng-container [ngTemplateOutlet]="panel.component"
                             [ngTemplateOutletContext]="{ typeTest: panel.key}">
@@ -327,7 +328,7 @@
             </div>
             @if (!course_form_duyet[typeTest] || course_form_duyet[typeTest]['status'] !== 1) {
             <div class="form-tracnghiem-panel-content-footer">
-                <button (click)="saveFormCc()" style="padding-right: 10px" mat-flat-button class="btn ictu-badge-btn--info-reverse">
+                <button (click)="saveFormCc()" style="margin-right: 10px" mat-flat-button class="btn ictu-badge-btn--info-reverse">
                     <i class="fa fa-floppy-o"></i>Lưu lại
                 </button> 
             </div>
