@@ -172,30 +172,28 @@
                             </tr>
                         </ng-template>
                         <ng-template pTemplate="body" let-row>
-                            <tr
+                            <tr class="cc-lesson-row"
                                 [ngClass]="!row['children'] || row['children'].length === 0?'require-cdr-backgroud-color':''">
-                                <th style="text-align: left; background-color: #f8f9fa;">
-                                    <div style="display: flex;">
-                                        <span style="flex: 1; font-weight: 500">{{label_week +' '+row['week']}}</span>
+                                <th>
+                                    <div class="cc-lesson-row__title">
+                                        <span class="cc-lesson-badge">{{label_week +' '+row['week']}}</span>
                                         @if (row['has_test']) {
-                                        <span style="margin-left: 10px; font-weight: 500;" class="blue">
-                                            Đã có đề
+                                        <span class="cc-status-badge">
+                                            <i class="fa fa-check" aria-hidden="true"></i>Đã có đề
                                         </span>
                                         }
                                     </div>
                                 </th>
-                                <th style="background-color: #f8f9fa;">
-                                    <span>
+                                <th>
+                                    <span class="cc-lesson-row__total">
                                         {{row['question_take_total']}} / {{row['total_question']}}
                                     </span>
                                 </th>
-                                <th style="background-color: #f8f9fa;" [colSpan]="6">
-
-                                </th>
+                                <th [colSpan]="6"></th>
                             </tr>
                             @for (child of row['children']; track child) {
-                            <tr [ngClass]="child['require_cdr']?'background-color-red':''">
-                                <td style="text-align: left; color: #3B82F6;">
+                            <tr class="cc-cdr-row" [ngClass]="child['require_cdr']?'background-color-red':''">
+                                <td class="cc-cdr-row__name">
                                     {{child['kyhieu']+' - '+child['cdr_name']}}
                                 </td>
                                 <td style="text-align: center;">
@@ -257,30 +255,28 @@
                             </tr>
                         </ng-template>
                         <ng-template pTemplate="body" let-row>
-                            <tr
+                            <tr class="cc-lesson-row"
                                 [ngClass]="!row['children'] || row['children'].length === 0?'require-cdr-backgroud-color':''">
-                                <th style="text-align: left; background-color: #f8f9fa;">
-                                    <div style="display: flex;">
-                                        <span style="flex: 1; font-weight: 500">{{label_week +' '+row['week']}}</span>
+                                <th>
+                                    <div class="cc-lesson-row__title">
+                                        <span class="cc-lesson-badge">{{label_week +' '+row['week']}}</span>
                                         @if (row['has_test']) {
-                                        <span style="margin-left: 10px; font-weight: normal;" class="blue">
-                                            Đã có đề
+                                        <span class="cc-status-badge">
+                                            <i class="fa fa-check" aria-hidden="true"></i>Đã có đề
                                         </span>
                                         }
                                     </div>
                                 </th>
-                                <th style="background-color: #f8f9fa;">
-                                    <span>
+                                <th>
+                                    <span class="cc-lesson-row__total">
                                         {{row['question_take_total']}} / {{row['total_question']}}
                                     </span>
                                 </th>
-                                <th style="background-color: #f8f9fa;" [colSpan]="list_part.length">
-
-                                </th>
+                                <th [colSpan]="list_part.length"></th>
                             </tr>
                             @for (child of row['children']; track child) {
-                            <tr [ngClass]="child['require_part']?'background-color-red':''">
-                                <td style="text-align: left; color: #3B82F6;">
+                            <tr class="cc-cdr-row" [ngClass]="child['require_part']?'background-color-red':''">
+                                <td class="cc-cdr-row__name">
                                     {{child['kyhieu']+' - '+child['cdr_name']}}
                                 </td>
                                 <td style="text-align: center;">

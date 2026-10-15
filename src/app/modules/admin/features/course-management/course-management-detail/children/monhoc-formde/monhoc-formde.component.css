@@ -282,15 +282,86 @@
     background: #f8fafc;
 }
 
-:host ::ng-deep .form-de-tab-panels .content-table-cauhoi table>tbody>tr:not(.background-color-red):not(.require-cdr-backgroud-color)> :is(th, td):first-child {
+:host ::ng-deep .form-de-tab-panels .form-de-tab-panel:not(.form-de-tab-panel--cc) .content-table-cauhoi table>tbody>tr:not(.background-color-red):not(.require-cdr-backgroud-color)> :is(th, td):first-child {
     background: #eff6ff !important;
 }
 
-:host ::ng-deep .form-de-tab-panels .content-table-cauhoi table>tbody>tr:not(.background-color-red):not(.require-cdr-backgroud-color):hover> :is(th, td):first-child {
+:host ::ng-deep .form-de-tab-panels .form-de-tab-panel:not(.form-de-tab-panel--cc) .content-table-cauhoi table>tbody>tr:not(.background-color-red):not(.require-cdr-backgroud-color):hover> :is(th, td):first-child {
     background: #dbeafe !important;
 }
 
-.form-de-tab-panels .p-inputgroup {
+.form-de-tab-panel--cc .content-table-cauhoi {
+    background: #ffffff;
+}
+
+.form-de-tab-panel--cc .cc-lesson-row > th {
+    padding: 10px 12px !important;
+    border-color: #bfdbfe !important;
+    background: #dbeafe !important;
+    color: #1e3a8a !important;
+    font-weight: 500 !important;
+}
+
+.form-de-tab-panel--cc .cc-lesson-row__title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-de-tab-panel--cc .cc-lesson-badge {
+    display: inline-flex;
+    min-height: 30px;
+    align-items: center;
+    padding: 4px 11px;
+    border: 1px solid #93c5fd;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #1e40af;
+    font-weight: 500;
+}
+
+.form-de-tab-panel--cc .cc-status-badge {
+    display: inline-flex;
+    min-height: 24px;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border: 1px solid #bbf7d0;
+    border-radius: 999px;
+    background: #f0fdf4;
+    color: #15803d;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.form-de-tab-panel--cc .cc-lesson-row__total {
+    color: #1e3a8a;
+    font-weight: 500;
+}
+
+:host ::ng-deep .form-de-tab-panel--cc .content-table-cauhoi table > tbody > tr.cc-cdr-row > td {
+    background: #ffffff !important;
+}
+
+:host ::ng-deep .form-de-tab-panel--cc .content-table-cauhoi table > tbody > tr.cc-cdr-row > td:first-child {
+    background: #ffffff !important;
+}
+
+:host ::ng-deep .form-de-tab-panel--cc .content-table-cauhoi table > tbody > tr.cc-cdr-row.background-color-red > td {
+    background: #fff1f2 !important;
+}
+
+.form-de-tab-panel--cc .cc-cdr-row__name {
+    color: #2563eb !important;
+    font-weight: 500;
+    text-align: left;
+}
+
+:host ::ng-deep .form-de-tab-panel--cc .content-table-cauhoi table > tbody > tr.cc-cdr-row:not(.background-color-red):hover > td {
+    background: #f8fbff !important;
+}
+
+.form-de-tab-panel--cc .p-inputgroup {
     display: inline-flex;
     width: 116px;
     min-width: 116px;
