@@ -75,10 +75,10 @@
                             <td class="text-center">{{ programmeName(course.ctdt_id) }}</td>
                             <td class="text-center course-management-actions">
                                 @if (canDownload) {
-                                <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
+                                <button type="button" class="btn ictu-button-success-light ictu-admin-icon-button"
                                     (click)="downloadDocuments(course)" [disabled]="downloadingCourseId() !== null"
                                     [attr.aria-label]="'Tải tài liệu giảng dạy ' + (course.title || '')"
-                                    title="Tải tài liệu giảng dạy">
+                                    pTooltip="Tải tài liệu giảng dạy" tooltipPosition="top" appendTo="body">
                                     <i class="ti ti-file-download" aria-hidden="true"></i>
                                 </button>
                                 }
@@ -86,14 +86,15 @@
                                 <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
                                     (click)="openClone(course)" [disabled]="cloneDrawerVisible()"
                                     [attr.aria-label]="'Sao chép môn học ' + (course.title || '')"
-                                    title="Sao chép môn học">
+                                    pTooltip="Sao chép môn học" tooltipPosition="top" appendTo="body">
                                     <i class="ti ti-copy" aria-hidden="true"></i>
                                 </button>
                                 }
                                 @if (canDelete) {
                                 <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
                                     (click)="deleteCourse(course)" [disabled]="deletingCourseId() !== null"
-                                    [attr.aria-label]="'Xóa học phần ' + (course.title || '')" title="Xóa học phần">
+                                    [attr.aria-label]="'Xóa học phần ' + (course.title || '')"
+                                    pTooltip="Xóa học phần" tooltipPosition="top" appendTo="body">
                                     <i class="ti ti-trash" aria-hidden="true"></i>
                                 </button>
                                 }
@@ -114,7 +115,9 @@
         </footer>
 
         <p-drawer [visible]="cloneDrawerVisible()" (visibleChange)="cloneDrawerVisible.set($event)" position="right"
-            [style]="{ width: '800px', maxWidth: '100vw' }" (onHide)="onCloneDrawerHide()" ariaLabel="Sao chép môn học">
+            [style]="{ width: 'min(800px, 100vw)' }" [modal]="false" appendTo="body" [blockScroll]="false"
+            styleClass="ictu-p-drawer course-management-clone-drawer" (onHide)="onCloneDrawerHide()"
+            ariaLabel="Sao chép môn học">
             <ng-template #header>
                 <span class="course-management-drawer-title">Sao chép nội dung từ môn học khác</span>
             </ng-template>

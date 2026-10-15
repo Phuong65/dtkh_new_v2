@@ -7,17 +7,20 @@ import { CoursePlanActivitiesService } from '@modules/shared/services/course-pla
 import { UserService } from '@core/services/user.service';
 import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
 import { NotificationService } from '@core/services/notification.service';
-import { Component, Input, OnChanges, OnInit, SimpleChanges, inject } from '@angular/core';
+import { NotificationService as IctuNotificationService } from '@core-new/service/notification.service';
+import { Component, DestroyRef, Input, OnChanges, OnInit, SimpleChanges, WritableSignal, inject, signal } from '@angular/core';
+import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
+import { ConfirmComponent } from '@core-new/components/confirm/confirm.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { InputTextModule } from 'primeng/inputtext';
 
 import { SharedModule } from '@modules/shared/shared.module';
-import { DialogModule } from 'primeng/dialog';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ElnKhoaHoc, EXAMFORMAT } from '@modules/shared/models/elng-khoa-hoc';
 import { OvicQueryCondition } from '@core/models/dto';
 import { ConditionOption } from '@modules/shared/models/condition-option';
-import { MatListModule, MatSelectionListChange } from '@angular/material/list';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatButtonModule } from '@angular/material/button';
 import { catchError, firstValueFrom, forkJoin, mergeMap, Observable, of } from 'rxjs';
 import { BUTTON_NO, BUTTON_YES } from '@core/models/buttons';
 import { CHUAN_DAU_RA } from '@modules/shared/utils/syscat';
@@ -31,18 +34,20 @@ import { OvicGroupsRadioV2Component } from '@modules/shared/components/ovic-grou
     ShowLabelData,
     OvicGroupsRadioV2Component,
     SharedModule,
-    DialogModule,
-    MatProgressBarModule,
-    MatListModule,
     MatMenuModule,
+    MatButtonModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    InputTextModule,
+    LoadingProgressComponent
 ],
     templateUrl: './clone-course.component.html',
     styleUrls: ['./clone-course.component.css']
 })
 export class CloneCourseComponent implements OnInit, OnChanges {
+    private readonly destroyRef = inject(DestroyRef);
     private notificationService = inject(NotificationService);
+    private readonly ictuNotificationService = inject(IctuNotificationService);
     private elnKhoaHocService = inject(ElnKhoaHocService);
     private userService = inject(UserService);
     private coursePlanActivitiesService = inject(CoursePlanActivitiesService);
@@ -61,15 +66,15 @@ export class CloneCourseComponent implements OnInit, OnChanges {
 
     courseClone: ElnKhoaHoc;
 
-    progressValue: number = 0;
+    readonly isLoadingCourses: WritableSignal<boolean> = signal(false);
 
-    displayModal: boolean = false;
+    readonly isProcessingApi: WritableSignal<boolean> = signal(false);
+
+    readonly loadingHeading: WritableSignal<string> = signal('Đang xử lý dữ liệu...');
 
     EXAMFORMAT = EXAMFORMAT;
 
     CHUAN_DAU_RA = CHUAN_DAU_RA;
-
-    waittingTitle: string = 'Đang đồng bộ dữ liệu, vui lòng chờ...';
 
     list_status = [
         { id: 0, label: "Hủy trạng thái duyệt" },
@@ -100,7 +105,8 @@ export class CloneCourseComponent implements OnInit, OnChanges {
 
         this.list_course_for_clone = [];
 
-        this.notificationService.isProcessing(true);
+        this.isLoadingCourses.set(true);
+        this.loadingHeading.set('Đang tải danh sách học phần...');
 
         const condition_course: ConditionOption = {
             condition: [
@@ -146,30 +152,27 @@ export class CloneCourseComponent implements OnInit, OnChanges {
                 }))
             }
             return of(_course)
-        })).subscribe({
+        }), takeUntilDestroyed(this.destroyRef)).subscribe({
             next: (_course) => {
                 this.list_course_for_clone = _course.data;
                 if (this.selectedCourse.copy_course_id) {
                     this.courseClone = _course.data[0];
                 }
-                this.notificationService.isProcessing(false);
+                this.isLoadingCourses.set(false);
             },
             error: () => {
-                this.notificationService.isProcessing(false);
+                this.isLoadingCourses.set(false);
+                this.notificationService.toastError('Không thể tải danh sách học phần để sao chép');
             }
         })
     }
 
-    changeSelecGiangvien(event: MatSelectionListChange) {
-
-        const index = this.list_course_for_clone.findIndex(m => m.id === event.options[0].value.id);
-
-        if (index !== -1) {
-            this.courseClone = this.list_course_for_clone[index]
-        }
+    selectCourseForClone(course: ElnKhoaHoc): void {
+        this.courseClone = course;
     }
 
     async startCloneCourse() {
+        if (this.isLoadingCourses() || this.isProcessingApi()) return;
         if (!this.courseClone) {
             return this.notificationService.toastWarning("Vui lòng chon môn học");
         }
@@ -186,26 +189,25 @@ export class CloneCourseComponent implements OnInit, OnChanges {
             page: null
         }
 
-        this.notificationService.isProcessing(true);
-
-        const question = await firstValueFrom(this.courseQuestionsService.getCourseQuestionsByPageNew(condition_question));
-
-        this.notificationService.isProcessing(false);
-
-        if (question.recordsFiltered !== 0) {
-            return this.notificationService.toastWarning("Môn này đã có câu hỏi, không thể đồng bộ");
+        this.isProcessingApi.set(true);
+        this.loadingHeading.set('Đang kiểm tra dữ liệu học phần...');
+        try {
+            const question = await firstValueFrom(this.courseQuestionsService.getCourseQuestionsByPageNew(condition_question)
+                .pipe(takeUntilDestroyed(this.destroyRef)));
+            if (question.recordsFiltered !== 0) {
+                this.notificationService.toastWarning('Môn này đã có câu hỏi, không thể đồng bộ');
+                return;
+            }
+        } catch {
+            if (!this.destroyRef.destroyed) this.notificationService.toastError('Không thể kiểm tra dữ liệu học phần');
+            return;
+        } finally {
+            this.isProcessingApi.set(false);
         }
+        if (this.destroyRef.destroyed) return;
 
-        this.notificationService.confirm(
-            '<div class="thonbao-saochep">' +
-            '<div class="thonbao-saochep_">' +
-            '- Thao tác này sẽ xóa nội dung của môn <strong>' + this.selectedCourse.title + '</strong> và sao chép từ môn <strong>' + this.courseClone.title + '</strong>' +
-            '</div>' +
-            '<div class="thonbao-saochep_">' +
-            '- Thầy/Cô có chắc muốn thực hiện thao tác sao chép' +
-            '</div>' +
-            '</div>', "Xác nhận hành động", [BUTTON_YES, BUTTON_NO]).then(a => {
-                if (a.name === "yes") {
+        this.confirmClone('nội dung học phần').subscribe(a => {
+                if (a?.name === 'yes') {
                     const condition_plan: ConditionOption = {
                         condition: [
                             { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: this.courseClone.id.toString(), orWhere: 'and' },
@@ -219,9 +221,8 @@ export class CloneCourseComponent implements OnInit, OnChanges {
                         page: null
                     }
 
-                    this.displayModal = true;
-
-                    this.progressValue = 0;
+                    this.isProcessingApi.set(true);
+                    this.loadingHeading.set('Đang sao chép dữ liệu học phần...');
 
                     this.coursePlanActivitiesService.getCoursePlanActivitiesByPageNew(condition_plan).subscribe({
                         next: (_plan) => {
@@ -306,7 +307,7 @@ export class CloneCourseComponent implements OnInit, OnChanges {
                             if (request.length) {
                                 this.loopAddForm(request, 0).subscribe({
                                     next: () => {
-                                        this.displayModal = false;
+                                        this.isProcessingApi.set(false);
                                         this.selectedCourse.av = this.courseClone.av;
                                         this.selectedCourse.params = this.courseClone.params;
                                         this.selectedCourse.copy_course_id = this.courseClone.id;
@@ -314,16 +315,17 @@ export class CloneCourseComponent implements OnInit, OnChanges {
                                     },
                                     error: (e) => {
                                         console.log(e);
-                                        this.displayModal = false;
+                                        this.isProcessingApi.set(false);
                                         this.notificationService.toastError("Sao chép thất bại, vui lòng thử lại");
                                     }
                                 })
                             } else {
-                                this.displayModal = false;
+                                this.isProcessingApi.set(false);
                             }
                         },
                         error: () => {
-
+                            this.isProcessingApi.set(false);
+                            this.notificationService.toastError('Không thể tải nội dung học phần nguồn');
                         }
                     })
                 }
@@ -332,7 +334,7 @@ export class CloneCourseComponent implements OnInit, OnChanges {
 
     loopAddForm(request: Observable<any>[], key: number): Observable<any> {
         return request[key].pipe(mergeMap(a => {
-            this.progressValue = (key + 1) / request.length * 100;
+            this.loadingHeading.set(`Đang đồng bộ dữ liệu (${key + 1}/${request.length})...`);
             if (request[key + 1]) {
                 return this.loopAddForm(request, key + 1);
             } else {
@@ -342,16 +344,9 @@ export class CloneCourseComponent implements OnInit, OnChanges {
     }
 
     startCloneQuestion() {
-        this.notificationService.confirm(
-            '<div class="thonbao-saochep">' +
-            '<div class="thonbao-saochep_">' +
-            '- Thao tác này sẽ xóa câu hỏi TN của môn <strong>' + this.selectedCourse.title + '</strong> và sao chép từ môn <strong>' + this.courseClone.title + '</strong>' +
-            '</div>' +
-            '<div class="thonbao-saochep_">' +
-            '- Thầy/Cô có chắc muốn thực hiện thao tác sao chép' +
-            '</div>' +
-            '</div>', "Xác nhận hành động", [BUTTON_YES, BUTTON_NO]).then(a => {
-                if (a.name === "yes") {
+        if (this.isLoadingCourses() || this.isProcessingApi() || !this.courseClone) return;
+        this.confirmClone('câu hỏi trắc nghiệm').subscribe(a => {
+                if (a?.name === 'yes') {
                     const condition_question: ConditionOption = {
                         condition: [
                             { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: this.courseClone.id.toString(), orWhere: 'and' },
@@ -377,9 +372,8 @@ export class CloneCourseComponent implements OnInit, OnChanges {
                         page: null
                     }
 
-                    this.displayModal = true;
-                    this.progressValue = 0;
-                    this.waittingTitle = 'Đang đồng bộ dữ liệu, vui lòng chờ...';
+                    this.isProcessingApi.set(true);
+                    this.loadingHeading.set('Đang đồng bộ dữ liệu, vui lòng chờ...');
                     forkJoin([
                         this.courseQuestionsService.getCourseQuestionsByPageNew(condition_question),
                         this.coursePlanActivitiesService.getCoursePlanActivitiesByPageNew(condition_plan)
@@ -452,7 +446,7 @@ export class CloneCourseComponent implements OnInit, OnChanges {
                             if (request.length) {
                                 this.loopAddForm(request, 0).subscribe({
                                     next: () => {
-                                        this.displayModal = false;
+                                        this.isProcessingApi.set(false);
                                         this.selectedCourse.av = this.courseClone.av;
                                         this.selectedCourse.params = this.courseClone.params;
                                         this.selectedCourse.copy_course_id = this.courseClone.id;
@@ -460,16 +454,17 @@ export class CloneCourseComponent implements OnInit, OnChanges {
                                     },
                                     error: (e) => {
                                         console.log(e);
-                                        this.displayModal = false;
+                                        this.isProcessingApi.set(false);
                                         this.notificationService.toastError("Sao chép thất bại, vui lòng thử lại");
                                     }
                                 })
                             } else {
-                                this.displayModal = false;
+                                this.isProcessingApi.set(false);
                             }
                         },
 
                         error: () => {
+                            this.isProcessingApi.set(false);
                             this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại")
                         }
                     })
@@ -478,16 +473,9 @@ export class CloneCourseComponent implements OnInit, OnChanges {
     }
 
     startCloneQuestionTh() {
-        this.notificationService.confirm(
-            '<div class="thonbao-saochep">' +
-            '<div class="thonbao-saochep_">' +
-            '- Thao tác này sẽ xóa câu hỏi TH của môn <strong>' + this.selectedCourse.title + '</strong> và sao chép từ môn <strong>' + this.courseClone.title + '</strong>' +
-            '</div>' +
-            '<div class="thonbao-saochep_">' +
-            '- Thầy/Cô có chắc muốn thực hiện thao tác sao chép' +
-            '</div>' +
-            '</div>', "Xác nhận hành động", [BUTTON_YES, BUTTON_NO]).then(a => {
-                if (a.name === "yes") {
+        if (this.isLoadingCourses() || this.isProcessingApi() || !this.courseClone) return;
+        this.confirmClone('câu hỏi tự luận/thực hành').subscribe(a => {
+                if (a?.name === 'yes') {
                     const condition_question: ConditionOption = {
                         condition: [
                             { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: this.courseClone.id.toString(), orWhere: 'and' },
@@ -524,11 +512,8 @@ export class CloneCourseComponent implements OnInit, OnChanges {
                         page: null
                     }
 
-                    this.displayModal = true;
-
-                    this.progressValue = 0;
-
-                    this.waittingTitle = 'Đang đồng bộ dữ liệu, vui lòng không tắt trình duyệt (1/4)';
+                    this.isProcessingApi.set(true);
+                    this.loadingHeading.set('Đang đồng bộ dữ liệu, vui lòng không tắt trình duyệt (1/4)');
 
                     forkJoin([
                         this.coursePlanActivityTuluanService.getCoursePlanActivityTuluanByPageNew(condition_question),
@@ -635,17 +620,18 @@ export class CloneCourseComponent implements OnInit, OnChanges {
                                     },
                                     error: (e) => {
                                         console.log(e);
-                                        this.displayModal = false;
+                                        this.isProcessingApi.set(false);
                                         this.notificationService.toastError("Sao chép thất bại, vui lòng thử lại");
                                     }
                                 })
                             } else {
-                                this.displayModal = false;
+                                this.isProcessingApi.set(false);
                                 this.addTuLuanQuestion(_course_tuluan, _tieuchi);
                             }
                         },
 
                         error: () => {
+                            this.isProcessingApi.set(false);
                             this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại")
                         }
                     })
@@ -654,9 +640,9 @@ export class CloneCourseComponent implements OnInit, OnChanges {
     }
 
     addTuLuanQuestion(_course_tuluan, _tieuchi) {
-        this.progressValue = 0;
+        this.isProcessingApi.set(true);
 
-        this.waittingTitle = 'Đang đồng bộ dữ liệu, vui lòng không tắt trình duyệt (2/4)';
+        this.loadingHeading.set('Đang đồng bộ dữ liệu, vui lòng không tắt trình duyệt (2/4)');
 
         const request_tuluan_question: Observable<any>[] = [];
 
@@ -705,7 +691,7 @@ export class CloneCourseComponent implements OnInit, OnChanges {
                 },
                 error: (e) => {
                     console.log(e);
-                    this.displayModal = false;
+                    this.isProcessingApi.set(false);
                     this.notificationService.toastError("Sao chép thất bại, vui lòng thử lại");
                 }
             })
@@ -715,9 +701,9 @@ export class CloneCourseComponent implements OnInit, OnChanges {
     }
 
     addTuluanGroupQuestion(_course_tuluan, _tieuchi) {
-        this.progressValue = 0;
+        this.isProcessingApi.set(true);
 
-        this.waittingTitle = 'Đang đồng bộ dữ liệu, vui lòng không tắt trình duyệt (3/4)';
+        this.loadingHeading.set('Đang đồng bộ dữ liệu, vui lòng không tắt trình duyệt (3/4)');
 
         const request_tuluan_group_question: Observable<any>[] = [];
 
@@ -761,7 +747,7 @@ export class CloneCourseComponent implements OnInit, OnChanges {
                 },
                 error: (e) => {
                     console.log(e);
-                    this.displayModal = false;
+                    this.isProcessingApi.set(false);
                     this.notificationService.toastError("Sao chép thất bại, vui lòng thử lại");
                 }
             })
@@ -771,9 +757,9 @@ export class CloneCourseComponent implements OnInit, OnChanges {
     }
 
     addTieuchicham(_tieuchi) {
-        this.progressValue = 0;
+        this.isProcessingApi.set(true);
 
-        this.waittingTitle = 'Đang đồng bộ dữ liệu, vui lòng không tắt trình duyệt (4/4)';
+        this.loadingHeading.set('Đang đồng bộ dữ liệu, vui lòng không tắt trình duyệt (4/4)');
 
         const request_tieuchi: Observable<any>[] = [];
 
@@ -785,18 +771,40 @@ export class CloneCourseComponent implements OnInit, OnChanges {
             this.loopAddForm(request_tieuchi, 0).subscribe({
                 next: () => {
                     this.notificationService.toastSuccess("Sao chép thành công");
-                    this.displayModal = false;
+                    this.isProcessingApi.set(false);
                 },
                 error: (e) => {
                     console.log(e);
-                    this.displayModal = false;
+                    this.isProcessingApi.set(false);
                     this.notificationService.toastError("Sao chép thất bại, vui lòng thử lại");
                 }
             })
         } else {
-            this.displayModal = false;
+            this.isProcessingApi.set(false);
             this.notificationService.toastSuccess("Sao chép thành công");
         }
+    }
+
+    private confirmClone(content: string) {
+        const target = this.escapeHtml(this.selectedCourse?.title || 'học phần hiện tại');
+        const source = this.escapeHtml(this.courseClone?.title || 'học phần nguồn');
+        const dialog = this.ictuNotificationService.matDialog.open(ConfirmComponent, {
+            data: {
+                heading: 'Xác nhận sao chép',
+                message: `Thao tác này sẽ xóa ${content} của học phần <strong>${target}</strong> và sao chép từ học phần <strong>${source}</strong>. Bạn có chắc muốn tiếp tục?`,
+                buttons: [BUTTON_NO, BUTTON_YES]
+            },
+            disableClose: true,
+            panelClass: 'ictu-app-notification',
+            width: 'min(400px, calc(100vw - 24px))',
+            maxWidth: 'calc(100vw - 24px)'
+        });
+        return dialog.afterClosed().pipe(takeUntilDestroyed(this.destroyRef));
+    }
+
+    private escapeHtml(value: string): string {
+        return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/\"/g, '&quot;').replace(/'/g, '&#039;');
     }
 
     changeStatusCopy(event) {

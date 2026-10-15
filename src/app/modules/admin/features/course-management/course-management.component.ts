@@ -18,6 +18,7 @@ import { saveAs } from 'file-saver';
 import { CloneCourseComponent } from './course-management-detail/children/clone-course/clone-course.component';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
+import { TooltipModule } from 'primeng/tooltip';
 import { MatButtonModule } from '@angular/material/button';
 import { catchError, defer, finalize, forkJoin, from, map, mergeMap, of, switchMap, tap, toArray } from 'rxjs';
 import { OvicConditionParam, OvicQueryCondition } from '@core/models/dto';
@@ -48,7 +49,7 @@ interface CourseDownloadDocument {
 @Component({
     selector: 'app-course-management',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule, DrawerModule, InputTextModule, SelectModule, MatButtonModule,
+    imports: [CommonModule, FormsModule, RouterModule, DrawerModule, InputTextModule, SelectModule, TooltipModule, MatButtonModule,
         IctuPaginatorComponent, LoadingProgressComponent, CloneCourseComponent],
     templateUrl: './course-management.component.html',
     styleUrl: './course-management.component.css'

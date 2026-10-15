@@ -169,7 +169,7 @@
     color: #0f172a;
     font-size: 14px;
     font-weight: 600;
-    line-height: 1.4;
+    line-height: 1;
     text-decoration: none;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -181,11 +181,11 @@
 }
 
 .course-management-subtitle {
-    margin-top: 3px;
     overflow: hidden;
     color: #475569;
-    font-size: 12px;
-    line-height: 1.35;
+    font-size: 12.5px;
+    font-style: italic;
+    line-height: 1;
     text-overflow: ellipsis;
     white-space: nowrap;
 }

@@ -14,7 +14,7 @@ import { ConditionOption } from '../models/condition-option';
 })
 export class CourseFormTuluan15pService {
 
-    api = getRoute('course-form-tuluan-15p/');
+    api = getRoute('course-form-tuluan/');
 
     constructor(
         private http: HttpClient,
