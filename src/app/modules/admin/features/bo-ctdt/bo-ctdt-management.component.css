@@ -519,12 +519,21 @@
     border: 0;
 }
 
+.bo-ctdt-form .ictu-form__row > .ictu-form__label {
+    margin: 0;
+}
+
+.bo-ctdt-form .ictu-form__row > input,
+.bo-ctdt-form .ictu-form__row > p-select,
+.bo-ctdt-form .ictu-form__row > .bo-ctdt-form__select {
+    margin-top: 4px;
+}
+
 .bo-ctdt-form__select {
     display: flex;
     width: 100%;
     min-width: 0;
     height: 43px;
-    margin-top: 5px;
     box-sizing: border-box;
     font-family: var(--primary-font-family), sans-serif;
     font-size: 14px;

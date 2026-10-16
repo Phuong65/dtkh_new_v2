@@ -18,7 +18,7 @@
                     <button type="button" mat-flat-button
                         class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button"
                         (click)="emitEvent('OPEN_FORM_ADD')" [disabled]="!canAdd" aria-label="Thêm bộ CTĐT"
-                        pTooltip="Thêm bộ CTĐT" tooltipPosition="bottom">
+                        pTooltip="Thêm bộ CTĐT" tooltipPosition="left">
                         <i class="ti ti-plus" aria-hidden="true"></i>
                     </button>
                 </div>
@@ -37,18 +37,18 @@
                         <button type="button" class="bo-ctdt-master-item__subjects ictu-button-info-light"
                             (click)="openSubjectDrawer(bo, $event)" [disabled]="!canUpdate"
                             [attr.aria-label]="'Chọn môn học cho bộ CTĐT ' + bo.name" pTooltip="Chọn môn học"
-                            tooltipPosition="right">
+                            tooltipPosition="left">
                             <i class="ti ti-book"></i>
                         </button>
                         <button type="button" class="bo-ctdt-master-item__edit ictu-button-info-light"
                             (click)="emitEvent('OPEN_FORM_UPDATE', bo); $event.stopPropagation()"
                             [disabled]="!canUpdate" [attr.aria-label]="'Sửa bộ CTĐT ' + bo.name" pTooltip="Sửa bộ CTĐT"
-                            tooltipPosition="right">
+                            tooltipPosition="left">
                             <i class="ti ti-edit" aria-hidden="true"></i>
                         </button>
                         <button type="button" class="bo-ctdt-master-item__delete ictu-button-danger-light"
                             (click)="deleteBoCtdt(bo); $event.stopPropagation()" [disabled]="!canDelete"
-                            [attr.aria-label]="'Xóa bộ CTĐT ' + bo.name" pTooltip="Xóa bộ CTĐT" tooltipPosition="right">
+                            [attr.aria-label]="'Xóa bộ CTĐT ' + bo.name" pTooltip="Xóa bộ CTĐT" tooltipPosition="left">
                             <i class="ti ti-trash" aria-hidden="true"></i>
                         </button>
                         <span class="bo-ctdt-master-item__chevron" aria-hidden="true"><i
@@ -82,7 +82,7 @@
                         <button type="button" mat-flat-button
                             class="btn ictu-badge-btn--success-reverse bo-ctdt-add-ctdt" (click)="openCreateCtdt()"
                             [disabled]="!selectedBo() || !canAddCtdt" aria-label="Thêm chương trình đào tạo"
-                            pTooltip="Thêm chương trình đào tạo" tooltipPosition="bottom">
+                            pTooltip="Thêm chương trình đào tạo" tooltipPosition="left">
                             <i class="ti ti-plus" aria-hidden="true"></i>
                         </button>
                     </div>
@@ -267,7 +267,7 @@
         }
         <div class="ictu-p-drawer__content__body position-relative">
             <form [formGroup]="ctdtForm" class="bo-ctdt-form">
-                <div class="ictu-form">
+                <div class="ictu-form ictu-form--label-on-top">
                     <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required"
                             for="ctdt-madt">Mã CTĐT</label><input id="ctdt-madt" type="text" formControlName="madt"
                             (input)="uppercaseCodeInput($event, ctdtForm, 'madt')" class="ictu-form__input-field"
@@ -285,10 +285,11 @@
                     </div>
                     <div class="ictu-form__row">
                         <label class="ictu-form__label ictu-form__label--required" for="ctdt-nganh">Ngành đào tạo</label>
-                        <p-select inputId="ctdt-nganh" class="bo-ctdt-form__select" [options]="ctdtFormNganhByDonVi"
+                        <p-select inputId="ctdt-nganh" class="bo-ctdt-form__select" [options]="ctdtFormNganhOptions"
                             optionLabel="title" optionValue="id" formControlName="nganh_id"
                             placeholder="Chọn ngành đào tạo" [filter]="true" filterBy="title"
-                            [disabled]="!ctdtForm.controls.category_id.value" appendTo="body"></p-select>
+                            appendTo="body"></p-select>
+                            <!-- [disabled]="!ctdtForm.controls.category_id.value"  -->
                     </div>
                     <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required" for="ctdt-khoa-apdung">Khóa áp dụng</label>
                         <input id="ctdt-khoa-apdung" type="text" formControlName="khoa_apdung"

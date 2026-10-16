@@ -26,6 +26,7 @@ import { FlickityModule } from './features/ngx-flickity/flickity.module';
 import { LoginTemplateVhhcmComponent } from './features/login-template-vhhcm/login-template-vhhcm.component';
 import { LoginTemplateHvuComponent } from './features/login-template-hvu/login-template-hvu.component';
 import { LoginTemplateIctuDttxComponent } from './features/login-template-ictu-dttx/login-template-ictu-dttx.component';
+import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 @NgModule({
     declarations: [
         LoginComponent,
@@ -57,7 +58,8 @@ import { LoginTemplateIctuDttxComponent } from './features/login-template-ictu-d
         IndexComponent,
         InputTextModule,
         PaginatorModule,
-        NgOptimizedImage
+        NgOptimizedImage,
+        LoadingProgressComponent
     ]
 })
 export class PublicModule { }

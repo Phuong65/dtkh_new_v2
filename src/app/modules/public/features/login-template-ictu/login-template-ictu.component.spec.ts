@@ -3,6 +3,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { InputTextModule } from 'primeng/inputtext';
+import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NotificationService } from '@core/services/notification.service';
 import { Title } from '@angular/platform-browser';
@@ -18,7 +19,7 @@ describe('LoginTemplateIctuComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ LoginTemplateIctuComponent ], imports: [ ReactiveFormsModule, HttpClientTestingModule, RouterTestingModule, InputTextModule ],
+      declarations: [ LoginTemplateIctuComponent ], imports: [ ReactiveFormsModule, HttpClientTestingModule, RouterTestingModule, InputTextModule, LoadingProgressComponent ],
       providers: [
         NgbModal,
         { provide: NotificationService, useValue: { toastError: () => {}, confirm: () => Promise.resolve() } },
@@ -43,6 +44,16 @@ describe('LoginTemplateIctuComponent', () => {
 
     expect(username.classList.contains('p-inputtext')).toBeTrue();
     expect(password.classList.contains('p-inputtext')).toBeTrue();
+  });
+
+  it('should show the login progress overlay while submitting', () => {
+    component.signInButton.isLoading = true;
+    fixture.detectChanges();
+
+    const progress: HTMLElement = fixture.nativeElement.querySelector('app-loading-progress');
+
+    expect(progress).toBeTruthy();
+    expect(progress.getAttribute('heading')).toBe('Đang đăng nhập...');
   });
 
   it('should mark required login fields as touched on an empty submit', () => {

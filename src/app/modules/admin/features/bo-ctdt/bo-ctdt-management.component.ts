@@ -82,6 +82,7 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     readonly ctdtFormLoading = signal<boolean>(false);
     ctdtFormDonVi: DonVi[] = [];
     ctdtFormNganh: ElnChuyenMuc[] = [];
+    ctdtFormNganhOptions: ElnChuyenMuc[] = [];
     ctdtFormHeDt: HeDt[] = [];
     private readonly notificationService = inject(NotificationService);
     private readonly auth = inject(AuthService);
@@ -327,7 +328,7 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
             condition: conditions,
             set: [
                 { label: 'limit', value: String(this.ctdtTable.paginator.rows()) },
-                { label: 'orderby', value: 'id' },
+                { label: 'orderby', value: 'created_at' },
                 { label: 'order', value: 'DESC' }
             ],
             page: String(page)
@@ -721,6 +722,7 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
         }
         this.creatingForBo = bo;
         this.ctdtForm.reset({ ten: '', madt: '', category_id: null, nganh_id: null, khoa_apdung: '', he_dt: null });
+        this.ctdtFormNganhOptions = [];
         this.ctdtDrawerVisible = true;
         this.loadCtdtFormOptions();
     }
@@ -749,6 +751,7 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
                 this.ctdtFormNganh = nganh.data || [];
                 this.ctdtFormDonVi = donvi.data || [];
                 this.ctdtFormHeDt = hedt || [];
+                this.updateCtdtFormNganhOptions();
                 this.ctdtFormLoading.set(false);
             },
             error: () => {
@@ -758,18 +761,21 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
         });
     }
 
-    onCtdtFormDonViChange(): void {
-        this.ctdtForm.controls.nganh_id.setValue(null);
+    private updateCtdtFormNganhOptions(): void {
+        const categoryId = this.ctdtForm.controls.category_id.value;
+        this.ctdtFormNganhOptions = categoryId
+            ? this.ctdtFormNganh.filter(nganh => Number(nganh.donvi_chuyenmon_id) === Number(categoryId))
+            : [];
     }
 
-    get ctdtFormNganhByDonVi(): ElnChuyenMuc[] {
-        const categoryId = this.ctdtForm.controls.category_id.value;
-        return this.ctdtFormNganh.filter(nganh => Number(nganh.donvi_chuyenmon_id) === Number(categoryId));
+    onCtdtFormDonViChange(): void {
+        this.ctdtForm.controls.nganh_id.setValue(null);
+        this.updateCtdtFormNganhOptions();
     }
 
     get canSubmitCtdtForm(): boolean {
         return !this.isSaving() && !this.ctdtFormLoading() && this.ctdtForm.valid
-            && this.ctdtFormNganhByDonVi.some(nganh => Number(nganh.id) === Number(this.ctdtForm.controls.nganh_id.value));
+            && this.ctdtFormNganhOptions.some(nganh => Number(nganh.id) === Number(this.ctdtForm.controls.nganh_id.value));
     }
 
     onCtdtKhoaKeyDown(event: KeyboardEvent): void {

@@ -202,6 +202,8 @@ export class LoginTemplateIctuComponent implements OnInit, OnDestroy {
             return;
         }
         if (button.name === 'signIn') {
+            this.isLoading = true;
+            button.isLoading = true;
             const signInfo = {
                 username: this.loginForm.controls['username'].value,
                 password: this.loginForm.controls['password'].value
