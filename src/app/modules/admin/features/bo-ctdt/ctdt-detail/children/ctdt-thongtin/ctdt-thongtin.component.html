@@ -54,10 +54,15 @@
                                 }
                             </div>
                             <div class="ctdt-field">
-                                <label for="khoa_apdung">Khóa áp dụng</label>
+                                <label for="khoa_apdung">Khóa áp dụng <span class="ctdt-required">*</span></label>
                                 <input id="khoa_apdung" type="text" class="admin-wrap-table__input"
                                     formControlName="khoa_apdung" (keydown)="pointQuestionKeyDown($event)"
-                                    placeholder="VD: 2024" autocomplete="off" inputmode="numeric">
+                                    placeholder="VD: 20" autocomplete="off" inputmode="numeric"
+                                    [attr.aria-invalid]="f['khoa_apdung'].touched && f['khoa_apdung'].invalid"
+                                    aria-describedby="khoa-apdung-error">
+                                @if (f['khoa_apdung'].touched && f['khoa_apdung'].invalid) {
+                                <span id="khoa-apdung-error" class="ctdt-field__error">Vui lòng nhập khóa áp dụng</span>
+                                }
                             </div>
                         </div>
                     </div>
@@ -101,11 +106,14 @@
                                 }
                             </div>
                             <div class="ctdt-field">
-                                <span class="ctdt-field__label">Hệ đào tạo</span>
+                                <span class="ctdt-field__label">Hệ đào tạo <span class="ctdt-required">*</span></span>
                                 <ovic-dropdown placeholder="Chọn hệ đào tạo" [options]="list_hedt"
                                     [defaultValue]="f['he_dt'].value" optionId="kyhieu" optionLabel="title"
                                     [formField]="f['he_dt']" [filter]="true" filterBy="title">
                                 </ovic-dropdown>
+                                @if (f['he_dt'].touched && f['he_dt'].invalid) {
+                                <span class="ctdt-field__error">Vui lòng chọn hệ đào tạo</span>
+                                }
                             </div>
                             <div class="ctdt-field">
                                 <label for="thoigian_daotao">Thời gian đào tạo (năm)</label>

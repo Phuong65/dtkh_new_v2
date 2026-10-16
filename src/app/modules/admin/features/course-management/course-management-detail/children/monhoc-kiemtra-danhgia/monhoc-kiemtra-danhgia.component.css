@@ -276,8 +276,23 @@
 .assessment-mcq-actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; }
 .assessment-mcq-actions { margin-top: 18px; }
 .assessment-mcq-card > .assessment-warning { display: block; margin-top: 18px; }
-.assessment-child-card { min-height: calc(100vh - 170px); border: 1px solid #e2e8f0; border-radius: 4px; background: #fff; overflow: auto; }
-.assessment-child-card > app-cauhoi-tuluan-15p { display: block; min-height: 100%; }
+.assessment-child-card {
+    display: flex;
+    height: calc(100dvh - 170px);
+    min-height: 560px;
+    min-width: 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    background: #fff;
+    overflow: hidden;
+}
+.assessment-child-card > app-cauhoi-tuluan-15p {
+    display: block;
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+}
 
 @media (max-width: 900px) {
     .assessment-tabs { justify-content: flex-start; }

@@ -519,8 +519,22 @@
     border: 0;
 }
 
+.bo-ctdt-form__select {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    height: 43px;
+    margin-top: 5px;
+    box-sizing: border-box;
+    font-family: var(--primary-font-family), sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    --p-select-border-color: var(--p-inputtext-border-color);
+    --p-select-focus-border-color: var(--p-inputtext-focus-border-color);
+}
+
 .bo-ctdt-program-table {
-    min-width: 680px;
+    min-width: 1280px;
     table-layout: fixed;
 }
 

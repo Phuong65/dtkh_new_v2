@@ -118,11 +118,11 @@
     </section>
     }
 
-    <!-- Lưu học kỳ và điều kiện học phần trên liên kết ctdt-hocphan. -->
+    <!-- Lưu thay đổi danh sách, học kỳ và điều kiện trên liên kết ctdt-hocphan. -->
     <footer class="content-sticky-footer">
         <div class="content-sticky-footer__inner">
             <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse content-sticky-save-btn"
-                (click)="saveCourseDetails()" [disabled]="savingHp() || isLoadingData()">
+                (click)="saveCourseDetails()" [disabled]="savingHp() || isLoadingData() || !hasPendingChanges()">
                 <i class="ti ti-device-floppy" aria-hidden="true"></i>
                 <span>Lưu lại</span>
             </button>
@@ -155,15 +155,12 @@
                     (click)="toggleCourseCondition(course)">
                     <span class="condition-check"><i class="ti" [class.ti-check]="course['selected_hp']"
                             aria-hidden="true"></i></span>
-                    <span><strong>{{ course.title }}</strong><small>{{ course.maso }}</small></span>
+                    <span><strong>{{ course.title }}</strong><small style="font-style: italic;line-height:1;font-size:12.5px">{{ course.maso }}</small></span>
                 </button>
                 } @empty {
                 <div class="condition-empty" role="status">
                     <span class="condition-empty__icon" aria-hidden="true"><i class="ti ti-book"></i></span>
-                    <strong>{{ searchCourse_hp ? 'Không tìm thấy học phần' : 'Chưa có học phần phù hợp' }}</strong>
-                    <span>{{ searchCourse_hp ? 'Hãy thử từ khóa ngắn hơn hoặc kiểm tra lại mã học phần.' : 'Hãy nhập học
-                        kỳ trước khi chọn học phần điều kiện.' }}</span>
-                    @if (searchCourse_hp) { <button type="button" (click)="searchCourse_hp = ''">Xóa tìm kiếm</button> }
+                    <strong>Chưa có học phần phù hợp</strong>
                 </div>
                 }
             </div>
@@ -175,7 +172,12 @@
         [header]="selectedKhoiKienthuc?.title || 'Gắn học phần vào CTĐT'" [style]="{ width: 'min(620px, 100vw)' }"
         appendTo="body" position="right" styleClass="ictu-p-drawer content-course-drawer">
         <div class="ictu-p-drawer__content">
-            <div class="ictu-p-drawer__content__body position-relative">
+            <div class="ictu-p-drawer__content__body position-relative"
+                [attr.aria-busy]="isLoadingSubjects()">
+                @if (isLoadingSubjects()) {
+                <app-loading-progress heading="Đang tải danh mục học phần..."
+                    backdropFilter="blur(2px)"></app-loading-progress>
+                }
                 <div class="course-picker-panel">
                     <div class="ictu-form ictu-form--label-on-top course-picker-search">
                         <div class="ictu-form__row">
@@ -193,19 +195,19 @@
                     </div>
                     } @else {
                     <div class="course-picker-list">
-                        @if (isLoadingSubjects()) {
-                        <div class="course-picker-empty">Đang tải danh mục môn học...</div>
-                        } @else {
+                        @if (!isLoadingSubjects()) {
                         @for (subject of list_subjects; track subject.id) {
                         <button type="button" class="course-picker-item"
-                            [class.course-picker-item--selected]="selectedSubjects.has(subject.id)"
+                            [class.course-picker-item--selected]="isSubjectSelected(subject)"
                             [class.course-picker-item--disabled]="isSubjectCreated(subject)"
-                            (click)="toggleSubjectCheck(subject)" [disabled]="savingHp() || isSubjectCreated(subject)">
+                            [attr.aria-pressed]="isSubjectSelected(subject)"
+                            (click)="toggleSubjectCheck(subject)"
+                            [disabled]="savingHp() || isLoadingSubjects() || isSubjectCreated(subject)">
                             <span class="course-picker-check"><i class="ti"
-                                    [class.ti-check]="selectedSubjects.has(subject.id)" aria-hidden="true"></i></span>
+                                    [class.ti-check]="isSubjectSelected(subject)" aria-hidden="true"></i></span>
                             <span class="course-picker-copy">
                                 <strong>{{ subject.name }} ({{ subject.code }})</strong>
-                                <small>{{ subject.sotinchi || 0 }} tín chỉ{{ isSubjectCreated(subject) ? ' · Đã tạo' : '' }}</small>
+                                <small>{{ subject.sotinchi || 0 }} tín chỉ{{ isSubjectCreated(subject) ? ' · Đã thuộc khối khác' : '' }}</small>
                             </span>
                         </button>
                         } @empty { <p class="course-picker-empty">Không có môn học phù hợp.</p> }
@@ -227,9 +229,9 @@
                 <button type="button" mat-flat-button
                     class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button"
                     (click)="saveCoursesFromSubjects()"
-                    [disabled]="savingHp() || isLoadingSubjects() || !selectedSubjects.size">
-                    <i class="ti ti-device-floppy" aria-hidden="true"></i>Tạo {{ selectedSubjects.size ? '(' +
-                    selectedSubjects.size + ')' : '' }}
+                    [disabled]="savingHp() || isLoadingSubjects() || !hasSubjectChanges()">
+                    <i class="ti ti-device-floppy" aria-hidden="true"></i>Xác nhận {{ selectedCourseIds.size ? '(' +
+                    selectedCourseIds.size + ')' : '' }}
                 </button>
             </div>
         </div>

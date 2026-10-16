@@ -157,7 +157,50 @@
     min-height: 100%;
 }
 
-.form-de-tab-panel--kthp {
+.formde-empty-state {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    min-height: 360px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    padding: 32px;
+    color: #64748b;
+    text-align: center;
+}
+
+.formde-empty-state i {
+    display: block;
+    margin-bottom: 2px;
+    color: #94a3b8;
+    font-size: 38px;
+    line-height: 1;
+}
+
+.formde-empty-state strong,
+.formde-empty-state span {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.formde-empty-state strong {
+    color: #334155;
+}
+
+.formde-empty-state > :first-child {
+    order: -1;
+}
+
+.formde-empty-state span {
+    max-width: 520px;
+    line-height: 1.5;
+}
+
+.form-de-tab-panel--kthp,
+.form-de-tab-panel--tntx {
     height: 100%;
     min-height: 100%;
 }
@@ -197,13 +240,15 @@
 
 /* Kiểm tra 15p: nội dung có gutter, thanh cuộn và footer sát mép panel. */
 .form-de-tab-panels:has(.form-de-tab-panel--dg:not([hidden])),
-.form-de-tab-panels:has(.form-de-tab-panel--cc:not([hidden])) {
+.form-de-tab-panels:has(.form-de-tab-panel--cc:not([hidden])),
+.form-de-tab-panels:has(.form-de-tab-panel--kthp:not([hidden])) {
     overflow: hidden;
     padding: 0;
 }
 
 .form-de-tab-panel--dg,
-.form-de-tab-panel--cc {
+.form-de-tab-panel--cc,
+.form-de-tab-panel--kthp {
     height: 100%;
     min-height: 0;
 }
@@ -224,13 +269,14 @@
     height: auto;
     min-height: 0;
     overflow: auto;
-    padding: 14px 0 14px 14px;
+    padding: 14px;
     border-radius: 0;
 }
 
 .form-de-tab-panel--dg .dg-lesson-card-list,
 .form-de-tab-panel--cc .dg-lesson-card-list {
-    padding-right: 14px;
+    width: 100%;
+    padding: 0;
 }
 
 .form-tracnghiem-panel-content-footer--dg {
@@ -305,7 +351,9 @@
 .form-de-tab-panel--cc .cc-lesson-row__title {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 10px;
+    width: 100%;
 }
 
 .form-de-tab-panel--cc .cc-lesson-badge {
@@ -320,18 +368,27 @@
     font-weight: 500;
 }
 
-.form-de-tab-panel--cc .cc-status-badge {
+.cc-status-badge,
+.form-de-tab-panel--tntx .test-card-header .cc-status-badge {
     display: inline-flex;
     min-height: 24px;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
+    margin-left: 8px;
     padding: 3px 9px;
-    border: 1px solid #bbf7d0;
+    border: 1px solid #86efac;
     border-radius: 999px;
-    background: #f0fdf4;
+    background: #dcfce7;
     color: #15803d;
     font-size: 12px;
     font-weight: 500;
+    white-space: nowrap;
+}
+
+.cc-status-badge .ti-check {
+    margin-right: 0;
+    font-size: 14px;
+    line-height: 1;
 }
 
 .form-de-tab-panel--cc .cc-lesson-row__total {
@@ -449,6 +506,23 @@
     line-height: 1.35;
 }
 
+:host ::ng-deep .form-de-tab-panel--tntx .panel-text-av-tx .p-panel-header {
+    padding: 0;
+    border-bottom: 0 !important;
+    background: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
+}
+
+:host ::ng-deep .form-de-tab-panel--tntx .p-panel-header .test-card-header strong {
+    display: inline-flex;
+    min-height: 30px;
+    align-items: center;
+    margin-right: 0 !important;
+    padding: 4px 11px;
+    border-radius: 6px;
+    color: #1e40af;
+    font-weight: 500 !important;
+}
+
 :host ::ng-deep .form-de-tab-panels .p-panel-content {
     padding: 0;
     border: 0;
@@ -553,11 +627,29 @@
 
 .test-card-header,
 .dg-lesson-card-header {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
     width: 100%;
+}
+
+.form-de-tab-panel--tntx .test-card-header {
+    min-height: 48px;
+    padding: 9px 14px 9px 18px;
+    border-bottom: 0;
+    background: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
+    color: #1e3a8a;
+    flex-wrap: wrap;
+}
+
+.form-de-tab-panel--tntx .test-card-header::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    background: #2563eb;
+    content: '';
 }
 
 .test-card-header strong,
@@ -571,6 +663,29 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
+}
+
+.form-de-tab-panel--tntx,
+.form-de-tab-panel--tntx :is(div, section, article, header, footer, p, table, th, td, span, strong, b, label, input, select, textarea, button, a):not(.fa):not(.pi):not(.ti):not(.material-icons) {
+    font-size: 14px !important;
+}
+
+.form-de-tab-panel--tntx .content-table-cauhoi table > tbody > tr > :is(th, td):first-child {
+    font-weight: 500 !important;
+}
+
+.form-de-tab-panel--tntx .test-card-header .blue {
+    display: inline-flex;
+    min-height: 24px;
+    align-items: center;
+    margin-left: 8px;
+    padding: 3px 9px;
+    border: 1px solid #bbf7d0;
+    border-radius: 999px;
+    background: #f0fdf4;
+    color: #15803d;
+    font-size: 12px;
+    font-weight: 500;
 }
 
 .test-card-header .ictu-admin-icon-button {

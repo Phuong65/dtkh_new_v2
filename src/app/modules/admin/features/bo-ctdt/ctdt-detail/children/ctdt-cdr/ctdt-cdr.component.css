@@ -19,10 +19,10 @@
     --cdr-muted: #64748b;
     --cdr-border: #cbd5e1;
     --cdr-surface: #ffffff;
-    --cdr-bg: #f3f4f6;
+    --cdr-bg: #fafbfc;
     --cdr-head-bg: #f1f5f9;
-    --cdr-plo-bg: #e2e8f0;
-    --cdr-plo-bg-hover: #d6dfe9;
+    --cdr-plo-bg: #f1f5f9;
+    --cdr-plo-bg-hover: #e2e8f0;
     --cdr-plo-accent: #475569;
     --cdr-plo-ink: #0f172a;
     --cdr-pi-bg: #ffffff;
@@ -66,27 +66,58 @@
     box-shadow: 0 1px 3px rgb(0 0 0 / 4%);
 }
 
-.cdr-table-card__header.admin-wrap-table__head {
+.cdr-table-card__header.admin-wrap-table__head,
+.cdr-matrix-card__header {
+    position: relative;
     display: flex;
+    min-height: 48px;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    padding: 10px 16px;
-    min-height: 48px;
-    border-bottom: 1px solid var(--cdr-border);
-    background: white;
+    padding: 9px 14px 9px 18px;
+    border-bottom: 0;
+    background: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
+    color: #1e3a8a;
+    flex-wrap: wrap;
+}
+
+.cdr-table-card__header.admin-wrap-table__head::before,
+.cdr-matrix-card__header::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    background: #2563eb;
+    content: '';
+}
+
+.cdr-matrix-card:has(> .matrix-empty-tip) > .cdr-matrix-card__header {
+    border-bottom: 1px solid #cbd5e1;
 }
 
 .cdr-table-card__title-wrap {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     flex-wrap: wrap;
     gap: 10px;
 }
 
+.cdr-table-card__icon {
+    display: inline-flex;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #bfdbfe;
+    border-radius: var(--cdr-radius);
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 17px;
+}
+
 .cdr-table-card__title.admin-wrap-table__heading {
     margin: 0;
-    color: var(--cdr-teal-dark);
+    color: #1e3a8a;
     font-size: 14.5px;
     font-weight: 600;
     letter-spacing: .02em;
@@ -160,10 +191,9 @@
 .col-percent { width: 120px; min-width: 120px; }
 .col-actions { width: 115px; min-width: 115px; }
 
-/* Hàng PLO cấp cha: xanh dương dịu + vạch nhấn, tương phản rõ với PI trắng. */
+/* Hàng PLO cấp cha: xanh dương dịu, tương phản rõ với PI trắng. */
 .row-plo {
     background: var(--cdr-plo-bg);
-    box-shadow: inset 4px 0 0 var(--cdr-plo-accent);
     transition: background-color .15s ease;
 }
 
@@ -172,7 +202,7 @@
 }
 
 .plo-code-tag {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
     min-width: 52px;
@@ -182,13 +212,13 @@
     color: var(--cdr-plo-ink);
     font-family: inherit;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .plo-order-num {
     color: var(--cdr-plo-ink);
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .plo-content-wrap {
@@ -216,8 +246,8 @@
 .plo-text {
     padding: 0 !important;
     color: var(--cdr-ink) !important;
-    font-style: italic !important;
-    font-weight: 600 !important;
+    font-style: normal !important;
+    font-weight: 500 !important;
     font-size: 14px !important;
     line-height: 1.5 !important;
 }
@@ -278,20 +308,22 @@
 .pi-code-tag {
     color: var(--cdr-text);
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .pi-text {
     padding: 0 !important;
     color: var(--cdr-text) !important;
+    font-weight: 500 !important;
     font-size: 14px !important;
     line-height: 1.5 !important;
 }
 
 .pi-percent-val {
+    display: block;
     color: var(--cdr-ink);
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 /* Nút hành động chuẩn core-new (ictu-admin-icon-button) */
@@ -339,27 +371,32 @@
     background: var(--cdr-surface);
 }
 
-.cdr-matrix-card__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 9px 16px;
-    border-bottom: 1px solid var(--cdr-border);
-    background: white;
-}
 
 .cdr-matrix-card__title {
     display: flex;
     align-items: center;
     gap: 7px;
-    color: var(--cdr-ink);
+    color: #1e3a8a;
     font-size: 13px;
     font-weight: 600;
 }
 
+.cdr-matrix-card__icon {
+    display: inline-flex;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #bfdbfe;
+    border-radius: var(--cdr-radius);
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 17px;
+}
+
 .cdr-matrix-card__title i {
-    color: var(--cdr-teal);
+    color: inherit;
     font-size: 16px;
 }
 

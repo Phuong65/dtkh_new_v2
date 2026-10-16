@@ -116,7 +116,7 @@
                 <aside class="assessment-test-sidebar" aria-label="Danh sách bài kiểm tra">
                     <header><span>Danh sách bài kiểm tra</span><button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
                         (click)="closeLeftBody()" [attr.aria-label]="closeLeft ? 'Mở danh sách' : 'Thu gọn danh sách'">
-                        <i [class]="closeLeft ? 'ti ti-layout-sidebar-right-expand' : 'ti ti-layout-sidebar-left-collapse'" aria-hidden="true"></i></button></header>
+                        <i [class]="closeLeft ? 'ti ti-chevrons-right' : 'ti ti-chevrons-lef'" aria-hidden="true"></i></button></header>
                     <div class="assessment-test-list">
                         @for (parent of list_plan; track parent.id) {
                         <section class="assessment-test-group">

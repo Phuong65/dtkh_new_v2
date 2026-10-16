@@ -15,6 +15,9 @@ import { NotificationService } from '@core-new/service/notification.service';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 import { AppState } from '@core-new/models/app-state';
 import { Drawer } from 'primeng/drawer';
+import { InputTextModule } from 'primeng/inputtext';
+import { TooltipModule } from 'primeng/tooltip';
+import { MatButtonModule } from '@angular/material/button';
 import { Component, ElementRef, Input, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ConditionOption } from '@modules/shared/models/condition-option';
@@ -87,7 +90,10 @@ export interface LessonFormRow {
     SafeHtmlPipe,
     OvicDateTimePipe,
     LoadingProgressComponent,
-    Drawer
+    Drawer,
+    InputTextModule,
+    TooltipModule,
+    MatButtonModule
 ],
     templateUrl: './cauhoi-tuluan-15p.component.html',
     styleUrls: ['./cauhoi-tuluan-15p.component.css']
@@ -340,6 +346,15 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
         this.drawerVisible = false;
         this.drawerTemplate = null;
         if (reload) this.loadCauhoi();
+    }
+
+    onDrawerHide(): void {
+        this.closeDrawer();
+    }
+
+    get drawerBusy(): boolean {
+        return this.isBusy() || this.displayModal || this.isSavingLessonForm || this.isSavingQuestion
+            || this.isSavingCardRubric || this.isGeneratingAiRubric || this.isGeneratingCardRubric;
     }
 
     get busy(): boolean {

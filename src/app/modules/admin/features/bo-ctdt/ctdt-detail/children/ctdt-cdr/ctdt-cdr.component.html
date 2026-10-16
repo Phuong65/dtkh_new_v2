@@ -14,13 +14,15 @@
         <section class="admin-wrap-table ictu-admin-table-shell cdr-table-card">
             <header class="admin-wrap-table__head cdr-table-card__header">
                 <div class="cdr-table-card__title-wrap">
+                    <span class="cdr-table-card__icon" aria-hidden="true"><i class="ti ti-certificate"></i></span>
                     <span class="admin-wrap-table__heading cdr-table-card__title">CHUẨN ĐẦU RA CỦA CHƯƠNG TRÌNH ĐÀO
                         TẠO</span>
                 </div>
                 <div class="admin-wrap-table__head-actions cdr-table-card__actions">
                     <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse cdr-add-button"
-                        (click)="openAddCtdtCdr()">
-                        <i class="ti ti-plus"></i>
+                        (click)="openAddCtdtCdr()" aria-label="Thêm chuẩn đầu ra PLO"
+                        pTooltip="Thêm chuẩn đầu ra PLO" tooltipPosition="bottom" appendTo="body">
+                        <i class="ti ti-plus" aria-hidden="true"></i>
                     </button>
                 </div>
             </header>
@@ -42,10 +44,10 @@
                             <!-- HÀNG PLO (CHA) -->
                             <tr class="row-plo">
                                 <td class="col-code cell-center">
-                                    <span class="plo-code-tag">{{ cdr.kyhieu }}</span>
+                                    <div class="plo-code-tag">{{ cdr.kyhieu }}</div>
                                 </td>
                                 <td class="col-plo cell-center">
-                                    <span class="plo-order-num">{{ cdr.ordering }}</span>
+                                    <div class="plo-order-num">{{ cdr.ordering }}</div>
                                 </td>
                                 <td class="col-content">
                                     <div class="plo-content-wrap">
@@ -68,8 +70,8 @@
                                         [class.percent-ok]="getPiPercentState(cdr) === 'complete'"
                                         [class.percent-warn]="getPiPercentState(cdr) === 'under'"
                                         [class.percent-danger]="getPiPercentState(cdr) === 'over'"
-                                        [ngbTooltip]="getPiPercentState(cdr) === 'complete' ? 'Tổng PI đạt 100%' : getPiPercentState(cdr) === 'under' ? 'Còn thiếu ' + getRemainingPiPercent(cdr) + '%' : 'Vượt quá ' + (getTotalPiPercent(cdr) - 100) + '%'"
-                                        placement="top" container="body">
+                                        [pTooltip]="getPiPercentState(cdr) === 'complete' ? 'Tổng PI đạt 100%' : getPiPercentState(cdr) === 'under' ? 'Còn thiếu ' + getRemainingPiPercent(cdr) + '%' : 'Vượt quá ' + (getTotalPiPercent(cdr) - 100) + '%'"
+                                        tooltipPosition="top" appendTo="body">
                                         Tổng: {{ getTotalPiPercent(cdr) }}%
                                     </span>
                                     }
@@ -79,20 +81,20 @@
                                         <button type="button" mat-flat-button
                                             class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button"
                                             (click)="openAddCtdtCdr(cdr)"
-                                            [attr.aria-label]="'Thêm PI cho ' + cdr.kyhieu" ngbTooltip="Thêm PI con"
-                                            placement="top" container="body">
+                                            [attr.aria-label]="'Thêm PI cho ' + cdr.kyhieu" pTooltip="Thêm PI con"
+                                            tooltipPosition="top" appendTo="body">
                                             <i class="ti ti-plus" aria-hidden="true"></i>
                                         </button>
                                         <button type="button" mat-flat-button
                                             class="btn  ictu-badge-btn--info-reverse ictu-admin-icon-button"
                                             (click)="editCtdtCdr(cdr)" [attr.aria-label]="'Sửa ' + cdr.kyhieu"
-                                            ngbTooltip="Sửa PLO" placement="top" container="body">
+                                            pTooltip="Sửa PLO" tooltipPosition="top" appendTo="body">
                                             <i class="ti ti-edit"></i>
                                         </button>
                                         <button type="button" mat-flat-button
                                             class="btn ictu-badge-btn--danger-reverse ictu-admin-icon-button"
                                             (click)="deleteCtdtCdr(cdr)" [attr.aria-label]="'Xóa ' + cdr.kyhieu"
-                                            ngbTooltip="Xóa PLO" placement="top" container="body">
+                                            pTooltip="Xóa PLO" tooltipPosition="top" appendTo="body">
                                             <i class="ti ti-trash" aria-hidden="true"></i>
                                         </button>
                                     </div>
@@ -105,7 +107,7 @@
                                 <td class="col-code cell-center">
                                     <div class="pi-code-wrap">
                                         <span class="pi-branch-symbol" aria-hidden="true">↳</span>
-                                        <span class="pi-code-tag">{{ child.kyhieu }}</span>
+                                        <div class="pi-code-tag">{{ child.kyhieu }}</div>
                                     </div>
                                 </td>
                                 <td class="col-plo cell-center">
@@ -115,20 +117,20 @@
                                     <div class="pi-text ql-editor" [innerHTML]="child.noidung | safeHtmlDecode"></div>
                                 </td>
                                 <td class="col-percent cell-center">
-                                    <span class="pi-percent-val">{{ child.percent_pi }}</span>
+                                    <div class="pi-percent-val">{{ child.percent_pi }}</div>
                                 </td>
                                 <td class="col-actions cell-center">
                                     <div class="btn-group-actions">
                                         <button type="button" mat-flat-button
                                             class="btn ictu-button-info-light ictu-admin-icon-button"
                                             (click)="editCtdtCdr(child, cdr)" [attr.aria-label]="'Sửa ' + child.kyhieu"
-                                            ngbTooltip="Sửa PI" placement="top" container="body">
+                                            pTooltip="Sửa PI" tooltipPosition="top" appendTo="body">
                                             <i class="ti ti-edit"></i>
                                         </button>
                                         <button type="button" mat-flat-button
                                             class="btn ictu-button-danger-light ictu-admin-icon-button"
                                             (click)="deleteCtdtCdr(child)" [attr.aria-label]="'Xóa ' + child.kyhieu"
-                                            ngbTooltip="Xóa PI" placement="top" container="body">
+                                            pTooltip="Xóa PI" tooltipPosition="top" appendTo="body">
                                             <i class="ti ti-trash" aria-hidden="true"></i>
                                         </button>
                                     </div>
@@ -153,7 +155,7 @@
         <section class="cdr-matrix-card">
             <header class="cdr-matrix-card__header">
                 <div class="cdr-matrix-card__title">
-                    <i class="ti ti-layout-grid" aria-hidden="true"></i>
+                    <span class="cdr-matrix-card__icon" aria-hidden="true"><i class="ti ti-layout-grid"></i></span>
                     <span>MA TRẬN ĐỐI CHIẾU MỤC TIÊU ĐÀO TẠO (PEO) VÀ CHUẨN ĐẦU RA (PLO)</span>
                 </div>
                 <span class="matrix-count-tag">{{ getMatrixLinkCount() }} liên kết</span>

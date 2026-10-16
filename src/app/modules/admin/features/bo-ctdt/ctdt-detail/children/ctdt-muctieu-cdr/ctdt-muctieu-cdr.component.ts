@@ -7,12 +7,12 @@ import { Drawer } from 'primeng/drawer';
 import { Select } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { MatButtonModule } from '@angular/material/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { HelperService } from '@core/services/helper.service';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 import { AppState } from '@core-new/models/app-state';
+import { IctuDeletingAnimationControl } from '@core-new/models/ictu-deleting-animation-control';
 import { OvicQueryCondition } from '@core/models/dto';
 import { AuthService } from '@core/services/auth.service';
 import { NotificationService } from '@core-new/service/notification.service';
@@ -39,7 +39,7 @@ export interface typeMuctieuCuthe {
     selector: 'app-ctdt-muctieu-cdr',
     standalone: true,
     imports: [CommonModule, ReactiveFormsModule, Drawer, Select, MultiSelectModule, InputTextModule,
-        OvicEditorComponent, SafeHtmlDecodePipe, NgbTooltipModule, MatButtonModule, TooltipModule, LoadingProgressComponent],
+        OvicEditorComponent, SafeHtmlDecodePipe, MatButtonModule, TooltipModule, LoadingProgressComponent],
     templateUrl: './ctdt-muctieu-cdr.component.html',
     styleUrls: ['./ctdt-muctieu-cdr.component.css']
 })
@@ -117,6 +117,20 @@ export class CtdtMuctieuCdrComponent implements OnInit, OnDestroy {
 
     reloadData(): void {
         if (this.selectedCtdt) this.loadTabData(this.selectedCtdt, true);
+    }
+
+    private rebuildGoalGroups(): void {
+        this.list_ctdt_muctieu_cuthe = this.type_ctdt_muctieu_cuthe.map(group => ({
+            key: group.key,
+            title: group.title,
+            children: this.list_muctieu_cuthe.filter(goal => goal.type === group.key)
+        }));
+        const ungrouped = this.list_muctieu_cuthe.filter(goal =>
+            !this.type_ctdt_muctieu_cuthe.some(group => group.key === goal.type)
+        );
+        if (ungrouped.length) {
+            this.list_ctdt_muctieu_cuthe.push({ key: '__ungrouped__', title: 'Chưa phân nhóm', children: ungrouped });
+        }
     }
 
     private loadTabData(ctdt: Ctdt, force = false): void {
@@ -210,15 +224,7 @@ export class CtdtMuctieuCdrComponent implements OnInit, OnDestroy {
             next: response => {
                 this.goalsState.set('success');
                 this.list_muctieu_cuthe = response.data || [];
-                this.list_ctdt_muctieu_cuthe = this.type_ctdt_muctieu_cuthe.map(group => ({
-                    key: group.key,
-                    title: group.title,
-                    children: this.list_muctieu_cuthe.filter(goal => goal.type === group.key)
-                }));
-                const ungrouped = this.list_muctieu_cuthe.filter(goal => !this.type_ctdt_muctieu_cuthe.some(group => group.key === goal.type));
-                if (ungrouped.length) {
-                    this.list_ctdt_muctieu_cuthe.push({ key: '__ungrouped__', title: 'Chưa phân nhóm', children: ungrouped });
-                }
+                this.rebuildGoalGroups();
                 this.resetForm();
             },
             error: () => this.goalsState.set('error')
@@ -292,7 +298,7 @@ export class CtdtMuctieuCdrComponent implements OnInit, OnDestroy {
             next: saved => {
                 if (!saved) return;
                 this.notificationService.toastSuccess(editing ? 'Sửa mục tiêu thành công' : 'Thêm mục tiêu thành công');
-                if (editing) this.drawerVisible = false;
+                this.drawerVisible = false;
                 this.loadMuctieuCuthe();
             },
             error: () => this.notificationService.toastError('Không thể lưu mục tiêu. Dữ liệu nhập được giữ lại, vui lòng thử lại.')
@@ -324,15 +330,30 @@ export class CtdtMuctieuCdrComponent implements OnInit, OnDestroy {
         }).pipe(takeUntil(this.destroy$)).subscribe(confirmed => {
             if (!confirmed || this.destroyed || this.busy || this.selectedCtdt?.id !== programmeId) return;
             this.deletingGoalId = goal.id;
-            this.ctdtMuctieuCutheService.deleteCtdtMuctieuCuthe(goal.id).pipe(
+            const deleteController = new IctuDeletingAnimationControl([goal.id], {
+                delete: id => this.ctdtMuctieuCutheService.deleteCtdtMuctieuCuthe(id)
+            });
+            this.notificationService.startDeleting(deleteController.progress).pipe(
                 takeUntil(this.destroy$), finalize(() => this.deletingGoalId = null)
             ).subscribe({
-                next: () => {
+                next: deleted => {
+                    if (!deleted) {
+                        this.notificationService.toastError('Xóa mục tiêu thất bại');
+                        return;
+                    }
+                    if (this.selectedCtdt?.id === programmeId) {
+                        this.list_muctieu_cuthe = this.list_muctieu_cuthe.filter(item => item.id !== goal.id);
+                        this.rebuildGoalGroups();
+                        if (this.selectedMuctieuCuthe?.id === goal.id) {
+                            this.drawerVisible = false;
+                            this.resetForm();
+                        }
+                    }
                     this.notificationService.toastSuccess('Xóa mục tiêu thành công');
-                    this.loadMuctieuCuthe();
                 },
                 error: () => this.notificationService.toastError('Xóa mục tiêu thất bại')
             });
+            deleteController.run();
         });
     }
 

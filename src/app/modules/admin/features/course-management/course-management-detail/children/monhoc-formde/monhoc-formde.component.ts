@@ -488,6 +488,21 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
         return this.list_week?.filter(week => !!week['checked']).length || 0;
     }
 
+    hasActiveTabData(key: string): boolean {
+        switch (key) {
+            case 'CC':
+                return !!this.list_cdr_cauhoi?.length;
+            case 'DG':
+                return !!this.list_test_dg?.length;
+            case 'TNTX':
+                return !!this.list_test_tx?.length;
+            case 'TN_KTHP':
+                return !!this.selectedCourse;
+            default:
+                return false;
+        }
+    }
+
     private startLoading(heading: string): void {
         this.loadingHeading.set(heading);
         this.isLoading.set(true);

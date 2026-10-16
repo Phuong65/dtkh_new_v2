@@ -1,7 +1,7 @@
 <div class="goals-shell">
-    @if (state() === 'loading' || goalsState() === 'loading' || savingGeneral || deletingGoalId !== null) {
+    @if (state() === 'loading' || goalsState() === 'loading' || savingGeneral) {
     <app-loading-progress
-        [heading]="savingGeneral ? 'Đang lưu mục tiêu chung...' : deletingGoalId !== null ? 'Đang xóa mục tiêu...' : goalsState() === 'loading' ? 'Đang tải danh sách mục tiêu...' : 'Đang tải mục tiêu chương trình...'"
+        [heading]="savingGeneral ? 'Đang lưu mục tiêu chung...' : goalsState() === 'loading' ? 'Đang tải danh sách mục tiêu...' : 'Đang tải mục tiêu chương trình...'"
         backdropFilter="blur(2px)"></app-loading-progress>
     }
     @if (state() === 'error') {
@@ -30,7 +30,6 @@
                         </button>
                     </header>
                     <div class="goals-card__body">
-                        <p class="goals-helper">Mô tả định hướng tổng quát và những năng lực chương trình hướng đến.</p>
                         <div class="goals-editor" role="group" aria-labelledby="goal-general-heading">
                             <ovic-editor height="220px" (changeText)="onMucTieuChungChange($event)"
                                 [default]="generalEditorInitialValue"></ovic-editor>
@@ -43,11 +42,14 @@
                 <section class="goals-card goals-peo-card" aria-labelledby="goal-peo-heading"
                     [attr.aria-busy]="goalsState() === 'loading'">
                     <header class="goals-card__header goals-peo-card__header">
-                        <h2 id="goal-peo-heading">MỤC TIÊU ĐÀO TẠO CỦA CHƯƠNG TRÌNH</h2>
+                        <div class="goals-card__heading">
+                            <span class="goals-card__icon" aria-hidden="true"><i class="ti ti-target"></i></span>
+                            <h2 id="goal-peo-heading">MỤC TIÊU ĐÀO TẠO CỦA CHƯƠNG TRÌNH</h2>
+                        </div>
                         <button mat-flat-button class="btn ictu-badge-btn--success-reverse" (click)="openAddMuctieu()"
                             [disabled]="busy || goalsState() === 'error' || !type_ctdt_muctieu_cuthe.length"
-                            aria-label="Thêm mục tiêu PEO" ngbTooltip="Thêm mục tiêu PEO" placement="top"
-                            container="body">
+                            aria-label="Thêm mục tiêu PEO" pTooltip="Thêm mục tiêu PEO" tooltipPosition="top"
+                            appendTo="body">
                             <i class="ti ti-plus" aria-hidden="true"></i>
                         </button>
                     </header>
@@ -113,15 +115,15 @@
                                             <button type="button"
                                                 class="btn ictu-button-info-light ictu-admin-icon-button"
                                                 (click)="editMucTieuchuThe(goal)" [disabled]="busy"
-                                                [attr.aria-label]="'Sửa ' + goal.kyhieu" ngbTooltip="Sửa mục tiêu"
-                                                placement="top" container="body">
-                                                <i class="ti ti-pencil" aria-hidden="true"></i>
+                                                [attr.aria-label]="'Sửa ' + goal.kyhieu" pTooltip="Sửa mục tiêu"
+                                                tooltipPosition="top" appendTo="body">
+                                                <i class="ti ti-edit" aria-hidden="true"></i>
                                             </button>
                                             <button type="button"
                                                 class="btn ictu-button-danger-light ictu-admin-icon-button"
                                                 (click)="deleteMuctieu(goal)" [disabled]="busy"
-                                                [attr.aria-label]="'Xóa ' + goal.kyhieu" ngbTooltip="Xóa mục tiêu"
-                                                placement="top" container="body">
+                                                [attr.aria-label]="'Xóa ' + goal.kyhieu" pTooltip="Xóa mục tiêu"
+                                                tooltipPosition="top" appendTo="body">
                                                 <i class="ti ti-trash" aria-hidden="true"></i>
                                             </button>
                                         </div>
@@ -152,7 +154,7 @@
                 <section class="goals-card goals-matrix-card" aria-labelledby="goal-matrix-heading">
                     <header class="goals-matrix-card__header">
                         <div class="goals-matrix-card__title">
-                            <i class="ti ti-layout-grid" aria-hidden="true"></i>
+                            <span class="goals-card__icon" aria-hidden="true"><i class="ti ti-layout-grid"></i></span>
                             <h2 id="goal-matrix-heading">MA TRẬN TƯƠNG THÍCH MỤC TIÊU ĐÀO TẠO (PEO) VỚI ĐỊNH HƯỚNG CƠ SỞ
                                 ĐÀO TẠO</h2>
                         </div>
@@ -210,8 +212,8 @@
 
             <aside class="goals-workspace__aside" aria-label="Tổng quan mục tiêu">
                 <section class="goals-summary-card goals-summary-card--primary">
-                    <div class="goals-summary-card__icon" aria-hidden="true">
-                        <i class="ti ti-target"></i>
+                    <div class="goals-summary-card__icon">
+                        <i class="ti ti-list-check" aria-hidden="true"></i>
                         <h2>Mục tiêu đã thiết lập</h2>
                     </div>
                     <strong>{{ goalsState() === 'loading' || goalsState() === 'error' ? '—' : list_muctieu_cuthe.length
@@ -220,7 +222,7 @@
                         dữ liệu' : 'PEO trong chương trình' }}</p>
                 </section>
                 <section class="goals-summary-card">
-                    <h2><i class="ti ti-category" aria-hidden="true"></i>Phân nhóm mục tiêu</h2>
+                    <h2><i class="ti ti-folders" aria-hidden="true"></i>Phân nhóm mục tiêu</h2>
                     @if (goalsState() !== 'loading' && goalsState() !== 'error') {
                     <dl class="goals-summary-list">
                         @for (group of list_ctdt_muctieu_cuthe; track group.key) {
@@ -240,7 +242,7 @@
                     }
                 </section>
                 <section class="goals-summary-card">
-                    <h2><i class="ti ti-bulb" aria-hidden="true"></i>Gợi ý soạn mục tiêu</h2>
+                    <h2><i class="ti ti-notes" aria-hidden="true"></i>Gợi ý soạn mục tiêu</h2>
                     <ul class="goals-guidance">
                         <li>Diễn đạt rõ ràng, có thể đánh giá.</li>
                         <li>Phù hợp với khung trình độ đã chọn.</li>

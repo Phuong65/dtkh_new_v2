@@ -104,6 +104,11 @@
                                     <th class="text-center" style="width: 50px;">#</th>
                                     <th class="wid-90 text-center" style="width: 90px;">Mã CTĐT</th>
                                     <th class="text-center">Tên chương trình đào tạo</th>
+                                    <th class="text-center" style="width: 100px;">Khóa</th>
+                                    <th class="text-center" style="width: 150px;">Ngành đào tạo</th>
+                                    <th class="text-center" style="width: 130px;">Khoa</th>
+                                    <th class="text-center" style="width: 120px;">Hệ đào tạo</th>
+                                    <th class="text-center" style="width: 100px;">Tổng tín chỉ</th>
                                     <th class="text-center" style="width: 90px;">Thao tác</th>
                                 </tr>
                             </thead>
@@ -118,6 +123,11 @@
                                             <strong>{{ ctdt.ten || 'Chưa đặt tên' }}</strong>
                                         </button>
                                     </td>
+                                    <td class="text-center">{{ ctdt.khoa_apdung || '—' }}</td>
+                                    <td>{{ getCtdtMeta(ctdt).nganh }}</td>
+                                    <td>{{ getCtdtMeta(ctdt).khoa }}</td>
+                                    <td>{{ getCtdtMeta(ctdt).heDaoTao }}</td>
+                                    <td class="text-center">{{ getCtdtMeta(ctdt).tongTinChi ?? '—' }}</td>
                                     <td class="text-center">
                                         <button type="button"
                                             class="btn ictu-button-danger-light ictu-admin-icon-button"
@@ -131,7 +141,7 @@
                                 </tr>
                                 } @empty {
                                 <tr>
-                                    <td colspan="4" class="bo-ctdt-empty">Bộ CTĐT này chưa có chương trình.</td>
+                                    <td colspan="9" class="bo-ctdt-empty">Bộ CTĐT này chưa có chương trình.</td>
                                 </tr>
                                 }
                             </tbody>
@@ -152,7 +162,7 @@
     <div class="ictu-p-drawer__content position-relative">
         <div class="ictu-p-drawer__content__body position-relative">
             <form [formGroup]="boCtdtForm" class="bo-ctdt-form">
-                <div class="ictu-form ictu-form--label-on-top">
+                <div class="ictu-form">
                     <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required"
                             for="bo-ctdt-code">Mã bộ CTĐT</label><input id="bo-ctdt-code" type="text"
                             formControlName="code" (input)="uppercaseCodeInput($event, boCtdtForm, 'code')"
@@ -250,11 +260,14 @@
 </p-drawer>
 
 <p-drawer [(visible)]="ctdtDrawerVisible" [dismissible]="false" header="Thêm chương trình đào tạo"
-    [style]="{ width: '400px', 'max-width': '100%' }" appendTo="body" position="right" styleClass="ictu-p-drawer">
+    [style]="{ width: 'min(560px, 100vw)' }" appendTo="body" position="right" styleClass="ictu-p-drawer">
     <div class="ictu-p-drawer__content position-relative">
+        @if (ctdtFormLoading()) {
+        <app-loading-progress heading="Đang tải danh mục CTĐT..." backdropFilter="none"></app-loading-progress>
+        }
         <div class="ictu-p-drawer__content__body position-relative">
             <form [formGroup]="ctdtForm" class="bo-ctdt-form">
-                <div class="ictu-form ictu-form--label-on-top">
+                <div class="ictu-form">
                     <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required"
                             for="ctdt-madt">Mã CTĐT</label><input id="ctdt-madt" type="text" formControlName="madt"
                             (input)="uppercaseCodeInput($event, ctdtForm, 'madt')" class="ictu-form__input-field"
@@ -263,13 +276,41 @@
                             for="ctdt-ten">Tên chương trình</label><input id="ctdt-ten" type="text"
                             formControlName="ten" class="ictu-form__input-field" pInputText
                             placeholder="Nhập tên chương trình"></div>
+                    <div class="ictu-form__row">
+                        <label class="ictu-form__label ictu-form__label--required" for="ctdt-category">Khoa</label>
+                        <p-select inputId="ctdt-category" class="bo-ctdt-form__select" [options]="ctdtFormDonVi"
+                            optionLabel="title" optionValue="id" formControlName="category_id"
+                            (onChange)="onCtdtFormDonViChange()" placeholder="Chọn khoa" [filter]="true"
+                            filterBy="title" appendTo="body"></p-select>
+                    </div>
+                    <div class="ictu-form__row">
+                        <label class="ictu-form__label ictu-form__label--required" for="ctdt-nganh">Ngành đào tạo</label>
+                        <p-select inputId="ctdt-nganh" class="bo-ctdt-form__select" [options]="ctdtFormNganhByDonVi"
+                            optionLabel="title" optionValue="id" formControlName="nganh_id"
+                            placeholder="Chọn ngành đào tạo" [filter]="true" filterBy="title"
+                            [disabled]="!ctdtForm.controls.category_id.value" appendTo="body"></p-select>
+                    </div>
+                    <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required" for="ctdt-khoa-apdung">Khóa áp dụng</label>
+                        <input id="ctdt-khoa-apdung" type="text" formControlName="khoa_apdung"
+                            (keydown)="onCtdtKhoaKeyDown($event)" class="ictu-form__input-field" pInputText
+                            placeholder="VD: 20" inputmode="numeric">
+                        @if (ctdtForm.controls.khoa_apdung.touched && ctdtForm.controls.khoa_apdung.invalid) {
+                        <span class="ictu-admin-form-error">Vui lòng nhập khóa bằng chữ số.</span>
+                        }</div>
+                    <div class="ictu-form__row">
+                        <label class="ictu-form__label ictu-form__label--required" for="ctdt-he-dt">Hệ đào tạo</label>
+                        <p-select inputId="ctdt-he-dt" class="bo-ctdt-form__select" [options]="ctdtFormHeDt"
+                            optionLabel="title" optionValue="kyhieu" formControlName="he_dt"
+                            placeholder="Chọn hệ đào tạo" [filter]="true" filterBy="title"
+                            appendTo="body"></p-select>
+                    </div>
                 </div>
             </form>
         </div>
         <div class="ictu-p-drawer__content__footer ictu-admin-drawer-footer"><button type="button" mat-flat-button
                 class="btn ictu-badge-btn--secondary ictu-admin-footer-button"
-                (click)="ctdtDrawerVisible = false">Hủy</button><button type="button" mat-flat-button
-                class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button" (click)="submitCtdtForm()"><i
-                    class="ti ti-device-floppy" aria-hidden="true"></i> Lưu lại</button></div>
+                (click)="ctdtDrawerVisible = false" [disabled]="isSaving()">Hủy</button><button type="button" mat-flat-button
+                class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button" (click)="submitCtdtForm()"
+                [disabled]="!canSubmitCtdtForm"><i class="ti ti-device-floppy" aria-hidden="true"></i> Lưu lại</button></div>
     </div>
 </p-drawer>

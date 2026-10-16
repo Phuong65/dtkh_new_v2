@@ -105,6 +105,15 @@ export class CtdtCauhinhComponent implements OnInit {
         });
     }
 
+    configGroupIcon(group: string): string {
+        switch (group) {
+            case 'KHUNG_TRINH_DO': return 'ti ti-certificate';
+            case 'KHOI_KIEN_THUC': return 'ti ti-book';
+            case 'TUONGTHICH_PEOs': return 'ti ti-arrows-left-right';
+            default: return 'ti ti-settings';
+        }
+    }
+
     autoResize(event: Event) {
         const textarea = event.target as HTMLTextAreaElement;
         textarea.style.height = 'auto';
@@ -270,6 +279,11 @@ export class CtdtCauhinhComponent implements OnInit {
         parent.ctdt_config.forEach((f, key) => {
             f.ordering = key + 1;
         })
+    }
+
+    onConfigRowReorder(parent: CtdtConfiAll, event: { dragIndex?: number; dropIndex?: number }): void {
+        if (this.busy || event?.dragIndex == null || event?.dropIndex == null) return;
+        parent.ctdt_config.forEach((config, index) => config.ordering = index + 1);
     }
 
     deleteConfig(parent: CtdtConfiAll, config: CtdtConfig, index: number) {

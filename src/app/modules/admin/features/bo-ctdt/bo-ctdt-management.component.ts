@@ -6,7 +6,7 @@ import { MatButton } from '@angular/material/button';
 import { Drawer } from 'primeng/drawer';
 import { InputText } from 'primeng/inputtext';
 import { Tooltip } from 'primeng/tooltip';
-import { Observable, Subject as RxSubject, concatMap, filter, forkJoin, from, map, of, switchMap, takeUntil, tap, toArray } from 'rxjs';
+import { Observable, Subject as RxSubject, catchError, concatMap, filter, forkJoin, from, map, of, switchMap, takeUntil, tap, toArray } from 'rxjs';
 import { IctuPaginatorComponent } from '@core-new/components/ictu-paginator/ictu-paginator.component';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 import { AppState } from '@core-new/models/app-state';
@@ -16,6 +16,15 @@ import { IctuDeletingAnimationControl } from '@core-new/models/ictu-deleting-ani
 import { NotificationService } from '@core-new/service/notification.service';
 import { OvicConditionParam, OvicQueryCondition } from '@core/models/dto';
 import { AuthService } from '@core/services/auth.service';
+import { ConditionOption } from '@modules/shared/models/condition-option';
+import { DonVi } from '@modules/shared/models/don-vi';
+import { ElnChuyenMuc } from '@modules/shared/models/Elng';
+import { HeDt } from '@modules/shared/models/he-dt';
+import { ElnChuyenMucService } from '@modules/shared/services/elearning-chuyen-muc.service';
+import { DonViService } from '@modules/shared/services/don-vi.service';
+import { HeDtService } from '@modules/shared/services/he-dt.service';
+import { CtdtHocphanService } from '@modules/shared/services/ctdt-hocphan.service';
+import { Select } from 'primeng/select';
 import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
 import { HelperService } from '@core/services/helper.service';
 import { BoCtdt } from '@modules/shared/models/bo-ctdt';
@@ -39,7 +48,8 @@ import { IctuPaginatorControl } from '@core-new/components/ictu-paginator/ictu-p
         Tooltip,
         IctuPaginatorComponent,
         LoadingProgressComponent,
-        MatButton
+        MatButton,
+        Select
     ],
     templateUrl: './bo-ctdt-management.component.html',
     styleUrl: './bo-ctdt-management.component.css'
@@ -48,6 +58,10 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     private readonly fb = inject(FormBuilder);
     private readonly boCtdtService = inject(BoCtdtService);
     private readonly ctdtService = inject(CtdtService);
+    private readonly donViService = inject(DonViService);
+    private readonly nganhService = inject(ElnChuyenMucService);
+    private readonly heDtService = inject(HeDtService);
+    private readonly ctdtHocphanService = inject(CtdtHocphanService);
     private readonly subjectService = inject(SubjectService);
     private readonly subjectCourseService = inject(SubjectCourseService);
     private readonly courseService = inject(ElnKhoaHocService);
@@ -62,7 +76,13 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     private requestedSubjectPage = 1;
     subjectRelationsReady = false;
     private readonly cancelCtdtLoad$ = new RxSubject<void>();
+    private readonly cancelCtdtMetaLoad$ = new RxSubject<void>();
+    private readonly cancelCtdtFormOptionsLoad$ = new RxSubject<void>();
     private readonly cancelBoLoad$ = new RxSubject<void>();
+    readonly ctdtFormLoading = signal<boolean>(false);
+    ctdtFormDonVi: DonVi[] = [];
+    ctdtFormNganh: ElnChuyenMuc[] = [];
+    ctdtFormHeDt: HeDt[] = [];
     private readonly notificationService = inject(NotificationService);
     private readonly auth = inject(AuthService);
     private readonly router = inject(Router);
@@ -71,6 +91,7 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     readonly destroy$ = new RxSubject<void>();
     readonly boTable = new IctuDataTable2<BoCtdt>({ rows: 20, pageLinkSize: 5 });
     readonly ctdtTable = new IctuDataTable2<Ctdt>({ rows: 10, pageLinkSize: 5 });
+    readonly ctdtDisplayMeta = signal<Record<number, { khoa: string; nganh: string; heDaoTao: string; tongTinChi: number | null }>>({});
     readonly state = signal<AppState>('loading');
     readonly ctdtState = signal<AppState>('success');
     readonly isSaving = signal<boolean>(false);
@@ -100,8 +121,12 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     private creatingForBo: BoCtdt | null = null;
 
     readonly ctdtForm = this.fb.group({
-        ten: ['', [Validators.required, Validators.maxLength(255)]],
-        madt: ['', [Validators.required, Validators.maxLength(50)]]
+        ten: ['', [Validators.required, Validators.pattern(/.*\S.*/), Validators.maxLength(255)]],
+        madt: ['', [Validators.required, Validators.pattern(/.*\S.*/), Validators.maxLength(50)]],
+        category_id: [null as number | null, Validators.required],
+        nganh_id: [null as number | null, Validators.required],
+        khoa_apdung: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]],
+        he_dt: [null as string | null, Validators.required]
     });
 
     readonly boCtdtForm: FormGroup = this.fb.group({
@@ -135,6 +160,10 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.cancelCtdtLoad$.next();
         this.cancelCtdtLoad$.complete();
+        this.cancelCtdtMetaLoad$.next();
+        this.cancelCtdtMetaLoad$.complete();
+        this.cancelCtdtFormOptionsLoad$.next();
+        this.cancelCtdtFormOptionsLoad$.complete();
         this.cancelBoLoad$.next();
         this.cancelBoLoad$.complete();
         this.cancelSubjectLoad$.next();
@@ -274,11 +303,16 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     loadCtdt(page = 1, resetPaginator = false): void {
         const bo = this.selectedBo();
         if (!bo) {
+            this.cancelCtdtLoad$.next();
+            this.cancelCtdtMetaLoad$.next();
+            this.ctdtDisplayMeta.set({});
             this.ctdtTable.fillRawData({ data: [], recordsFiltered: 0, recordsTotal: 0, draw: 1 }, { paged: 1, resetPaginator: true });
             this.ctdtState.set('success');
             return;
         }
 
+        this.cancelCtdtMetaLoad$.next();
+        this.ctdtDisplayMeta.set({});
         this.ctdtState.set('loading');
         const conditions: OvicConditionParam[] = [
             { conditionName: 'ctdt_bo_id', condition: OvicQueryCondition.equal, value: String(bo.id), orWhere: 'and' }
@@ -300,14 +334,82 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
         }).pipe(takeUntil(this.destroy$), takeUntil(this.cancelCtdtLoad$)).subscribe({
             next: response => {
                 const total = Number(response.recordsFiltered) || 0;
-                this.ctdtTable.fillRawData({ data: response.data || [], recordsFiltered: total, recordsTotal: total, draw: 1 }, { paged: page, resetPaginator });
+                const rows = response.data || [];
+                this.ctdtTable.fillRawData({ data: rows, recordsFiltered: total, recordsTotal: total, draw: 1 }, { paged: page, resetPaginator });
                 this.ctdtState.set('success');
+                this.loadCtdtDisplayMeta(rows);
             },
             error: () => {
                 this.ctdtState.set('error');
                 this.notificationService.toastError('Không thể tải danh sách chương trình đào tạo', 'Lỗi kết nối');
             }
         });
+    }
+
+    private loadCtdtDisplayMeta(rows: Ctdt[]): void {
+        const validRows = rows.filter(row => Number.isInteger(Number(row.id)) && Number(row.id) > 0);
+        if (!validRows.length) {
+            this.ctdtDisplayMeta.set({});
+            return;
+        }
+
+        const major: ConditionOption = {
+            condition: [{ conditionName: 'type', condition: OvicQueryCondition.equal, value: 'nganh', orWhere: 'and' }],
+            set: [{ label: 'limit', value: '-1' }], page: null
+        };
+        const unit: ConditionOption = {
+            condition: [{ conditionName: 'status', condition: OvicQueryCondition.greaterThan, value: '0', orWhere: 'and' }],
+            set: [{ label: 'limit', value: '-1' }, { label: 'orderby', value: 'title' }, { label: 'order', value: 'ASC' }], page: null
+        };
+        forkJoin({
+            nganh: this.nganhService.getChuyemucByPageNew(major),
+            khoa: this.donViService.getDonviByPageNew(unit),
+            heDaoTao: this.heDtService.getAllHeDt(),
+            credits: forkJoin(validRows.map(row => this.loadCtdtCredits(Number(row.id))))
+        }).pipe(
+            catchError(() => of({ nganh: { data: [] }, khoa: { data: [] }, heDaoTao: [], credits: validRows.map(() => null) })),
+            takeUntil(this.cancelCtdtMetaLoad$),
+            takeUntil(this.destroy$)
+        ).subscribe(({ nganh, khoa, heDaoTao, credits }) => {
+            const nganhById = new Map((nganh.data || []).map(item => [Number(item.id), item.title]));
+            const khoaById = new Map((khoa.data || []).map(item => [Number(item.id), item.title]));
+            const heDaoTaoByCode = new Map((heDaoTao || []).map(item => [String((item as HeDt & { kyhieu?: string }).kyhieu ?? item.id), item.title]));
+            const metadata = validRows.reduce((result, row, index) => {
+                result[Number(row.id)] = {
+                    khoa: khoaById.get(Number(row.category_id)) || '—',
+                    nganh: nganhById.get(Number(row.nganh_id)) || '—',
+                    heDaoTao: heDaoTaoByCode.get(String(row.he_dt)) || '—',
+                    tongTinChi: credits[index]
+                };
+                return result;
+            }, {} as Record<number, { khoa: string; nganh: string; heDaoTao: string; tongTinChi: number | null }>);
+            this.ctdtDisplayMeta.set(metadata);
+        });
+    }
+
+    private loadCtdtCredits(ctdtId: number): Observable<number | null> {
+        const condition: ConditionOption = {
+            condition: [{ conditionName: 'ctdt_id', condition: OvicQueryCondition.equal, value: String(ctdtId) }],
+            set: [{ label: 'limit', value: '-1' }], page: null
+        };
+        return this.ctdtHocphanService.getCtdtHocphanByPageNew(condition).pipe(
+            switchMap(links => {
+                const courseIds = [...new Set((links.data || []).map(link => Number(link.course_id)).filter(id => Number.isInteger(id) && id > 0))];
+                if (!courseIds.length) return of([] as { params?: { sotinchi?: number } }[]);
+                const courseCondition: ConditionOption = {
+                    condition: [{ conditionName: 'status', condition: OvicQueryCondition.greaterThan, value: '-1' }],
+                    set: [{ label: 'limit', value: '-1' }, { label: 'include', value: courseIds.join(',') }, { label: 'include_by', value: 'id' }],
+                    page: null
+                };
+                return this.courseService.getKhoaHocByPageNew_2(courseCondition).pipe(map(response => response.data || []));
+            }),
+            map(courses => courses.reduce((total, course) => total + Number(course.params?.sotinchi || 0), 0)),
+            catchError(() => of(null))
+        );
+    }
+
+    getCtdtMeta(ctdt: Ctdt): { khoa: string; nganh: string; heDaoTao: string; tongTinChi: number | null } {
+        return this.ctdtDisplayMeta()[Number(ctdt.id)] || { khoa: '—', nganh: '—', heDaoTao: '—', tongTinChi: null };
     }
 
     openSubjectDrawer(bo: BoCtdt, event?: Event): void {
@@ -618,8 +720,62 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
             return;
         }
         this.creatingForBo = bo;
-        this.ctdtForm.reset({ ten: '', madt: '' });
+        this.ctdtForm.reset({ ten: '', madt: '', category_id: null, nganh_id: null, khoa_apdung: '', he_dt: null });
         this.ctdtDrawerVisible = true;
+        this.loadCtdtFormOptions();
+    }
+
+    private loadCtdtFormOptions(): void {
+        const major: ConditionOption = {
+            condition: [{ conditionName: 'type', condition: OvicQueryCondition.equal, value: 'nganh', orWhere: 'and' }],
+            set: [{ label: 'limit', value: '-1' }], page: null
+        };
+        const unit: ConditionOption = {
+            condition: [
+                { conditionName: 'status', condition: OvicQueryCondition.greaterThan, value: '0', orWhere: 'and' },
+                { conditionName: 'parent_id', condition: OvicQueryCondition.equal, value: String(this.auth.user?.donvi_id), orWhere: 'and' }
+            ],
+            set: [{ label: 'limit', value: '-1' }, { label: 'order', value: 'ASC' }, { label: 'orderby', value: 'title' }],
+            page: null
+        };
+        this.cancelCtdtFormOptionsLoad$.next();
+        this.ctdtFormLoading.set(true);
+        forkJoin({
+            nganh: this.nganhService.getChuyemucByPageNew(major),
+            donvi: this.donViService.getDonviByPageNew(unit),
+            hedt: this.heDtService.getAllHeDt()
+        }).pipe(takeUntil(this.cancelCtdtFormOptionsLoad$), takeUntil(this.destroy$)).subscribe({
+            next: ({ nganh, donvi, hedt }) => {
+                this.ctdtFormNganh = nganh.data || [];
+                this.ctdtFormDonVi = donvi.data || [];
+                this.ctdtFormHeDt = hedt || [];
+                this.ctdtFormLoading.set(false);
+            },
+            error: () => {
+                this.ctdtFormLoading.set(false);
+                this.notificationService.toastError('Không thể tải danh mục Khoa, Ngành và Hệ đào tạo', 'Lỗi kết nối');
+            }
+        });
+    }
+
+    onCtdtFormDonViChange(): void {
+        this.ctdtForm.controls.nganh_id.setValue(null);
+    }
+
+    get ctdtFormNganhByDonVi(): ElnChuyenMuc[] {
+        const categoryId = this.ctdtForm.controls.category_id.value;
+        return this.ctdtFormNganh.filter(nganh => Number(nganh.donvi_chuyenmon_id) === Number(categoryId));
+    }
+
+    get canSubmitCtdtForm(): boolean {
+        return !this.isSaving() && !this.ctdtFormLoading() && this.ctdtForm.valid
+            && this.ctdtFormNganhByDonVi.some(nganh => Number(nganh.id) === Number(this.ctdtForm.controls.nganh_id.value));
+    }
+
+    onCtdtKhoaKeyDown(event: KeyboardEvent): void {
+        if (event.ctrlKey || event.metaKey || /^[0-9]$/.test(event.key)
+            || ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
     }
 
     openCtdt(item: Ctdt): void {
@@ -634,7 +790,7 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
             return;
         }
         this.ctdtForm.markAllAsTouched();
-        if (this.ctdtForm.invalid) {
+        if (!this.canSubmitCtdtForm) {
             this.notificationService.toastWarning('Vui lòng kiểm tra lại các trường bắt buộc');
             return;
         }
@@ -643,6 +799,10 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
         const payload: Partial<Ctdt> = {
             ten: (value.ten || '').trim(),
             madt: (value.madt || '').trim(),
+            category_id: Number(value.category_id),
+            nganh_id: Number(value.nganh_id),
+            khoa_apdung: value.khoa_apdung ? Number(value.khoa_apdung) : null,
+            he_dt: value.he_dt || null,
             ctdt_bo_id: this.creatingForBo.id
         };
 

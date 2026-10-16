@@ -29,11 +29,12 @@
 
 .ctdt-header {
     position: relative;
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     flex: 0 0 64px;
     height: 64px;
     align-items: stretch;
-    gap: 12px;
+    gap: 0;
     padding: 0 18px;
     border-bottom: 1px solid var(--ctdt-header-border);
     background: var(--ctdt-header-bg);
@@ -42,14 +43,15 @@
 
 .ctdt-header__left {
     display: flex;
-    flex: 0 1 360px;
     min-width: 0;
     align-items: center;
     gap: 12px;
+    padding-right: 12px;
+    overflow: hidden;
 }
 
 .ctdt-header__right {
-    flex: 0 0 var(--ctdt-header-side);
+    min-width: 0;
 }
 
 .ctdt-program-name {
@@ -103,7 +105,6 @@
 /* Tabs sáng, có nền hover nhẹ và indicator xanh rõ ràng. */
 .ctdt-tabs {
     display: flex;
-    flex: 1 1 auto;
     min-width: 0;
     justify-content: center;
     overflow: hidden;
@@ -303,11 +304,22 @@
 }
 
 @media (max-width: 960px) {
+    .ctdt-header {
+        display: flex;
+        gap: 12px;
+    }
+
+    .ctdt-header__left {
+        flex: 0 1 360px;
+        padding-right: 0;
+    }
+
     .ctdt-header__right {
         display: none;
     }
 
     .ctdt-tabs {
+        flex: 1 1 auto;
         justify-content: flex-start;
     }
 
@@ -323,12 +335,14 @@
 
 @media (max-width: 560px) {
     .ctdt-header {
+        display: flex;
         gap: 8px;
         padding: 0 10px;
     }
 
     .ctdt-header__left {
-        flex-basis: min(260px, 42vw);
+        flex: 0 1 min(260px, 42vw);
+        padding-right: 0;
     }
 
     .ctdt-program-name {

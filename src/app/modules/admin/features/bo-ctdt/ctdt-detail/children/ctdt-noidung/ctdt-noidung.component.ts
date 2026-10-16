@@ -31,7 +31,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 
 type CourseConditionKey = 'hp_hoctruoc' | 'hp_tienquyet' | 'hp_songhanh';
-type CourseRow = ElnKhoaHoc & {
+type CourseRow = Pick<ElnKhoaHoc, 'id' | 'title' | 'maso'> & {
+    params?: Pick<NonNullable<ElnKhoaHoc['params']>, 'sotinchi' | 'sotinchi_th'>;
     ctdt_hocphan_id?: number;
     khoikienthuc?: string;
     hocky?: number;
@@ -42,6 +43,11 @@ type CourseRow = ElnKhoaHoc & {
 };
 
 type SubjectCourseOption = CatalogSubject & { course_id: number };
+type StagedCourseAddition = { subject: SubjectCourseOption; blockKey: string; course: CourseRow };
+type SubjectSyncOperation =
+    | { kind: 'add'; courseId: number; addition: StagedCourseAddition }
+    | { kind: 'delete'; courseId: number; linkId: number }
+    | { kind: 'update'; courseId: number; course: CourseRow };
 
 export interface typeCtdtHocphan {
     key: string;
@@ -84,8 +90,15 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
     list_course: CourseRow[] = [];
     selectedKhoiKienthuc: typeCtdtHocphan | null = null;
     list_subjects: SubjectCourseOption[] = [];
-    selectedSubjects = new Map<number, SubjectCourseOption>();
+    readonly selectedCourseIds = new Set<number>();
+    private readonly selectedSubjects = new Map<number, SubjectCourseOption>();
+    private readonly currentBlockLinks = new Map<number, number>();
+    private readonly initialDrawerCourseIds = new Set<number>();
     private readonly linkedCourseIds = new Set<number>();
+    private courseLinks: CtdtHocphan[] = [];
+    private readonly persistedCourseRows = new Map<number, CourseRow>();
+    private readonly stagedAdds = new Map<number, StagedCourseAddition>();
+    private readonly stagedDeletes = new Map<number, number>();
     private readonly dirtyCourseIds = new Set<number>();
     readonly subjectPaginator = new IctuPaginatorControl({ pageLinkSize: 5, rows: 20, showFirstLastIcon: true });
     private appliedSubjectSearch = '';
@@ -149,7 +162,11 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         this.loadedCtdtId = Number(ctdtId);
         this.list_course = [];
         this.list_cdt_hocphan = [];
+        this.courseLinks = [];
+        this.persistedCourseRows.clear();
         this.linkedCourseIds.clear();
+        this.stagedAdds.clear();
+        this.stagedDeletes.clear();
         this.dirtyCourseIds.clear();
         this.isLoadingData.set(true);
         this.courseLoadError = '';
@@ -225,28 +242,31 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         ).subscribe({
             next: ({ links, courses }) => {
                 if (this.selectedCtdt?.id !== ctdtId) return;
+                this.courseLinks = links;
                 const courseById = new Map(courses.map(course => [Number(course.id), course]));
                 const drafts = new Map(this.list_course.filter(c => this.dirtyCourseIds.has(c.id)).map(c => [c.id, c]));
-                this.list_course = links.map(link => {
+                const persistedRows: CourseRow[] = links.reduce<CourseRow[]>((rows, link) => {
                     const course = courseById.get(Number(link.course_id));
-                    if (!course) return null;
+                    if (!course) return rows;
                     const draft = drafts.get(course.id);
-                    if (draft) return draft;
-                    return {
-                        ...course,
-                        ctdt_hocphan_id: link.id,
-                        khoikienthuc: link.khoikienthuc,
-                        hocky: link.hocky ?? null,
-                        hp_hoctruoc: [...(link.hp_hoctruoc || [])],
-                        hp_tienquyet: [...(link.hp_tienquyet || [])],
-                        hp_songhanh: [...(link.hp_songhanh || [])]
-                    };
-                }).filter((course): course is CourseRow => course !== null);
+                    rows.push(draft
+                        ? { ...draft, ctdt_hocphan_id: link.id, khoikienthuc: link.khoikienthuc }
+                        : {
+                            ...course,
+                            ctdt_hocphan_id: link.id,
+                            khoikienthuc: link.khoikienthuc,
+                            hocky: link.hocky ?? null,
+                            hp_hoctruoc: [...(link.hp_hoctruoc || [])],
+                            hp_tienquyet: [...(link.hp_tienquyet || [])],
+                            hp_songhanh: [...(link.hp_songhanh || [])]
+                        });
+                    return rows;
+                }, []);
+                persistedRows.forEach(course => this.persistedCourseRows.set(Number(course.id), course));
                 this.linkedCourseIds.clear();
-                this.list_course.forEach(course => {
-                    this.linkedCourseIds.add(Number(course.id));
-                });
-                this.groupCourses();
+                links.forEach(link => this.linkedCourseIds.add(Number(link.course_id)));
+                this.reconcileStagedLinks();
+                this.applyStagedLinksToView();
                 this.isLoadingData.set(false);
             },
             error: () => {
@@ -300,7 +320,26 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         this.selectedKhoiKienthuc = block;
         this.searchCourse = '';
         this.appliedSubjectSearch = '';
+        this.selectedCourseIds.clear();
         this.selectedSubjects.clear();
+        this.currentBlockLinks.clear();
+        this.initialDrawerCourseIds.clear();
+        this.courseLinks
+            .filter(link => link.khoikienthuc === block.key)
+            .forEach(link => {
+                const courseId = Number(link.course_id);
+                const linkId = Number(link.id);
+                if (!Number.isInteger(courseId) || courseId <= 0 || !Number.isInteger(linkId) || linkId <= 0) return;
+                this.currentBlockLinks.set(courseId, linkId);
+                if (!this.stagedDeletes.has(courseId)) this.selectedCourseIds.add(courseId);
+            });
+        this.stagedAdds.forEach(({ subject, blockKey }) => {
+            if (blockKey === block.key) {
+                this.selectedCourseIds.add(Number(subject.course_id));
+                this.selectedSubjects.set(Number(subject.course_id), subject);
+            }
+        });
+        this.selectedCourseIds.forEach(courseId => this.initialDrawerCourseIds.add(courseId));
         this.createError = '';
         this.list_subjects = [];
         this.subjectPaginator.reset(0);
@@ -369,67 +408,129 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         this.cancelSubjects$.next();
         this.isLoadingSubjects.set(false);
         this.selectedKhoiKienthuc = null;
+        this.selectedCourseIds.clear();
         this.selectedSubjects.clear();
+        this.currentBlockLinks.clear();
+        this.initialDrawerCourseIds.clear();
     }
 
     isSubjectCreated(subject: SubjectCourseOption): boolean {
-        return this.linkedCourseIds.has(Number(subject.course_id));
+        const courseId = Number(subject.course_id);
+        const link = this.courseLinks.find(item => Number(item.course_id) === courseId);
+        if (link && link.khoikienthuc !== this.selectedKhoiKienthuc?.key) return true;
+        const staged = this.stagedAdds.get(courseId);
+        return Boolean(staged && staged.blockKey !== this.selectedKhoiKienthuc?.key);
+    }
+
+    isSubjectSelected(subject: SubjectCourseOption): boolean {
+        return this.selectedCourseIds.has(Number(subject.course_id));
     }
 
     toggleSubjectCheck(subject: SubjectCourseOption): void {
-        if (this.savingHp() || this.isSubjectCreated(subject)) return;
-        if (this.selectedSubjects.has(subject.id)) this.selectedSubjects.delete(subject.id);
-        else this.selectedSubjects.set(subject.id, subject);
+        if (this.savingHp() || this.isLoadingSubjects() || this.isSubjectCreated(subject)) return;
+        const courseId = Number(subject.course_id);
+        if (!Number.isInteger(courseId) || courseId <= 0) return;
+        if (this.selectedCourseIds.has(courseId)) this.selectedCourseIds.delete(courseId);
+        else this.selectedCourseIds.add(courseId);
+        this.selectedSubjects.set(courseId, subject);
+    }
+
+    hasSubjectChanges(): boolean {
+        return [...this.initialDrawerCourseIds].some(courseId => !this.selectedCourseIds.has(courseId))
+            || [...this.selectedCourseIds].some(courseId => !this.initialDrawerCourseIds.has(courseId));
     }
 
     saveCoursesFromSubjects(): void {
-        if (this.savingHp() || this.isLoadingSubjects() || !this.selectedCtdt?.id || !this.selectedKhoiKienthuc?.key) return;
-        const subjects = [...this.selectedSubjects.values()].filter(subject => !this.isSubjectCreated(subject));
-        if (!subjects.length) return;
-        if (subjects.some(subject => !Number.isInteger(Number(subject.course_id)) || Number(subject.course_id) <= 0)) {
+        if (this.savingHp() || this.isLoadingSubjects() || !this.selectedKhoiKienthuc?.key) return;
+        const blockKey = this.selectedKhoiKienthuc.key;
+        const additions = [...this.selectedCourseIds]
+            .filter(courseId => !this.currentBlockLinks.has(courseId))
+            .map(courseId => this.selectedSubjects.get(courseId));
+        if (additions.some(subject => !subject)) {
+            this.createError = 'Không thể xác định thông tin học phần đã chọn. Vui lòng tải lại danh mục và chọn lại.';
+            return;
+        }
+        const invalidSubject = additions.find(subject => !Number.isInteger(Number(subject.course_id)) || Number(subject.course_id) <= 0);
+        if (invalidSubject) {
             this.createError = 'Môn học chưa có course_id trong subject-courses. Vui lòng tạo course cho môn này trước.';
             return;
         }
-        const ctdt = { ...this.selectedCtdt };
-        const blockKey = this.selectedKhoiKienthuc.key;
-        let completed = 0;
-        let current: SubjectCourseOption = subjects[0];
-        this.savingHp.set(true);
-        this.createError = '';
-        this.progressValue = 0;
-
-        from(subjects).pipe(
-            concatMap(subject => {
-                current = subject;
-                this.savingTitle = `Đang thêm học phần ${completed + 1}/${subjects.length} vào CTĐT...`;
-                return this.ctdtHocphanService.addCtdtHocphan(this.buildCtdtHocphan(subject, ctdt, blockKey)).pipe(tap(() => {
-                    completed++;
-                    this.progressValue = Math.round(completed / subjects.length * 100);
-                    if (this.selectedCtdt?.id === ctdt.id) {
-                        this.linkedCourseIds.add(Number(subject.course_id));
-                        this.selectedSubjects.delete(subject.id);
-                    }
-                }));
-            }),
-            toArray(), takeUntil(this.destroy$), finalize(() => this.savingHp.set(false))
-        ).subscribe({
-            next: () => {
-                this.savingHp.set(false);
-                this.notificationService.toastSuccess(`Đã thêm ${completed} học phần vào CTĐT`);
-                this.closeDrawerChooseMonhoc();
-                if (this.selectedCtdt?.id === ctdt.id) this.loadCtdthocPhan();
-            },
-            error: error => {
-                this.savingHp.set(false);
-                const message = typeof error?.error?.message === 'string' ? error.error.message : error?.message || 'Vui lòng kiểm tra lại trước khi thử lại.';
-                this.createError = `Đã xử lý ${completed}/${subjects.length} học phần. Lỗi tại ${current.code} — ${current.name}: ${message}`;
-                this.notificationService.toastError(this.createError);
-                if (this.selectedCtdt?.id === ctdt.id) this.loadCtdthocPhan();
+        this.currentBlockLinks.forEach((linkId, courseId) => {
+            if (this.selectedCourseIds.has(courseId)) this.stagedDeletes.delete(courseId);
+            else this.stagedDeletes.set(courseId, linkId);
+        });
+        this.stagedAdds.forEach((addition, courseId) => {
+            if (addition.blockKey === blockKey && !this.selectedCourseIds.has(courseId)) {
+                this.stagedAdds.delete(courseId);
+                this.dirtyCourseIds.delete(courseId);
             }
+        });
+        this.selectedCourseIds.forEach(courseId => {
+            if (!this.currentBlockLinks.has(courseId)) {
+                const subject = this.selectedSubjects.get(courseId);
+                if (subject && !this.stagedAdds.has(courseId)) {
+                    this.stagedAdds.set(courseId, {
+                        subject,
+                        blockKey,
+                        course: this.buildDraftCourse(subject, blockKey)
+                    });
+                }
+            }
+        });
+        this.reconcileStagedLinks();
+        this.applyStagedLinksToView();
+        this.closeDrawerChooseMonhoc();
+    }
+
+    private reconcileStagedLinks(): void {
+        this.stagedDeletes.forEach((linkId, courseId) => {
+            if (!this.courseLinks.some(link => Number(link.id) === linkId && Number(link.course_id) === courseId)) {
+                this.stagedDeletes.delete(courseId);
+                this.dirtyCourseIds.delete(courseId);
+                this.persistedCourseRows.delete(courseId);
+            }
+        });
+        this.stagedAdds.forEach((_, courseId) => {
+            if (this.linkedCourseIds.has(courseId)) this.stagedAdds.delete(courseId);
+        });
+        const currentIds = new Set(this.courseLinks.map(link => Number(link.course_id)));
+        this.persistedCourseRows.forEach((_, courseId) => {
+            if (!currentIds.has(courseId)) this.persistedCourseRows.delete(courseId);
         });
     }
 
-    private buildCtdtHocphan(subject: SubjectCourseOption, ctdt: Ctdt, blockKey: string): Partial<CtdtHocphan> {
+    private buildDraftCourse(subject: SubjectCourseOption, blockKey: string): CourseRow {
+        return {
+            id: subject.course_id,
+            title: subject.name,
+            maso: subject.code,
+            khoikienthuc: blockKey,
+            hocky: null,
+            hp_hoctruoc: [],
+            hp_tienquyet: [],
+            hp_songhanh: [],
+            params: {
+                sotinchi: Number(subject.sotinchi) || 0,
+                sotinchi_th: Number(subject.sotinchi_th) || 0
+            }
+        };
+    }
+
+    private applyStagedLinksToView(): void {
+        this.list_course = [
+            ...[...this.persistedCourseRows.values()].filter(course => !this.stagedDeletes.has(Number(course.id))),
+            ...[...this.stagedAdds.entries()]
+                .filter(([courseId]) => !this.linkedCourseIds.has(courseId))
+                .map(([, addition]) => addition.course)
+        ];
+        this.groupCourses();
+    }
+
+    hasPendingChanges(): boolean {
+        return this.dirtyCourseIds.size > 0 || this.stagedAdds.size > 0 || this.stagedDeletes.size > 0;
+    }
+
+    private buildCtdtHocphan(subject: SubjectCourseOption, ctdt: Ctdt, blockKey: string, course?: CourseRow): Partial<CtdtHocphan> {
         return {
             ctdt_id: ctdt.id,
             course_id: subject.course_id,
@@ -437,6 +538,10 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
             khoikienthuc: blockKey,
             sotinchi: Number(subject.sotinchi) || 0,
             sotinchi_thuchanh: Number(subject.sotinchi_th) || 0,
+            hocky: course?.hocky ?? null,
+            hp_hoctruoc: course?.hp_hoctruoc || [],
+            hp_tienquyet: course?.hp_tienquyet || [],
+            hp_songhanh: course?.hp_songhanh || [],
             category_id: ctdt.category_id,
             status: 1,
             ordering: 100
@@ -450,35 +555,84 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
 
     saveCourseDetails(): void {
         if (this.savingHp() || this.isLoadingData()) return;
-        const courses = this.list_course.filter(course => this.dirtyCourseIds.has(course.id));
-        if (!courses.length) return;
-        if (courses.some(course => !course.ctdt_hocphan_id)) {
-            this.notificationService.toastWarning('Học phần chưa có liên kết CTĐT. Vui lòng thêm lại trước khi lưu học kỳ.');
+        const courses = this.list_course.filter(course => this.dirtyCourseIds.has(Number(course.id)) && course.ctdt_hocphan_id);
+        const additions = [...this.stagedAdds.entries()]
+            .filter(([courseId]) => !this.linkedCourseIds.has(courseId))
+            .map(([courseId, addition]) => ({ kind: 'add' as const, courseId, addition }));
+        const deletions = [...this.stagedDeletes.entries()]
+            .map(([courseId, linkId]) => ({ kind: 'delete' as const, courseId, linkId }));
+        if (!courses.length && !additions.length && !deletions.length) return;
+        if (this.list_course.some(course => this.dirtyCourseIds.has(Number(course.id))
+            && !course.ctdt_hocphan_id && !this.stagedAdds.has(Number(course.id)))) {
+            this.notificationService.toastWarning('Học phần chưa có liên kết CTĐT. Vui lòng tải lại trước khi lưu học kỳ.');
             return;
         }
-        if (courses.some(course => course.hocky != null && (!Number.isInteger(course.hocky) || course.hocky < 1))) {
+        if (this.list_course.some(course => course.hocky != null && (!Number.isInteger(course.hocky) || course.hocky < 1))) {
             this.notificationService.toastWarning('Học kỳ phải là số nguyên lớn hơn 0 hoặc để trống.');
             return;
         }
-        const ctdtId = this.selectedCtdt?.id;
+        const ctdt = this.selectedCtdt;
+        if (!ctdt?.id) return;
+        const operations: SubjectSyncOperation[] = [
+            ...deletions,
+            ...additions,
+            ...courses.map(course => ({ kind: 'update' as const, courseId: Number(course.id), course }))
+        ];
+        let completed = 0;
+        let current = operations[0];
         this.savingHp.set(true);
-        this.savingTitle = 'Đang lưu học kỳ và điều kiện vào học phần...';
-        from(courses).pipe(
-            concatMap(course => this.ctdtHocphanService.updateCtdtHocphan(course.ctdt_hocphan_id, {
-                hocky: course.hocky,
-                hp_hoctruoc: course.hp_hoctruoc || [],
-                hp_tienquyet: course.hp_tienquyet || [],
-                hp_songhanh: course.hp_songhanh || []
-            }).pipe(tap(() => this.dirtyCourseIds.delete(course.id)))),
+        this.savingTitle = 'Đang lưu thay đổi học phần...';
+        this.progressValue = 0;
+        from(operations).pipe(
+            concatMap(operation => {
+                current = operation;
+                this.savingTitle = operation.kind === 'delete'
+                    ? `Đang xóa liên kết ${completed + 1}/${operations.length}...`
+                    : operation.kind === 'add'
+                        ? `Đang thêm học phần ${completed + 1}/${operations.length}...`
+                        : `Đang cập nhật học phần ${completed + 1}/${operations.length}...`;
+                const request = operation.kind === 'delete'
+                    ? this.ctdtHocphanService.deleteCtdtHocphan(operation.linkId)
+                    : operation.kind === 'add'
+                        ? this.ctdtHocphanService.addCtdtHocphan(this.buildCtdtHocphan(operation.addition.subject, ctdt, operation.addition.blockKey, operation.addition.course))
+                        : this.ctdtHocphanService.updateCtdtHocphan(operation.course.ctdt_hocphan_id, {
+                            hocky: operation.course.hocky,
+                            hp_hoctruoc: operation.course.hp_hoctruoc || [],
+                            hp_tienquyet: operation.course.hp_tienquyet || [],
+                            hp_songhanh: operation.course.hp_songhanh || []
+                        });
+                return request.pipe(tap(() => {
+                    completed++;
+                    this.progressValue = Math.round(completed / operations.length * 100);
+                    if (operation.kind === 'delete') {
+                        this.stagedDeletes.delete(operation.courseId);
+                        this.dirtyCourseIds.delete(operation.courseId);
+                    } else if (operation.kind === 'add') {
+                        this.stagedAdds.delete(operation.courseId);
+                        this.dirtyCourseIds.delete(operation.courseId);
+                    } else {
+                        this.dirtyCourseIds.delete(operation.courseId);
+                    }
+                }));
+            }),
             toArray(), takeUntil(this.destroy$), finalize(() => this.savingHp.set(false))
         ).subscribe({
             next: () => {
+                this.stagedAdds.clear();
+                this.stagedDeletes.clear();
+                this.dirtyCourseIds.clear();
                 this.notificationService.toastSuccess('Lưu thay đổi thành công');
-                if (this.selectedCtdt?.id === ctdtId) this.loadCtdthocPhan();
+                if (this.selectedCtdt?.id === ctdt.id) this.loadCtdthocPhan();
             },
-            error: () => {
-                this.notificationService.toastError('Một số học phần chưa lưu được. Thay đổi chưa lưu được giữ lại để thử lại.');
-                this.loadCtdthocPhan();
+            error: error => {
+                const label = current.kind === 'delete'
+                    ? `liên kết #${current.linkId}`
+                    : current.kind === 'add'
+                        ? current.addition.subject.name
+                        : current.course.title;
+                const message = typeof error?.error?.message === 'string' ? error.error.message : error?.message || 'Vui lòng thử lại.';
+                this.notificationService.toastError(`Đã xử lý ${completed}/${operations.length}. Lỗi tại ${label}: ${message}`);
+                if (this.selectedCtdt?.id === ctdt.id) this.loadCtdthocPhan();
             }
         });
     }

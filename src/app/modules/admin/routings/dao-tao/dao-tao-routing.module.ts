@@ -23,6 +23,7 @@ const routes: Routes = [
     },
     {
         path: 'chuongtrinh-daotao',
+        
          loadComponent: () => import('@modules/admin/features/bo-ctdt/bo-ctdt-management.component').then(c => c.BoCtdtManagementComponent),
         // loadChildren: () => import('@modules/admin/features/chuongtrinh-daotao/ctdt.module').then(m => m.CtdtModule)
     },
@@ -33,13 +34,14 @@ const routes: Routes = [
     },
     {
         path: 'quanly-monhoc',
-        loadComponent: () => import('@modules/admin/features/subject-management/subject-management.component').then(c => c.SubjectManagementComponent),
-        //loadChildren: () => import('@modules/admin/features/quanly-monhoc/quanly-monhoc.module').then(m => m.QuanlyMonhocModule)
+        loadChildren: () => import('@modules/admin/features/quanly-monhoc/quanly-monhoc.module').then(m => m.QuanlyMonhocModule)
     },
     {
         path: 'kehoach-hoctap',
+        
+        loadComponent: () => import('@modules/admin/features/subject-management/subject-management.component').then(c => c.SubjectManagementComponent),
         // loadComponent: () => import('@modules/admin/features/quanly-kehoach-hoctap/quanly-kehoach-hoctap/quanly-kehoach-hoctap.component').then(c => c.QuanlyKehoachHoctapComponent),
-        loadComponent: () => import('@modules/admin/features/quanly-kehoach-hoctap/noidung-hoctap/noidung-hoctap.component').then(c => c.NoidungHoctapComponent),
+        // loadComponent: () => import('@modules/admin/features/quanly-kehoach-hoctap/noidung-hoctap/noidung-hoctap.component').then(c => c.NoidungHoctapComponent),
     },
     {
         path: 'kehoach-hoctap/chitiet-kehoach',

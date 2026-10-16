@@ -81,13 +81,13 @@ export class CtdtThongtinComponent implements OnChanges, OnDestroy {
             mota: [''],
             madt: ['', Validators.required],
             nganh_id: ['', Validators.required],
-            he_dt: [''],
+            he_dt: ['', Validators.required],
             danhhieu_totnghiep: [''],
             thoigian_daotao: [''],
             vitri_lamviec_sautotnghiep: [''],
             cohoihoctap_sautotnghiep: [''],
             category_id: ['', Validators.required],
-            khoa_apdung: ['']
+            khoa_apdung: ['', Validators.required]
         });
     }
 

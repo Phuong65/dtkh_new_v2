@@ -17,7 +17,7 @@
                 <header class="admin-wrap-table__head cauhinh-card__header">
                     <div class="cauhinh-card__title-wrap">
                         <span class="cauhinh-card__icon" aria-hidden="true">
-                            <i class="ti ti-settings"></i>
+                            <i [class]="configGroupIcon(parent.group)"></i>
                         </span>
                         <span class="admin-wrap-table__heading cauhinh-card__heading">{{ parent.title }}</span>
                         <span class="cauhinh-count-badge" aria-label="Số lượng cấu hình">
@@ -37,10 +37,11 @@
                 <div class="admin-wrap-table__body ictu-admin-table-shell__body">
                     <div class="ictu-admin-table-scroll cauhinh-table-responsive">
                         <p-table [reorderableColumns]="true" [value]="parent.ctdt_config"
+                            (onRowReorder)="onConfigRowReorder(parent, $event)"
                             styleClass="cauhinh-grid-table admin-table">
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th class="col-handle" aria-label="Kéo thả để sắp xếp"></th>
+                                    <!-- <th class="col-handle" aria-label="Kéo thả để sắp xếp"></th> -->
                                     <th class="col-order">Thứ tự</th>
                                     <th class="col-title">Tiêu đề</th>
                                     <th class="col-content">Nội dung (nếu có)</th>
@@ -50,13 +51,13 @@
 
                             <ng-template pTemplate="body" let-con let-rowIndex="rowIndex">
                                 <tr [pReorderableRow]="rowIndex" class="cauhinh-row">
-                                    <td class="col-handle cell-center">
-                                        <span class="cauhinh-drag-handle" pReorderableRowHandle
-                                            aria-label="Kéo thả đổi thứ tự" pTooltip="Kéo thả để đổi thứ tự"
+                                    <!-- <td class="col-handle cell-center">
+                                        <span class="p-datatable-reorderable-row-handle cauhinh-drag-handle" pReorderableRowHandle
+                                            role="button" tabindex="0" aria-label="Kéo thả đổi thứ tự" pTooltip="Kéo thả để đổi thứ tự"
                                             tooltipPosition="top" appendTo="body">
-                                            <i class="ti ti-menu-2" aria-hidden="true"></i>
-                                        </span>
-                                    </td>
+                                            <i class="ti ti-grip-vertical" aria-hidden="true"></i>
+                                        </span> 
+                                    </td>--> 
                                     <td class="col-order cell-center">
                                         <span class="cauhinh-order-badge">{{ con.ordering }}</span>
                                     </td>
