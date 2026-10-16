@@ -143,7 +143,7 @@ export class CourseManagementComponent {
         if (this.ctdtId() !== null) conditions.push({ conditionName: 'ctdt_id', condition: OvicQueryCondition.equal, value: String(this.ctdtId()), orWhere: 'and' });
         const option: ConditionOption = {
             condition: conditions,
-            set: [{ label: 'limit', value: String(this.table.paginator.rows()) }, { label: 'orderby', value: 'created_at' }, { label: 'order', value: 'DESC' }],
+            set: [{ label: 'limit', value: String(this.table.paginator.rows()) }, { label: 'orderby', value: 'name' }, { label: 'order', value: 'ASC' }],
             page: String(page)
         };
         this.courseService.getKhoaHocByPageNew_2(option).pipe(

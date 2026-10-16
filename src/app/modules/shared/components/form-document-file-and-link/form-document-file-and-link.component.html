@@ -49,12 +49,12 @@
     </div>
     <div class="row">
       <div (click)="openFileManager()" class="col-6" style="padding-right: 5px;">
-        <button mat-raised-button class="btn btn-success">
+        <button type="button" mat-raised-button class="btn btn-success">
           Chọn tệp tin
         </button>
       </div>
       <div (click)="openFormAdd(opTemplateAddLink,$event)" class="col-6" style="padding-left: 5px; ">
-        <button mat-raised-button class="btn btn-primary">
+        <button type="button" mat-raised-button class="btn btn-primary">
           Thêm link
         </button>
       </div>
@@ -136,7 +136,7 @@
 
           @if (!documentTypeLink.ordering) {
             <button
-              (click)="addLinkToList()"
+              type="button" (click)="addLinkToList()"
               style="width: auto"
               class="btn btn-primary">
               Thêm
@@ -145,7 +145,7 @@
 
           @if (documentTypeLink.ordering) {
             <button
-              (click)="opTemplateAddLink.hide()"
+              type="button" (click)="opTemplateAddLink.hide()"
               style="width: auto"
               class="btn btn-primary">
               Đóng

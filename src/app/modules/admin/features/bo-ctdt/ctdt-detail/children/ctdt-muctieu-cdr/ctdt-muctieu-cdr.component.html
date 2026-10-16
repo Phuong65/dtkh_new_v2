@@ -102,8 +102,9 @@
                                         @if (goal.tuongthich?.length) {
                                         <div class="goals-peo-tags">
                                             @for (key of goal.tuongthich; track $index) {
-                                            <span><i class="ti ti-link" aria-hidden="true"></i>{{
-                                                compatibilityTitle(key) }}</span>
+                                            <span [class]="'goals-peo-tag goals-peo-tag--' + compatibilityColorIndex(key)">
+                                                <i class="ti ti-link" aria-hidden="true"></i>{{ compatibilityTitle(key) }}
+                                            </span>
                                             }
                                         </div>
                                         } @else {

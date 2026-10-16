@@ -476,17 +476,26 @@
     gap: 4px;
 }
 
-.goals-peo-tags span {
+.goals-peo-tags .goals-peo-tag {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     padding: 3px 7px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--tag-border, #cbd5e1);
     border-radius: 999px;
-    background: #f1f5f9;
-    color: #475569;
+    background: var(--tag-bg, #f1f5f9);
+    color: var(--tag-ink, #475569);
     font-size: 11px;
 }
+
+.goals-peo-tag--0 { --tag-border: #2563eb; --tag-bg: #bfdbfe; --tag-ink: #172554; }
+.goals-peo-tag--1 { --tag-border: #059669; --tag-bg: #a7f3d0; --tag-ink: #064e3b; }
+.goals-peo-tag--2 { --tag-border: #7c3aed; --tag-bg: #ddd6fe; --tag-ink: #3b0764; }
+.goals-peo-tag--3 { --tag-border: #ea580c; --tag-bg: #fed7aa; --tag-ink: #7c2d12; }
+.goals-peo-tag--4 { --tag-border: #db2777; --tag-bg: #fbcfe8; --tag-ink: #831843; }
+.goals-peo-tag--5 { --tag-border: #0891b2; --tag-bg: #a5f3fc; --tag-ink: #164e63; }
+.goals-peo-tag--6 { --tag-border: #ca8a04; --tag-bg: #fde68a; --tag-ink: #713f12; }
+.goals-peo-tag--7 { --tag-border: #475569; --tag-bg: #cbd5e1; --tag-ink: #1e293b; }
 
 .goals-peo-empty {
     color: #94a3b8;

@@ -197,7 +197,11 @@ export class LoginTemplateIctuComponent implements OnInit, OnDestroy {
             return;
         }
         this.currentLoginButton = button;
-        if (button.name === 'signIn' && this.loginForm.valid) {
+        if (button.name === 'signIn' && this.loginForm.invalid) {
+            this.loginForm.markAllAsTouched();
+            return;
+        }
+        if (button.name === 'signIn') {
             const signInfo = {
                 username: this.loginForm.controls['username'].value,
                 password: this.loginForm.controls['password'].value
@@ -273,9 +277,11 @@ export class LoginTemplateIctuComponent implements OnInit, OnDestroy {
     }
 
     btnClickSendRequestPassword() {
-        if (this.resetPasswordForm.valid) {
-            this.resetPassword$.next(this.resetPasswordForm.controls['email'].value);
+        if (this.resetPasswordForm.invalid) {
+            this.resetPasswordForm.markAllAsTouched();
+            return;
         }
+        this.resetPassword$.next(this.resetPasswordForm.controls['email'].value);
     }
 
     requestResetPassword(email: string) {
@@ -323,6 +329,9 @@ export class LoginTemplateIctuComponent implements OnInit, OnDestroy {
     }
 
     btnSignInWithThirdPartyAccounts(source: SignInThirdPartyName): void {
+        if (this.isLoading || this.signInButton.isLoading) {
+            return;
+        }
         this.isLoading = true;
         this.signInWithThirdPartyObserver.next(source);
     }

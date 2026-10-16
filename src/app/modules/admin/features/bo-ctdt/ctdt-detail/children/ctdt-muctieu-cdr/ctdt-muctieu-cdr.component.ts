@@ -365,6 +365,12 @@ export class CtdtMuctieuCdrComponent implements OnInit, OnDestroy {
         return this.list_tuongthich.find(item => item.key === key)?.title || key;
     }
 
+    compatibilityColorIndex(key: string): number {
+        const index = this.list_tuongthich.findIndex(item => item.key === key);
+        if (index >= 0) return index % 8;
+        return [...key].reduce((hash, char) => hash + char.charCodeAt(0), 0) % 8;
+    }
+
     compatibilityTooltip(key: string): string {
         const item = this.list_tuongthich.find(config => config.key === key);
         const content = item?.noidung ? this.helperService.decodeHTML(item.noidung) : '';
