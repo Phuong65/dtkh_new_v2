@@ -25,11 +25,59 @@
     pointer-events: none;
 }
 
+.bo-ctdt-divider--collapsed {
+    display: none;
+}
+
+.bo-ctdt-panel-reopen {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    z-index: 4;
+    display: inline-flex;
+    width: 20px;
+    height: 72px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+    transform: translateY(-50%);
+    border: 0;
+    border-radius: 0 !important;
+    background: transparent;
+    color: #1d4ed8;
+    cursor: pointer;
+}
+
+.bo-ctdt-panel-reopen::before {
+    position: absolute;
+    inset: 0;
+    background: #cfe5ff;
+    clip-path: polygon(0 0, 100% 22%, 100% 78%, 0 100%);
+    content: '';
+}
+
+.bo-ctdt-panel-reopen i {
+    position: relative;
+    margin: 0 !important;
+    font-size: 14px;
+}
+
+.bo-ctdt-panel-reopen:hover::before,
+.bo-ctdt-panel-reopen:focus-visible::before {
+    background: #93c5fd;
+}
+
+.bo-ctdt-panel-reopen:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: -2px;
+}
+
 .bo-ctdt-master-card {
     display: flex;
     flex: 0 0 320px;
     min-width: 290px;
     max-width: 340px;
+    transition: flex-basis .2s ease, min-width .2s ease, max-width .2s ease;
     height: 100%;
     background: #ffffff;
     border: 1px solid #e2e8f0;
@@ -48,13 +96,42 @@
     background: #ffffff;
 }
 
+.bo-ctdt-master-content {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+}
+
 .bo-ctdt-panel-header {
     display: flex;
     align-items: center;
     height: 55px;
-    padding: 16px 16px 12px;
+    padding: 16px 12px 12px 16px;
     border-bottom: 1px solid #f1f5f9;
     gap: 10px;
+}
+
+.bo-ctdt-panel-header h1 {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.bo-ctdt-panel-toggle {
+    display: inline-flex !important;
+    flex: 0 0 auto;
+    width: 32px;
+    min-width: 32px !important;
+    height: 32px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+    cursor: pointer;
+}
+
+.bo-ctdt-panel-toggle:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
 }
 
 .bo-ctdt-panel-kicker {

@@ -5,12 +5,20 @@
     }
 
     <div class="bo-ctdt-master-detail ictu-admin-table-shell">
-        <div class="bo-ctdt-master-card">
+        <div class="bo-ctdt-master-card" [hidden]="masterPanelCollapsed()">
             <aside class="bo-ctdt-master" aria-labelledby="bo-ctdt-master-title">
                 <div class="bo-ctdt-panel-header">
                     <h1 id="bo-ctdt-master-title">Bộ chương trình đào tạo</h1>
+                    <button type="button" mat-flat-button
+                        class="btn ictu-badge-btn--secondary-reverse bo-ctdt-panel-toggle" (click)="toggleMasterPanel()"
+                        aria-label="Thu gọn danh sách bộ CTĐT" [attr.aria-expanded]="!masterPanelCollapsed()"
+                        aria-controls="bo-ctdt-master-content" pTooltip="Thu gọn danh sách bộ CTĐT"
+                        tooltipPosition="left">
+                        <i class="ti ti-chevrons-left" aria-hidden="true"></i>
+                    </button>
                 </div>
 
+                <div id="bo-ctdt-master-content" class="bo-ctdt-master-content" [hidden]="masterPanelCollapsed()">
                 <div class="bo-ctdt-master-search">
                     <input class="admin-wrap-table__head-actions__search" pInputText type="text"
                         placeholder="Tìm bộ CTĐT..." [value]="searchValue()" (input)="onSearchChange($event)"
@@ -63,10 +71,19 @@
                     <ictu-paginator [control]="boTable.paginator"
                         (onChangePage)="onBoPageChange($event)"></ictu-paginator>
                 </div>
+                </div>
             </aside>
         </div>
 
-        <div class="bo-ctdt-divider" aria-hidden="true"></div>
+        <div class="bo-ctdt-divider" [class.bo-ctdt-divider--collapsed]="masterPanelCollapsed()" aria-hidden="true"></div>
+
+        @if (masterPanelCollapsed()) {
+        <button type="button" class="bo-ctdt-panel-reopen" (click)="toggleMasterPanel()"
+            aria-label="Mở danh sách bộ CTĐT" aria-expanded="false" aria-controls="bo-ctdt-master-content"
+            pTooltip="Mở danh sách bộ CTĐT" tooltipPosition="right" appendTo="body">
+            <i class="ti ti-chevrons-right" aria-hidden="true"></i>
+        </button>
+        }
 
         <main class="bo-ctdt-detail" aria-labelledby="bo-ctdt-title">
             <div class="admin-wrap-table ictu-admin-table-shell bo-ctdt-detail-shell">

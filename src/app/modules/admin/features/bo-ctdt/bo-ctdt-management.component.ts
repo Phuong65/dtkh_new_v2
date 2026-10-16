@@ -92,6 +92,8 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     readonly destroy$ = new RxSubject<void>();
     readonly boTable = new IctuDataTable2<BoCtdt>({ rows: 20, pageLinkSize: 5 });
     readonly ctdtTable = new IctuDataTable2<Ctdt>({ rows: 10, pageLinkSize: 5 });
+    readonly masterPanelCollapsed = signal<boolean>(false);
+    toggleMasterPanel(): void { this.masterPanelCollapsed.update(collapsed => !collapsed); }
     readonly ctdtDisplayMeta = signal<Record<number, { khoa: string; nganh: string; heDaoTao: string; tongTinChi: number | null }>>({});
     readonly state = signal<AppState>('loading');
     readonly ctdtState = signal<AppState>('success');

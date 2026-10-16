@@ -6,7 +6,7 @@ export const url_servers = {
     host: ['h', 't', 't', 'p', 's', ':', '/', '/', 'a', 'p', 'i', '-', 'd', 'e', 'v', '.', 'i', 'c', 't', 'u', '.', 'v', 'n'],
     ws_url: ['w', 's', 's', ':', '/', '/', 'a', 'p', 'i', '-', 'd', 'e', 'v', '.', 'i', 'c', 't', 'u', '.', 'v', 'n'],
     pageTitle: '[LCMS] - Hệ thống quản lý học tập trực tuyến, Trường Đại học CNTT & TT',
-    X_APP_ID: '903F23F0-3CA2-4ECC-AD04-06AFF5381C50',//'0645451e-3396-41eb-8d02-ae39cb030cdd',
+    X_APP_ID:  '0645451e-3396-41eb-8d02-ae39cb030cdd', //'903F23F0-3CA2-4ECC-AD04-06AFF5381C50',
     localhost: '0645451e-3396-41eb-8d02-ae39cb030cdd',
     google_client_id: '973389896263-11sa03rtspsn2fap5uo160l3opa7n62t.apps.googleusercontent.com',
     ketServer_api: `https://apps.ictu.vn:9081/tracnghiem_ket/api/v1/`,
