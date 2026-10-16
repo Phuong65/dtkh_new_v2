@@ -707,9 +707,12 @@ export class FilesManagementNewComponent implements OnInit, OnChanges, AfterView
     }
 
     nodeSelect(event: TREE) {
-        if (!this.selectedFolder || this.selectedFolder.id !== event.id) {
-            this.selectedFolder = event;
-            this.auth.currentFolder = event;
+        const isSameFolder = this.selectedFolder?.id === event.id;
+        this.selectedFolder = event;
+        this.auth.currentFolder = event;
+
+        // Load the initial folder even when it is already cached as the current folder.
+        if (!isSameFolder || !this.file_list.length) {
             this.loadFileList(1);
         }
     }

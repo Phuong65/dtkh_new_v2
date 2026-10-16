@@ -532,7 +532,7 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
                 bo_ctdt_id: Number(bo.id),
                 subject_id: Number(subject.id),
                 title: subject.name,
-                maso: subject.code,
+                maso: `${bo.code}_${subject.code}`,
                 slug: this.helperService.slugVietnamese(subject.name),
                 desc: subject.desc || '',
                 status: 1,

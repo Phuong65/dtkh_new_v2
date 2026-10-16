@@ -340,6 +340,17 @@
     line-height: 1.5;
 }
 
+.ictu-login__forgot-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+}
+
+.ictu-login__forgot-row .ictu-login__forgot {
+    min-height: 32px;
+    padding: 0;
+}
+
 .ictu-login__forgot:hover {
     color: var(--login-primary-dark);
     text-decoration: underline;

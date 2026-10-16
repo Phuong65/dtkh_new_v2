@@ -56,7 +56,6 @@
                 <div class="ictu-form__row ictu-login__field">
                     <div class="ictu-login__field-label">
                         <label for="password">Mật khẩu <span aria-hidden="true">*</span></label>
-                        <button type="button" class="ictu-login__forgot" (click)="openResetPasswordPanel($event, resetPasswordPanel)">Quên mật khẩu?</button>
                     </div>
                     <div class="ictu-form__input-field ictu-login__control" [class.ictu-login__control--invalid]="f['password'].invalid && f['password'].touched">
                         <i class="pi pi-lock" aria-hidden="true"></i>
@@ -73,6 +72,10 @@
                     </div>
                     <p class="ictu-login__field-error" id="password-error" role="alert"
                         *ngIf="f['password'].invalid && f['password'].touched">Vui lòng nhập mật khẩu.</p>
+                    <div class="ictu-login__forgot-row">
+                        <button type="button" class="ictu-login__forgot"
+                            (click)="openResetPasswordPanel($event, resetPasswordPanel)">Quên mật khẩu?</button>
+                    </div>
                 </div>
 
                 <button class="ictu-login__submit" type="submit" [disabled]="signInButton.isLoading"

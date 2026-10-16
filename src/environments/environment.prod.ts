@@ -1,5 +1,5 @@
 
-import { url_servers } from './api-servers/lcms-ictu-2-1';
+import { url_servers } from './api-servers/lcms-ictu-new';
 const key = url_servers;
 export const environment = {
     production: true,
