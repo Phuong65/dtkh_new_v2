@@ -38,29 +38,37 @@
         </button>
     </div>
     } @else {
-    <div class="ictu-p-drawer__content__body clone-course__body">
-        <section class="ictu-form ictu-form--label-on-top clone-course__details" aria-label="Thông tin học phần nguồn">
-            <div class="ictu-form__row"><span class="ictu-form__label">Tên môn</span><span class="ictu-form__input-field">{{ courseClone?.title || '—' }}</span></div>
-            <div class="ictu-form__row"><span class="ictu-form__label">Mã môn</span><span class="ictu-form__input-field">{{ courseClone?.maso || '—' }}</span></div>
-            <div class="ictu-form__row"><span class="ictu-form__label">Số tín chỉ</span><span class="ictu-form__input-field">{{ courseClone?.params?.sotinchi ?? 0 }}</span></div>
-            <div class="ictu-form__row"><span class="ictu-form__label">Hình thức thi</span><span class="ictu-form__input-field">{{ courseClone?.params?.exam_format | showlabel : EXAMFORMAT : 'key' }}</span></div>
-            <div class="ictu-form__row"><span class="ictu-form__label">Yêu cầu CDR</span><span class="ictu-form__input-field">{{ courseClone?.params?.cdr | showlabel : CHUAN_DAU_RA }}</span></div>
-            <div class="ictu-form__row"><span class="ictu-form__label">Giảng viên phụ trách</span><span class="ictu-form__input-field">{{ courseClone?.['creator_plan_name'] || 'Chưa phân quyền' }}</span></div>
-            <div class="ictu-form__row"><span class="ictu-form__label">Trạng thái sao chép</span>
-                <ovic-groups-radio-v2 (onChange)="changeStatusCopy($event)" group_name="list_status" [columns]="2"
-                    [options]="list_status" optionId="id" optionLabel="label" [defaultValue]="selectStatus"></ovic-groups-radio-v2>
+    <div class="ictu-p-drawer__content__body clone-course__body clone-course__details-body">
+        <section class="clone-course__source-card" aria-label="Thông tin học phần nguồn">
+            <header class="clone-course__source-header">
+                <span class="clone-course__source-icon" aria-hidden="true"><i class="ti ti-book"></i></span>
+                <div><span class="clone-course__eyebrow">HỌC PHẦN NGUỒN</span><strong>{{ courseClone?.title || 'Chưa xác định' }}</strong></div>
+            </header>
+            <div class="ictu-form ictu-form--label-on-top clone-course__details">
+                <div class="ictu-form__row"><span class="ictu-form__label">Mã môn</span><span class="ictu-form__input-field">{{ courseClone?.maso || '—' }}</span></div>
+                <div class="ictu-form__row"><span class="ictu-form__label">Số tín chỉ</span><span class="ictu-form__input-field">{{ courseClone?.params?.sotinchi ?? 0 }}</span></div>
+                <div class="ictu-form__row"><span class="ictu-form__label">Hình thức thi</span><span class="ictu-form__input-field">{{ courseClone?.params?.exam_format ? (courseClone.params.exam_format | showlabel : EXAMFORMAT : 'key') : '—' }}</span></div>
+                <div class="ictu-form__row"><span class="ictu-form__label">Yêu cầu CDR</span><span class="ictu-form__input-field">{{ courseClone?.params?.cdr ? (courseClone.params.cdr | showlabel : CHUAN_DAU_RA) : '—' }}</span></div>
+                <div class="ictu-form__row"><span class="ictu-form__label">Giảng viên phụ trách</span><span class="ictu-form__input-field">{{ courseClone?.['creator_plan_name'] || 'Chưa phân quyền' }}</span></div>
             </div>
+        </section>
+        <section class="clone-course__status-card" aria-labelledby="clone-status-heading">
+            <div><span id="clone-status-heading" class="clone-course__section-title">Trạng thái sao chép</span><small>Chọn cách giữ trạng thái duyệt của nội dung nguồn.</small></div>
+            <ovic-groups-radio-v2 (onChange)="changeStatusCopy($event)" group_name="list_status" [columns]="2"
+                [options]="list_status" optionId="id" optionLabel="label" [defaultValue]="selectStatus"></ovic-groups-radio-v2>
         </section>
     </div>
     <div class="ictu-p-drawer__content__footer ictu-admin-drawer-footer clone-course__actions">
-        <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button"
+        <button type="button" mat-flat-button class="btn ictu-badge-btn--info-reverse ictu-admin-footer-button"
             (click)="startCloneCourse()"><i class="ti ti-copy" aria-hidden="true"></i>Sao chép nội dung</button>
-        <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button"
-            (click)="startCloneQuestion()"><i class="ti ti-copy" aria-hidden="true"></i>Sao chép câu hỏi TN</button>
-        @if (selectedCourse && courseClone && selectedCourse.params?.exam_format !== 'TRACNGHIEM' && courseClone.params?.exam_format !== 'TRACNGHIEM') {
-        <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button"
-            (click)="startCloneQuestionTh()"><i class="ti ti-copy" aria-hidden="true"></i>Sao chép câu hỏi - đề TH</button>
-        }
+        <button type="button" mat-flat-button class="btn ictu-badge-btn--warning-reverse ictu-admin-footer-button"
+            (click)="startCloneQuestion()"><i class="ti ti-file-text" aria-hidden="true"></i>Sao chép câu hỏi TN</button>
+        <button type="button" mat-flat-button class="btn ictu-badge-btn--teal-reverse ictu-admin-footer-button"
+            (click)="startCloneQuestionTh()"
+            [disabled]="selectedCourse?.params?.exam_format === 'TRACNGHIEM' || courseClone?.params?.exam_format === 'TRACNGHIEM'"
+            [attr.aria-label]="'Sao chép câu hỏi - đề thực hành'">
+            <i class="ti ti-file-code" aria-hidden="true"></i>Sao chép câu hỏi - đề TH
+        </button>
     </div>
     }
 </div>

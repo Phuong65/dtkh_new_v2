@@ -144,6 +144,8 @@
 .course-management-col-category { width: 180px; }
 .course-management-col-programme { width: 230px; }
 .course-management-col-actions { width: 150px; }
+.course-management-programmes { line-height: 1.45; }
+.course-management-programmes div + div { margin-top: 2px; padding-top: 2px; border-top: 1px solid #eef2f7; }
 
 .course-management-table td:nth-child(2) {
     white-space: nowrap;

@@ -966,6 +966,7 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
 
         this.formReset();
         this.selectedCauhoi = cauhoi;
+        this.formTitle = 'Sửa câu hỏi';
         this.f['desc'].setValue(cauhoi.desc);
         this.f['course_plan_activity_id'].setValue(cauhoi.course_plan_activity_id);
         this.f['note'].setValue(cauhoi.note);

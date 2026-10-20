@@ -33,6 +33,7 @@ import { Ctdt } from '@modules/shared/models/ctdt';
 import { ElnKhoaHoc, EXAMFORMAT } from '@modules/shared/models/elng-khoa-hoc';
 import { ConditionOption } from '@modules/shared/models/condition-option';
 import { CtdtService } from '@modules/shared/services/ctdt.service';
+import { CtdtHocphanService } from '@modules/shared/services/ctdt-hocphan.service';
 import { DonViService } from '@modules/shared/services/don-vi.service';
 import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
 
@@ -59,6 +60,7 @@ export class CourseManagementComponent {
     private readonly destroyRef = inject(DestroyRef);
     private readonly courseService = inject(ElnKhoaHocService);
     private readonly ctdtService = inject(CtdtService);
+    private readonly ctdtHocphanService = inject(CtdtHocphanService);
     private readonly donViService = inject(DonViService);
     private readonly auth = inject(AuthService);
     private readonly userService = inject(UserService);
@@ -79,6 +81,7 @@ export class CourseManagementComponent {
     readonly ctdtId = signal<number | null>(null);
     readonly categories = signal<DonVi[]>([]);
     readonly programmes = signal<Ctdt[]>([]);
+    readonly programmeIdsByCourseId = signal<Record<number, number[]>>({});
     readonly table = new IctuDataTable2<CourseRow>({ rows: 20, pageLinkSize: 5 });
     readonly cloneDrawerVisible = signal(false);
     readonly selectedCourse = signal<CourseRow | null>(null);
@@ -149,9 +152,8 @@ export class CourseManagementComponent {
         this.courseService.getKhoaHocByPageNew_2(option).pipe(
             switchMap(response => {
                 const courses = (response.data || []) as CourseRow[];
+                const courseIds = courses.map(course => Number(course.id)).filter(id => Number.isInteger(id) && id > 0);
                 const teacherIds = [...new Set(courses.map(course => course.creator_plan_id).filter((id): id is number => Number.isFinite(id)))];
-                if (!teacherIds.length) return of({ response, users: [] as User[] });
-
                 const teacherOption: ConditionOption = {
                     condition: [],
                     set: [
@@ -161,19 +163,46 @@ export class CourseManagementComponent {
                     ],
                     page: null
                 };
-                return this.userService.getUserByPageNew(teacherOption).pipe(
-                    map(({ data: users }) => ({ response, users })),
-                    catchError(() => {
-                        this.notificationService.toastWarning('Không thể tải tên giảng viên phụ trách');
-                        return of({ response, users: [] as User[] });
-                    })
-                );
+                const linkOption: ConditionOption = {
+                    condition: [],
+                    set: [
+                        { label: 'include', value: courseIds.join(',') },
+                        { label: 'include_by', value: 'course_id' },
+                        { label: 'limit', value: '-1' }
+                    ],
+                    page: null
+                };
+                return forkJoin({
+                    users: teacherIds.length ? this.userService.getUserByPageNew(teacherOption).pipe(
+                        map(result => result.data || []),
+                        catchError(() => {
+                            this.notificationService.toastWarning('Không thể tải tên giảng viên phụ trách');
+                            return of([] as User[]);
+                        })
+                    ) : of([] as User[]),
+                    links: courseIds.length ? this.ctdtHocphanService.getCtdtHocphanByPageNew(linkOption).pipe(
+                        map(result => result.data || []),
+                        catchError(() => {
+                            this.notificationService.toastWarning('Không thể tải chương trình đào tạo của học phần');
+                            return of([]);
+                        })
+                    ) : of([])
+                }).pipe(map(({ users, links }) => ({ response, users, links })));
             }),
             takeUntilDestroyed(this.destroyRef)
         ).subscribe({
-            next: ({ response, users }) => {
+            next: ({ response, users, links }) => {
                 if (requestId !== this.requestId) return;
                 const teacherNames = new Map(users.map(user => [user.id, user.display_name]));
+                const programmeIds: Record<number, number[]> = {};
+                links.forEach(link => {
+                    const courseId = Number(link.course_id);
+                    const programmeId = Number(link.ctdt_id);
+                    if (!Number.isInteger(courseId) || courseId <= 0 || !Number.isInteger(programmeId) || programmeId <= 0) return;
+                    const ids = programmeIds[courseId] ?? (programmeIds[courseId] = []);
+                    if (!ids.includes(programmeId)) ids.push(programmeId);
+                });
+                this.programmeIdsByCourseId.set(programmeIds);
                 const courses = (response.data || []) as CourseRow[];
                 courses.forEach(course => {
                     course.teacherName = teacherNames.get(course.creator_plan_id) || 'Chưa phân quyền';
@@ -385,8 +414,13 @@ export class CourseManagementComponent {
         return this.categories().find(item => item.id === id)?.title || '—';
     }
 
-    programmeName(id: number): string {
-        return this.programmes().find(item => item.id === id)?.ten || '—';
+    programmeNames(course: CourseRow): string[] {
+        const linkedIds = this.programmeIdsByCourseId()[Number(course.id)];
+        const programmeIds = linkedIds?.length ? linkedIds : [Number(course.ctdt_id)].filter(Number.isInteger);
+        const names = programmeIds
+            .map(id => this.programmes().find(item => Number(item.id) === id)?.ten)
+            .filter((name): name is string => Boolean(name));
+        return names.length ? names : ['—'];
     }
 
     filteredProgrammes(): Ctdt[] {

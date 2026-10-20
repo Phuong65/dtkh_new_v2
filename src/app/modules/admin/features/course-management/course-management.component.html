@@ -1,4 +1,8 @@
 <section class="admin-section--table ictu-admin-page course-management-page" aria-labelledby="course-management-title">
+    @if (downloadingCourseId() !== null) {
+    <app-loading-progress [heading]="downloadMessage() || 'Đang tải tài liệu giảng dạy...'"
+        backdropFilter="blur(2px)"></app-loading-progress>
+    }
     @if (state() === 'loading') {
     <app-loading-progress heading="Đang tải danh sách học phần..." backdropFilter="none"></app-loading-progress>
     }
@@ -35,14 +39,6 @@
         </div>
         }
 
-        @if (downloadingCourseId() !== null) {
-        <div class="course-management-download-status" role="status" aria-live="polite">
-            <span>{{ downloadMessage() }}</span>
-            <progress [value]="downloadProgress()" max="100" aria-label="Tiến độ tải tài liệu giảng dạy"></progress>
-            <span>{{ downloadProgress() | number:'1.0-0' }}%</span>
-        </div>
-        }
-
         <div class="admin-wrap-table__body ictu-admin-table-shell__body">
             <div class="ictu-admin-table-scroll course-management-table-scroll">
                 <table class="tbl admin-table course-management-table">
@@ -72,7 +68,11 @@
                             <td class="text-center">{{ course.params?.sotinchi || 0 }}</td>
                             <td class="text-center">{{ course.params?.sotinchi_th || 0 }}</td>
                             <td class="text-center">{{ categoryName(course.category_ids) }}</td>
-                            <td class="text-center">{{ programmeName(course.ctdt_id) }}</td>
+                            <td class="text-left course-management-programmes">
+                                @for (programmeName of programmeNames(course); track programmeName) {
+                                <div>{{ programmeName }}</div>
+                                }
+                            </td>
                             <td class="text-center course-management-actions">
                                 @if (canDownload) {
                                 <button type="button" class="btn ictu-button-success-light ictu-admin-icon-button"
