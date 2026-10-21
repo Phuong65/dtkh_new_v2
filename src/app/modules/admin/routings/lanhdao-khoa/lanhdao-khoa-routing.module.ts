@@ -13,7 +13,7 @@ const routes: Routes = [
     },
     {
         path: 'chuongtrinh-daotao',
-        loadChildren: () => import('@modules/admin/features/chuongtrinh-daotao/ctdt.module').then(m => m.CtdtModule)
+        loadComponent: () => import('@modules/admin/features/bo-ctdt/bo-ctdt-management.component').then(c => c.BoCtdtManagementComponent),
     },
     {
         path: 'kehoach-hoctap',

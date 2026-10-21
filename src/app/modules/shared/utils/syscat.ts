@@ -691,6 +691,7 @@ export const ROLES = {
     giangvien: "teacher",
     trogiang: "supporter",
     chuyenvien_pdt: "daotao_ld",
+    daotao_new: "daotao_new",
     kiemduyet_hoidong: "kd_hoidong",
     kiemduyet_uyvien: "kd_uyvien",
     phanquyen_taokehoach: "lapkehoach_quyen",

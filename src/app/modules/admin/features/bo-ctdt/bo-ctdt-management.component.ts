@@ -23,8 +23,10 @@ import { HeDt } from '@modules/shared/models/he-dt';
 import { ElnChuyenMucService } from '@modules/shared/services/elearning-chuyen-muc.service';
 import { DonViService } from '@modules/shared/services/don-vi.service';
 import { HeDtService } from '@modules/shared/services/he-dt.service';
+import { ElngUserProfileService } from '@modules/shared/services/elearning-user-profile.service';
 import { CtdtHocphanService } from '@modules/shared/services/ctdt-hocphan.service';
 import { Select } from 'primeng/select';
+import { MultiSelectModule } from 'primeng/multiselect';
 import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
 import { HelperService } from '@core/services/helper.service';
 import { BoCtdt } from '@modules/shared/models/bo-ctdt';
@@ -36,6 +38,7 @@ import { SubjectCourseService } from '@modules/shared/services/subject-course.se
 import { Subject } from '@modules/shared/models/subject';
 import { SubjectCourseExtend } from '@modules/shared/models/subject-course';
 import { IctuPaginatorControl } from '@core-new/components/ictu-paginator/ictu-paginator-control';
+import { ROUTERS } from '@modules/shared/utils/syscat';
 
 @Component({
     selector: 'app-bo-ctdt-management',
@@ -49,7 +52,8 @@ import { IctuPaginatorControl } from '@core-new/components/ictu-paginator/ictu-p
         IctuPaginatorComponent,
         LoadingProgressComponent,
         MatButton,
-        Select
+        Select,
+        MultiSelectModule
     ],
     templateUrl: './bo-ctdt-management.component.html',
     styleUrl: './bo-ctdt-management.component.css'
@@ -58,6 +62,7 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     private readonly fb = inject(FormBuilder);
     private readonly boCtdtService = inject(BoCtdtService);
     private readonly ctdtService = inject(CtdtService);
+    private readonly userProfileService = inject(ElngUserProfileService);
     private readonly donViService = inject(DonViService);
     private readonly nganhService = inject(ElnChuyenMucService);
     private readonly heDtService = inject(HeDtService);
@@ -79,8 +84,14 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     private readonly cancelCtdtMetaLoad$ = new RxSubject<void>();
     private readonly cancelCtdtFormOptionsLoad$ = new RxSubject<void>();
     private readonly cancelBoLoad$ = new RxSubject<void>();
+    private readonly cancelProfileLoad$ = new RxSubject<void>();
+    private readonly cancelBoFormLoad$ = new RxSubject<void>();
+    readonly boFormLoading = signal<boolean>(false);
+    readonly boFormLoadError = signal<boolean>(false);
+    boFormDonVi: DonVi[] = [];
     readonly ctdtFormLoading = signal<boolean>(false);
     ctdtFormDonVi: DonVi[] = [];
+    ctdtFormDonViOptions: DonVi[] = [];
     ctdtFormNganh: ElnChuyenMuc[] = [];
     ctdtFormNganhOptions: ElnChuyenMuc[] = [];
     ctdtFormHeDt: HeDt[] = [];
@@ -100,6 +111,8 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     readonly isSaving = signal<boolean>(false);
     readonly searchValue = signal<string>('');
     readonly selectedBo = signal<BoCtdt | null>(null);
+    private readonly isFacultyRoute = this.auth.hasRouter(ROUTERS.lanhdao_khoa) && !this.auth.hasRouter(ROUTERS.daotao);
+    private facultyCategoryId: number | null = null;
     readonly ctdtSearchValue = signal<string>('');
     readonly subjectDrawerBo = signal<BoCtdt | null>(null);
     readonly subjectRelations = signal<SubjectCourseExtend[]>([]);
@@ -117,6 +130,7 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     canAdd = true;
     canUpdate = true;
     canDelete = true;
+    canSelectSubjects = true;
     canAddCtdt = false;
     canDeleteCtdt = true;
     ctdtDrawerVisible = false;
@@ -134,7 +148,8 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
 
     readonly boCtdtForm: FormGroup = this.fb.group({
         name: ['', [Validators.required, Validators.maxLength(255)]],
-        code: ['', [Validators.required, Validators.maxLength(50)]]
+        code: ['', [Validators.required, Validators.maxLength(50)]],
+        category_ids: [[], Validators.required]
     });
 
     readonly formControl = new IctuFormControl2<BoCtdt>({
@@ -169,6 +184,10 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
         this.cancelCtdtFormOptionsLoad$.complete();
         this.cancelBoLoad$.next();
         this.cancelBoLoad$.complete();
+        this.cancelProfileLoad$.next();
+        this.cancelProfileLoad$.complete();
+        this.cancelBoFormLoad$.next();
+        this.cancelBoFormLoad$.complete();
         this.cancelSubjectLoad$.next();
         this.cancelSubjectLoad$.complete();
         this.cancelRelationLoad$.next();
@@ -185,8 +204,14 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
             this.canAddCtdt = this.canAdd || this.auth.userCanAdd('chuongtrinh-daotao');
         }
         if (this.auth?.userCanEdit) this.canUpdate = this.auth.userCanEdit(routePath) || this.auth.userCanEdit('bo-ctdt');
+        this.canSelectSubjects = this.isFacultyRoute || this.canUpdate;
         if (this.auth?.userCanDelete) this.canDelete = this.auth.userCanDelete(routePath) || this.auth.userCanDelete('bo-ctdt');
         if (this.auth?.userCanDelete) this.canDeleteCtdt = this.canDelete || this.auth.userCanDelete('chuongtrinh-daotao');
+        if (this.isFacultyRoute) {
+            this.canAdd = false;
+            this.canUpdate = false;
+            this.canDelete = false;
+        }
     }
 
     emitEvent(name: DataTableEventName, data: BoCtdt = null): void {
@@ -263,9 +288,48 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
         else this.loadSubjects(this.requestedSubjectPage);
     }
 
+    private loadFacultyProfile(page: number, resetPaginator: boolean): void {
+        const condition: ConditionOption = {
+            condition: [{ conditionName: 'user_id', condition: OvicQueryCondition.equal, value: String(this.auth.user?.id), orWhere: 'and' }],
+            set: [{ label: 'limit', value: '1' }], page: null
+        };
+        this.state.set('loading');
+        this.cancelProfileLoad$.next();
+        this.userProfileService.getUserProfileByPageNewV2(condition).pipe(
+            takeUntil(this.cancelProfileLoad$), takeUntil(this.destroy$)
+        ).subscribe({
+            next: response => {
+                const categoryId = Number(response.data?.[0]?.donvi_chuyenmon_id);
+                if (!Number.isInteger(categoryId) || categoryId <= 0) {
+                    this.state.set('error');
+                    this.notificationService.toastWarning('Tài khoản chưa được phân vào Khoa. Vui lòng liên hệ Phòng Đào tạo.');
+                    return;
+                }
+                this.facultyCategoryId = categoryId;
+                this.loadBoCtdt(page, resetPaginator);
+            },
+            error: () => {
+                this.state.set('error');
+                this.notificationService.toastError('Không thể tải thông tin Khoa của tài khoản', 'Lỗi kết nối');
+            }
+        });
+    }
+
     loadBoCtdt(page = 1, resetPaginator = false): void {
+        if (this.isFacultyRoute && !this.facultyCategoryId) {
+            this.loadFacultyProfile(page, resetPaginator);
+            return;
+        }
         this.state.set('loading');
         const conditions: OvicConditionParam[] = [];
+        if (this.isFacultyRoute) {
+            conditions.push({
+                conditionName: 'category_ids',
+                condition: OvicQueryCondition.like,
+                value: `%${this.facultyCategoryId}%`,
+                orWhere: 'and'
+            });
+        }
         const query = this.searchValue();
         if (query) {
             conditions.push({ conditionName: 'name', condition: OvicQueryCondition.like, value: `%${query}%`, orWhere: 'or' });
@@ -282,8 +346,9 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
                 this.boTable.fillRawData({ data: rows, recordsFiltered: total, recordsTotal: total, draw: 1 }, { paged: page, resetPaginator });
                 this.state.set('success');
                 const current = this.selectedBo();
-                const next = current && rows.some((item: BoCtdt) => item.id === current.id) ? current : rows[0] || null;
-                if (this.selectedBo()?.id === next?.id) {
+                const next = current ? rows.find((item: BoCtdt) => item.id === current.id) || rows[0] || null : rows[0] || null;
+                if (current?.id === next?.id) {
+                    this.selectedBo.set(next);
                     this.loadCtdt(1, true);
                 } else {
                     this.selectBo(next);
@@ -304,6 +369,15 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     }
 
     loadCtdt(page = 1, resetPaginator = false): void {
+        if (this.isFacultyRoute && !this.facultyCategoryId) {
+            this.cancelCtdtLoad$.next();
+            this.cancelCtdtMetaLoad$.next();
+            this.ctdtDisplayMeta.set({});
+            this.ctdtTable.fillRawData({ data: [], recordsFiltered: 0, recordsTotal: 0, draw: 1 }, { paged: 1, resetPaginator: true });
+            this.ctdtState.set('error');
+            this.loadFacultyProfile(1, true);
+            return;
+        }
         const bo = this.selectedBo();
         if (!bo) {
             this.cancelCtdtLoad$.next();
@@ -320,6 +394,9 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
         const conditions: OvicConditionParam[] = [
             { conditionName: 'ctdt_bo_id', condition: OvicQueryCondition.equal, value: String(bo.id), orWhere: 'and' }
         ];
+        if (this.isFacultyRoute) {
+            conditions.push({ conditionName: 'category_id', condition: OvicQueryCondition.equal, value: String(this.facultyCategoryId), orWhere: 'and' });
+        }
         const query = this.ctdtSearchValue();
         if (query) {
             conditions.push({ conditionName: 'ten', condition: OvicQueryCondition.like, value: `%${query}%`, orWhere: 'and' });
@@ -417,7 +494,7 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
 
     openSubjectDrawer(bo: BoCtdt, event?: Event): void {
         event?.stopPropagation();
-        if (!this.canUpdate) {
+        if (!this.canSelectSubjects) {
             this.notificationService.toastWarning('Bạn không có quyền cập nhật học phần của bộ chương trình đào tạo');
             return;
         }
@@ -694,13 +771,52 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
         this.isLoadingSubjectRelations.set(false);
     }
 
+    private normalizeCategoryIds(value: number[] | string | null | undefined): number[] {
+        const ids: (number | string)[] = Array.isArray(value) ? value : typeof value === 'string' ? value.split(',') : [];
+        return [...new Set(ids.map(id => Number(id)).filter(id => Number.isInteger(id) && id > 0))];
+    }
+
+    private loadBoFormDonVi(): void {
+        if (this.boFormDonVi.length) return;
+        const condition: ConditionOption = {
+            condition: [
+                { conditionName: 'status', condition: OvicQueryCondition.greaterThan, value: '0', orWhere: 'and' },
+                { conditionName: 'parent_id', condition: OvicQueryCondition.equal, value: String(this.auth.user?.donvi_id), orWhere: 'and' }
+            ],
+            set: [{ label: 'limit', value: '-1' }, { label: 'order', value: 'ASC' }, { label: 'orderby', value: 'title' }],
+            page: null
+        };
+        this.boFormLoading.set(true);
+        this.boFormLoadError.set(false);
+        this.cancelBoFormLoad$.next();
+        this.donViService.getDonviByPageNew(condition).pipe(
+            takeUntil(this.cancelBoFormLoad$), takeUntil(this.destroy$)
+        ).subscribe({
+            next: response => {
+                this.boFormDonVi = response.data || [];
+                this.boFormLoading.set(false);
+            },
+            error: () => {
+                this.boFormLoading.set(false);
+                this.boFormLoadError.set(true);
+                this.notificationService.toastError('Không thể tải danh mục Khoa', 'Lỗi kết nối');
+            }
+        });
+    }
+
+    retryBoFormDonVi(): void {
+        this.boFormDonVi = [];
+        this.loadBoFormDonVi();
+    }
+
     openCreateDrawer(): void {
         if (!this.canAdd) {
             this.notificationService.toastWarning('Bạn không có quyền thêm mới bộ chương trình đào tạo');
             return;
         }
-        this.boCtdtForm.reset({ name: '', code: '' });
+        this.boCtdtForm.reset({ name: '', code: '', category_ids: [] });
         this.formControl.openFormAdd();
+        this.loadBoFormDonVi();
     }
 
     openEditDrawer(item: BoCtdt): void {
@@ -708,8 +824,9 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
             this.notificationService.toastWarning('Bạn không có quyền chỉnh sửa bộ chương trình đào tạo');
             return;
         }
-        this.boCtdtForm.reset({ name: item.name || '', code: item.code || '' });
+        this.boCtdtForm.reset({ name: item.name || '', code: item.code || '', category_ids: this.normalizeCategoryIds(item.category_ids) });
         this.formControl.openFormEdit(item);
+        this.loadBoFormDonVi();
     }
 
     openCreateCtdt(): void {
@@ -722,8 +839,14 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
             this.notificationService.toastWarning('Bạn không có quyền thêm mới chương trình đào tạo');
             return;
         }
+        const categoryIds = this.normalizeCategoryIds(bo.category_ids);
+        if (!categoryIds.length) {
+            this.notificationService.toastWarning('Bộ CTĐT chưa được áp dụng cho Khoa nào.');
+            return;
+        }
         this.creatingForBo = bo;
-        this.ctdtForm.reset({ ten: '', madt: '', category_id: null, nganh_id: null, khoa_apdung: '', he_dt: null });
+        this.ctdtForm.reset({ ten: '', madt: '', category_id: categoryIds.length === 1 ? categoryIds[0] : null, nganh_id: null, khoa_apdung: '', he_dt: null });
+        this.ctdtFormDonViOptions = [];
         this.ctdtFormNganhOptions = [];
         this.ctdtDrawerVisible = true;
         this.loadCtdtFormOptions();
@@ -752,6 +875,8 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
             next: ({ nganh, donvi, hedt }) => {
                 this.ctdtFormNganh = nganh.data || [];
                 this.ctdtFormDonVi = donvi.data || [];
+                const categoryIds = this.normalizeCategoryIds(this.creatingForBo?.category_ids);
+                this.ctdtFormDonViOptions = this.ctdtFormDonVi.filter(unit => categoryIds.includes(Number(unit.id)));
                 this.ctdtFormHeDt = hedt || [];
                 this.updateCtdtFormNganhOptions();
                 this.ctdtFormLoading.set(false);
@@ -765,7 +890,7 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
 
     private updateCtdtFormNganhOptions(): void {
         const categoryId = this.ctdtForm.controls.category_id.value;
-        this.ctdtFormNganhOptions = categoryId
+        this.ctdtFormNganhOptions = categoryId && this.ctdtFormDonViOptions.some(unit => Number(unit.id) === Number(categoryId))
             ? this.ctdtFormNganh.filter(nganh => Number(nganh.donvi_chuyenmon_id) === Number(categoryId))
             : [];
     }
@@ -776,7 +901,9 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     }
 
     get canSubmitCtdtForm(): boolean {
+        const categoryId = Number(this.ctdtForm.controls.category_id.value);
         return !this.isSaving() && !this.ctdtFormLoading() && this.ctdtForm.valid
+            && this.ctdtFormDonViOptions.some(unit => Number(unit.id) === categoryId)
             && this.ctdtFormNganhOptions.some(nganh => Number(nganh.id) === Number(this.ctdtForm.controls.nganh_id.value));
     }
 
@@ -865,12 +992,17 @@ export class BoCtdtManagementComponent implements OnInit, OnDestroy {
     submitForm(): void {
         if (this.formControl.state() === 'SUBMITTING' || this.isSaving()) return;
         this.boCtdtForm.markAllAsTouched();
-        if (this.boCtdtForm.invalid) {
+        const value = this.boCtdtForm.getRawValue();
+        const categoryIds = this.normalizeCategoryIds(value.category_ids);
+        if (this.boFormLoading() || this.boFormLoadError() || this.boCtdtForm.invalid || !categoryIds.length) {
             this.notificationService.toastWarning('Vui lòng kiểm tra lại các trường bắt buộc');
             return;
         }
-        const value = this.boCtdtForm.getRawValue();
-        const payload: Partial<BoCtdt> = { name: (value.name || '').trim(), code: (value.code || '').trim() };
+        const payload: Partial<BoCtdt> = {
+            name: (value.name || '').trim(),
+            code: (value.code || '').trim(),
+            category_ids: categoryIds
+        };
         const isAdd = this.formControl.isFormAdd;
         const request$ = isAdd ? this.boCtdtService.create(payload) : this.boCtdtService.update(this.formControl.object.id, payload);
         this.isSaving.set(true);

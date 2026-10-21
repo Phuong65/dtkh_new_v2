@@ -4,4 +4,5 @@ export interface BoCtdt extends BaseModel {
     id: number;
     name: string;
     code: string;
+    category_ids: number[];
 }

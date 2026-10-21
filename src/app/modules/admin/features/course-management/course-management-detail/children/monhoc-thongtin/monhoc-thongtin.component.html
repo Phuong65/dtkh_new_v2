@@ -12,39 +12,6 @@
             [attr.inert]="isSaving() ? '' : null" novalidate>
             <div class="mh-workspace">
                 <div class="mh-main">
-                    <nav class="mh-section-nav" aria-label="Điều hướng biểu mẫu học phần">
-                        <button type="button" [class.is-active]="activeSection === 'sec-info'"
-                            [attr.aria-current]="activeSection === 'sec-info' ? 'location' : null"
-                            aria-controls="sec-info" (click)="scrollToSection('sec-info')">
-                            <i class="ti ti-id" aria-hidden="true"></i><span>Thông tin cơ bản</span>
-                        </button>
-                        <button type="button" [class.is-active]="activeSection === 'sec-ctdt'"
-                            [attr.aria-current]="activeSection === 'sec-ctdt' ? 'location' : null"
-                            aria-controls="sec-ctdt" (click)="scrollToSection('sec-ctdt')">
-                            <i class="ti ti-sitemap" aria-hidden="true"></i><span>Chương trình đào tạo</span>
-                        </button>
-                        <button type="button" [class.is-active]="activeSection === 'sec-time'"
-                            [attr.aria-current]="activeSection === 'sec-time' ? 'location' : null"
-                            aria-controls="sec-time" (click)="scrollToSection('sec-time')">
-                            <i class="ti ti-clock" aria-hidden="true"></i><span>Khối lượng học tập</span>
-                        </button>
-                        <button type="button" [class.is-active]="activeSection === 'sec-eval'"
-                            [attr.aria-current]="activeSection === 'sec-eval' ? 'location' : null"
-                            aria-controls="sec-eval" (click)="scrollToSection('sec-eval')">
-                            <i class="ti ti-clipboard-check" aria-hidden="true"></i><span>Đánh giá & CĐR</span>
-                        </button>
-                        <button type="button" [class.is-active]="activeSection === 'sec-desc'"
-                            [attr.aria-current]="activeSection === 'sec-desc' ? 'location' : null"
-                            aria-controls="sec-desc" (click)="scrollToSection('sec-desc')">
-                            <i class="ti ti-file-text" aria-hidden="true"></i><span>Đề cương chi tiết</span>
-                        </button>
-                        <button type="button" [class.is-active]="activeSection === 'sec-docs'"
-                            [attr.aria-current]="activeSection === 'sec-docs' ? 'location' : null"
-                            aria-controls="sec-docs" (click)="scrollToSection('sec-docs')">
-                            <i class="ti ti-folders" aria-hidden="true"></i><span>Tài liệu & học liệu</span>
-                        </button>
-                    </nav>
-
                     <section id="sec-info" class="mh-card" aria-labelledby="mh-general-title">
                         <div class="mh-card__header">
                             <span class="mh-card__icon" aria-hidden="true"><i class="ti ti-id"></i></span>
@@ -340,7 +307,8 @@
                             <i class="ti ti-circle-check" aria-hidden="true"></i>
                             <h2 id="mh-status-title">Trạng thái thông tin</h2>
                         </div>
-                        <div class="mh-status" [class.mh-status--complete]="formKhoaHoc.valid">
+                        <div class="mh-status" role="status" aria-live="polite"
+                            [class.mh-status--complete]="formKhoaHoc.valid">
                             <span aria-hidden="true"></span>
                             {{ formKhoaHoc.valid ? 'Đã điền đủ thông tin bắt buộc' : 'Cần bổ sung thông tin bắt buộc' }}
                         </div>

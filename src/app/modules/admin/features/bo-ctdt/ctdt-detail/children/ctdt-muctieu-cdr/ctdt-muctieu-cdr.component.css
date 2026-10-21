@@ -335,6 +335,16 @@
     padding: 10px 16px;
 }
 
+.goals-peo-card__header > button {
+    display: inline-flex;
+    min-height: 30px;
+    align-items: center;
+    gap: 5px;
+    padding: 0 10px !important;
+    border-radius: 4px !important;
+    white-space: nowrap;
+}
+
 .goals-peo-card__header h2 {
     margin: 0;
     color: #1e3a8a;
@@ -410,12 +420,83 @@
 }
 
 .goals-peo-table__group-row > td,
-.goals-peo-table__group-row :is(.goals-peo-table__group-index, .goals-peo-group-title, .goals-peo-group-title strong, .goals-peo-group-title span) {
+.goals-peo-table__group-row :is(.goals-peo-table__group-index, .goals-peo-group-title > strong, .goals-peo-group-title > span) {
     color: #1e3a8a !important;
 }
 
-.goals-peo-table__group-row .goals-peo-group-title i {
+.goals-peo-table__group-row .goals-peo-group-title > i {
     color: #2563eb !important;
+}
+
+.goals-peo-group-title {
+    min-width: 0;
+}
+
+.goals-peo-group-actions {
+    display: flex;
+    min-width: 0;
+    margin-left: auto;
+    align-items: center;
+    gap: 6px;
+}
+
+.goals-peo-group-add {
+    display: inline-flex !important;
+    min-height: 30px;
+    align-items: center;
+    gap: 4px;
+    padding: 0 9px !important;
+    border-radius: 4px !important;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.goals-peo-group-secondary-actions {
+    display: inline-flex;
+    gap: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(4px);
+    transition: opacity .15s ease, transform .15s ease;
+}
+
+.goals-peo-table__group-row:hover .goals-peo-group-secondary-actions,
+.goals-peo-table__group-row:focus-within .goals-peo-group-secondary-actions {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
+}
+
+.goals-peo-group-secondary-actions .ictu-admin-icon-button {
+    width: 30px;
+    min-width: 30px;
+    height: 30px;
+    min-height: 30px;
+    padding: 0 !important;
+    border-radius: 4px !important;
+}
+
+@media (hover: none) {
+    .goals-peo-group-secondary-actions {
+        opacity: 1;
+        pointer-events: auto;
+        transform: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .goals-peo-group-title {
+        flex-wrap: wrap;
+    }
+
+    .goals-peo-group-actions {
+        width: 100%;
+        margin-left: 25px;
+    }
+
+    .goals-peo-card__header > button span {
+        display: none;
+    }
 }
 
 .goals-peo-table__group-index {
@@ -431,7 +512,7 @@
     color: #0f172a;
 }
 
-.goals-peo-group-title i {
+.goals-peo-group-title > i {
     color: #475569;
     font-size: 17px;
 }
@@ -441,7 +522,7 @@
     font-weight: 800;
 }
 
-.goals-peo-group-title span {
+.goals-peo-group-title > span {
     color: #64748b;
     font-size: 12px;
 }

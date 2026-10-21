@@ -46,11 +46,11 @@
                             <span class="goals-card__icon" aria-hidden="true"><i class="ti ti-target"></i></span>
                             <h2 id="goal-peo-heading">MỤC TIÊU ĐÀO TẠO CỦA CHƯƠNG TRÌNH</h2>
                         </div>
-                        <button mat-flat-button class="btn ictu-badge-btn--success-reverse" (click)="openAddMuctieu()"
-                            [disabled]="busy || goalsState() === 'error' || !type_ctdt_muctieu_cuthe.length"
-                            aria-label="Thêm mục tiêu PEO" pTooltip="Thêm mục tiêu PEO" tooltipPosition="top"
+                        <button mat-flat-button class="btn ictu-badge-btn--success-reverse" (click)="openAddKhungTrinhDo()"
+                            [disabled]="busy || goalsState() === 'error'"
+                            aria-label="Thêm khung trình độ" pTooltip="Thêm khung trình độ" tooltipPosition="top"
                             appendTo="body">
-                            <i class="ti ti-plus" aria-hidden="true"></i>
+                            <i class="ti ti-plus" aria-hidden="true"></i><span>Thêm khung trình độ</span>
                         </button>
                     </header>
                     @if (goalsState() === 'loading') {
@@ -64,7 +64,7 @@
                     } @else {
                     @if (!type_ctdt_muctieu_cuthe.length) {
                     <p class="goals-config-note"><i class="ti ti-info-circle" aria-hidden="true"></i>Chưa có khung trình
-                        độ. Vui lòng thiết lập trong Cấu hình trước khi thêm mục tiêu.</p>
+                        độ. Bấm nút Thêm khung trình độ ở tiêu đề bảng để bắt đầu.</p>
                     }
                     <div class="goals-list goals-peo-table-wrap">
                         <table class="goals-peo-table">
@@ -87,6 +87,28 @@
                                             <i class="ti ti-folder" aria-hidden="true"></i>
                                             <strong>{{ group.title }}</strong>
                                             <span>{{ group.children.length }} mục tiêu</span>
+                                            <div class="goals-peo-group-actions">
+                                                <div class="goals-peo-group-secondary-actions">
+                                                    <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
+                                                        (click)="editKhungTrinhDo(group)" [disabled]="busy || group.key === '__ungrouped__'"
+                                                        [attr.aria-label]="'Sửa khung trình độ ' + group.title" pTooltip="Sửa khung trình độ"
+                                                        tooltipPosition="top" appendTo="body">
+                                                        <i class="ti ti-edit" aria-hidden="true"></i>
+                                                    </button>
+                                                    <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
+                                                        (click)="deleteKhungTrinhDo(group)" [disabled]="busy || group.key === '__ungrouped__'"
+                                                        [attr.aria-label]="'Xóa khung trình độ ' + group.title" pTooltip="Xóa khung trình độ"
+                                                        tooltipPosition="top" appendTo="body">
+                                                        <i class="ti ti-trash" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                                <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse"
+                                                    (click)="addPeoToGroup(group)" [disabled]="busy || group.key === '__ungrouped__'"
+                                                    [attr.aria-label]="'Thêm PEO vào ' + group.title" pTooltip="Thêm PEO"
+                                                    tooltipPosition="top" appendTo="body">
+                                                    <i class="ti ti-plus" aria-hidden="true"></i> Thêm PEO
+                                                </button>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
@@ -330,6 +352,43 @@
             <button type="submit" form="goal-form" mat-flat-button
                 class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button" [disabled]="busy">
                 <i class="ti ti-device-floppy" aria-hidden="true"></i>{{ savingGoal ? 'Đang lưu...' : 'Lưu mục tiêu' }}
+            </button>
+        </div>
+    </div>
+</p-drawer>
+
+<p-drawer [(visible)]="groupDrawerVisible" [dismissible]="!savingConfig" [closable]="!savingConfig"
+    [closeOnEscape]="!savingConfig" [blockScroll]="true" [header]="groupFormTitle"
+    [style]="{ width: 'min(480px, 100vw)' }" appendTo="body" position="right"
+    styleClass="ictu-p-drawer ctdt-group-drawer">
+    <div class="ictu-p-drawer__content goal-drawer-layout">
+        <div class="ictu-p-drawer__content__body goal-drawer-body">
+            @if (savingConfig) {
+            <app-loading-progress heading="Đang lưu khung trình độ..." backdropFilter="blur(2px)"></app-loading-progress>
+            }
+            <form id="khung-trinh-do-form" [formGroup]="formKhungTrinhDo"
+                (ngSubmit)="saveKhungTrinhDo()" [attr.aria-busy]="savingConfig">
+                <fieldset class="ictu-form" [disabled]="savingConfig">
+                    <legend class="goals-sr-only">Thông tin khung trình độ</legend>
+                    <div class="ictu-form__row">
+                        <label class="ictu-form__label ictu-form__label--required" for="khung-trinh-do-title">Tên khung trình độ</label>
+                        <input pInputText id="khung-trinh-do-title" type="text" class="ictu-form__input-field"
+                            formControlName="title" placeholder="Nhập tên khung trình độ" autocomplete="off"
+                            [attr.aria-invalid]="formKhungTrinhDo.controls['title'].touched && formKhungTrinhDo.controls['title'].invalid"
+                            aria-describedby="khung-trinh-do-title-error">
+                        @if (formKhungTrinhDo.controls['title'].touched && formKhungTrinhDo.controls['title'].invalid) {
+                        <span id="khung-trinh-do-title-error" class="ictu-admin-form-error" role="alert">Nhập tên khung trình độ.</span>
+                        }
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <div class="ictu-p-drawer__content__footer ictu-admin-drawer-footer goal-drawer-footer">
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button"
+                (click)="closeKhungTrinhDo()" [disabled]="savingConfig">Hủy</button>
+            <button type="submit" form="khung-trinh-do-form" mat-flat-button
+                class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button" [disabled]="savingConfig">
+                <i class="ti ti-device-floppy" aria-hidden="true"></i>{{ savingConfig ? 'Đang lưu...' : 'Lưu khung trình độ' }}
             </button>
         </div>
     </div>

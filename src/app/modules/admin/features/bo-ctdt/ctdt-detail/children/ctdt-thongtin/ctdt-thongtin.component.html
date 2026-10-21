@@ -1,10 +1,10 @@
 <div class="ctdt-thongtin-shell">
-    @if (isLoading || isSaving) {
+    @if (isLoading() || isSaving()) {
     <app-loading-progress
-        [heading]="isSaving ? 'Đang lưu thông tin chương trình...' : 'Đang tải thông tin chương trình...'"
+        [heading]="isSaving() ? 'Đang lưu thông tin chương trình...' : 'Đang tải thông tin chương trình...'"
         backdropFilter="blur(2px)"></app-loading-progress>
     }
-    @if (selectedCtdt) {
+    @if (selectedCtdt && !loadError()) {
     <div class="ctdt-workspace">
         <form [formGroup]="formCtdt" class="ctdt-workspace__grid" (ngSubmit)="saveCtdt()">
             <div class="ctdt-workspace__main">
@@ -205,7 +205,7 @@
                         <span class="ctdt-aside-status__dot" aria-hidden="true"></span>
                         {{ formCtdt.valid ? 'Đã điền đủ thông tin bắt buộc' : 'Cần bổ sung thông tin bắt buộc' }}
                     </div>
-                    <button type="submit" class="ctdt-save-btn" [disabled]="formCtdt.invalid">
+                    <button type="submit" class="ctdt-save-btn" [disabled]="formCtdt.invalid || isLoading() || isSaving() || loadError()">
                         <i class="ti ti-device-floppy" aria-hidden="true"></i>
                         <span>Lưu thay đổi</span>
                     </button>
@@ -267,7 +267,7 @@
             </aside>
         </form>
     </div>
-    } @else if (!isLoading) {
+    } @else if (shouldShowLoadError) {
     <div class="admin-table__alert-danger text-center w-100">
         Tải dữ liệu thất bại. Vui lòng chọn
         <a (click)="reloadData()" href="javascript:" class="admin-table__alert-danger__btn-reload">tải lại</a>.

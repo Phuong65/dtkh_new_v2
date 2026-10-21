@@ -5,7 +5,7 @@ import { DonViService } from '@modules/shared/services/don-vi.service';
 import { NotificationService } from '@core/services/notification.service';
 import { ElngUserProfileService } from '@modules/shared/services/elearning-user-profile.service';
 import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
-import { Component, DestroyRef, ElementRef, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 import { AppState } from '@core-new/models/app-state';
@@ -70,7 +70,6 @@ interface ItemGroupExTend extends SelectItemGroup {
 export class MonhocThongtinComponent implements OnInit {
     private activatedRoute = inject(ActivatedRoute);
     private readonly destroyRef = inject(DestroyRef);
-    private readonly hostElement = inject<ElementRef<HTMLElement>>(ElementRef);
     private elnKhoaHocService = inject(ElnKhoaHocService);
     private auth = inject(AuthService);
     private elngUserProfileService = inject(ElngUserProfileService);
@@ -140,27 +139,9 @@ export class MonhocThongtinComponent implements OnInit {
 
     activeDescTab: 'desc' | 'yeucau' = 'desc';
 
-    activeSection = 'sec-info';
     readonly state = signal<AppState>('loading');
     readonly isSaving = signal(false);
     readonly errorMessage = signal('');
-
-    scrollToSection(sectionId: string): void {
-        const host = this.hostElement.nativeElement;
-        const section = host.querySelector<HTMLElement>(`#${sectionId}`);
-        const container = host.querySelector<HTMLElement>(
-            window.matchMedia('(max-width: 960px)').matches ? '.mh-shell' : '.mh-main'
-        );
-        if (!section || !container) return;
-
-        this.activeSection = sectionId;
-        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        container.scrollTo({
-            top: container.scrollTop + section.getBoundingClientRect().top - container.getBoundingClientRect().top - 16,
-            behavior: prefersReducedMotion ? 'auto' : 'smooth'
-        });
-        section.querySelector('h2')?.focus({ preventScroll: true });
-    }
 
     /** Inserted by Angular inject() migration for backwards compatibility */
     constructor(...args: unknown[]);

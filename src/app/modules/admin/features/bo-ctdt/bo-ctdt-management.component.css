@@ -602,11 +602,15 @@
 
 .bo-ctdt-form .ictu-form__row > input,
 .bo-ctdt-form .ictu-form__row > p-select,
-.bo-ctdt-form .ictu-form__row > .bo-ctdt-form__select {
+.bo-ctdt-form .ictu-form__row > p-multiSelect,
+.bo-ctdt-form .ictu-form__row > p-multiselect,
+.bo-ctdt-form .ictu-form__row > .bo-ctdt-form__select,
+.bo-ctdt-form .ictu-form__row > .bo-ctdt-form__multiselect {
     margin-top: 4px;
 }
 
-.bo-ctdt-form__select {
+.bo-ctdt-form__select,
+.bo-ctdt-form__multiselect {
     display: flex;
     width: 100%;
     min-width: 0;

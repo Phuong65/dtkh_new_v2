@@ -69,7 +69,7 @@ export class CtdtCdrComponent implements OnInit {
 
     readonly state: WritableSignal<AppState> = signal<AppState>('loading');
     loadingHeading = 'Đang tải chuẩn đầu ra...';
-    isManager = [ROLES.manager, ROLES.admin, ROLES.troly_pdt, ROLES.chuyenvien_pdt]
+    isManager = [ROLES.manager, ROLES.admin, ROLES.troly_pdt, ROLES.chuyenvien_pdt, ROLES.daotao_new]
         .some(role => this.auth.userHasRole(role));
     isLanhDaoKhoa = this.auth.userHasRole(ROLES.lanhdaokhoa);
     userId: number = this.auth.user?.id ?? 0;

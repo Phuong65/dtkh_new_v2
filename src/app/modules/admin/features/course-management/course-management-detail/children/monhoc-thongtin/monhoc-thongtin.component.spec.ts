@@ -68,7 +68,7 @@ describe('MonhocThongtinComponent giao diện thống nhất', () => {
             .toEqual(['sec-info', 'sec-ctdt', 'sec-time', 'sec-eval', 'sec-desc', 'sec-docs']);
         expect(root.querySelectorAll('button[type="submit"]').length).toBe(1);
         expect(root.querySelector('.mh-overview')?.textContent).toContain('HP01');
-        expect(root.querySelector('main')).toBeNull();
+        expect(root.querySelector('[role="main"]')).toBeNull();
     });
 
     for (const field of ['title', 'maso', 'category_ids', 'sotinchi', 'sotinchi_th']) {
@@ -108,8 +108,12 @@ describe('MonhocThongtinComponent giao diện thống nhất', () => {
         expect(button.disabled).toBeTrue();
         expect(button.textContent).toContain('Đang lưu');
         expect(root.querySelector('app-loading-progress')).not.toBeNull();
+        expect(root.querySelector('form')?.hasAttribute('inert')).toBeTrue();
         button.click();
         expect(save).not.toHaveBeenCalled();
+        component.isSaving.set(false);
+        fixture.detectChanges();
+        expect(root.querySelector('form')?.hasAttribute('inert')).toBeFalse();
     });
 
     it('hiển thị thông báo lỗi cụ thể, tải lại bằng button', () => {
@@ -163,24 +167,12 @@ describe('MonhocThongtinComponent giao diện thống nhất', () => {
         renderForm();
         for (const field of ['title', 'maso', 'sotinchi', 'sotinchi_th']) {
             expect(root.querySelector<HTMLInputElement>(`#${field}`)!.readOnly).toBeTrue();
+            expect(root.querySelector<HTMLInputElement>(`#${field}`)!.disabled).toBeFalse();
         }
     });
 
-    for (const mobile of [false, true]) {
-        it(`cuộn riêng ${mobile ? 'workspace mobile' : 'main desktop'}, tôn trọng reduced-motion`, () => {
-            renderForm();
-            spyOn(window, 'matchMedia').and.callFake(query => ({
-                matches: query.includes('prefers-reduced-motion') || mobile
-            } as MediaQueryList));
-            const container = root.querySelector<HTMLElement>(mobile ? '.mh-shell' : '.mh-main')!;
-            const other = root.querySelector<HTMLElement>(mobile ? '.mh-main' : '.mh-shell')!;
-            const scroll = spyOn(container, 'scrollTo');
-            const otherScroll = spyOn(other, 'scrollTo');
-            component.scrollToSection('sec-desc');
-            expect(component.activeSection).toBe('sec-desc');
-            expect(scroll).toHaveBeenCalled();
-            expect(scroll.calls.mostRecent().args[0]).toEqual(jasmine.objectContaining({ behavior: 'auto' }));
-            expect(otherScroll).not.toHaveBeenCalled();
-        });
-    }
+    it('không hiển thị menu điều hướng từng phần', () => {
+        renderForm();
+        expect(root.querySelector('.mh-section-nav')).toBeNull();
+    });
 });

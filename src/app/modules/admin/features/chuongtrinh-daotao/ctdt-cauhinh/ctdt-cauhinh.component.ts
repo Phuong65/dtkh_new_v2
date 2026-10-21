@@ -192,47 +192,25 @@ export class CtdtCauhinhComponent implements OnInit {
                         ctdt_config: []
                     })
                 })
-                if (_config.recordsFiltered) {
-                    data.forEach(f => {
-                        f.ctdt_config = _config.data.filter(m => m.group === f.group);
-                    })
-                    // _config.data.forEach(f => {
-                    //     const index = data.findIndex(m => m.group === f.group);
-                    //     if (index !== -1) {
-                    //         data[index].ctdt_config.push(f);
-                    //     } else {
-                    //         const index_ = this.list_config.findIndex(m => m.config_key === f.key);
-                    //         data.push({
-                    //             ctdt_config: [f],
-                    //             group: f.group,
-                    //             title: index_
-                    //         })
-                    //     }
-                    //     console.log(data);
-                    // })
-                } else {
-                    this.list_config.forEach(f => {
-                        const child = [];
-                        if (Array.isArray(f.params)) {
-                            f.params.forEach((c, ckey) => {
-                                child.push({
-                                    ctdt_id: this.selectedCtdt.id,
-                                    key: c.key,
-                                    group: f.config_key,
-                                    title: c.title,
-                                    ordering: ckey + 1,
-                                    noidung: c.noidung
-                                })
-                            })
-                        }
-
-                        const index = data.findIndex(m => m.group === f.config_key);
-
-                        if (index !== -1) {
-                            data[index].ctdt_config = child;
-                        }
-                    })
-                }
+                data.forEach(f => {
+                    const custom = (_config.data || []).filter(m => m.group === f.group);
+                    const marker = (_config.data || []).some(m => m.group === 'KHUNG_TRINH_DO_EMPTY');
+                    if (custom.length) {
+                        f.ctdt_config = custom;
+                    } else if (f.group === 'KHUNG_TRINH_DO' && marker) {
+                        f.ctdt_config = [];
+                    } else {
+                        const defaults = this.list_config.find(config => config.config_key === f.group)?.params;
+                        f.ctdt_config = Array.isArray(defaults) ? defaults.map((item, index) => ({
+                            ctdt_id: this.selectedCtdt.id,
+                            key: item.key,
+                            group: f.group,
+                            title: item.title,
+                            ordering: item.ordering ?? index + 1,
+                            noidung: item.noidung
+                        })) : [];
+                    }
+                });
 
                 this.list_ctdt_config = this.helperService.sort(data, 'title');
 
@@ -288,11 +266,11 @@ export class CtdtCauhinhComponent implements OnInit {
         this.list_ctdt_config.forEach(f => {
             f.ctdt_config.forEach((c, ckey) => {
                 c.ordering = ckey + 1;
-                c.key = this.helperService.slugVietnamese(c.title);
+                if (!c.key) c.key = this.helperService.slugVietnamese(c.title);
                 if (c.id) {
                     const data = { ...c };
                     delete data.id;
-                    request.push(this.ctdtConfigService.updateCtdtConfig(c.id, c));
+                    request.push(this.ctdtConfigService.updateCtdtConfig(c.id, data));
                 } else {
                     request.push(this.ctdtConfigService.addCtdtConfig(c));
                 }

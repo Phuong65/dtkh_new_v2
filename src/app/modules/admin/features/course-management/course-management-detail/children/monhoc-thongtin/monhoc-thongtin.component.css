@@ -77,51 +77,6 @@
     overscroll-behavior: contain;
 }
 
-.mh-section-nav {
-    display: flex;
-    flex: 0 0 auto;
-    min-width: 0;
-    gap: 4px;
-    padding: 4px;
-    overflow-x: auto;
-    border: 1px solid var(--mh-border-light);
-    border-radius: var(--mh-radius);
-    background: #ffffff;
-    scrollbar-width: thin;
-}
-
-.mh-section-nav button {
-    display: inline-flex;
-    flex: 0 0 auto;
-    min-height: 40px;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 8px 10px;
-    border: 0;
-    border-bottom: 2px solid transparent;
-    border-radius: 0;
-    background: transparent;
-    color: var(--mh-text);
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 600;
-    white-space: nowrap;
-    cursor: pointer;
-}
-
-.mh-section-nav button:hover {
-    background: #f8fafc;
-    color: var(--mh-primary-hover);
-}
-
-.mh-section-nav button.is-active {
-    border-bottom-color: var(--mh-primary-hover);
-    background: #eff6ff;
-    color: var(--mh-primary-hover);
-}
-
-.mh-section-nav button:focus-visible,
 .mh-editor-tabs button:focus-visible,
 .mh-save-button:focus-visible,
 .mh-error button:focus-visible {
@@ -294,6 +249,7 @@
 .mh-field input.admin-wrap-table__input:read-only {
     background: #f1f5f9 !important;
     color: var(--mh-text) !important;
+    cursor: default;
 }
 
 .mh-program-picker {
@@ -303,12 +259,15 @@
 .mh-program-table-wrap {
     width: 100%;
     max-width: 100%;
-    border: 1px solid var(--mh-border-light);
+    overflow-x: auto;
     border-radius: var(--mh-radius);
 }
 
 .mh-program-table {
+    --admin-table-border-color: var(--mh-border-light);
+    width: 100%;
     min-width: 560px;
+    border-collapse: collapse;
     table-layout: fixed;
 }
 
@@ -323,6 +282,7 @@
 .mh-program-table th,
 .mh-program-table td {
     padding: 10px 12px;
+    border: 1px solid var(--mh-border-light);
 }
 
 .mh-program-table strong {
@@ -754,10 +714,6 @@
         margin-left: auto;
     }
 
-    .mh-section-nav button {
-        min-height: 44px;
-    }
-
     .mh-editor-tabs {
         padding: 0 8px;
     }
@@ -799,7 +755,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .mh-section-nav button,
     .mh-editor-tabs button {
         transition: none;
     }

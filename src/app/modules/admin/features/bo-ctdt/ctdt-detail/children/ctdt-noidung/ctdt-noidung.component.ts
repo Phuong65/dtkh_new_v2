@@ -121,7 +121,7 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
     readonly isLoadingData: WritableSignal<boolean> = signal(false);
 
     constructor() {
-        this.isManager = [ROLES.manager, ROLES.admin, ROLES.troly_pdt, ROLES.chuyenvien_pdt]
+        this.isManager = [ROLES.manager, ROLES.admin, ROLES.troly_pdt, ROLES.chuyenvien_pdt, ROLES.daotao_new]
             .some(role => this.auth.userHasRole(role));
         this.isLanhDaoKhoa = this.auth.userHasRole(ROLES.lanhdaokhoa);
         this.userId = this.auth.user?.id ?? 0;
