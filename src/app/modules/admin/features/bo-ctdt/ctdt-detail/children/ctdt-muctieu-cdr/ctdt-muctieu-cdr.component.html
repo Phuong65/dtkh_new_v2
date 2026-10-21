@@ -71,10 +71,10 @@
                             <caption class="goals-sr-only">Danh sách mục tiêu PEO theo nhóm</caption>
                             <thead>
                                 <tr>
-                                    <th class="goals-peo-table__index">TT</th>
+                                    <th class="goals-peo-table__index">STT</th>
                                     <th class="goals-peo-table__code">Ký hiệu</th>
                                     <th class="goals-peo-table__content">Nội dung mục tiêu</th>
-                                    <th class="goals-peo-table__compatibility">Định hướng tương thích</th>
+                                    <th class="goals-peo-table__compatibility">Định hướng</th>
                                     <th class="goals-peo-table__actions">Thao tác</th>
                                 </tr>
                             </thead>
@@ -124,7 +124,7 @@
                                         @if (goal.tuongthich?.length) {
                                         <div class="goals-peo-tags">
                                             @for (key of goal.tuongthich; track $index) {
-                                            <span [class]="'goals-peo-tag goals-peo-tag--' + compatibilityColorIndex(key)">
+                                            <span class="ictu-badge ictu-badge--secondary">
                                                 <i class="ti ti-link" aria-hidden="true"></i>{{ compatibilityTitle(key) }}
                                             </span>
                                             }
@@ -181,13 +181,18 @@
                             <h2 id="goal-matrix-heading">MA TRẬN TƯƠNG THÍCH MỤC TIÊU ĐÀO TẠO (PEO) VỚI ĐỊNH HƯỚNG CƠ SỞ
                                 ĐÀO TẠO</h2>
                         </div>
+                        <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse goals-matrix-add"
+                            (click)="openAddDinhHuong()" [disabled]="busy" aria-label="Thêm định hướng"
+                            pTooltip="Thêm định hướng" tooltipPosition="top" appendTo="body">
+                            <i class="ti ti-plus" aria-hidden="true"></i><span>Thêm định hướng</span>
+                        </button>
                     </header>
                     @if (goalsState() === 'loading') {
                     <div class="goals-inline-state" role="status">Đang cập nhật ma trận...</div>
                     } @else if (goalsState() === 'error') {
                     <p class="goals-inline-state">Ma trận sẽ hiển thị sau khi tải được danh sách mục tiêu.</p>
-                    } @else if (!list_muctieu_cuthe.length || !list_tuongthich.length) {
-                    <p class="goals-inline-state">Cần có mục tiêu và cấu hình tương thích để hiển thị ma trận.</p>
+                    } @else if (!list_tuongthich.length) {
+                    <p class="goals-inline-state">Chưa có định hướng tương thích. Bấm “Thêm định hướng” để bắt đầu.</p>
                     } @else {
                     <div class="goals-matrix-scroll" role="region" aria-labelledby="goal-matrix-heading" tabindex="0">
                         <table class="goals-matrix">
@@ -196,21 +201,40 @@
                             <thead>
                                 <tr>
                                     <th scope="col" rowspan="2" class="goals-matrix__corner">Định hướng</th>
-                                    <th scope="colgroup" [attr.colspan]="list_muctieu_cuthe.length"
+                                    <th scope="colgroup" [attr.colspan]="list_muctieu_cuthe.length || 1"
                                         class="goals-matrix__group">Mục tiêu đào tạo (PEOs)</th>
                                 </tr>
                                 <tr>
                                     @for (goal of list_muctieu_cuthe; track goal.id) {
                                     <th scope="col" class="goals-matrix__goal">{{ goal.ordering }}</th>
+                                    } @empty {
+                                    <th scope="col" class="goals-matrix__goal">Chưa có PEO</th>
                                     }
                                 </tr>
                             </thead>
                             <tbody>
                                 @for (compatibility of list_tuongthich; track compatibility.key) {
-                                <tr>
-                                    <th scope="row" [pTooltip]="compatibilityTooltip(compatibility.key)"
-                                        tooltipPosition="right" appendTo="body">
-                                        <strong>{{ compatibility.title }}</strong>
+                                <tr class="goals-matrix__orientation-row">
+                                    <th scope="row">
+                                        <div class="goals-matrix__orientation">
+                                            <strong class="goals-matrix__orientation-title"
+                                                [pTooltip]="compatibilityTooltip(compatibility.key)" tooltipEvent="both"
+                                                tooltipPosition="right" appendTo="body" tabindex="0">{{ compatibility.title }}</strong>
+                                            <div class="goals-matrix__orientation-actions">
+                                                <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
+                                                    (click)="editDinhHuong(compatibility)" [disabled]="busy"
+                                                    [attr.aria-label]="'Sửa định hướng ' + compatibility.title"
+                                                    pTooltip="Sửa định hướng" tooltipPosition="top" appendTo="body">
+                                                    <i class="ti ti-edit" aria-hidden="true"></i>
+                                                </button>
+                                                <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
+                                                    (click)="deleteDinhHuong(compatibility)" [disabled]="busy"
+                                                    [attr.aria-label]="'Xóa định hướng ' + compatibility.title"
+                                                    pTooltip="Xóa định hướng" tooltipPosition="top" appendTo="body">
+                                                    <i class="ti ti-trash" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </th>
                                     @for (goal of list_muctieu_cuthe; track goal.id) {
                                     <td class="goals-matrix__check">
@@ -222,6 +246,8 @@
                                         <span class="goals-sr-only">Chưa liên kết</span>
                                         }
                                     </td>
+                                    } @empty {
+                                    <td class="goals-matrix__empty-peo">Chưa có PEO</td>
                                     }
                                 </tr>
                                 }
@@ -293,6 +319,7 @@
                 <fieldset class="ictu-form goal-form-grid" [disabled]="savingGoal"
                     [attr.inert]="savingGoal ? '' : null">
                     <legend class="goals-sr-only">Thông tin mục tiêu cụ thể</legend>
+                    <input type="hidden" formControlName="type">
                     <div class="ictu-form__row goal-form-field">
                         <label class="ictu-form__label ictu-form__label--required" for="goal-ordering">Ký hiệu</label>
                         <div class="ictu-form__group-control--before goal-code-control">
@@ -306,20 +333,6 @@
                         @if (f['ordering'].touched && f['ordering'].invalid) {
                         <span id="goal-ordering-error" class="ictu-admin-form-error" role="alert">Nhập số thứ tự mục
                             tiêu.</span>
-                        }
-                    </div>
-                    <div class="ictu-form__row goal-form-field">
-                        <label class="ictu-form__label ictu-form__label--required" for="goal-type">Khung trình
-                            độ</label>
-                        <p-select inputId="goal-type" class="goal-type-select" [options]="type_ctdt_muctieu_cuthe"
-                            optionLabel="title" optionValue="key" formControlName="type"
-                            placeholder="Chọn khung trình độ" appendTo="body" [filter]="true" filterBy="title">
-                        </p-select>
-                        @if (f['type'].touched && f['type'].invalid) {
-                        <span class="ictu-admin-form-error" role="alert">Chọn khung trình độ.</span>
-                        }
-                        @if (!type_ctdt_muctieu_cuthe.length) {
-                        <p class="goal-form-hint">Chưa cấu hình khung trình độ cho chương trình.</p>
                         }
                     </div>
                     <div class="ictu-form__row goal-form-field goal-form-field--full">
@@ -352,6 +365,50 @@
             <button type="submit" form="goal-form" mat-flat-button
                 class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button" [disabled]="busy">
                 <i class="ti ti-device-floppy" aria-hidden="true"></i>{{ savingGoal ? 'Đang lưu...' : 'Lưu mục tiêu' }}
+            </button>
+        </div>
+    </div>
+</p-drawer>
+
+<p-drawer [(visible)]="orientationDrawerVisible" [dismissible]="!savingConfig" [closable]="!savingConfig"
+    [closeOnEscape]="!savingConfig" [blockScroll]="true" [header]="orientationFormTitle"
+    [style]="{ width: 'min(620px, 100vw)' }" appendTo="body" position="right"
+    styleClass="ictu-p-drawer ctdt-orientation-drawer">
+    <div class="ictu-p-drawer__content goal-drawer-layout">
+        <div class="ictu-p-drawer__content__body goal-drawer-body">
+            @if (savingConfig) {
+            <app-loading-progress heading="Đang lưu định hướng..." backdropFilter="blur(2px)"></app-loading-progress>
+            }
+            <form id="orientation-form" [formGroup]="formDinhHuong"
+                (ngSubmit)="saveDinhHuong()" [attr.aria-busy]="savingConfig">
+                <fieldset class="ictu-form goal-form-grid" [disabled]="savingConfig">
+                    <legend class="goals-sr-only">Thông tin định hướng</legend>
+                    <div class="ictu-form__row goal-form-field goal-form-field--full">
+                        <label class="ictu-form__label ictu-form__label--required" for="orientation-title">Tên định hướng</label>
+                        <input pInputText id="orientation-title" type="text" class="ictu-form__input-field"
+                            formControlName="title" placeholder="Nhập tên định hướng" autocomplete="off"
+                            [attr.aria-invalid]="formDinhHuong.controls['title'].touched && formDinhHuong.controls['title'].invalid"
+                            aria-describedby="orientation-title-error">
+                        @if (formDinhHuong.controls['title'].touched && formDinhHuong.controls['title'].invalid) {
+                        <span id="orientation-title-error" class="ictu-admin-form-error" role="alert">Nhập tên định hướng.</span>
+                        }
+                    </div>
+                    <div class="ictu-form__row goal-form-field goal-form-field--full">
+                        <span class="ictu-form__label" id="orientation-content-label">Nội dung định hướng</span>
+                        <div class="goal-form-editor" role="group" aria-labelledby="orientation-content-label">
+                            <ovic-editor height="220px" [formField]="formDinhHuong.controls['noidung']"
+                                [default]="formDinhHuong.controls['noidung'].value"></ovic-editor>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <div class="ictu-p-drawer__content__footer ictu-admin-drawer-footer goal-drawer-footer">
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button"
+                (click)="closeDinhHuong()" [disabled]="savingConfig">Hủy</button>
+            <button type="submit" form="orientation-form" mat-flat-button
+                class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button" [disabled]="savingConfig">
+                <i class="ti ti-device-floppy" aria-hidden="true"></i>{{ savingConfig ? 'Đang lưu...' : 'Lưu định hướng' }}
             </button>
         </div>
     </div>

@@ -2,9 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, WritableSignal, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Observable, Subject, concatMap, finalize, forkJoin, from, map, of, switchMap, takeUntil, toArray } from 'rxjs';
+import { Observable, Subject, concatMap, defer, finalize, forkJoin, from, map, of, switchMap, takeUntil, tap, throwError, toArray } from 'rxjs';
 import { Drawer } from 'primeng/drawer';
-import { Select } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { MatButtonModule } from '@angular/material/button';
@@ -35,10 +34,22 @@ export interface typeMuctieuCuthe {
     children: CtdtMuctieuCuthe[];
 }
 
+interface OrientationMutation {
+    kind: 'save' | 'delete';
+    programmeId: number;
+    session: number;
+    key: string;
+    editing: boolean;
+    defaults: CtdtConfig[];
+    payload?: CtdtConfig;
+    attemptedCreate: boolean;
+    writesComplete: boolean;
+}
+
 @Component({
     selector: 'app-ctdt-muctieu-cdr',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, Drawer, Select, MultiSelectModule, InputTextModule,
+    imports: [CommonModule, ReactiveFormsModule, Drawer, MultiSelectModule, InputTextModule,
         OvicEditorComponent, SafeHtmlDecodePipe, MatButtonModule, TooltipModule, LoadingProgressComponent],
     templateUrl: './ctdt-muctieu-cdr.component.html',
     styleUrls: ['./ctdt-muctieu-cdr.component.css']
@@ -55,10 +66,18 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
     private readonly ctdtConfigService = inject(CtdtConfigService);
     private readonly helperService = inject(HelperService);
     private readonly emptyKhungTrinhDoGroup = 'KHUNG_TRINH_DO_EMPTY';
+    private readonly emptyDinhHuongGroup = 'TUONGTHICH_PEOs_EMPTY';
     private emptyKhungTrinhDoMarker: CtdtConfig | null = null;
+    private emptyDinhHuongMarker: CtdtConfig | null = null;
     private readonly destroy$ = new Subject<void>();
     private readonly cancelTabLoad$ = new Subject<void>();
     private readonly cancelGoalsLoad$ = new Subject<void>();
+    private readonly cancelOrientation$ = new Subject<void>();
+    private orientationSession = 0;
+    private orientationSeed: CtdtConfig[] | null = null;
+    private orientationSaveKey: string | null = null;
+    private readonly attemptedOrientationKeys = new Set<string>();
+    private orientationRefreshPending: { programmeId: number; session: number; message: string; closeDrawer: boolean } | null = null;
     private destroyed = false;
     private loadedCtdtId: number | null = null;
 
@@ -78,15 +97,24 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
     formKhungTrinhDo: FormGroup = this.formBuilder.group({
         title: ['', Validators.required]
     });
+    formDinhHuong: FormGroup = this.formBuilder.group({
+        title: ['', Validators.required],
+        noidung: ['']
+    });
     isUpdated = false;
     groupDrawerVisible = false;
+    orientationDrawerVisible = false;
     savingConfig = false;
     selectedKhungTrinhDo: CtdtConfig | null = null;
+    selectedDinhHuong: CtdtConfig | null = null;
+    selectedGoalTypeKey: string | null = null;
     groupFormTitle = '';
+    orientationFormTitle = '';
     userId: number = this.auth.user?.id;
     donvi_chuyenmon_id: number;
     type_ctdt_muctieu_cuthe: CtdtConfig[] = [];
     list_tuongthich: CtdtConfig[] = [];
+    private defaultDinhHuong: CtdtConfig[] = [];
     list_ctdt_muctieu_cuthe: typeMuctieuCuthe[] = [];
     list_muctieu_cuthe: CtdtMuctieuCuthe[] = [];
     selectedMuctieuCuthe: CtdtMuctieuCuthe;
@@ -126,6 +154,8 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
         this.cancelTabLoad$.complete();
         this.cancelGoalsLoad$.next();
         this.cancelGoalsLoad$.complete();
+        this.cancelOrientation$.next();
+        this.cancelOrientation$.complete();
         this.destroy$.next();
         this.destroy$.complete();
     }
@@ -157,12 +187,21 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
         if (!force && this.loadedCtdtId === ctdt.id && this.type_ctdt_muctieu_cuthe.length) return;
         this.cancelTabLoad$.next();
         this.cancelGoalsLoad$.next();
+        this.cancelOrientation$.next();
+        this.orientationSession++;
+        this.orientationSeed = null;
+        this.orientationSaveKey = null;
+        this.orientationRefreshPending = null;
+        this.attemptedOrientationKeys.clear();
         this.loadedCtdtId = ctdt.id;
         this.drawerVisible = false;
         this.groupDrawerVisible = false;
+        this.orientationDrawerVisible = false;
         this.type_ctdt_muctieu_cuthe = [];
         this.emptyKhungTrinhDoMarker = null;
+        this.emptyDinhHuongMarker = null;
         this.list_tuongthich = [];
+        this.defaultDinhHuong = [];
         this.list_muctieu_cuthe = [];
         this.list_ctdt_muctieu_cuthe = [];
         this.mucTieuChungDraft = ctdt.muctieu || '';
@@ -180,7 +219,7 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
         };
         const programmeConfig: ConditionOption = {
             condition: [{ conditionName: 'ctdt_id', condition: OvicQueryCondition.equal, value: String(ctdt.id) }],
-            set: [{ label: 'limit', value: '-1' }, { label: 'include', value: 'KHUNG_TRINH_DO,TUONGTHICH_PEOs,KHUNG_TRINH_DO_EMPTY' },
+            set: [{ label: 'limit', value: '-1' }, { label: 'include', value: 'KHUNG_TRINH_DO,TUONGTHICH_PEOs,KHUNG_TRINH_DO_EMPTY,TUONGTHICH_PEOs_EMPTY' },
                 { label: 'include_by', value: 'group' }, { label: 'orderby', value: 'ordering' }, { label: 'order', value: 'ASC' }],
             page: null
         };
@@ -206,11 +245,14 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
                 }
                 this.emptyKhungTrinhDoMarker = (ctdtConfig.data || [])
                     .find(item => item.group === this.emptyKhungTrinhDoGroup) || null;
+                this.emptyDinhHuongMarker = (ctdtConfig.data || [])
+                    .find(item => item.group === this.emptyDinhHuongGroup) || null;
                 const resolveConfig = (group: string): CtdtConfig[] => {
                     const custom = (ctdtConfig.data || []).filter(item => item.group === group);
                     const fallback = (config.data || []).find(item => item.config_key === group)?.params;
                     if (custom.length) return custom;
                     if (group === 'KHUNG_TRINH_DO' && this.emptyKhungTrinhDoMarker) return [];
+                    if (group === 'TUONGTHICH_PEOs' && this.emptyDinhHuongMarker) return [];
                     return Array.isArray(fallback)
                         ? fallback.map((item: CtdtConfig, index: number) => ({
                             ...item,
@@ -220,6 +262,8 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
                         })) : [];
                 };
                 this.type_ctdt_muctieu_cuthe = resolveConfig('KHUNG_TRINH_DO');
+                const defaultOrientationParams = (config.data || []).find(item => item.config_key === 'TUONGTHICH_PEOs')?.params;
+                this.defaultDinhHuong = Array.isArray(defaultOrientationParams) ? defaultOrientationParams : [];
                 this.list_tuongthich = resolveConfig('TUONGTHICH_PEOs');
                 this.goalsState.set('loading');
                 this.loadMuctieuCuthe();
@@ -283,6 +327,7 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
         this.formMuctieuCuthe.reset({ ctdt_id: this.selectedCtdt.id, kyhieu: '', ordering, noidung: '', type: '', tuongthich: [] });
         this.isUpdated = false;
         this.selectedMuctieuCuthe = null;
+        this.selectedGoalTypeKey = null;
     }
 
     openAddKhungTrinhDo(): void {
@@ -339,7 +384,30 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     private runConfigRequests(requestFactories: Array<() => Observable<unknown>>): Observable<unknown[]> {
-        return from(requestFactories).pipe(concatMap(createRequest => createRequest()), toArray());
+        return from(requestFactories).pipe(concatMap(createRequest => defer(createRequest)), toArray());
+    }
+
+    private runConfigDeleteAnimation(
+        animationId: number,
+        createRequest: () => Observable<unknown>,
+        onSuccess: () => void,
+        errorMessage: string
+    ): void {
+        const deleteController = new IctuDeletingAnimationControl([animationId], {
+            delete: () => defer(createRequest)
+        });
+        this.notificationService.startDeleting(deleteController.progress).pipe(
+            takeUntil(this.cancelTabLoad$),
+            takeUntil(this.destroy$),
+            finalize(() => this.savingConfig = false)
+        ).subscribe({
+            next: deleted => {
+                if (deleted) onSuccess();
+                else this.notificationService.toastError(errorMessage);
+            },
+            error: () => this.notificationService.toastError(errorMessage)
+        });
+        deleteController.run();
     }
 
     private materializeDefaultKhungTrinhDo(saved: CtdtConfig[], override?: CtdtConfig): Observable<unknown[]> {
@@ -425,6 +493,7 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
     addPeoToGroup(group: typeMuctieuCuthe): void {
         if (!this.selectedCtdt || this.busy || group.key === '__ungrouped__') return;
         this.resetForm();
+        this.selectedGoalTypeKey = group.key;
         this.formTitle = `Thêm PEO · ${group.title}`;
         this.formMuctieuCuthe.patchValue({ type: group.key });
         this.drawerVisible = true;
@@ -457,21 +526,16 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
                         ? this.ctdtConfigService.deleteCtdtConfig(config.id)
                         : this.ctdtConfigService.deleteCtdtConfig(config.id).pipe(switchMap(() => this.addConfigMarkerIfNeeded())))
                     : this.addConfigMarkerIfNeeded());
-            request.pipe(takeUntil(this.cancelTabLoad$), takeUntil(this.destroy$), finalize(() => this.savingConfig = false)).subscribe({
-                next: () => {
+            this.runConfigDeleteAnimation(
+                config.id || -Math.abs(group.key.split('').reduce((sum, char) => sum + char.charCodeAt(0), 1)),
+                () => request,
+                () => {
                     if (this.selectedCtdt?.id !== programmeId) return;
                     this.refreshKhungTrinhDo('Xóa khung trình độ thành công');
                 },
-                error: () => this.notificationService.toastError('Xóa khung trình độ thất bại')
-            });
+                'Xóa khung trình độ thất bại'
+            );
         });
-    }
-
-    openAddMuctieu(): void {
-        if (!this.selectedCtdt || this.busy || this.goalsState() === 'error') return;
-        this.resetForm();
-        this.formTitle = 'Thêm mục tiêu cụ thể';
-        this.drawerVisible = true;
     }
 
     saveMucTieuCuthe(): void {
@@ -479,6 +543,7 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
         this.formMuctieuCuthe.markAllAsTouched();
         if (this.formMuctieuCuthe.invalid) return;
         const data = { ...this.formMuctieuCuthe.getRawValue() };
+        if (!this.isUpdated && this.selectedGoalTypeKey) data.type = this.selectedGoalTypeKey;
         data.kyhieu = `${this.kyhieuMutieuCuthe} ${data.ordering}`;
         data.tuongthich = Array.isArray(data.tuongthich) ? data.tuongthich : [];
         const editing = this.isUpdated;
@@ -518,7 +583,9 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
         if (!this.selectedCtdt || this.busy) return;
         this.resetForm();
         this.isUpdated = true;
-        this.formTitle = 'Sửa mục tiêu';
+        this.selectedGoalTypeKey = goal.type;
+        const group = this.type_ctdt_muctieu_cuthe.find(item => item.key === goal.type);
+        this.formTitle = group ? `Sửa PEO · ${group.title}` : 'Sửa PEO · Chưa phân nhóm';
         this.selectedMuctieuCuthe = goal;
         this.formMuctieuCuthe.patchValue({
             ordering: goal.ordering,
@@ -566,18 +633,240 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
         });
     }
 
+    openAddDinhHuong(): void {
+        if (!this.selectedCtdt || this.busy || this.orientationRefreshPending) return;
+        this.orientationSeed = null;
+        this.orientationSaveKey = null;
+        this.attemptedOrientationKeys.clear();
+        this.formDinhHuong.reset({ title: '', noidung: '' });
+        this.selectedDinhHuong = null;
+        this.orientationFormTitle = 'Thêm định hướng';
+        this.orientationDrawerVisible = true;
+    }
+
+    editDinhHuong(orientation: CtdtConfig): void {
+        if (!this.selectedCtdt || this.busy || this.orientationRefreshPending) return;
+        this.orientationSeed = null;
+        this.orientationSaveKey = orientation.key;
+        this.attemptedOrientationKeys.clear();
+        this.selectedDinhHuong = orientation;
+        this.formDinhHuong.reset({ title: orientation.title, noidung: orientation.noidung || '' });
+        this.orientationFormTitle = 'Sửa định hướng';
+        this.orientationDrawerVisible = true;
+    }
+
+    closeDinhHuong(): void {
+        if (!this.savingConfig) {
+            this.orientationDrawerVisible = false;
+            this.orientationSeed = null;
+            this.orientationSaveKey = null;
+            this.attemptedOrientationKeys.clear();
+        }
+    }
+
+    private getDinhHuongConfig(programmeId = this.selectedCtdt?.id): Observable<CtdtConfig[]> {
+        if (!programmeId) return of([]);
+        return this.ctdtConfigService.getCtdtConfigByPageNew({
+            condition: [{ conditionName: 'ctdt_id', condition: OvicQueryCondition.equal, value: String(programmeId) }],
+            set: [{ label: 'limit', value: '-1' }, { label: 'include', value: 'TUONGTHICH_PEOs,TUONGTHICH_PEOs_EMPTY' },
+                { label: 'include_by', value: 'group' }, { label: 'orderby', value: 'ordering' }, { label: 'order', value: 'ASC' }],
+            page: null
+        }).pipe(map(response => response.data || []));
+    }
+
+    private buildDinhHuongPayload(config: CtdtConfig, ordering: number, title = config.title, noidung = config.noidung || ''): CtdtConfig {
+        return {
+            ctdt_id: this.selectedCtdt!.id,
+            group: 'TUONGTHICH_PEOs',
+            key: config.key || this.helperService.slugVietnamese(title),
+            title,
+            ordering,
+            noidung
+        };
+    }
+
+    private materializeDefaultDinhHuong(saved: CtdtConfig[], override?: CtdtConfig): Observable<unknown[]> {
+        const savedKeys = new Set(saved.filter(item => item.group === 'TUONGTHICH_PEOs').map(item => item.key));
+        const seed = this.orientationSeed || this.defaultDinhHuong;
+        const requests = seed
+            .filter(item => !savedKeys.has(item.key))
+            .map((item, index) => () => this.ctdtConfigService.addCtdtConfig(this.buildDinhHuongPayload(
+                item,
+                item.ordering ?? index + 1,
+                override?.key === item.key ? override.title : item.title,
+                override?.key === item.key ? override.noidung || '' : item.noidung || ''
+            )));
+        return requests.length ? this.runConfigRequests(requests) : of([]);
+    }
+
+    private addDinhHuongMarkerIfNeeded(): Observable<unknown> {
+        return this.emptyDinhHuongMarker ? of(null) : this.ctdtConfigService.addCtdtConfig({
+            ctdt_id: this.selectedCtdt!.id,
+            group: this.emptyDinhHuongGroup,
+            key: this.emptyDinhHuongGroup.toLocaleLowerCase(),
+            title: 'Đã xóa toàn bộ định hướng',
+            ordering: 1,
+            noidung: ''
+        });
+    }
+
+    private removeEmptyDinhHuongMarker(programmeId: number): Observable<unknown> {
+        return this.getDinhHuongConfig(programmeId).pipe(switchMap(rows => {
+            const marker = rows.find(item => item.group === this.emptyDinhHuongGroup);
+            return marker?.id ? this.ctdtConfigService.deleteCtdtConfig(marker.id) : of(null);
+        }));
+    }
+
+    private applyDinhHuongRows(rows: CtdtConfig[], programmeId: number): void {
+        this.emptyDinhHuongMarker = rows.find(item => item.group === this.emptyDinhHuongGroup) || null;
+        const custom = rows.filter(item => item.group === 'TUONGTHICH_PEOs');
+        this.list_tuongthich = custom.length ? custom : this.emptyDinhHuongMarker ? []
+            : this.defaultDinhHuong.map((item, index) => ({ ...item, ctdt_id: programmeId,
+                group: 'TUONGTHICH_PEOs', ordering: item.ordering ?? index + 1 }));
+    }
+
+    private refreshDinhHuong(message: string, programmeId: number, closeDrawer = true): void {
+        const session = this.orientationSession;
+        this.orientationRefreshPending = { programmeId, session, message, closeDrawer };
+        this.getDinhHuongConfig(programmeId).pipe(takeUntil(this.cancelOrientation$), takeUntil(this.destroy$)).subscribe({
+            next: rows => {
+                if (this.selectedCtdt?.id !== programmeId || session !== this.orientationSession) return;
+                this.applyDinhHuongRows(rows, programmeId);
+                this.orientationRefreshPending = null;
+                if (closeDrawer) this.orientationDrawerVisible = false;
+                if (message) this.notificationService.toastSuccess(message);
+            },
+            error: () => this.notificationService.toastError('Đã lưu nhưng không thể tải lại danh sách định hướng')
+        });
+    }
+
+    retryDinhHuongRefresh(): void {
+        const pending = this.orientationRefreshPending;
+        if (!pending || pending.session !== this.orientationSession || this.selectedCtdt?.id !== pending.programmeId) return;
+        this.refreshDinhHuong(pending.message, pending.programmeId, pending.closeDrawer);
+    }
+
+    saveDinhHuong(): void {
+        if (!this.selectedCtdt || this.savingConfig) return;
+        this.formDinhHuong.markAllAsTouched();
+        if (this.formDinhHuong.invalid) return;
+        const title = String(this.formDinhHuong.value.title || '').trim();
+        const noidung = String(this.formDinhHuong.value.noidung || '');
+        if (!title) return;
+        const programmeId = this.selectedCtdt.id;
+        const session = this.orientationSession;
+        const selected = this.selectedDinhHuong;
+        const editing = Boolean(selected);
+        if (!this.orientationSeed) this.orientationSeed = this.list_tuongthich.map(item => ({ ...item }));
+        if (!this.orientationSaveKey) {
+            this.orientationSaveKey = editing ? selected!.key : this.helperService.slugVietnamese(title);
+        }
+        const key = this.orientationSaveKey;
+        if (!key || this.list_tuongthich.some(item => item.key !== selected?.key
+            && (item.key === key || item.title.trim().toLocaleLowerCase() === title.toLocaleLowerCase()))) {
+            this.notificationService.toastWarning('Định hướng đã tồn tại hoặc không hợp lệ');
+            return;
+        }
+        const payload: CtdtConfig = {
+            ctdt_id: programmeId,
+            group: 'TUONGTHICH_PEOs',
+            key,
+            title,
+            noidung,
+            ordering: editing ? selected!.ordering || 1 : this.list_tuongthich.length + 1
+        };
+        this.savingConfig = true;
+        this.getDinhHuongConfig().pipe(
+            switchMap(saved => {
+                const real = saved.filter(item => item.group === 'TUONGTHICH_PEOs');
+                const persistedSelected = real.find(item => item.key === selected?.key);
+                if (editing && persistedSelected?.id) {
+                    return this.ctdtConfigService.updateCtdtConfig(persistedSelected.id,
+                        this.buildDinhHuongPayload(persistedSelected, persistedSelected.ordering || 1, title, noidung));
+                }
+                return this.materializeDefaultDinhHuong(saved, editing ? payload : undefined).pipe(
+                    switchMap(() => editing ? of(null) : this.ctdtConfigService.addCtdtConfig(payload)));
+            }),
+            switchMap(saved => this.removeEmptyDinhHuongMarker(programmeId).pipe(map(() => saved))),
+            takeUntil(this.cancelTabLoad$), takeUntil(this.destroy$), finalize(() => this.savingConfig = false)
+        ).subscribe({
+            next: () => this.refreshDinhHuong(editing ? 'Sửa định hướng thành công' : 'Thêm định hướng thành công', programmeId),
+            error: () => {
+                this.notificationService.toastError('Không thể lưu định hướng. Vui lòng thử lại.');
+                if (this.selectedCtdt?.id === programmeId) this.getDinhHuongConfig().pipe(
+                    takeUntil(this.cancelTabLoad$), takeUntil(this.destroy$)
+                ).subscribe({
+                    next: rows => {
+                        const persisted = rows.find(item => item.group === 'TUONGTHICH_PEOs' && item.key === key);
+                        if (persisted?.id && this.selectedCtdt?.id === programmeId) {
+                            this.selectedDinhHuong = persisted;
+                            this.notificationService.toastInfo('Định hướng đã được lưu. Kiểm tra lại dữ liệu trước khi thử tiếp.');
+                        }
+                    },
+                    error: () => this.notificationService.toastError('Không thể kiểm tra trạng thái lưu định hướng')
+                });
+            }
+        });
+    }
+
+    deleteDinhHuong(orientation: CtdtConfig): void {
+        if (!this.selectedCtdt || this.busy) return;
+        const linkedCount = this.list_muctieu_cuthe.filter(goal =>
+            Array.isArray(goal.tuongthich) && goal.tuongthich.includes(orientation.key)).length;
+        if (linkedCount) {
+            this.notificationService.toastWarning(`Không thể xóa: định hướng đang liên kết với ${linkedCount} PEO.`);
+            return;
+        }
+        const safeTitle = (orientation.title || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        this.notificationService.confirmDelete2({
+            heading: 'Xác nhận xóa',
+            htmlMessage: `Bạn có chắc muốn xóa định hướng "${safeTitle}"?`
+        }).pipe(takeUntil(this.destroy$)).subscribe(confirmed => {
+            if (!confirmed || !this.selectedCtdt || this.busy) return;
+            const programmeId = this.selectedCtdt.id;
+            const animationId = orientation.id || -Math.abs(orientation.key.split('').reduce((sum, char) => sum + char.charCodeAt(0), 1));
+            this.savingConfig = true;
+            this.runConfigDeleteAnimation(
+                animationId,
+                () => forkJoin([this.getDinhHuongConfig(programmeId), this.ctdtMuctieuCutheService.getCtdtMuctieuCutheByPageNew({
+                    condition: [{ conditionName: 'ctdt_id', condition: OvicQueryCondition.equal, value: String(programmeId) }],
+                    set: [{ label: 'limit', value: '-1' }], page: null
+                })]).pipe(
+                    switchMap(([saved, goals]) => {
+                        if ((goals.data || []).some(goal => Array.isArray(goal.tuongthich)
+                            && goal.tuongthich.includes(orientation.key))) {
+                            this.notificationService.toastWarning('Định hướng vừa được liên kết với PEO, không thể xóa.');
+                            return throwError(() => new Error('Định hướng đang được PEO sử dụng'));
+                        }
+                        const real = saved.filter(item => item.group === 'TUONGTHICH_PEOs');
+                        const target = real.find(item => item.key === orientation.key);
+                        const remaining = this.list_tuongthich.filter(item => item.key !== orientation.key);
+                        if (!real.length) {
+                            return remaining.length ? this.runConfigRequests(remaining.map((item, index) =>
+                                () => this.ctdtConfigService.addCtdtConfig(this.buildDinhHuongPayload(item, index + 1))))
+                                : this.addDinhHuongMarkerIfNeeded();
+                        }
+                        if (!target?.id) return throwError(() => new Error('Không tìm thấy định hướng cần xóa'));
+                        return real.length === 1
+                            ? this.addDinhHuongMarkerIfNeeded().pipe(switchMap(() => this.ctdtConfigService.deleteCtdtConfig(target.id)))
+                            : this.ctdtConfigService.deleteCtdtConfig(target.id);
+                    })
+                ),
+                () => {
+                    if (this.selectedCtdt?.id !== programmeId) return;
+                    this.refreshDinhHuong('Xóa định hướng thành công', programmeId);
+                },
+                'Xóa định hướng thất bại'
+            );
+        });
+    }
+
     checkTuongthich(key: string, goal: CtdtMuctieuCuthe): boolean {
         return Array.isArray(goal.tuongthich) && goal.tuongthich.includes(key);
     }
 
     compatibilityTitle(key: string): string {
         return this.list_tuongthich.find(item => item.key === key)?.title || key;
-    }
-
-    compatibilityColorIndex(key: string): number {
-        const index = this.list_tuongthich.findIndex(item => item.key === key);
-        if (index >= 0) return index % 8;
-        return [...key].reduce((hash, char) => hash + char.charCodeAt(0), 0) % 8;
     }
 
     compatibilityTooltip(key: string): string {

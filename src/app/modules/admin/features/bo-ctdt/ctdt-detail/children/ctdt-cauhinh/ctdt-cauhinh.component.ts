@@ -216,10 +216,12 @@ export class CtdtCauhinhComponent implements OnInit {
                 })
                 data.forEach(f => {
                     const custom = (_config.data || []).filter(m => m.group === f.group);
-                    const marker = (_config.data || []).some(m => m.group === 'KHUNG_TRINH_DO_EMPTY');
+                    const emptyKhungMarker = (_config.data || []).some(m => m.group === 'KHUNG_TRINH_DO_EMPTY');
+                    const emptyDinhHuongMarker = (_config.data || []).some(m => m.group === 'TUONGTHICH_PEOs_EMPTY');
                     if (custom.length) {
                         f.ctdt_config = custom;
-                    } else if (f.group === 'KHUNG_TRINH_DO' && marker) {
+                    } else if ((f.group === 'KHUNG_TRINH_DO' && emptyKhungMarker)
+                        || (f.group === 'TUONGTHICH_PEOs' && emptyDinhHuongMarker)) {
                         f.ctdt_config = [];
                     } else {
                         const defaults = this.list_config.find(config => config.config_key === f.group)?.params;
