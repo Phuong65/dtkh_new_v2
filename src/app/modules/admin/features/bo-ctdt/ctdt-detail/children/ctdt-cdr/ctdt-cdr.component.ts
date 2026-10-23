@@ -1,6 +1,6 @@
 import { CtdtCdrService } from '@modules/shared/services/ctdt-cdr.service';
 import { HelperService } from '@core/services/helper.service';
-import { Component, OnInit, WritableSignal, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, WritableSignal, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SafeHtmlDecodePipe } from '@modules/shared/pipes/safe-html-decode';
 import { OvicEditorComponent } from '@modules/shared/components/ovic-editor/ovic-editor.component';
@@ -18,7 +18,7 @@ import { CtdtMuctieuCutheService } from '@modules/shared/services/ctdt-muctieu-c
 import { CtdtService } from '@modules/shared/services/ctdt.service';
 import { ElngUserProfileService } from '@modules/shared/services/elearning-user-profile.service';
 import { ROLES } from '@modules/shared/utils/syscat';
-import { firstValueFrom, forkJoin } from 'rxjs';
+import { firstValueFrom, forkJoin, of, Subject, takeUntil } from 'rxjs';
 import { Ctdt } from '@modules/shared/models/ctdt';
 import { CtdtCdr } from '@modules/shared/models/ctdt-cdr';
 import { CtdtMuctieuCuthe } from '@modules/shared/models/ctdt-muctieu-cuthe';
@@ -31,6 +31,15 @@ import { TooltipModule } from 'primeng/tooltip';
 
 export interface CtdtCdrParent extends CtdtCdr {
     children?: CtdtCdr[];
+}
+
+export interface CtdtCdrSummary {
+    programmeId: number;
+    state: AppState;
+    ploCount: number;
+    piCount: number;
+    peoPloLinkCount: number;
+    invalidPiPercentPloCount: number;
 }
 
 @Component({
@@ -53,9 +62,10 @@ export interface CtdtCdrParent extends CtdtCdr {
         LoadingProgressComponent
     ],
     templateUrl: './ctdt-cdr.component.html',
-    styleUrls: ['./ctdt-cdr.component.css']
+    styleUrls: ['./ctdt-cdr.component.css'],
+    host: { '[class.cdr-embedded]': 'embedded' }
 })
-export class CtdtCdrComponent implements OnInit {
+export class CtdtCdrComponent implements OnChanges, OnInit, OnDestroy {
     private readonly auth = inject(AuthService);
     private readonly notificationService = inject(NotificationService);
     private readonly router = inject(Router);
@@ -66,6 +76,16 @@ export class CtdtCdrComponent implements OnInit {
     private readonly ctdtCdrService = inject(CtdtCdrService);
     private readonly ctdtMuctieuCutheService = inject(CtdtMuctieuCutheService);
     private readonly helperService = inject(HelperService);
+    private readonly destroy$ = new Subject<void>();
+    private readonly cancelLoad$ = new Subject<void>();
+    private loadedCtdtId: number | null = null;
+    private loadToken = 0;
+
+    @Input() selectedCtdtInput: Ctdt | null = null;
+    @Input() embedded = false;
+    @Input() peoListInput: CtdtMuctieuCuthe[] | null = null;
+    @Input() peoRefreshKey = 0;
+    @Output() summaryChange = new EventEmitter<CtdtCdrSummary>();
 
     readonly state: WritableSignal<AppState> = signal<AppState>('loading');
     loadingHeading = 'Đang tải chuẩn đầu ra...';
@@ -95,6 +115,7 @@ export class CtdtCdrComponent implements OnInit {
     kyhieu_cdr: string;
     drawerVisible = false;
     savingCdr = false;
+    isMatrixExpanded = false;
 
     readonly collapsedPlos = signal<Set<number>>(new Set<number>());
     readonly hoveredMatrixCol = signal<number | null>(null);
@@ -111,29 +132,78 @@ export class CtdtCdrComponent implements OnInit {
     });
 
     ngOnInit(): void {
-        if (this.isLanhDaoKhoa || this.isManager) {
-            this.activatedRoute.queryParams.subscribe(async (params) => {
-                if (params && params['code']) {
-                    this.loadCtdtData(String(params['code']));
-                } else {
-                    this.state.set('success');
-                    this.router.navigate(['/admin/content-none']);
-                }
-            })
-        } else {
+        if (!this.isLanhDaoKhoa && !this.isManager) {
             this.state.set('success');
             this.router.navigate(['/admin/content-none']);
+            return;
+        }
+        if (this.embedded) {
+            // Inputs are handled by ngOnChanges, including the initial binding.
+            return;
+        }
+        this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+            if (params?.['code']) {
+                this.loadCtdtData(String(params['code']));
+            } else {
+                this.state.set('success');
+                this.router.navigate(['/admin/content-none']);
+            }
+        });
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (!this.embedded || (!this.isLanhDaoKhoa && !this.isManager)) return;
+        const ctdt = this.selectedCtdtInput;
+        if (!ctdt?.id || this.peoRefreshKey <= 0) return;
+        if (ctdt.id !== this.loadedCtdtId || changes['peoRefreshKey'] || changes['peoListInput']) {
+            this.loadEmbeddedData(ctdt);
         }
     }
 
+    private loadEmbeddedData(ctdt: Ctdt): void {
+        this.cancelLoad$.next();
+        this.loadedCtdtId = ctdt.id;
+        this.selectedCtdt = ctdt;
+        this.list_cdr_muctieu = this.peoListInput ?? [];
+        this.loadCtdtCdr();
+    }
+
+    private emitSummary(state: AppState, programmeId = this.selectedCtdt?.id ?? this.selectedCtdtInput?.id ?? 0): void {
+        this.summaryChange.emit({
+            programmeId,
+            state,
+            ploCount: this.list_ctdt_cdr.length,
+            piCount: this.getTotalPiCount(),
+            peoPloLinkCount: this.getMatrixLinkCount(),
+            invalidPiPercentPloCount: this.list_ctdt_cdr.filter(cdr =>
+                Boolean(cdr.children?.length) && this.getTotalPiPercent(cdr) !== 100).length
+        });
+    }
+
+    ngOnDestroy(): void {
+        this.cancelLoad$.next();
+        this.cancelLoad$.complete();
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
     reloadData(): void {
-        const code = this.activatedRoute.snapshot.queryParamMap.get('code');
-        if (code) this.loadCtdtData(code);
+        if (this.embedded) {
+            if (this.selectedCtdtInput?.id) this.loadEmbeddedData(this.selectedCtdtInput);
+            return;
+        }
+        const id = Number(this.activatedRoute.snapshot.queryParamMap.get('code'));
+        if (id) this.loadCtdtData(String(id));
     }
 
     private loadCtdtData(ctdtId: string): void {
+        const requestedCtdtId = Number(ctdtId);
+        const requestToken = ++this.loadToken;
+        this.cancelLoad$.next();
+        this.loadedCtdtId = requestedCtdtId;
         this.loadingHeading = 'Đang tải dữ liệu chuẩn đầu ra...';
         this.state.set('loading');
+        this.emitSummary('loading', requestedCtdtId);
         const conditionCtdt: ConditionOption = {
             condition: [{ conditionName: 'id', condition: OvicQueryCondition.equal, value: ctdtId }],
             set: [{ label: 'limit', value: '1' }],
@@ -153,12 +223,16 @@ export class CtdtCdrComponent implements OnInit {
         forkJoin([
             this.ctdtService.getCtdtByPageNew(conditionCtdt),
             this.elngUserProfileService.getUserProfileByPageNewV2(conditionUser),
-            this.ctdtMuctieuCutheService.getCtdtMuctieuCutheByPageNew(conditionMuctieu)
-        ]).subscribe({
+            this.embedded && this.peoListInput
+                ? of({ data: this.peoListInput })
+                : this.ctdtMuctieuCutheService.getCtdtMuctieuCutheByPageNew(conditionMuctieu)
+        ]).pipe(takeUntil(this.cancelLoad$), takeUntil(this.destroy$)).subscribe({
             next: ([ctdtResponse, userResponse, muctieuResponse]) => {
+                if (this.loadedCtdtId !== requestedCtdtId || requestToken !== this.loadToken) return;
                 this.selectedCtdt = ctdtResponse.data?.[0] || null;
                 if (!this.selectedCtdt) {
                     this.state.set('error');
+                    this.emitSummary('error', requestedCtdtId);
                     return;
                 }
                 this.list_cdr_muctieu = muctieuResponse.data || [];
@@ -172,7 +246,11 @@ export class CtdtCdrComponent implements OnInit {
                 }
                 this.loadCtdtCdr();
             },
-            error: () => this.state.set('error')
+            error: () => {
+                if (this.loadedCtdtId !== requestedCtdtId || requestToken !== this.loadToken) return;
+                this.state.set('error');
+                this.emitSummary('error', requestedCtdtId);
+            }
         });
     }
 
@@ -182,8 +260,11 @@ export class CtdtCdrComponent implements OnInit {
 
     loadCtdtCdr() {
         if (!this.selectedCtdt) return;
+        const requestedCtdtId = this.selectedCtdt.id;
+        const requestToken = ++this.loadToken;
         this.loadingHeading = 'Đang tải danh sách chuẩn đầu ra...';
         this.state.set('loading');
+        this.emitSummary('loading', requestedCtdtId);
 
         const condition_ctdt_cdr: ConditionOption = {
             condition: [
@@ -196,18 +277,22 @@ export class CtdtCdrComponent implements OnInit {
             page: null
         }
 
-        this.ctdtCdrService.getCtdtCdrByPageNew(condition_ctdt_cdr).subscribe({
+        this.ctdtCdrService.getCtdtCdrByPageNew(condition_ctdt_cdr).pipe(
+            takeUntil(this.cancelLoad$), takeUntil(this.destroy$)
+        ).subscribe({
             next: (_ctdt_cdr) => {
-                const parent: CtdtCdrParent[] = _ctdt_cdr.data.filter(m => m.parent_id === 0);
+                if (this.selectedCtdt?.id !== requestedCtdtId || requestToken !== this.loadToken) return;
+                const rows = _ctdt_cdr.data || [];
+                const parent: CtdtCdrParent[] = rows.filter(m => Number(m.parent_id) === 0);
                 parent.forEach(f => {
-                    f.children = _ctdt_cdr.data.filter(m => m.parent_id === f.id);
+                    f.children = rows.filter(m => Number(m.parent_id) === Number(f.id));
                 })
                 this.list_ctdt_cdr = parent;
                 this.compatibilityMatrix = Object.fromEntries(this.list_cdr_muctieu.map(peo => [
                     peo.id,
                     Object.fromEntries(parent.map(cdr => [
                         cdr.id,
-                        cdr.tuongthich_peos.includes(peo.id)
+                        Array.isArray(cdr.tuongthich_peos) && cdr.tuongthich_peos.map(Number).includes(Number(peo.id))
                     ]))
                 ]));
 
@@ -217,8 +302,13 @@ export class CtdtCdrComponent implements OnInit {
 
                 this.resetForm();
                 this.state.set('success');
+                this.emitSummary('success', requestedCtdtId);
             },
-            error: () => this.state.set('error')
+            error: () => {
+                if (this.selectedCtdt?.id !== requestedCtdtId || requestToken !== this.loadToken) return;
+                this.state.set('error');
+                this.emitSummary('error', requestedCtdtId);
+            }
         })
     }
 

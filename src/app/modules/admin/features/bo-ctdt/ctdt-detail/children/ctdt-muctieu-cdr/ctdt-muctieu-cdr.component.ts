@@ -27,6 +27,7 @@ import { ElngUserProfileService } from '@modules/shared/services/elearning-user-
 import { OvicEditorComponent } from '@modules/shared/components/ovic-editor/ovic-editor.component';
 import { SafeHtmlDecodePipe } from '@modules/shared/pipes/safe-html-decode';
 import { ROLES } from '@modules/shared/utils/syscat';
+import { CtdtCdrComponent, CtdtCdrSummary } from '../ctdt-cdr/ctdt-cdr.component';
 
 export interface typeMuctieuCuthe {
     key: string;
@@ -50,7 +51,7 @@ interface OrientationMutation {
     selector: 'app-ctdt-muctieu-cdr',
     standalone: true,
     imports: [CommonModule, ReactiveFormsModule, Drawer, MultiSelectModule, InputTextModule,
-        OvicEditorComponent, SafeHtmlDecodePipe, MatButtonModule, TooltipModule, LoadingProgressComponent],
+        OvicEditorComponent, SafeHtmlDecodePipe, MatButtonModule, TooltipModule, LoadingProgressComponent, CtdtCdrComponent],
     templateUrl: './ctdt-muctieu-cdr.component.html',
     styleUrls: ['./ctdt-muctieu-cdr.component.css']
 })
@@ -73,6 +74,8 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
     private readonly cancelTabLoad$ = new Subject<void>();
     private readonly cancelGoalsLoad$ = new Subject<void>();
     private readonly cancelOrientation$ = new Subject<void>();
+    peoRefreshKey = 0;
+    cdrSummary: CtdtCdrSummary | null = null;
     private orientationSession = 0;
     private orientationSeed: CtdtConfig[] | null = null;
     private orientationSaveKey: string | null = null;
@@ -206,6 +209,8 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
         this.defaultDinhHuong = [];
         this.list_muctieu_cuthe = [];
         this.list_ctdt_muctieu_cuthe = [];
+        this.peoRefreshKey = 0;
+        this.cdrSummary = null;
         this.mucTieuChungDraft = ctdt.muctieu || '';
         this.state.set('loading');
         this.goalsState.set('success');
@@ -298,6 +303,7 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
                 this.goalsState.set('success');
                 this.list_muctieu_cuthe = response.data || [];
                 this.rebuildGoalGroups();
+                this.peoRefreshKey++;
                 this.resetForm();
             },
             error: () => this.goalsState.set('error')
@@ -626,6 +632,7 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
                             this.drawerVisible = false;
                             this.resetForm();
                         }
+                        this.peoRefreshKey++;
                     }
                     this.notificationService.toastSuccess('Xóa mục tiêu thành công');
                 },
@@ -877,9 +884,33 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
         return content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() || this.compatibilityTitle(key);
     }
 
+    onCdrSummaryChange(summary: CtdtCdrSummary): void {
+        if (summary.programmeId === this.selectedCtdt?.id) this.cdrSummary = summary;
+    }
+
+    hasGeneralContent(): boolean {
+        const text = this.helperService.decodeHTML(this.selectedCtdt?.muctieu || '')
+            .replace(/<[^>]*>/g, ' ').replace(/[ ​-‍﻿]/g, ' ').trim();
+        return text.length > 0;
+    }
+
+    private linkedOrientationKeys(goal: CtdtMuctieuCuthe): string[] {
+        const validKeys = new Set(this.list_tuongthich.map(item => item.key));
+        return [...new Set(Array.isArray(goal.tuongthich) ? goal.tuongthich : [])]
+            .filter(key => validKeys.has(key));
+    }
+
     getCompatibilityLinkCount(): number {
         return this.list_muctieu_cuthe.reduce((count, goal) =>
-            count + (Array.isArray(goal.tuongthich) ? goal.tuongthich.length : 0), 0);
+            count + this.linkedOrientationKeys(goal).length, 0);
+    }
+
+    getLinkedPeoCount(): number {
+        return this.list_muctieu_cuthe.filter(goal => this.linkedOrientationKeys(goal).length > 0).length;
+    }
+
+    getUsedOrientationCount(): number {
+        return new Set(this.list_muctieu_cuthe.flatMap(goal => this.linkedOrientationKeys(goal))).size;
     }
 
     pointQuestionKeyDown(event: KeyboardEvent): void {

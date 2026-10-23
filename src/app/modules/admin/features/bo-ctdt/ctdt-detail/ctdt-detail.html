@@ -1,5 +1,5 @@
 <section class="ctdt-shell" aria-label="Chi tiết chương trình đào tạo">
-    <!-- Header: Nút back và thanh 6 tab cùng 1 hàng -->
+    <!-- Header: Nút back và thanh 3 tab cùng 1 hàng -->
     <header class="ctdt-header">
         <div class="ctdt-header__left">
             <button type="button" class="ctdt-back-btn" (click)="goBack()" pTooltip="Quay lại danh sách"
@@ -51,19 +51,10 @@
             aria-labelledby="tab-muc-tieu">
             <app-ctdt-muctieu-cdr [selectedCtdt]="selectedCtdt()"></app-ctdt-muctieu-cdr>
         </section>
-        } @else if (activeTabId() === 'cdr') {
-        <section class="ctdt-tab-panel ctdt-tab-panel--form" role="tabpanel" id="panel-cdr" aria-labelledby="tab-cdr">
-            <app-ctdt-cdr></app-ctdt-cdr>
-        </section>
         } @else if (activeTabId() === 'noi-dung') {
         <section class="ctdt-tab-panel ctdt-tab-panel--form" role="tabpanel" id="panel-noi-dung"
             aria-labelledby="tab-noi-dung">
             <app-ctdt-noidung [selectedCtdt]="selectedCtdt()"></app-ctdt-noidung>
-        </section>
-        } @else if (activeTabId() === 'cau-hinh') {
-        <section class="ctdt-tab-panel ctdt-tab-panel--form" role="tabpanel" id="panel-cau-hinh"
-            aria-labelledby="tab-cau-hinh">
-            <app-ctdt-cauhinh></app-ctdt-cauhinh>
         </section>
         } @else {
         <section class="ctdt-placeholder" role="tabpanel" [id]="'panel-' + activeTab.id"

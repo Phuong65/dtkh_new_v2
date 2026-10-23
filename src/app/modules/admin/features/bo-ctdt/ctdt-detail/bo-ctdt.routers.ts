@@ -25,16 +25,8 @@ export const routes: Routes = [
                 loadComponent: () => import('@modules/admin/features/chuongtrinh-daotao/ctdt-doingu/ctdt-doingu.component').then(c => c.CtdtDoinguComponent),
             },
             {
-                path: 'ctdt-cauhinh',
-                loadComponent: () => import('@modules/admin/features/chuongtrinh-daotao/ctdt-cauhinh/ctdt-cauhinh.component').then(c => c.CtdtCauhinhComponent),
-            },
-            {
                 path: 'ctdt-noidung',
                 loadComponent: () => import('@modules/admin/features/chuongtrinh-daotao/ctdt-noidung/ctdt-noidung.component').then(m => m.CtdtNoidungComponent),
-            },
-            {
-                path: 'ctdt-cdr',
-                loadComponent: () => import('@modules/admin/features/chuongtrinh-daotao/ctdt-cdr/ctdt-cdr.component').then(c => c.CtdtCdrComponent),
             },
         ]
     }

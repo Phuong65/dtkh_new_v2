@@ -7,14 +7,12 @@ import { LoadingProgressComponent } from '@core-new/components/loading-progress/
 import { Ctdt } from '@modules/shared/models/ctdt';
 import { CtdtThongtinComponent } from './children/ctdt-thongtin/ctdt-thongtin.component';
 import { CtdtMuctieuCdrComponent } from './children/ctdt-muctieu-cdr/ctdt-muctieu-cdr.component';
-import { CtdtCdrComponent } from './children/ctdt-cdr/ctdt-cdr.component';
 import { CtdtNoidungComponent } from './children/ctdt-noidung/ctdt-noidung.component';
-import { CtdtCauhinhComponent } from './children/ctdt-cauhinh/ctdt-cauhinh.component';
 import { ConditionOption } from '@modules/shared/models/condition-option';
 import { CtdtService } from '@modules/shared/services/ctdt.service';
 import { OvicQueryCondition } from '@core/models/dto';
 
-export type CtdtTabId = 'thong-tin' | 'muc-tieu' | 'cdr' | 'noi-dung' | 'cau-hinh';
+export type CtdtTabId = 'thong-tin' | 'muc-tieu' | 'noi-dung';
 
 export interface CtdtTabItem {
     id: CtdtTabId;
@@ -25,7 +23,7 @@ export interface CtdtTabItem {
 @Component({
     selector: 'app-ctdt-detail',
     standalone: true,
-    imports: [CommonModule, Tooltip, LoadingProgressComponent, CtdtThongtinComponent, CtdtMuctieuCdrComponent, CtdtCdrComponent, CtdtNoidungComponent, CtdtCauhinhComponent],
+    imports: [CommonModule, Tooltip, LoadingProgressComponent, CtdtThongtinComponent, CtdtMuctieuCdrComponent, CtdtNoidungComponent],
     templateUrl: './ctdt-detail.html',
     styleUrl: './ctdt-detail.css',
 })
@@ -39,10 +37,8 @@ export class CtdtDetail implements OnInit, OnDestroy {
 
     readonly tabs: readonly CtdtTabItem[] = [
         { id: 'thong-tin', label: 'Thông tin chung', icon: 'ti ti-info-circle' },
-        { id: 'muc-tieu', label: 'TRIẾT LÝ VÀ MỤC TIÊU', icon: 'ti ti-target' },
-        { id: 'cdr', label: 'CDR', icon: 'ti ti-certificate' },
-        { id: 'noi-dung', label: 'Học phần', icon: 'ti ti-book' },
-        { id: 'cau-hinh', label: 'Cấu hình', icon: 'ti ti-settings' }
+        { id: 'muc-tieu', label: 'Triết lý và mục tiêu', icon: 'ti ti-target' },
+        { id: 'noi-dung', label: 'Học phần', icon: 'ti ti-book' }
     ];
 
     readonly activeTabId = signal<CtdtTabId>('thong-tin');
@@ -60,10 +56,21 @@ export class CtdtDetail implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
             const boId = params.get('bo_id') ? Number(params.get('bo_id')) : null;
-            const requestedTab = params.get('tab') as CtdtTabId;
+            const requestedTab = params.get('tab');
             this.boId.set(boId);
-            if (requestedTab && this.tabs.some(tab => tab.id === requestedTab)) {
-                this.activeTabId.set(requestedTab);
+            const validTab = this.tabs.find(tab => tab.id === requestedTab);
+            if (validTab) {
+                this.activeTabId.set(validTab.id);
+                return;
+            }
+            this.activeTabId.set(this.tabs[0].id);
+            if (requestedTab) {
+                this.router.navigate([], {
+                    relativeTo: this.route,
+                    queryParams: { tab: null },
+                    queryParamsHandling: 'merge',
+                    replaceUrl: true
+                });
             }
         });
 

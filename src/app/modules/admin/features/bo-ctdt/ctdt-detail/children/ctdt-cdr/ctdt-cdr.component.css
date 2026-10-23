@@ -45,6 +45,25 @@
     background: var(--cdr-bg);
 }
 
+:host(.cdr-embedded) {
+    height: auto;
+}
+
+:host(.cdr-embedded) .cdr-shell {
+    height: auto;
+    overflow: visible;
+    background: transparent;
+}
+
+:host(.cdr-embedded) .cdr-workspace {
+    max-width: none;
+    padding: 0;
+}
+
+:host(.cdr-embedded) .cdr-matrix-card {
+    margin-top: 20px;
+}
+
 .cdr-shell > app-loading-progress { z-index: 30; }
 
 .cdr-workspace {
@@ -90,7 +109,7 @@
     content: '';
 }
 
-.cdr-matrix-card:has(> .matrix-empty-tip) > .cdr-matrix-card__header {
+.cdr-matrix-card:has(> #cdr-matrix-panel:not([hidden])) > .cdr-matrix-card__header {
     border-bottom: 1px solid #cbd5e1;
 }
 
@@ -118,10 +137,11 @@
 .cdr-table-card__title.admin-wrap-table__heading {
     margin: 0;
     color: #1e3a8a;
-    font-size: 14.5px;
-    font-weight: 600;
-    letter-spacing: .02em;
-    text-transform: uppercase;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: normal;
+    text-transform: none;
 }
 
 .cdr-table-card__sub {
@@ -155,6 +175,8 @@
 .cdr-table-responsive.ictu-admin-table-scroll {
     overflow-x: auto;
     overflow-y: visible;
+    overscroll-behavior-x: contain;
+    overscroll-behavior-y: auto;
 }
 
 .cdr-grid-table.admin-table {
@@ -366,19 +388,49 @@
 /* 3. Matrix Card (Ma trận đối chiếu) */
 .cdr-matrix-card {
     margin-top: 18px;
+    overflow: hidden;
     border: 1px solid var(--cdr-border);
     border-radius: var(--cdr-radius);
     background: var(--cdr-surface);
 }
 
+.cdr-matrix-card__toggle {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #1e3a8a;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.cdr-matrix-card__toggle > .ti:last-child {
+    margin-left: auto;
+    color: #2563eb;
+    font-size: 17px;
+}
+
+.cdr-matrix-card__toggle:focus-visible {
+    border-radius: var(--cdr-radius);
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
 
 .cdr-matrix-card__title {
     display: flex;
     align-items: center;
     gap: 7px;
     color: #1e3a8a;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: normal;
+    text-transform: none;
 }
 
 .cdr-matrix-card__icon {

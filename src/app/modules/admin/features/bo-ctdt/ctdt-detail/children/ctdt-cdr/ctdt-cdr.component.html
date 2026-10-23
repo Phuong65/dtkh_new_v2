@@ -15,8 +15,7 @@
             <header class="admin-wrap-table__head cdr-table-card__header">
                 <div class="cdr-table-card__title-wrap">
                     <span class="cdr-table-card__icon" aria-hidden="true"><i class="ti ti-certificate"></i></span>
-                    <span class="admin-wrap-table__heading cdr-table-card__title">CHUẨN ĐẦU RA CỦA CHƯƠNG TRÌNH ĐÀO
-                        TẠO</span>
+                    <span class="admin-wrap-table__heading cdr-table-card__title">Chuẩn đầu ra của chương trình đào tạo</span>
                 </div>
                 <div class="admin-wrap-table__head-actions cdr-table-card__actions">
                     <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse cdr-add-button"
@@ -154,13 +153,21 @@
         <!-- MA TRẬN ĐỐI CHIẾU PEO – PLO (THU GỌN GỌN GÀNG PHÍA DƯỚI) -->
         <section class="cdr-matrix-card">
             <header class="cdr-matrix-card__header">
-                <div class="cdr-matrix-card__title">
-                    <span class="cdr-matrix-card__icon" aria-hidden="true"><i class="ti ti-layout-grid"></i></span>
-                    <span>MA TRẬN ĐỐI CHIẾU MỤC TIÊU ĐÀO TẠO (PEO) VÀ CHUẨN ĐẦU RA (PLO)</span>
-                </div>
+                <button type="button" class="cdr-matrix-card__toggle"
+                    (click)="isMatrixExpanded = !isMatrixExpanded"
+                    [attr.aria-expanded]="isMatrixExpanded" aria-controls="cdr-matrix-panel">
+                    <span class="cdr-matrix-card__title">
+                        <span class="cdr-matrix-card__icon" aria-hidden="true"><i class="ti ti-layout-grid"></i></span>
+                        <span>Ma trận đối chiếu mục tiêu đào tạo (PEO) và chuẩn đầu ra (PLO)</span>
+                    </span>
+                    <i class="ti" [class.ti-chevron-down]="!isMatrixExpanded"
+                        [class.ti-chevron-up]="isMatrixExpanded" aria-hidden="true"></i>
+                </button>
                 <span class="matrix-count-tag">{{ getMatrixLinkCount() }} liên kết</span>
             </header>
 
+            <div id="cdr-matrix-panel" [hidden]="!isMatrixExpanded">
+            @if (isMatrixExpanded) {
             @if (!list_cdr_muctieu.length || !list_ctdt_cdr.length) {
             <div class="matrix-empty-tip">
                 <span>Chưa đủ dữ liệu để hiển thị ma trận đối chiếu (cần có ít nhất 1 PEO và 1 PLO).</span>
@@ -203,6 +210,8 @@
                 </table>
             </div>
             }
+            }
+            </div>
         </section>
     </div>
     }

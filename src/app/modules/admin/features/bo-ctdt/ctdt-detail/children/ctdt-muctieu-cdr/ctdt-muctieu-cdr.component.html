@@ -19,11 +19,11 @@
                     <header class="goals-card__header">
                         <div class="goals-card__heading">
                             <span class="goals-card__icon" aria-hidden="true"><i class="ti ti-arrows-left-right"></i></span>
-                            <h2 id="goal-identity-heading">TIÊU CHÍ TƯƠNG THÍCH VỚI MỤC TIÊU CỦA CHƯƠNG TRÌNH ĐÀO TẠO (PEOs)</h2>
+                            <h2 id="goal-identity-heading">Định hướng</h2>
                         </div>
                         <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse"
-                            (click)="openAddDinhHuong()" [disabled]="busy" aria-label="Thêm tiêu chí tương thích"
-                            pTooltip="Thêm tiêu chí" tooltipPosition="top" appendTo="body">
+                            (click)="openAddDinhHuong()" [disabled]="busy" aria-label="Thêm định hướng"
+                            pTooltip="Thêm định hướng" tooltipPosition="top" appendTo="body">
                             <i class="ti ti-plus" aria-hidden="true"></i>
                         </button>
                     </header>
@@ -84,7 +84,7 @@
                             (click)="isMatrixExpanded = !isMatrixExpanded" [attr.aria-expanded]="isMatrixExpanded"
                             aria-controls="goal-matrix-panel">
                             <span class="goals-card__icon" aria-hidden="true"><i class="ti ti-layout-grid"></i></span>
-                            <span id="goal-matrix-heading">MA TRẬN TƯƠNG THÍCH MỤC TIÊU ĐÀO TẠO (PEO) VỚI ĐỊNH HƯỚNG CƠ SỞ ĐÀO TẠO</span>
+                            <span id="goal-matrix-heading">Ma trận tương thích mục tiêu đào tạo (PEO) với định hướng cơ sở đào tạo</span>
                             <i class="ti" [class.ti-chevron-down]="!isMatrixExpanded" [class.ti-chevron-up]="isMatrixExpanded" aria-hidden="true"></i>
                         </button>
                     </header>
@@ -167,7 +167,7 @@
                     <header class="goals-card__header goals-peo-card__header">
                         <div class="goals-card__heading">
                             <span class="goals-card__icon" aria-hidden="true"><i class="ti ti-target"></i></span>
-                            <h2 id="goal-peo-heading">MỤC TIÊU ĐÀO TẠO CỦA CHƯƠNG TRÌNH</h2>
+                            <h2 id="goal-peo-heading">Mục tiêu đào tạo của chương trình</h2>
                         </div>
                         <button mat-flat-button class="btn ictu-badge-btn--success-reverse" (click)="openAddKhungTrinhDo()"
                             [disabled]="busy || goalsState() === 'error'"
@@ -297,47 +297,80 @@
                     }
                 </section>
 
+                <section class="goals-embedded-cdr" aria-label="Chuẩn đầu ra của chương trình đào tạo">
+                    <app-ctdt-cdr [selectedCtdtInput]="selectedCtdt" [peoListInput]="list_muctieu_cuthe"
+                        [embedded]="true" [peoRefreshKey]="peoRefreshKey"
+                        (summaryChange)="onCdrSummaryChange($event)"></app-ctdt-cdr>
+                </section>
             </div>
 
-            <aside class="goals-workspace__aside" aria-label="Tổng quan mục tiêu">
-                <section class="goals-summary-card goals-summary-card--primary">
-                    <div class="goals-summary-card__icon">
-                        <i class="ti ti-list-check" aria-hidden="true"></i>
-                        <h2>Mục tiêu đã thiết lập</h2>
-                    </div>
-                    <strong>{{ goalsState() === 'loading' || goalsState() === 'error' ? '—' : list_muctieu_cuthe.length
-                        }}</strong>
-                    <p>{{ goalsState() === 'loading' ? 'Đang tải dữ liệu...' : goalsState() === 'error' ? 'Chưa tải được
-                        dữ liệu' : 'PEO trong chương trình' }}</p>
+            <aside class="goals-workspace__aside" aria-label="Thông tin nhanh chương trình">
+                <section class="goals-summary-card">
+                    <h2><i class="ti ti-chart-bar" aria-hidden="true"></i>Thông tin nhanh</h2>
+                    <dl class="goals-summary-list">
+                        <div>
+                            <dt>PEO</dt>
+                            <dd>{{ goalsState() === 'success' && state() === 'success' ? list_muctieu_cuthe.length : '—' }}</dd>
+                        </div>
+                        <div>
+                            <dt>PLO</dt>
+                            <dd>{{ cdrSummary?.state === 'success' ? cdrSummary!.ploCount : '—' }}</dd>
+                        </div>
+                        <div>
+                            <dt>Định hướng</dt>
+                            <dd>{{ state() === 'success' ? list_tuongthich.length : '—' }}</dd>
+                        </div>
+                        <div>
+                            <dt>Khung trình độ</dt>
+                            <dd>{{ state() === 'success' ? type_ctdt_muctieu_cuthe.length : '—' }}</dd>
+                        </div>
+                    </dl>
                 </section>
                 <section class="goals-summary-card">
-                    <h2><i class="ti ti-folders" aria-hidden="true"></i>Phân nhóm mục tiêu</h2>
-                    @if (goalsState() !== 'loading' && goalsState() !== 'error') {
+                    <h2><i class="ti ti-link" aria-hidden="true"></i>Liên kết mục tiêu</h2>
+                    @if (state() === 'success' && goalsState() === 'success') {
                     <dl class="goals-summary-list">
-                        @for (group of list_ctdt_muctieu_cuthe; track group.key) {
                         <div>
-                            <dt>{{ group.title }}</dt>
-                            <dd>{{ group.children.length }}</dd>
+                            <dt>PEO đã gắn định hướng</dt>
+                            <dd>{{ list_muctieu_cuthe.length ? getLinkedPeoCount() + '/' + list_muctieu_cuthe.length : '—' }}</dd>
                         </div>
-                        } @empty {
                         <div>
-                            <dt>Chưa có nhóm mục tiêu</dt>
+                            <dt>Định hướng đã dùng</dt>
+                            <dd>{{ list_tuongthich.length ? getUsedOrientationCount() + '/' + list_tuongthich.length : '—' }}</dd>
                         </div>
-                        }
+                        <div>
+                            <dt>Tổng liên kết PEO–định hướng</dt>
+                            <dd>{{ getCompatibilityLinkCount() }}</dd>
+                        </div>
+                        <div>
+                            <dt>Mục tiêu chung</dt>
+                            <dd>{{ hasGeneralContent() ? 'Đã có nội dung' : 'Chưa có nội dung' }}</dd>
+                        </div>
                     </dl>
                     } @else {
-                    <p class="goals-helper">{{ goalsState() === 'loading' ? 'Đang tải...' : 'Dữ liệu chưa sẵn sàng' }}
-                    </p>
+                    <p class="goals-helper">{{ state() === 'error' || goalsState() === 'error' ? 'Không tải được dữ liệu liên kết' : 'Đang tải liên kết...' }}</p>
                     }
                 </section>
                 <section class="goals-summary-card">
-                    <h2><i class="ti ti-notes" aria-hidden="true"></i>Gợi ý soạn mục tiêu</h2>
-                    <ul class="goals-guidance">
-                        <li>Diễn đạt rõ ràng, có thể đánh giá.</li>
-                        <li>Phù hợp với khung trình độ đã chọn.</li>
-                        <li>Liên kết với định hướng của cơ sở đào tạo.</li>
-                        <li>Tránh trùng lặp giữa các mục tiêu.</li>
-                    </ul>
+                    <h2><i class="ti ti-certificate" aria-hidden="true"></i>Chuẩn đầu ra</h2>
+                    @if (cdrSummary?.state === 'success') {
+                    <dl class="goals-summary-list">
+                        <div>
+                            <dt>Chỉ báo PI</dt>
+                            <dd>{{ cdrSummary!.piCount }}</dd>
+                        </div>
+                        <div>
+                            <dt>Liên kết PEO–PLO</dt>
+                            <dd>{{ cdrSummary!.peoPloLinkCount }}</dd>
+                        </div>
+                        <div>
+                            <dt>PLO có tổng PI khác 100%</dt>
+                            <dd>{{ cdrSummary!.invalidPiPercentPloCount }}</dd>
+                        </div>
+                    </dl>
+                    } @else {
+                    <p class="goals-helper">{{ cdrSummary?.state === 'error' ? 'Không tải được chuẩn đầu ra' : 'Đang tải chuẩn đầu ra...' }}</p>
+                    }
                 </section>
             </aside>
         </div>
