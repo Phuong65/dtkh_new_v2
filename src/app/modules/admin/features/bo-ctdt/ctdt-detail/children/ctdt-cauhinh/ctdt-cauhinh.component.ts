@@ -218,9 +218,11 @@ export class CtdtCauhinhComponent implements OnInit {
                     const custom = (_config.data || []).filter(m => m.group === f.group);
                     const emptyKhungMarker = (_config.data || []).some(m => m.group === 'KHUNG_TRINH_DO_EMPTY');
                     const emptyDinhHuongMarker = (_config.data || []).some(m => m.group === 'TUONGTHICH_PEOs_EMPTY');
+                    const emptyKhoiMarker = (_config.data || []).some(m => m.group === 'KHOI_KIEN_THUC_EMPTY');
                     if (custom.length) {
                         f.ctdt_config = custom;
                     } else if ((f.group === 'KHUNG_TRINH_DO' && emptyKhungMarker)
+                        || (f.group === 'KHOI_KIEN_THUC' && emptyKhoiMarker)
                         || (f.group === 'TUONGTHICH_PEOs' && emptyDinhHuongMarker)) {
                         f.ctdt_config = [];
                     } else {

@@ -980,7 +980,6 @@
 }
 
 .goals-summary-card--primary {
-    border-top: 3px solid var(--navy);
     background: #fcfdfe;
 }
 

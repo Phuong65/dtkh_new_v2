@@ -16,6 +16,14 @@
 
     @if(!isLoadingData() && !savingHp()){
     <section class="admin-wrap-table ictu-admin-table-shell content-card">
+        <div class="content-table-toolbar" aria-labelledby="content-table-title">
+            <h2 id="content-table-title">Khối kiến thức và học phần</h2>
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse content-add-block-button"
+                (click)="openAddKhoi()" [disabled]="blockActionsBusy || hasPendingChanges()"
+                aria-label="Thêm khối kiến thức" pTooltip="Thêm khối kiến thức" tooltipPosition="top">
+                <i class="ti ti-plus" aria-hidden="true"></i><span>Thêm khối kiến thức</span>
+            </button>
+        </div>
         <div class="admin-wrap-table__body ictu-admin-table-shell__body">
             <div class="ictu-admin-table-scroll content-table-scroll">
                 <table class="tbl admin-table content-table">
@@ -56,12 +64,26 @@
                                         <i class="ti ti-folder" aria-hidden="true"></i>
                                         <strong>{{ khoi.title }}</strong>
                                     </div>
-                                    <button type="button" mat-flat-button
-                                        class="btn ictu-badge-btn--success-reverse content-add-button"
-                                        (click)="openSelectedMonhoc(khoi)"
-                                        [attr.aria-label]="'Thêm học phần vào ' + khoi.title">
-                                        <i class="ti ti-plus" aria-hidden="true"></i>Thêm học phần
-                                    </button>
+                                    <div class="content-block-actions">
+                                        <div class="content-block-secondary-actions">
+                                            <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
+                                                (click)="openEditKhoi(khoi)" [disabled]="!khoi.key || blockActionsBusy || hasPendingChanges()"
+                                                [attr.aria-label]="'Sửa khối kiến thức ' + khoi.title" pTooltip="Sửa khối kiến thức" tooltipPosition="top">
+                                                <i class="ti ti-edit" aria-hidden="true"></i>
+                                            </button>
+                                            <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
+                                                (click)="deleteKhoi(khoi)" [disabled]="!khoi.key || blockActionsBusy || hasPendingChanges()"
+                                                [attr.aria-label]="'Xóa khối kiến thức ' + khoi.title" pTooltip="Xóa khối kiến thức" tooltipPosition="top">
+                                                <i class="ti ti-trash" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                        <button type="button" mat-flat-button
+                                            class="btn ictu-badge-btn--success-reverse content-add-button"
+                                            (click)="openSelectedMonhoc(khoi)" [disabled]="!khoi.key || blockActionsBusy"
+                                            [attr.aria-label]="'Thêm học phần vào ' + khoi.title">
+                                            <i class="ti ti-plus" aria-hidden="true"></i>Thêm học phần
+                                        </button>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -233,6 +255,36 @@
                     <i class="ti ti-device-floppy" aria-hidden="true"></i>Xác nhận {{ selectedCourseIds.size ? '(' +
                     selectedCourseIds.size + ')' : '' }}
                 </button>
+            </div>
+        </div>
+    </p-drawer>
+
+    <p-drawer [(visible)]="khoiDrawerVisible" [dismissible]="!savingKhoi()" [closable]="!savingKhoi()"
+        [closeOnEscape]="!savingKhoi()" [blockScroll]="true" [header]="khoiFormHeading"
+        [style]="{ width: 'min(480px, 100vw)' }" appendTo="body" position="right" styleClass="ictu-p-drawer">
+        <div class="ictu-p-drawer__content position-relative">
+            @if (savingKhoi()) {
+            <app-loading-progress heading="Đang lưu khối kiến thức..." backdropFilter="blur(2px)"></app-loading-progress>
+            }
+            <div class="ictu-p-drawer__content__body position-relative">
+                <form id="khoi-form" [formGroup]="formKhoi" (ngSubmit)="saveKhoi()" class="ictu-form">
+                    <div class="ictu-form__row">
+                        <label class="ictu-form__label ictu-form__label--required" for="khoi-title">Tên khối kiến thức</label>
+                        <input pInputText id="khoi-title" type="text" formControlName="title"
+                            class="ictu-form__input-field" placeholder="Nhập tên khối kiến thức" autocomplete="off"
+                            [attr.aria-invalid]="formKhoi.controls['title'].touched && formKhoi.controls['title'].invalid"
+                            aria-describedby="khoi-title-error">
+                        @if (formKhoi.controls['title'].touched && formKhoi.controls['title'].invalid) {
+                        <span id="khoi-title-error" class="ictu-admin-form-error" role="alert">Nhập tên khối kiến thức.</span>
+                        }
+                    </div>
+                </form>
+            </div>
+            <div class="ictu-p-drawer__content__footer ictu-admin-drawer-footer">
+                <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button"
+                    (click)="closeKhoiDrawer()" [disabled]="savingKhoi()">Hủy</button>
+                <button type="submit" form="khoi-form" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button"
+                    [disabled]="savingKhoi()">Lưu khối kiến thức</button>
             </div>
         </div>
     </p-drawer>

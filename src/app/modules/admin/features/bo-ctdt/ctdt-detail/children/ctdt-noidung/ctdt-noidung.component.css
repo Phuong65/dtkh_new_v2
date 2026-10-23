@@ -51,14 +51,16 @@
 .content-shell > app-loading-progress { z-index: 30; }
 
 .content-card.ictu-admin-table-shell {
+    display: flex;
     width: min(70%, 1120px);
     margin: 10px auto;
     flex: 1 1 auto;
+    flex-direction: column;
     height: 100% !important;
     min-height: 0 !important;
     overflow: hidden !important;
-    border: none;
-    border-radius: 0;
+    border: 1px solid var(--noidung-border);
+    border-radius: var(--noidung-radius);
     background: var(--noidung-surface);
     box-shadow: none;
     box-sizing: border-box;
@@ -215,6 +217,91 @@
     font-size: 14px;
     font-weight: 600;
     letter-spacing: .01em;
+}
+
+.content-table-toolbar {
+    display: flex;
+    flex: 0 0 55px;
+    width: 100%;
+    height: 55px;
+    min-height: 55px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 16px;
+    position: relative;
+    border-bottom: 1px solid #cbd5e1;
+    background: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
+    color: #1e3a8a;
+    box-sizing: border-box;
+}
+
+.content-table-toolbar::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    background: #2563eb;
+    content: '';
+}
+
+.content-table-toolbar h2 {
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    color: #1e3a8a;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.content-add-block-button {
+    display: inline-flex !important;
+    min-height: 32px;
+    align-items: center;
+    gap: 5px;
+    padding: 0 10px !important;
+    border-radius: 4px !important;
+}
+
+.content-block-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.content-block-secondary-actions {
+    display: inline-flex;
+    gap: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(4px);
+    transition: opacity .15s ease, transform .15s ease;
+}
+
+.content-block-row:hover .content-block-secondary-actions,
+.content-block-row:focus-within .content-block-secondary-actions {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
+}
+
+.content-block-secondary-actions .ictu-admin-icon-button {
+    width: 30px;
+    min-width: 30px;
+    height: 30px;
+    min-height: 30px;
+    padding: 0 !important;
+    border-radius: 4px !important;
+}
+
+@media (hover: none) {
+    .content-block-secondary-actions {
+        opacity: 1;
+        pointer-events: auto;
+        transform: none;
+    }
 }
 
 .content-block-title small {
@@ -940,9 +1027,28 @@
         padding: 0 12px;
     }
 
+    .content-table-toolbar {
+        align-items: center;
+        flex-direction: row;
+        padding: 0 12px;
+    }
+
+    .content-table-toolbar h2 {
+        font-size: 16px;
+    }
+
+    .content-table-toolbar .content-add-block-button span {
+        display: none;
+    }
+
     .content-block-title {
         flex-direction: column;
         align-items: flex-start;
         gap: 6px;
+    }
+
+    .content-block-actions {
+        width: 100%;
+        margin-left: 25px;
     }
 }

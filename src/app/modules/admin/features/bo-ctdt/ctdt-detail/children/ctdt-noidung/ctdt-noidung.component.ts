@@ -1,7 +1,7 @@
 import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, WritableSignal, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { OvicQueryCondition } from '@core/models/dto';
 import { AuthService } from '@core/services/auth.service';
@@ -10,7 +10,7 @@ import { ConditionOption } from '@modules/shared/models/condition-option';
 import { CtdtService } from '@modules/shared/services/ctdt.service';
 import { CtdtHocphanService } from '@modules/shared/services/ctdt-hocphan.service';
 import { ElngUserProfileService } from '@modules/shared/services/elearning-user-profile.service';
-import { concatMap, finalize, forkJoin, from, map, of, Subject, switchMap, takeUntil, tap, toArray } from 'rxjs';
+import { concatMap, defer, finalize, forkJoin, from, map, Observable, of, Subject, switchMap, takeUntil, tap, throwError, toArray } from 'rxjs';
 import { Ctdt } from '@modules/shared/models/ctdt';
 import { ROLES } from '@modules/shared/utils/syscat';
 import { ConfigsService } from '@modules/shared/services/configs.service';
@@ -29,6 +29,9 @@ import { Drawer } from 'primeng/drawer';
 import { InputTextModule } from 'primeng/inputtext';
 import { MatButtonModule } from '@angular/material/button';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
+import { IctuDeletingAnimationControl } from '@core-new/models/ictu-deleting-animation-control';
+import { HelperService } from '@core/services/helper.service';
+import { TooltipModule } from 'primeng/tooltip';
 
 type CourseConditionKey = 'hp_hoctruoc' | 'hp_tienquyet' | 'hp_songhanh';
 type CourseRow = Pick<ElnKhoaHoc, 'id' | 'title' | 'maso'> & {
@@ -58,8 +61,8 @@ export interface typeCtdtHocphan {
 @Component({
     selector: 'app-ctdt-noidung',
     standalone: true,
-    imports: [CommonModule, TableModule, FormsModule, PopoverModule,
-        Drawer, InputTextModule, MatButtonModule, LoadingProgressComponent, IctuPaginatorComponent],
+    imports: [CommonModule, TableModule, FormsModule, ReactiveFormsModule, PopoverModule,
+        Drawer, InputTextModule, MatButtonModule, LoadingProgressComponent, IctuPaginatorComponent, TooltipModule],
     templateUrl: './ctdt-noidung.component.html',
     styleUrls: ['./ctdt-noidung.component.css']
 })
@@ -67,6 +70,7 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
     private readonly destroy$ = new Subject<void>();
     private readonly cancelLoad$ = new Subject<void>();
     private readonly cancelSubjects$ = new Subject<void>();
+    private readonly cancelKhoi$ = new Subject<void>();
     private loadedCtdtId: number | null = null;
     private readonly auth = inject(AuthService);
     private readonly notificationService = inject(NotificationService);
@@ -79,6 +83,11 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
     private readonly elnKhoaHocService = inject(ElnKhoaHocService);
     private readonly subjectCourseService = inject(SubjectCourseService);
     private readonly ctdtConfigService = inject(CtdtConfigService);
+    private readonly formBuilder = inject(FormBuilder);
+    private readonly helperService = inject(HelperService);
+    private readonly emptyKhoiGroup = 'KHOI_KIEN_THUC_EMPTY';
+    private emptyKhoiMarker: CtdtConfig | null = null;
+    private defaultKhoi: CtdtConfig[] = [];
 
     @Input() selectedCtdt: Ctdt | null = null;
 
@@ -87,6 +96,16 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
     userId = 0;
     list_khoikienthuc: CtdtConfig[] = [];
     list_cdt_hocphan: typeCtdtHocphan[] = [];
+    readonly formKhoi: FormGroup = this.formBuilder.group({ title: ['', Validators.required] });
+    khoiDrawerVisible = false;
+    khoiFormHeading = '';
+    selectedKhoi: CtdtConfig | null = null;
+    readonly savingKhoi: WritableSignal<boolean> = signal(false);
+    readonly deletingKhoi: WritableSignal<boolean> = signal(false);
+
+    get blockActionsBusy(): boolean {
+        return this.savingKhoi() || this.deletingKhoi() || this.savingHp() || this.isLoadingData();
+    }
     list_course: CourseRow[] = [];
     selectedKhoiKienthuc: typeCtdtHocphan | null = null;
     list_subjects: SubjectCourseOption[] = [];
@@ -153,16 +172,21 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         this.destroy$.complete();
         this.cancelLoad$.complete();
         this.cancelSubjects$.complete();
+        this.cancelKhoi$.complete();
     }
 
     initCtdtData(ctdtId: string): void {
         if (this.loadedCtdtId === Number(ctdtId)) return;
         this.cancelLoad$.next();
+        this.cancelKhoi$.next();
         this.closeDrawerChooseMonhoc();
         this.loadedCtdtId = Number(ctdtId);
         this.list_course = [];
         this.list_cdt_hocphan = [];
         this.courseLinks = [];
+        this.khoiDrawerVisible = false;
+        this.emptyKhoiMarker = null;
+        this.defaultKhoi = [];
         this.persistedCourseRows.clear();
         this.linkedCourseIds.clear();
         this.stagedAdds.clear();
@@ -185,7 +209,7 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         };
         const condition_ctdt_config: ConditionOption = {
             condition: [{ conditionName: 'ctdt_id', condition: OvicQueryCondition.equal, value: ctdtId }],
-            set: [{ label: 'limit', value: '-1' }, { label: 'include', value: 'KHOI_KIEN_THUC' },
+            set: [{ label: 'limit', value: '-1' }, { label: 'include', value: 'KHOI_KIEN_THUC,KHOI_KIEN_THUC_EMPTY' },
                 { label: 'include_by', value: 'group' }, { label: 'orderby', value: 'ordering' }, { label: 'order', value: 'ASC' }],
             page: null
         };
@@ -203,8 +227,7 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
                     this.router.navigate(['/admin/content-none']);
                     return;
                 }
-                this.list_khoikienthuc = config.recordsFiltered ? config.data
-                    : Array.isArray(defaults.data?.[0]?.params) ? defaults.data[0].params : [];
+                this.applyKhoiConfig(config.data || [], defaults.data?.[0]?.params, Number(ctdtId));
                 this.loadCtdthocPhan();
             },
             error: () => {
@@ -281,6 +304,214 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         else if (this.selectedCtdt?.id) this.initCtdtData(String(this.selectedCtdt.id));
     }
 
+    private applyKhoiConfig(rows: CtdtConfig[], defaults: unknown, ctdtId: number): void {
+        this.emptyKhoiMarker = rows.find(item => item.group === this.emptyKhoiGroup) || null;
+        if (Array.isArray(defaults)) this.defaultKhoi = defaults;
+        const custom = rows.filter(item => item.group === 'KHOI_KIEN_THUC');
+        this.list_khoikienthuc = custom.length ? custom : this.emptyKhoiMarker ? []
+            : this.defaultKhoi.map((item, index) => ({ ...item, ctdt_id: ctdtId,
+                group: 'KHOI_KIEN_THUC', ordering: item.ordering ?? index + 1 }));
+        this.groupCourses();
+    }
+
+    private getKhoiConfig(ctdtId: number): Observable<CtdtConfig[]> {
+        return this.ctdtConfigService.getCtdtConfigByPageNew({
+            condition: [{ conditionName: 'ctdt_id', condition: OvicQueryCondition.equal, value: String(ctdtId) }],
+            set: [{ label: 'limit', value: '-1' }, { label: 'include', value: 'KHOI_KIEN_THUC,KHOI_KIEN_THUC_EMPTY' },
+                { label: 'include_by', value: 'group' }, { label: 'orderby', value: 'ordering' }, { label: 'order', value: 'ASC' }],
+            page: null
+        }).pipe(map(response => response.data || []));
+    }
+
+    private refreshKhoiConfig(ctdtId: number, message: string): void {
+        this.getKhoiConfig(ctdtId).pipe(takeUntil(this.destroy$)).subscribe({
+            next: rows => {
+                if (this.selectedCtdt?.id !== ctdtId) return;
+                this.applyKhoiConfig(rows, undefined, ctdtId);
+                this.khoiDrawerVisible = false;
+                this.loadCtdthocPhan();
+                this.notificationService.toastSuccess(message);
+            },
+            error: () => this.notificationService.toastError('Không thể tải lại danh sách khối kiến thức')
+        });
+    }
+
+    openAddKhoi(): void {
+        if (this.blockActionsBusy || this.hasPendingChanges()) {
+            if (this.hasPendingChanges()) this.notificationService.toastWarning('Vui lòng lưu các thay đổi học phần trước khi thêm khối kiến thức.');
+            return;
+        }
+        this.formKhoi.reset({ title: '' });
+        this.selectedKhoi = null;
+        this.khoiFormHeading = 'Thêm khối kiến thức';
+        this.khoiDrawerVisible = true;
+    }
+
+    openEditKhoi(block: typeCtdtHocphan): void {
+        const config = this.list_khoikienthuc.find(item => item.key === block.key);
+        if (!config || this.blockActionsBusy || this.hasPendingChanges()) {
+            if (this.hasPendingChanges()) this.notificationService.toastWarning('Vui lòng lưu các thay đổi học phần trước khi sửa khối kiến thức.');
+            return;
+        }
+        this.selectedKhoi = config;
+        this.formKhoi.reset({ title: config.title });
+        this.khoiFormHeading = 'Sửa khối kiến thức';
+        this.khoiDrawerVisible = true;
+    }
+
+    closeKhoiDrawer(): void {
+        if (!this.savingKhoi() && !this.deletingKhoi()) this.khoiDrawerVisible = false;
+    }
+
+    saveKhoi(): void {
+        if (!this.selectedCtdt || this.savingKhoi() || this.deletingKhoi()) return;
+        this.formKhoi.markAllAsTouched();
+        const title = String(this.formKhoi.value.title || '').trim();
+        if (this.formKhoi.invalid || !title) return;
+        const programmeId = this.selectedCtdt.id;
+        const hasPendingChanges = this.hasPendingChanges();
+        if (hasPendingChanges) {
+            this.notificationService.toastWarning('Vui lòng lưu các thay đổi học phần trước khi sửa khối kiến thức.');
+            return;
+        }
+        const selected = this.selectedKhoi;
+        const editing = Boolean(selected);
+        const defaultSnapshot = this.list_khoikienthuc.map(item => ({ ...item }));
+        const key = selected?.key || this.helperService.slugVietnamese(title);
+        if (!key || this.list_khoikienthuc.some(item => item.key !== selected?.key
+            && (item.key === key || item.title.trim().toLocaleLowerCase() === title.toLocaleLowerCase()))) {
+            this.notificationService.toastWarning('Khối kiến thức đã tồn tại hoặc không hợp lệ');
+            return;
+        }
+        const payload: CtdtConfig = { ctdt_id: programmeId, group: 'KHOI_KIEN_THUC', key, title,
+            ordering: selected?.ordering || this.list_khoikienthuc.length + 1, noidung: selected?.noidung || '' };
+        this.savingKhoi.set(true);
+        this.getKhoiConfig(programmeId).pipe(
+            switchMap(rows => {
+                const real = rows.filter(item => item.group === 'KHOI_KIEN_THUC');
+                const persisted = real.find(item => item.key === selected?.key);
+                if (editing && persisted?.id) return this.ctdtConfigService.updateCtdtConfig(persisted.id, payload);
+                const savedKeys = new Set(real.map(item => item.key));
+                const defaultsToMaterialize = defaultSnapshot
+                    .filter(item => !savedKeys.has(item.key))
+                    .map((item, index) => () => this.ctdtConfigService.addCtdtConfig({
+                        ctdt_id: programmeId, group: 'KHOI_KIEN_THUC', key: item.key,
+                        title: editing && item.key === key ? title : item.title,
+                        ordering: item.ordering ?? index + 1, noidung: item.noidung || ''
+                    }));
+                return (defaultsToMaterialize.length ? from(defaultsToMaterialize).pipe(concatMap(request => defer(request)), toArray()) : of([]))
+                    .pipe(switchMap(() => editing ? of(null) : real.some(item => item.key === key) ? of(null)
+                        : this.ctdtConfigService.addCtdtConfig(payload)));
+            }),
+            switchMap(saved => this.emptyKhoiMarker?.id ? this.ctdtConfigService.deleteCtdtConfig(this.emptyKhoiMarker.id).pipe(map(() => saved)) : of(saved)),
+            takeUntil(this.destroy$), finalize(() => this.savingKhoi.set(false))
+        ).subscribe({
+            next: () => this.refreshKhoiConfig(programmeId, 'Lưu khối kiến thức thành công'),
+            error: () => this.notificationService.toastError('Không thể lưu khối kiến thức')
+        });
+    }
+
+    deleteKhoi(block: typeCtdtHocphan): void {
+        if (!this.selectedCtdt || this.blockActionsBusy || !block.key || this.courseLoadError) return;
+        if (this.hasPendingChanges()) {
+            this.notificationService.toastWarning('Vui lòng lưu các thay đổi học phần trước khi xóa khối kiến thức.');
+            return;
+        }
+        const config = this.list_khoikienthuc.find(item => item.key === block.key);
+        if (!config) return;
+        const programmeId = this.selectedCtdt.id;
+        const defaultSnapshot = this.list_khoikienthuc.map(item => ({ ...item }));
+        const count = this.courseLinks.filter(link => link.khoikienthuc === block.key).length;
+        const safeTitle = block.title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        this.notificationService.confirmDelete2({
+            heading: 'Xóa khối kiến thức và học phần',
+            htmlMessage: `Xóa khối "${safeTitle}" và toàn bộ học phần thuộc khối trong CTĐT này (hiện có ${count} học phần)? Môn học gốc không bị xóa.`
+        }).pipe(takeUntil(this.cancelKhoi$), takeUntil(this.destroy$)).subscribe(confirmed => {
+            if (!confirmed || this.selectedCtdt?.id !== programmeId || this.blockActionsBusy || this.hasPendingChanges()) return;
+            this.deletingKhoi.set(true);
+            const operation = forkJoin({
+                configs: this.getKhoiConfig(programmeId),
+                links: this.ctdtHocphanService.getCtdtHocphanByPageNew({
+                    condition: [{ conditionName: 'ctdt_id', condition: OvicQueryCondition.equal, value: String(programmeId) }],
+                    set: [{ label: 'limit', value: '-1' }], page: null
+                })
+            }).pipe(switchMap(({ configs, links }) => this.buildDeleteKhoiOperation(
+                programmeId, block.key, defaultSnapshot, configs, links.data || []
+            )));
+            let operationComplete = false;
+            const controller = new IctuDeletingAnimationControl([1], {
+                // One sequential operation: a failed child deletion must prevent deleting the block.
+                delete: () => operation.pipe(
+                    tap(() => operationComplete = true),
+                    takeUntil(this.cancelKhoi$), takeUntil(this.destroy$)
+                )
+            });
+            this.notificationService.startDeleting(controller.progress).pipe(
+                takeUntil(this.cancelKhoi$), takeUntil(this.destroy$),
+                finalize(() => this.deletingKhoi.set(false))
+            ).subscribe({
+                next: ok => {
+                    if (this.selectedCtdt?.id !== programmeId) return;
+                    if (ok && operationComplete) {
+                        this.refreshKhoiConfig(programmeId, 'Xóa khối kiến thức và học phần thành công');
+                    } else {
+                        this.notificationService.toastError('Xóa chưa hoàn tất. Khối được giữ lại nếu còn học phần chưa xóa; vui lòng tải lại và thử lại.');
+                        this.refreshKhoiConfig(programmeId, '');
+                    }
+                },
+                error: () => this.notificationService.toastError('Xóa khối kiến thức thất bại')
+            });
+            controller.run();
+        });
+    }
+
+    private buildDeleteKhoiOperation(
+        programmeId: number, blockKey: string, snapshot: CtdtConfig[], configs: CtdtConfig[], links: CtdtHocphan[]
+    ): Observable<unknown> {
+        const targets = links.filter(link => Number(link.ctdt_id) === Number(programmeId) && link.khoikienthuc === blockKey);
+        const remainingLinks = links.filter(link => !targets.includes(link));
+        const real = configs.filter(item => item.group === 'KHOI_KIEN_THUC');
+        const configTargets = real.filter(item => item.key === blockKey);
+        if ([...targets, ...configTargets].some(item => !Number.isInteger(Number(item.id)) || Number(item.id) <= 0)) {
+            return throwError(() => new Error('Liên kết hoặc khối kiến thức không có ID hợp lệ'));
+        }
+        const removedCourseIds = new Set(targets.map(link => Number(link.course_id)));
+        remainingLinks.forEach(link => removedCourseIds.delete(Number(link.course_id)));
+        const requests: Array<() => Observable<unknown>> = [];
+        // Preserve untouched default blocks when creating the first programme-specific configuration.
+        snapshot.filter(item => item.key !== blockKey && !real.some(saved => saved.key === item.key))
+            .forEach((item, index) => requests.push(() => this.ctdtConfigService.addCtdtConfig({
+                ctdt_id: programmeId, group: 'KHOI_KIEN_THUC', key: item.key, title: item.title,
+                ordering: item.ordering ?? index + 1, noidung: item.noidung || ''
+            })));
+        const remainingBlocks = new Set([...snapshot, ...real].filter(item => item.key !== blockKey).map(item => item.key));
+        remainingLinks.forEach(link => {
+            const patch: Partial<CtdtHocphan> = {};
+            this.conditionKeys.forEach(key => {
+                const current = link[key] || [];
+                const filtered = current.filter(id => !removedCourseIds.has(Number(id)));
+                if (filtered.length !== current.length) patch[key] = filtered;
+            });
+            if (Object.keys(patch).length) requests.push(() => this.ctdtHocphanService.updateCtdtHocphan(link.id, patch));
+        });
+        targets.forEach(link => requests.push(() => this.ctdtHocphanService.deleteCtdtHocphan(Number(link.id))));
+        requests.push(() => this.ctdtHocphanService.getCtdtHocphanByPageNew({
+            condition: [
+                { conditionName: 'ctdt_id', condition: OvicQueryCondition.equal, value: String(programmeId) },
+                { conditionName: 'khoikienthuc', condition: OvicQueryCondition.equal, value: blockKey, orWhere: 'and' }
+            ], set: [{ label: 'limit', value: '-1' }], page: null
+        }).pipe(switchMap(response => response.data?.length
+            ? throwError(() => new Error('Khối vẫn còn học phần, vui lòng thử lại')) : of(null))));
+        configTargets.forEach(item => requests.push(() => this.ctdtConfigService.deleteCtdtConfig(item.id)));
+        if (!remainingBlocks.size && !configs.some(item => item.group === this.emptyKhoiGroup)) {
+            requests.push(() => this.ctdtConfigService.addCtdtConfig({
+                ctdt_id: programmeId, group: this.emptyKhoiGroup, key: 'khoi_kien_thuc_empty',
+                title: 'Đã xóa toàn bộ khối kiến thức', ordering: 1
+            }));
+        }
+        return from(requests).pipe(concatMap(request => defer(request)), toArray());
+    }
+
     private groupCourses(): void {
         this.list_cdt_hocphan = this.list_khoikienthuc.map(block => ({
             key: block.key, title: block.title,
@@ -316,7 +547,7 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     openSelectedMonhoc(block: typeCtdtHocphan): void {
-        if (this.savingHp() || this.isLoadingData() || this.courseLoadError || !block.key) return;
+        if (this.savingHp() || this.isLoadingData() || this.courseLoadError || !block.key || this.deletingKhoi()) return;
         this.selectedKhoiKienthuc = block;
         this.searchCourse = '';
         this.appliedSubjectSearch = '';
