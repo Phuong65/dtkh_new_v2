@@ -773,7 +773,7 @@
     justify-content: space-between;
     gap: 12px;
     padding: 9px 14px 9px 18px;
-    border-bottom: 0;
+    border-bottom: 1px solid #cbd5e1;
     background: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
 }
 
@@ -783,6 +783,132 @@
     width: 5px;
     background: #2563eb;
     content: '';
+}
+
+.goals-matrix-card__toggle {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #1e3a8a;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 800;
+    text-align: left;
+    cursor: pointer;
+}
+
+.goals-matrix-card__toggle > span:nth-child(2) {
+    min-width: 0;
+    line-height: 1.35;
+    white-space: normal;
+}
+
+.goals-matrix-card__toggle > .ti:last-child {
+    margin-left: auto;
+    color: #2563eb;
+    font-size: 17px;
+}
+
+.goals-matrix-card__toggle:focus-visible {
+    border-radius: 4px;
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+.goals-matrix-add {
+    flex: 0 0 auto;
+}
+
+.goals-identity-table-wrap {
+    overflow-x: auto;
+}
+
+.goals-identity-table {
+    width: 100%;
+    min-width: 820px;
+    border-collapse: collapse;
+    color: #334155;
+    font-size: 14px;
+}
+
+.goals-identity-table th,
+.goals-identity-table td {
+    padding: 8px 10px;
+    border: 1px solid #cbd5e1;
+    vertical-align: middle;
+}
+
+.goals-identity-table thead th {
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.goals-identity-table__index {
+    width: 58px;
+    text-align: center;
+}
+
+.goals-identity-table__title {
+    width: 170px;
+    text-align: left !important;
+}
+
+.goals-identity-table__content.ql-editor p {
+    margin: 0;
+}
+
+.goals-identity-table__actions {
+    width: 116px;
+    min-width: 116px;
+    text-align: center !important;
+}
+
+.goals-identity-actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.goals-identity-actions .ictu-admin-icon-button {
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 !important;
+}
+
+.goals-identity-table td:nth-child(2) {
+    color: #0f172a;
+    font-weight: 600;
+    text-align: left;
+}
+
+.goals-identity-table__content {
+    display: block;
+    max-width: 100%;
+    min-height: 38px;
+    padding: 6px 8px;
+    color: #0f172a;
+    font-size: 14px;
+    line-height: 1.5;
+    text-align: left;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.goals-identity-table__content:focus-visible {
+    border-radius: 3px;
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
 }
 
 .goals-matrix-card__title {
@@ -1334,6 +1460,19 @@
         align-items: flex-start;
         flex-direction: column;
         padding: 14px;
+    }
+
+    .goals-matrix-card__header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .goals-matrix-add {
+        width: 100%;
+    }
+
+    .goals-matrix-add span {
+        display: inline;
     }
 
     .goals-card__body {

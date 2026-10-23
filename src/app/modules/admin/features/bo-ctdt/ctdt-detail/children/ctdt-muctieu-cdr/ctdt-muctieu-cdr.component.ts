@@ -108,6 +108,7 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
     selectedKhungTrinhDo: CtdtConfig | null = null;
     selectedDinhHuong: CtdtConfig | null = null;
     selectedGoalTypeKey: string | null = null;
+    isMatrixExpanded = false;
     groupFormTitle = '';
     orientationFormTitle = '';
     userId: number = this.auth.user?.id;
@@ -194,6 +195,7 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
         this.orientationRefreshPending = null;
         this.attemptedOrientationKeys.clear();
         this.loadedCtdtId = ctdt.id;
+        this.isMatrixExpanded = false;
         this.drawerVisible = false;
         this.groupDrawerVisible = false;
         this.orientationDrawerVisible = false;
