@@ -17,7 +17,10 @@
     @if(!isLoadingData() && !savingHp()){
     <section class="admin-wrap-table ictu-admin-table-shell content-card">
         <div class="content-table-toolbar" aria-labelledby="content-table-title">
-            <h2 id="content-table-title">Khối kiến thức và học phần</h2>
+            <div class="content-table-toolbar__heading">
+                <span class="content-table-toolbar__icon" aria-hidden="true"><i class="ti ti-books"></i></span>
+                <h2 id="content-table-title">Khối kiến thức và học phần</h2>
+            </div>
             <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse content-add-block-button"
                 (click)="openAddKhoi()" [disabled]="blockActionsBusy || hasPendingChanges()"
                 aria-label="Thêm khối kiến thức" pTooltip="Thêm khối kiến thức" tooltipPosition="top">
