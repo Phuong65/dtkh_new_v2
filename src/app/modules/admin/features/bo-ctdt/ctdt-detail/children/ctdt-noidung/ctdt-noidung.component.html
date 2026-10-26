@@ -18,8 +18,8 @@
     <section class="admin-wrap-table ictu-admin-table-shell content-card">
         <div class="content-table-toolbar" aria-labelledby="content-table-title">
             <div class="content-table-toolbar__heading">
-                <span class="content-table-toolbar__icon" aria-hidden="true"><i class="ti ti-books"></i></span>
-                <h2 id="content-table-title">Khối kiến thức và học phần</h2>
+                <span class="content-table-toolbar__icon" aria-hidden="true"><i class="ti ti-book"></i></span>
+                <h2 id="content-table-title">Cấu trúc học phần CTĐT</h2>
             </div>
             <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse content-add-block-button"
                 (click)="openAddKhoi()" [disabled]="blockActionsBusy || hasPendingChanges()"
@@ -64,7 +64,7 @@
                             <td colspan="8">
                                 <div class="content-block-title">
                                     <div class="content-block-name">
-                                        <i class="ti ti-folder" aria-hidden="true"></i>
+                                        <span class="content-block-folder-icon" aria-hidden="true"><i class="ti ti-folder"></i></span>
                                         <strong>{{ khoi.title }}</strong>
                                     </div>
                                     <div class="content-block-actions">

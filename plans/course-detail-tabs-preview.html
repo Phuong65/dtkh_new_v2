@@ -1,0 +1,255 @@
+<title>Bố cục học phần</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Two workflow families above a master-detail drafting workspace. */
+:root {
+  --bg: #f5f7fb; --surface: #ffffff; --surface-soft: #f1f5f9; --surface-blue: #eff6ff;
+  --ink: #0f172a; --text: #334155; --muted: #64748b; --line: #dce4ef;
+  --primary: #2563eb; --primary-deep: #1d4ed8; --on-primary: #ffffff;
+  --success: #166534; --success-bg: #f0fdf4; --warning: #9a3412; --warning-bg: #fff7ed;
+  --font-display: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+  --font-body: 'Be Vietnam Pro', 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101827; --surface: #1b283a; --surface-soft: #223249; --surface-blue: #183754;
+    --ink: #f5f8ff; --text: #d9e4f1; --muted: #a6b6c9; --line: #35475b;
+    --primary: #73aaff; --primary-deep: #a1c5ff; --on-primary: #10213c;
+    --success: #86e1a8; --success-bg: #173c2c; --warning: #ffd095; --warning-bg: #493320;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101827; --surface: #1b283a; --surface-soft: #223249; --surface-blue: #183754;
+  --ink: #f5f8ff; --text: #d9e4f1; --muted: #a6b6c9; --line: #35475b;
+  --primary: #73aaff; --primary-deep: #a1c5ff; --on-primary: #10213c;
+  --success: #86e1a8; --success-bg: #173c2c; --warning: #ffd095; --warning-bg: #493320;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--text); font-family: var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 56px; line-height: 1.5;
+}
+button { font: inherit; }
+button:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.page { max-width: 1400px; margin: 0 auto; min-width: 0; }
+.eyebrow { font: 700 11px var(--font-display); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+h1,h2,h3,p { margin: 0; }
+h1,h2,h3 { font-family: var(--font-display); color: var(--ink); text-wrap: balance; }
+.page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: 22px; }
+.page-head h1 { font-size: clamp(23px, 3vw, 32px); font-weight: 700; line-height: 1.22; margin-top: 5px; }
+.page-head p { color: var(--muted); font-size: 12px; margin-top: 7px; max-width: 65ch; }
+.demo-tag { color: var(--primary-deep); border: 1px solid var(--line); background: var(--surface); padding: 8px 12px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.group-choice { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.group-card { text-align: left; width: 100%; background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 4px; padding: 19px 21px; display: flex; gap: 16px; cursor: pointer; min-width: 0; transition: border-color .15s, background-color .15s; }
+.group-card:hover { border-color: var(--primary); }
+.group-card[aria-pressed="true"] { border-color: var(--primary); background: var(--surface-blue); box-shadow: inset 0 -3px var(--primary); }
+.group-letter { flex: none; width: 40px; height: 40px; display: grid; place-items: center; background: var(--surface-soft); color: var(--primary-deep); font: 700 19px var(--font-display); border-radius: 4px; }
+.group-card[aria-pressed="true"] .group-letter { background: var(--primary); color: var(--on-primary); }
+.group-copy { min-width: 0; display: grid; gap: 4px; }
+.group-copy strong { font: 700 17px var(--font-display); color: var(--ink); line-height: 1.3; }
+.group-copy small { font: 500 11px var(--font-display); color: var(--muted); letter-spacing: .02em; }
+.group-copy span { font-size: 12px; color: var(--muted); }
+.group-number { margin-left: auto; flex: none; font: 600 11px var(--font-display); color: var(--muted); white-space: nowrap; }
+.workspace { display: grid; grid-template-columns: minmax(245px, 285px) minmax(0, 1fr); border: 1px solid var(--line); background: var(--surface); min-height: 570px; }
+.sidebar { border-right: 1px solid var(--line); background: var(--surface); min-width: 0; }
+.sidebar-head { padding: 20px 20px 16px; border-bottom: 1px solid var(--line); }
+.sidebar-head h2 { font-size: 16px; margin-top: 5px; }
+.sidebar-head p { font-size: 11px; margin-top: 5px; color: var(--muted); }
+.step-list { display: grid; gap: 2px; padding: 12px 8px; }
+.step-btn { width: 100%; text-align: left; background: transparent; border: 1px solid transparent; border-radius: 4px; display: flex; gap: 11px; padding: 12px 10px; color: var(--text); cursor: pointer; min-width: 0; align-items: flex-start; }
+.step-btn:hover { background: var(--surface-soft); }
+.step-btn[aria-current="step"] { background: var(--surface-blue); border-color: var(--line); color: var(--primary-deep); }
+.step-no { flex: none; font: 700 12px var(--font-display); display: grid; place-items: center; width: 27px; height: 27px; border: 1px solid var(--line); border-radius: 4px; font-variant-numeric: tabular-nums; }
+.step-btn[aria-current="step"] .step-no { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.step-copy { display: grid; gap: 4px; min-width: 0; }
+.step-copy strong { font-size: 12px; line-height: 1.45; font-weight: 600; }
+.step-copy small { font-size: 10px; color: var(--muted); line-height: 1.4; }
+.sidebar-tip { margin: 7px 18px 20px; padding-top: 15px; border-top: 1px solid var(--line); font-size: 11px; color: var(--muted); line-height: 1.6; }
+.main-panel { min-width: 0; display: flex; flex-direction: column; }
+.panel-top { padding: 25px 28px 22px; border-bottom: 1px solid var(--line); }
+.panel-topline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.panel-id { color: var(--primary-deep); }
+.dot { color: var(--muted); }
+.panel-top h2 { font-size: clamp(21px, 2vw, 27px); margin-top: 8px; line-height: 1.25; }
+.panel-subtitle { font-size: 12px; color: var(--muted); margin-top: 7px; max-width: 68ch; }
+.panel-content { padding: 22px 28px 26px; flex: 1; min-width: 0; }
+.dependency { background: var(--surface-blue); border-left: 3px solid var(--primary); padding: 12px 15px; font-size: 11px; line-height: 1.65; color: var(--text); }
+.dependency strong { color: var(--primary-deep); }
+.section-kicker { display: flex; align-items: center; gap: 10px; margin: 23px 0 11px; }
+.section-kicker h3 { font-size: 15px; }
+.section-kicker span { font-size: 10px; color: var(--muted); }
+.example-box { border: 1px solid var(--line); background: var(--surface); overflow: hidden; }
+.example-head { padding: 11px 16px; background: var(--surface-soft); border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+.example-head strong { font: 600 12px var(--font-display); color: var(--ink); }
+.example-head small { color: var(--muted); font-size: 10px; }
+.example-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 12px; padding: 12px 16px; border-top: 1px solid var(--line); font-size: 11px; }
+.example-head + .example-row { border-top: 0; }
+.example-label { color: var(--muted); }
+.example-value { font-weight: 600; color: var(--ink); min-width: 0; overflow-wrap: anywhere; }
+.preview-note { font-size: 11px; color: var(--muted); line-height: 1.6; margin-top: 12px; }
+.panel-bottom { border-top: 1px solid var(--line); background: var(--surface-soft); padding: 15px 28px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.panel-bottom .hint { color: var(--muted); font-size: 11px; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.action { cursor: pointer; background: var(--surface); border: 1px solid var(--line); color: var(--text); border-radius: 4px; padding: 10px 14px; font-size: 11px; font-weight: 600; }
+.action:hover:not(:disabled) { border-color: var(--primary); }
+.action.primary { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+.action:disabled { opacity: .45; cursor: not-allowed; }
+.flow { margin-top: 18px; border: 1px solid var(--line); background: var(--surface); padding: 18px 20px; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 18px; align-items: center; }
+.flow h2 { font-size: 15px; margin-top: 4px; }
+.flow p { font-size: 11px; color: var(--muted); margin-top: 5px; line-height: 1.65; }
+.flow-chain { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
+.chain-chip { font: 600 10px var(--font-display); background: var(--surface-blue); color: var(--primary-deep); padding: 6px 8px; border: 1px solid var(--line); }
+.chain-arrow { color: var(--muted); font-size: 14px; }
+@media (max-width: 900px) {
+  .workspace { grid-template-columns: 220px minmax(0, 1fr); }
+  .flow { grid-template-columns: 1fr; }
+}
+@media (max-width: 650px) {
+  body { padding-block: 18px 38px; }
+  .group-choice { grid-template-columns: 1fr; gap: 8px; }
+  .group-card { padding: 14px; }
+  .workspace { grid-template-columns: 1fr; }
+  .sidebar { border-right: none; border-bottom: 1px solid var(--line); }
+  .sidebar-head { padding: 14px 16px 10px; }
+  .step-list { display: flex; overflow-x: auto; padding: 9px 12px 13px; gap: 7px; scrollbar-width: thin; }
+  .step-btn { flex: 0 0 min(190px, 70vw); border: 1px solid var(--line); padding: 10px; }
+  .sidebar-tip { display: none; }
+  .panel-top, .panel-content { padding-left: 17px; padding-right: 17px; }
+  .panel-bottom { padding: 14px 17px; }
+  .example-row { grid-template-columns: 1fr; gap: 3px; }
+  .flow { padding: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+<div class="page">
+  <header class="page-head">
+    <div>
+      <div class="eyebrow">Phác thảo điều hướng · course-detail</div>
+      <h1>Học phần, theo đúng thứ tự công việc</h1>
+      <p>Hai nhóm tách việc viết đề cương khỏi việc chuẩn bị câu hỏi và đề kiểm tra.</p>
+    </div>
+    <div class="demo-tag">BẢN MÔ PHỎNG · KHÔNG LƯU DỮ LIỆU</div>
+  </header>
+
+  <nav class="group-choice" aria-label="Chọn nhóm công việc">
+    <button class="group-card" id="group-a" type="button" aria-pressed="true" data-group="a">
+      <span class="group-letter">A</span>
+      <span class="group-copy"><small>NHÓM A · BIÊN SOẠN</small><strong>Đề cương học phần</strong><span>Viết nội dung, thiết kế đánh giá, rà soát và xuất.</span></span>
+      <span class="group-number">05 BƯỚC</span>
+    </button>
+    <button class="group-card" id="group-b" type="button" aria-pressed="false" data-group="b">
+      <span class="group-letter">B</span>
+      <span class="group-copy"><small>NHÓM B · TRIỂN KHAI</small><strong>Ngân hàng & đề kiểm tra</strong><span>Thiết lập bài kiểm tra, câu hỏi, form đề và sinh đề.</span></span>
+      <span class="group-number">05 BƯỚC</span>
+    </button>
+  </nav>
+
+  <div class="workspace">
+    <aside class="sidebar" aria-label="Các bước trong nhóm">
+      <div class="sidebar-head"><span class="eyebrow" id="sidebar-eyebrow">NHÓM A · BIÊN SOẠN</span><h2 id="sidebar-title">Các bước làm đề cương</h2><p>Chọn bước để xem nội dung cần nhập.</p></div>
+      <nav id="step-list" class="step-list" aria-label="Danh sách bước"></nav>
+      <p class="sidebar-tip" id="sidebar-tip">Có thể hoàn tất đề cương mà chưa cần sinh đề hoặc hoàn tất ngân hàng câu hỏi.</p>
+    </aside>
+
+    <main class="main-panel" id="step-detail" aria-live="polite">
+      <div class="panel-top">
+        <div class="panel-topline"><span class="eyebrow panel-id" id="step-id">BƯỚC A3 / 05</span><span class="dot" aria-hidden="true">·</span><span class="eyebrow">MINH HỌA: ADT332</span></div>
+        <h2 id="step-title">Nội dung & kế hoạch giảng dạy</h2>
+        <p class="panel-subtitle" id="step-subtitle">Tổ chức bài học, liên kết CLO, phương pháp và học liệu.</p>
+      </div>
+      <div class="panel-content">
+        <div class="dependency"><strong>Trước khi nhập:</strong> <span id="step-requires">Thông tin tín chỉ và CLO đã được xác định.</span></div>
+        <div class="section-kicker"><h3>Công việc của bước này</h3><span>Giao diện mẫu, chưa kết nối hệ thống</span></div>
+        <div class="example-box">
+          <div class="example-head"><strong id="example-heading">Bài 1 · Quy trình phát triển ứng dụng</strong><small>Dữ liệu minh họa từ đề cương</small></div>
+          <div id="example-rows"></div>
+        </div>
+        <p class="preview-note" id="step-note">Kế hoạch bài học có thể lập trước; vị trí kiểm tra được gắn sau khi thiết kế đánh giá.</p>
+      </div>
+      <div class="panel-bottom"><span class="hint" id="next-hint">Xem bước tiếp theo trong cùng nhóm.</span><div class="actions"><button class="action" type="button" id="prev-step">← Bước trước</button><button class="action primary" type="button" id="next-step">Bước tiếp →</button></div></div>
+    </main>
+  </div>
+
+  <section class="flow" aria-label="Mối liên hệ giữa hai nhóm">
+    <div><span class="eyebrow">MỐI QUAN HỆ DỮ LIỆU</span><h2>Một nguồn nhập, hai luồng sử dụng</h2><p>CO/CLO và bài học được khai báo trong đề cương; nhóm ngân hàng kế thừa để phân bổ câu hỏi. Form đề và câu hỏi có thể chuẩn bị song song. Đề cương không phải chờ sinh đề.</p></div>
+    <div class="flow-chain" aria-label="Thứ tự dữ liệu"><span class="chain-chip">A1–A2 · Nền tảng</span><span class="chain-arrow">›</span><span class="chain-chip">A3–A4 · Kế hoạch</span><span class="chain-arrow">›</span><span class="chain-chip">B1–B4 · Chuẩn bị đề</span><span class="chain-arrow">›</span><span class="chain-chip">B5 · Sinh đề</span></div>
+  </section>
+</div>
+<script>
+const groups = {
+  a: {
+    eyebrow: 'NHÓM A · BIÊN SOẠN', title: 'Các bước làm đề cương',
+    tip: 'Có thể hoàn tất đề cương mà chưa cần sinh đề hoặc hoàn tất ngân hàng câu hỏi.',
+    steps: [
+      { title: 'Thông tin học phần', short: 'Hồ sơ, CTĐT, tín chỉ', subtitle: 'Thiết lập dữ liệu nền cho đề cương và các bước sau.', requires: 'Có học phần cần biên soạn.', heading: 'Học phần ADT332 · Công nghệ phát triển ứng dụng', rows: [['Số tín chỉ', '3 tín chỉ (2 lý thuyết + 1 thực hành)'], ['Thời lượng', '30 LT · 27 TH · 3 kiểm tra · 90 tự học'], ['Học liệu', 'Tài liệu chính [1], [2]; tham khảo [3]–[5]']], note: 'CTĐT áp dụng phải xác định trước khi đối sánh CLO với PLO/PI.' },
+      { title: 'Mục tiêu & chuẩn đầu ra', short: 'CO, CLO, PLO/PI', subtitle: 'Khai báo CO/CLO và đối sánh chuẩn đầu ra của CTĐT.', requires: 'Học phần đã liên kết CTĐT.', heading: 'Từ mục tiêu đến chuẩn đầu ra', rows: [['Mục tiêu học phần', 'CO1 · Hiểu quy trình phát triển ứng dụng'], ['Chuẩn đầu ra', 'CLO1 · Trình bày quy trình phát triển ứng dụng'], ['Đối sánh CTĐT', 'PLO8 · Mức đóng góp I']], note: 'CLO thuộc CO; PLO/PI tham chiếu từ CTĐT, không nhập lặp.' },
+      { title: 'Nội dung & kế hoạch giảng dạy', short: 'Bài, CLO, phương pháp', subtitle: 'Tổ chức bài học, liên kết CLO, phương pháp và học liệu.', requires: 'Thông tin tín chỉ và danh sách CLO đã được xác định.', heading: 'Bài 1 · Quy trình phát triển ứng dụng', rows: [['Nội dung trên lớp', 'Các giai đoạn phát triển; lập kế hoạch; mô hình phát triển'], ['Chuẩn đầu ra', 'CLO1, CLO2'], ['Hoạt động & tài liệu', 'Lý thuyết + hướng dẫn thực hành · Tài liệu [1]']], note: 'Kế hoạch bài học có thể lập trước; vị trí kiểm tra được gắn sau khi thiết kế đánh giá.' },
+      { title: 'Thiết kế kiểm tra – đánh giá', short: 'Tỷ lệ, CLO, rubric', subtitle: 'Quy định cách đo CLO và phân bổ điểm trước khi triển khai bài kiểm tra.', requires: 'Có CLO; nên có khung bài/tuần để chọn thời điểm kiểm tra.', heading: 'Cơ cấu điểm minh họa', rows: [['Chuyên cần & LMS', '5% + 15%'], ['Kiểm tra thường xuyên', '3 bài × 10% = 30% · tuần 3, 5, 9'], ['Thi cuối kỳ', '50% · đánh giá CLO1–CLO6']], note: 'Đây là thiết kế đánh giá trong đề cương, không phải tab sinh đề hiện tại. Rubric cấp học phần cần bổ sung.' },
+      { title: 'Rà soát, phê duyệt & xuất', short: 'Kiểm tra, duyệt, Word', subtitle: 'Đọc lại đề cương theo mẫu, xử lý thiếu sót và xuất bản.', requires: 'Các mục A1–A4 đủ dữ liệu theo quy định; quyền phê duyệt được xác minh.', heading: 'Danh sách rà soát trước khi xuất', rows: [['Chuẩn đầu ra', 'CO ↔ CLO ↔ PLO/PI được đối chiếu'], ['Đánh giá', 'Tổng tỷ lệ điểm = 100%'], ['Bản xuất', 'Trình bày theo thứ tự của mẫu đề cương']], note: 'Không buộc hoàn tất ngân hàng câu hỏi hoặc sinh đề mới được xuất đề cương.' }
+    ]
+  },
+  b: {
+    eyebrow: 'NHÓM B · TRIỂN KHAI', title: 'Các bước chuẩn bị đề',
+    tip: 'Ngân hàng câu hỏi và Form đề có thể chuẩn bị song song. Sinh đề là bước cuối.',
+    steps: [
+      { title: 'Cấu hình bài kiểm tra', short: 'Loại bài, thời hạn', subtitle: 'Tạo hoạt động kiểm tra để các form và màn hình đề có dữ liệu sử dụng.', requires: 'Hình thức thi, tín chỉ và thiết kế đánh giá từ nhóm A.', heading: 'Bài kiểm tra thường xuyên · mẫu', rows: [['Hình thức', 'Thực hành'], ['Số bài', '3 bài kiểm tra thường xuyên'], ['Vận hành', 'Thời hạn, thời gian làm bài, số đề']], note: 'Chuyển phần tạo bài kiểm tra từ Cấu hình hiện tại lên trước Form đề.' },
+      { title: 'Ma trận câu hỏi theo CĐR/CPI', short: 'Chỉ tiêu theo bài', subtitle: 'Xác định lượng câu hỏi cần biên soạn theo bài, CPI và mức độ.', requires: 'Có danh sách bài/CPI từ A3 và cấu hình mức độ.', heading: 'Một bài trong ma trận câu hỏi', rows: [['Phạm vi', 'Bài 1 · Quy trình phát triển'], ['Chuẩn', 'CLO1, CLO2 / CPI tương ứng'], ['Mức độ tham chiếu', 'Biết 3 · Hiểu 5 · Vận dụng 7']], note: 'Chỉ tiêu ngân hàng không đồng nhất với số câu lấy cho mỗi đề.' },
+      { title: 'Ngân hàng câu hỏi', short: 'Soạn và duyệt câu', subtitle: 'Viết câu hỏi, đáp án; liên kết bài/CPI, mức độ; gửi duyệt.', requires: 'Có bài/CPI; có thể dùng chỉ tiêu B2 để định hướng biên soạn.', heading: 'Câu hỏi · cấu trúc minh họa', rows: [['Gắn nguồn', 'Bài 1 · CPI · mức độ Hiểu'], ['Nội dung', 'Câu hỏi, đáp án, giải thích'], ['Trạng thái', 'Bản nháp → Gửi duyệt → Đã duyệt']], note: 'Có thể làm song song với Form đề. Rubric từng câu tự luận khác rubric học phần.' },
+      { title: 'Form đề', short: 'Cấu trúc lấy câu', subtitle: 'Quy định số câu, điểm và nguồn câu cho mỗi loại đề.', requires: 'Có bài/CPI và hoạt động kiểm tra B1; chưa bắt buộc hoàn tất B3.', heading: 'Form đề LMS · minh họa', rows: [['Tổng số câu', '15 câu / bài · 15 phút'], ['Phân bổ mức độ', 'Biết 3 · Hiểu 5 · Vận dụng 7'], ['Nguồn câu hỏi', 'Bài/CPI tương ứng']], note: 'Form là bản thiết kế lấy câu; chưa tạo câu hỏi và chưa sinh đề.' },
+      { title: 'Sinh và quản lý đề', short: 'Kiểm tra đủ, sinh đề', subtitle: 'Kiểm tra cấu trúc form và nguồn câu đã duyệt trước khi sinh.', requires: 'Có hoạt động kiểm tra B1, form B4 và đủ câu hỏi đã duyệt từ B3.', heading: 'Điều kiện để nút “Sinh đề” khả dụng', rows: [['Hoạt động', 'Bài kiểm tra đã được tạo'], ['Cấu trúc', 'Form đề hợp lệ'], ['Nguồn câu', 'Đủ câu đã duyệt theo từng bài/CPI/mức độ']], note: 'Chỉ kiểm tra có ít nhất một câu là chưa đủ; cần kiểm tra từng chỉ tiêu của form.' }
+    ]
+  }
+};
+let activeGroup = 'a';
+let activeIndex = 2;
+const $ = id => document.getElementById(id);
+function render() {
+  const group = groups[activeGroup];
+  const step = group.steps[activeIndex];
+  document.querySelectorAll('.group-card').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.group === activeGroup)));
+  $('sidebar-eyebrow').textContent = group.eyebrow;
+  $('sidebar-title').textContent = group.title;
+  $('sidebar-tip').textContent = group.tip;
+  $('step-list').replaceChildren(...group.steps.map((item, index) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'step-btn';
+    if (index === activeIndex) button.setAttribute('aria-current', 'step');
+    const number = document.createElement('span'); number.className = 'step-no'; number.textContent = String(index + 1).padStart(2, '0');
+    const copy = document.createElement('span'); copy.className = 'step-copy';
+    const strong = document.createElement('strong'); strong.textContent = item.title;
+    const small = document.createElement('small'); small.textContent = item.short;
+    copy.append(strong, small); button.append(number, copy);
+    button.addEventListener('click', () => { activeIndex = index; render(); });
+    return button;
+  }));
+  $('step-id').textContent = `BƯỚC ${activeGroup.toUpperCase()}${activeIndex + 1} / 05`;
+  $('step-title').textContent = step.title;
+  $('step-subtitle').textContent = step.subtitle;
+  $('step-requires').textContent = step.requires;
+  $('example-heading').textContent = step.heading;
+  $('example-rows').replaceChildren(...step.rows.map(([label, value]) => {
+    const row = document.createElement('div'); row.className = 'example-row';
+    const l = document.createElement('span'); l.className = 'example-label'; l.textContent = label;
+    const v = document.createElement('span'); v.className = 'example-value'; v.textContent = value;
+    row.append(l, v); return row;
+  }));
+  $('step-note').textContent = step.note;
+  $('prev-step').disabled = activeIndex === 0;
+  $('next-step').disabled = activeIndex === group.steps.length - 1;
+  $('next-hint').textContent = activeIndex === group.steps.length - 1 ? 'Đã tới bước cuối trong nhóm.' : 'Xem bước tiếp theo trong cùng nhóm.';
+}
+document.querySelectorAll('.group-card').forEach(button => button.addEventListener('click', () => {
+  activeGroup = button.dataset.group;
+  activeIndex = activeGroup === 'a' ? 2 : 0;
+  render();
+}));
+$('prev-step').addEventListener('click', () => { if (activeIndex > 0) { activeIndex--; render(); } });
+$('next-step').addEventListener('click', () => { if (activeIndex < groups[activeGroup].steps.length - 1) { activeIndex++; render(); } });
+render();
+</script>

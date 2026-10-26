@@ -754,30 +754,45 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         if (!Number.isInteger(courseId) || courseId <= 0
             || !this.list_course.some(item => Number(item.id) === courseId && item.khoikienthuc === course.khoikienthuc)) return;
 
-        const stagedAddition = this.stagedAdds.get(courseId);
-        if (stagedAddition) {
-            this.stagedAdds.delete(courseId);
-            this.dirtyCourseIds.delete(courseId);
-        } else {
+        const stagedAddition = this.stagedAdds.has(courseId);
+        if (!stagedAddition) {
             const linkId = Number(course.ctdt_hocphan_id);
             if (!Number.isInteger(linkId) || linkId <= 0
                 || !this.courseLinks.some(link => Number(link.id) === linkId && Number(link.course_id) === courseId)) {
                 this.notificationService.toastWarning('Không xác định được liên kết học phần. Vui lòng tải lại dữ liệu.');
                 return;
             }
-            this.stagedDeletes.set(courseId, linkId);
         }
 
-        if (this.selectedCourseCondition?.id === courseId) {
-            popover?.hide();
-            this.selectedCourseCondition = null;
-            this.keyHp = null;
-            this.list_course_dk = [];
-        }
-        this.applyStagedLinksToView();
-        this.notificationService.toastInfo(stagedAddition
-            ? `Đã bỏ học phần "${course.title}" chưa lưu.`
-            : `Đã đánh dấu gỡ học phần "${course.title}". Bấm Lưu lại để áp dụng.`);
+        const programmeId = this.selectedCtdt.id;
+        const safeTitle = String(course.title || '').replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        this.notificationService.confirmDelete2({
+            heading: 'Xác nhận gỡ học phần',
+            htmlMessage: `Bạn có chắc muốn gỡ học phần <b>"${safeTitle}"</b> khỏi khối kiến thức? Môn học gốc không bị xóa.`
+                + (stagedAddition ? '' : ' Bấm Lưu lại để áp dụng thay đổi.')
+        }).pipe(takeUntil(this.cancelKhoi$), takeUntil(this.destroy$)).subscribe(confirmed => {
+            if (!confirmed || this.blockActionsBusy || this.courseLoadError || this.selectedCtdt?.id !== programmeId
+                || !this.list_course.includes(course) || this.stagedAdds.has(courseId) !== stagedAddition) return;
+
+            if (stagedAddition) {
+                this.stagedAdds.delete(courseId);
+                this.dirtyCourseIds.delete(courseId);
+            } else {
+                this.stagedDeletes.set(courseId, Number(course.ctdt_hocphan_id));
+            }
+
+            if (this.selectedCourseCondition?.id === courseId) {
+                popover?.hide();
+                this.selectedCourseCondition = null;
+                this.keyHp = null;
+                this.list_course_dk = [];
+            }
+            this.applyStagedLinksToView();
+            this.notificationService.toastInfo(stagedAddition
+                ? `Đã bỏ học phần "${course.title}" chưa lưu.`
+                : `Đã đánh dấu gỡ học phần "${course.title}". Bấm Lưu lại để áp dụng.`);
+        });
     }
 
     private applyStagedLinksToView(): void {

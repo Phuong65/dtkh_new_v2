@@ -169,8 +169,23 @@
     color: #1e3a8a;
 }
 
-.content-table.admin-table tbody > tr.content-block-row .content-block-name i {
+.content-block-folder-icon {
+    display: inline-flex;
+    width: 26px;
+    height: 26px;
+    flex: 0 0 26px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #bfdbfe;
+    border-radius: 4px;
+    background: #eff6ff;
     color: #2563eb;
+}
+
+.content-block-folder-icon .ti {
+    display: block;
+    font-size: 16px;
+    line-height: 1;
 }
 
 .content-table.admin-table tbody > tr.content-block-row:hover {

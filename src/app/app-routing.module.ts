@@ -27,6 +27,11 @@ const routes: Routes = [
             .then(c => c.CourseManagementDetail)
     },
     {
+        path: 'hoc-phan-preview',
+        loadComponent: () => import('@modules/admin/features/course-management/course-detail-preview/course-detail-preview')
+            .then(c => c.CourseDetailPreview)
+    },
+    {
         path: '',
         loadChildren: () =>
             import('@modules/public/public.module').then((m) => m.PublicModule),

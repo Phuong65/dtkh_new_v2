@@ -1,0 +1,56 @@
+<section class="course-detail-preview" aria-label="Xem trước điều hướng học phần">
+    <header class="course-detail-preview__header">
+        <h1 class="course-detail-preview__page-title" title="Xem trước điều hướng học phần">
+            <i class="ti ti-books" aria-hidden="true"></i>
+            <span>Xem trước điều hướng học phần</span>
+        </h1>
+
+        <nav class="course-detail-preview__group-tabs" role="tablist" aria-label="Nhóm công việc học phần">
+            @for (group of groups; track group.id; let index = $index) {
+            <button #groupButton type="button" class="course-detail-preview__group-tab" role="tab"
+                [id]="'course-preview-group-' + group.id"
+                [class.course-detail-preview__group-tab--active]="activeGroupId() === group.id"
+                [attr.aria-selected]="activeGroupId() === group.id"
+                aria-controls="course-preview-panel"
+                [attr.tabindex]="activeGroupId() === group.id ? 0 : -1"
+                (click)="selectGroup(group.id)"
+                (keydown)="onGroupKeydown($event, index)">
+                <i class="ti course-detail-preview__group-tab-icon" aria-hidden="true"
+                    [class.ti-file-description]="group.id === 'outline'"
+                    [class.ti-folders]="group.id === 'question-bank'"></i>
+                <span>{{ group.label }}</span>
+            </button>
+            }
+        </nav>
+    </header>
+
+    <section class="course-detail-preview__workspace" role="tabpanel" id="course-preview-panel"
+        [attr.aria-labelledby]="'course-preview-group-' + activeGroup().id" tabindex="0">
+        <aside class="course-detail-preview__sidebar">
+            <h2 class="course-detail-preview__sidebar-title" [title]="activeGroup().label">
+                <span>{{ activeGroup().label }}</span>
+            </h2>
+
+            <nav aria-label="Các mục trong nhóm đang chọn">
+                <ol class="course-detail-preview__item-list">
+                    @for (item of activeGroup().items; track item.id; let index = $index) {
+                    <li>
+                        <button #itemButton type="button" class="course-detail-preview__item"
+                            [class.course-detail-preview__item--active]="activeItemId() === item.id"
+                            [attr.aria-current]="activeItemId() === item.id ? 'page' : null"
+                            (click)="selectItem(item.id)"
+                            (keydown)="onItemKeydown($event, index)">
+                            <span class="course-detail-preview__item-index" aria-hidden="true">{{ index + 1 }}</span>
+                            <span>{{ item.title }}</span>
+                        </button>
+                    </li>
+                    }
+                </ol>
+            </nav>
+        </aside>
+
+        <main class="course-detail-preview__panel">
+            <h2 class="course-detail-preview__panel-title">{{ activeItem().title }}</h2>
+        </main>
+    </section>
+</section>
