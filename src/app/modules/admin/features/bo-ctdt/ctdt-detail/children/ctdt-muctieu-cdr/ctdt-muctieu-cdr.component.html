@@ -351,27 +351,6 @@
                     <p class="goals-helper">{{ state() === 'error' || goalsState() === 'error' ? 'Không tải được dữ liệu liên kết' : 'Đang tải liên kết...' }}</p>
                     }
                 </section>
-                <section class="goals-summary-card">
-                    <h2><i class="ti ti-certificate" aria-hidden="true"></i>Chuẩn đầu ra</h2>
-                    @if (cdrSummary?.state === 'success') {
-                    <dl class="goals-summary-list">
-                        <div>
-                            <dt>Chỉ báo PI</dt>
-                            <dd>{{ cdrSummary!.piCount }}</dd>
-                        </div>
-                        <div>
-                            <dt>Liên kết PEO–PLO</dt>
-                            <dd>{{ cdrSummary!.peoPloLinkCount }}</dd>
-                        </div>
-                        <div>
-                            <dt>PLO có tổng PI khác 100%</dt>
-                            <dd>{{ cdrSummary!.invalidPiPercentPloCount }}</dd>
-                        </div>
-                    </dl>
-                    } @else {
-                    <p class="goals-helper">{{ cdrSummary?.state === 'error' ? 'Không tải được chuẩn đầu ra' : 'Đang tải chuẩn đầu ra...' }}</p>
-                    }
-                </section>
             </aside>
         </div>
     </div>
