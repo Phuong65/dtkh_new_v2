@@ -365,6 +365,38 @@
     background: var(--noidung-course-hover);
 }
 
+.content-course-title-cell {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.content-course-title-cell > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.content-course-remove-button {
+    flex: 0 0 auto;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.content-course-row:hover .content-course-remove-button,
+.content-course-row:focus-within .content-course-remove-button {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+@media (hover: none) {
+    .content-course-remove-button {
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
 .content-course-code {
     display: inline-block;
     padding: 2px 6px;

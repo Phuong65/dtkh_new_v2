@@ -96,7 +96,19 @@
                             <td class="content-cell-center">{{ courseIndex + 1 }}</td>
                             <td class="content-cell-center"><strong class="content-course-name">{{ child.maso || '—'
                                     }}</strong></td>
-                            <td>{{ child.title }}</td>
+                            <td>
+                                <div class="content-course-title-cell">
+                                    <span>{{ child.title }}</span>
+                                    <button type="button"
+                                        class="btn ictu-button-danger-light ictu-admin-icon-button content-course-remove-button"
+                                        (click)="removeCourseFromBlock(child, conditionPopover)"
+                                        [disabled]="blockActionsBusy || !!courseLoadError"
+                                        [attr.aria-label]="'Gỡ học phần ' + child.title + ' khỏi khối ' + khoi.title"
+                                        pTooltip="Gỡ học phần khỏi khối" tooltipPosition="top" appendTo="body">
+                                        <i class="ti ti-trash" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </td>
                             <td class="content-cell-center">{{ child.params?.sotinchi || 0 }}</td>
                             <td class="content-cell-center">{{ child.params?.sotinchi_th || 0 }}</td>
                             <td class="content-cell-center">

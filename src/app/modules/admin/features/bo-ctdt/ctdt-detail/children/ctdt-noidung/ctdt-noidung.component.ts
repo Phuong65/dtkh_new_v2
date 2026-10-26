@@ -747,6 +747,39 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         };
     }
 
+    removeCourseFromBlock(course: CourseRow, popover?: { hide: () => void }): void {
+        if (!this.selectedCtdt?.id || this.blockActionsBusy || this.courseLoadError || !course?.id) return;
+
+        const courseId = Number(course.id);
+        if (!Number.isInteger(courseId) || courseId <= 0
+            || !this.list_course.some(item => Number(item.id) === courseId && item.khoikienthuc === course.khoikienthuc)) return;
+
+        const stagedAddition = this.stagedAdds.get(courseId);
+        if (stagedAddition) {
+            this.stagedAdds.delete(courseId);
+            this.dirtyCourseIds.delete(courseId);
+        } else {
+            const linkId = Number(course.ctdt_hocphan_id);
+            if (!Number.isInteger(linkId) || linkId <= 0
+                || !this.courseLinks.some(link => Number(link.id) === linkId && Number(link.course_id) === courseId)) {
+                this.notificationService.toastWarning('Không xác định được liên kết học phần. Vui lòng tải lại dữ liệu.');
+                return;
+            }
+            this.stagedDeletes.set(courseId, linkId);
+        }
+
+        if (this.selectedCourseCondition?.id === courseId) {
+            popover?.hide();
+            this.selectedCourseCondition = null;
+            this.keyHp = null;
+            this.list_course_dk = [];
+        }
+        this.applyStagedLinksToView();
+        this.notificationService.toastInfo(stagedAddition
+            ? `Đã bỏ học phần "${course.title}" chưa lưu.`
+            : `Đã đánh dấu gỡ học phần "${course.title}". Bấm Lưu lại để áp dụng.`);
+    }
+
     private applyStagedLinksToView(): void {
         this.list_course = [
             ...[...this.persistedCourseRows.values()].filter(course => !this.stagedDeletes.has(Number(course.id))),
