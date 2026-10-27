@@ -1,6 +1,9 @@
 @if (selectedTemplateBo(); as templateBo) {
 <app-bo-ctdt-cdr [selectedBo]="templateBo" [canAdd]="canAdd" [canUpdate]="canUpdate" [canDelete]="canDelete"
     (back)="closeCdrTemplate()"></app-bo-ctdt-cdr>
+} @else if (selectedPeoBo(); as peoBo) {
+<app-bo-ctdt-peo [selectedBo]="peoBo" [canAdd]="canAdd" [canUpdate]="canUpdate" [canDelete]="canDelete"
+    (back)="closePeo()"></app-bo-ctdt-peo>
 } @else {
 <section class="admin-section--table ictu-admin-page bo-ctdt-list position-relative" aria-labelledby="bo-ctdt-list-title">
     @if (state() === 'loading') {
@@ -72,6 +75,12 @@
                                     [attr.aria-label]="'Nhập PLO cho ' + bo.name"
                                     pTooltip="Nhập PLO/PI" tooltipPosition="left">
                                     <i class="ti ti-certificate" aria-hidden="true"></i>
+                                </button>
+                                <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
+                                    (click)="openPeo(bo)" [disabled]="saving() || deleting() || subjectSaving()"
+                                    [attr.aria-label]="'Nhập PEO cho ' + bo.name"
+                                    pTooltip="Nhập PEO" tooltipPosition="left">
+                                    <i class="ti ti-target" aria-hidden="true"></i>
                                 </button>
                                 <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
                                     (click)="openSubjectDrawer(bo)" [disabled]="!canSelectSubjects || saving() || deleting()"

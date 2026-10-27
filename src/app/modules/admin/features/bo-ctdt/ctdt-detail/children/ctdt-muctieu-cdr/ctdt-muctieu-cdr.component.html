@@ -340,7 +340,7 @@
 
 </div>
 
-<p-drawer [(visible)]="drawerVisible" [dismissible]="!busy" [closable]="!busy" [closeOnEscape]="!busy"
+<p-drawer [visible]="drawerVisible" (visibleChange)="onPeoDrawerVisibilityChange($event)" [dismissible]="!busy" [closable]="!busy" [closeOnEscape]="!busy"
     [blockScroll]="true" [header]="formTitle" [style]="{ width: 'min(700px, 100vw)' }" appendTo="body" position="right"
     styleClass="ictu-p-drawer ctdt-goals-drawer" ariaCloseLabel="Đóng biểu mẫu">
     <div class="ictu-p-drawer__content goal-drawer-layout">
@@ -369,21 +369,68 @@
                             tiêu.</span>
                         }
                     </div>
-                    <div class="ictu-form__row goal-form-field goal-form-field--full">
+                    <div class="ictu-form__row goal-form-field">
                         <label class="ictu-form__label" for="goal-compatibility">Tương thích với định hướng</label>
                         <p-multiSelect inputId="goal-compatibility" class="goal-compatibility-select" optionValue="key"
                             optionLabel="title" [options]="list_tuongthich" formControlName="tuongthich"
                             placeholder="Chọn các định hướng liên quan" display="chip" appendTo="body">
                         </p-multiSelect>
-                        <p class="goal-form-hint">Có thể chọn nhiều định hướng. Lựa chọn được phản ánh trong ma trận
-                            tương thích.</p>
                     </div>
-                    <div class="ictu-form__row goal-form-field goal-form-field--full">
+                    @if (!isUpdated) {
+                    <div class="peo-create-tabs goal-form-field--full" role="tablist" aria-label="Cách tạo PEO">
+                        <button type="button" class="peo-create-tab" role="tab" id="peo-tab-template"
+                            [class.peo-create-tab--active]="peoCreateMode() === 'template'"
+                            [attr.aria-selected]="peoCreateMode() === 'template'" aria-controls="peo-panel-template"
+                            [attr.tabindex]="peoCreateMode() === 'template' ? 0 : -1"
+                            (click)="selectPeoCreateMode('template')" (keydown)="onPeoCreateModeKeydown($event, 0)"
+                            [disabled]="savingGoal">
+                            <span class="peo-create-tab__label">Chọn từ mẫu</span>
+                            <small class="peo-create-tab__caption">Dùng nội dung chuẩn hóa</small>
+                        </button>
+                        <button type="button" class="peo-create-tab" role="tab" id="peo-tab-manual"
+                            [class.peo-create-tab--active]="peoCreateMode() === 'manual'"
+                            [attr.aria-selected]="peoCreateMode() === 'manual'" aria-controls="peo-panel-manual"
+                            [attr.tabindex]="peoCreateMode() === 'manual' ? 0 : -1"
+                            (click)="selectPeoCreateMode('manual')" (keydown)="onPeoCreateModeKeydown($event, 1)"
+                            [disabled]="savingGoal">
+                            <span class="peo-create-tab__label">Nhập mới</span>
+                            <small class="peo-create-tab__caption">Soạn nội dung riêng</small>
+                        </button>
+                    </div>
+                    <div class="peo-template-panel goal-form-field--full" role="tabpanel" id="peo-panel-template"
+                        aria-labelledby="peo-tab-template" [hidden]="peoCreateMode() !== 'template'">
+                        <div #peoTemplateField class="ictu-form__row goal-form-field">
+                            <label class="ictu-form__label ictu-form__label--required" for="peo-template">Mẫu PEO</label>
+                            <p-select inputId="peo-template" [options]="peoTemplates()" optionLabel="label" optionValue="id"
+                                [formControl]="selectedPeoTemplateId" [filter]="true" filterBy="searchText" [showClear]="true"
+                                appendTo="body" panelStyleClass="peo-template-select-panel"
+                                [panelStyle]="{ width: peoTemplateField.offsetWidth + 'px', 'max-width': 'calc(100vw - 36px)' }"
+                                [loading]="peoTemplateState() === 'loading'" [disabled]="savingGoal || peoTemplateState() === 'loading'"
+                                placeholder="Chọn PEO của Bộ CTĐT" class="peo-template-select">
+                            </p-select>
+                        </div>
+                        @if (peoTemplateState() === 'loading') {
+                        <div class="peo-template-state" role="status">Đang tải mẫu PEO...</div>
+                        } @else if (peoTemplateState() === 'error') {
+                        <div class="peo-template-state peo-template-state--error" role="alert">
+                            {{ peoTemplateError() }}
+                            @if (peoTemplateRetryable()) {
+                            <button type="button" class="peo-template-retry" (click)="loadPeoTemplates()">Thử lại</button>
+                            }
+                        </div>
+                        } @else if (!peoTemplates().length) {
+                        <div class="peo-template-state">Bộ CTĐT chưa có mẫu PEO. Có thể chuyển sang Nhập mới.</div>
+                        }
+                    </div>
+                    }
+                    <div class="ictu-form__row goal-form-field goal-form-field--full" id="peo-panel-manual"
+                        [attr.role]="!isUpdated ? 'tabpanel' : null"
+                        [attr.aria-labelledby]="!isUpdated ? 'peo-tab-manual' : null" [hidden]="isPeoTemplateMode">
                         <span id="goal-content-label" class="ictu-form__label ictu-form__label--required">Nội dung mục
                             tiêu</span>
                         <div class="goal-form-editor" role="group" aria-labelledby="goal-content-label">
                             <ovic-editor height="260px" [formField]="f['noidung']"
-                                [default]="f['noidung'].value"></ovic-editor>
+                                [default]="peoManualInitialValue"></ovic-editor>
                         </div>
                         @if (f['noidung'].touched && f['noidung'].invalid) {
                         <span class="ictu-admin-form-error" role="alert">Nhập nội dung mục tiêu.</span>
@@ -397,7 +444,7 @@
             <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button"
                 (click)="closeForm()" [disabled]="busy">Hủy</button>
             <button type="submit" form="goal-form" mat-flat-button
-                class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button" [disabled]="busy">
+                class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button" [disabled]="!canSubmitPeoForm">
                 <i class="ti ti-device-floppy" aria-hidden="true"></i>{{ savingGoal ? 'Đang lưu...' : 'Lưu mục tiêu' }}
             </button>
         </div>

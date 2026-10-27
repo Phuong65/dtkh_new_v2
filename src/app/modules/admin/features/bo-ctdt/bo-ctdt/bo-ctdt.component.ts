@@ -33,12 +33,13 @@ import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.s
 import { SubjectService } from '@modules/shared/services/subject.service';
 import { SubjectCourseService } from '@modules/shared/services/subject-course.service';
 import { BoCtdtCdrComponent } from './bo-ctdt-cdr/bo-ctdt-cdr.component';
+import { BoCtdtPeoComponent } from './bo-ctdt-peo/bo-ctdt-peo.component';
 
 @Component({
     selector: 'app-bo-ctdt',
     standalone: true,
     imports: [CommonModule, FormsModule, ReactiveFormsModule, Drawer, InputText, Tooltip, MultiSelectModule,
-        Select, MatButton, IctuPaginatorComponent, LoadingProgressComponent, BoCtdtCdrComponent],
+        Select, MatButton, IctuPaginatorComponent, LoadingProgressComponent, BoCtdtCdrComponent, BoCtdtPeoComponent],
     templateUrl: './bo-ctdt.component.html',
     styleUrl: './bo-ctdt.component.css'
 })
@@ -70,6 +71,7 @@ export class BoCtdtComponent implements OnInit, OnDestroy {
     private destroyed = false;
     private readonly departmentTitles = new Map<number, string>();
     readonly selectedTemplateBo = signal<BoCtdt | null>(null);
+    readonly selectedPeoBo = signal<BoCtdt | null>(null);
 
     readonly drawer = viewChild<Drawer>('drawer');
     readonly table = new IctuDataTable2<BoCtdt>({ rows: 20, pageLinkSize: 5 });
@@ -335,6 +337,15 @@ export class BoCtdtComponent implements OnInit, OnDestroy {
 
     closeCdrTemplate(): void {
         this.selectedTemplateBo.set(null);
+    }
+
+    openPeo(item: BoCtdt): void {
+        if (this.saving() || this.deleting() || this.subjectSaving()) return;
+        this.selectedPeoBo.set(item);
+    }
+
+    closePeo(): void {
+        this.selectedPeoBo.set(null);
     }
 
     openPrograms(item: BoCtdt): void {

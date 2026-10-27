@@ -1,0 +1,117 @@
+<section class="admin-section--table ictu-admin-page bo-peo-page position-relative" aria-labelledby="bo-peo-title">
+    <header class="admin-wrap-table__head bo-peo-toolbar">
+        <div class="bo-peo-heading">
+            <h1 id="bo-peo-title" class="admin-wrap-table__heading">Mục tiêu cụ thể (PEO)</h1>
+            <p>{{ selectedBo?.name }} · {{ selectedBo?.code }}</p>
+        </div>
+        <button type="button" mat-flat-button class="btn ictu-badge-btn--danger-reverse ictu-admin-icon-button"
+            (click)="goBack()" [disabled]="busy" aria-label="Đóng danh sách PEO"
+            pTooltip="Đóng" tooltipPosition="left">
+            <i class="ti ti-x" aria-hidden="true"></i>
+        </button>
+    </header>
+
+    <div class="bo-peo-body position-relative" [attr.aria-busy]="state() === 'loading' || busy">
+        @if (state() === 'loading') {
+        <app-loading-progress heading="Đang tải PEO..." backdropFilter="none"></app-loading-progress>
+        }
+        @if (state() === 'error') {
+        <div class="admin-table__alert-danger text-center w-100" role="alert">
+            Tải dữ liệu thất bại. Vui lòng chọn
+            <a href="javascript:" (click)="loadRows()" class="admin-table__alert-danger__btn-reload">tải lại</a>.
+        </div>
+        } @else {
+        <section class="bo-peo-card" aria-labelledby="bo-peo-table-title">
+            <header class="bo-peo-card-header">
+                <div class="bo-peo-card-heading">
+                    <span class="bo-peo-card-icon" aria-hidden="true"><i class="ti ti-target"></i></span>
+                    <h2 id="bo-peo-table-title">Mục tiêu đào tạo của Bộ CTĐT</h2>
+                </div>
+                @if (canAdd) {
+                <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button"
+                    (click)="openCreate()" [disabled]="state() !== 'success' || busy"
+                    aria-label="Thêm PEO" pTooltip="Thêm PEO" tooltipPosition="left">
+                    <i class="ti ti-plus" aria-hidden="true"></i>
+                </button>
+                }
+            </header>
+            <div class="bo-peo-table-wrap">
+                <table class="bo-peo-table" aria-labelledby="bo-peo-table-title">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="bo-peo-col-index">STT</th>
+                            <th scope="col">Nội dung mục tiêu</th>
+                            <th scope="col" class="bo-peo-col-actions">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (goal of rows(); track goal.id; let i = $index) {
+                        <tr>
+                            <td class="bo-peo-col-index">{{ i + 1 }}</td>
+                            <td><div class="bo-peo-content ql-editor" [innerHTML]="decodeContent(goal.noidung)"></div></td>
+                            <td class="bo-peo-col-actions">
+                                <div class="bo-peo-actions">
+                                    @if (canUpdate) {
+                                    <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
+                                        (click)="openEdit(goal)" [disabled]="busy"
+                                        [attr.aria-label]="'Sửa mục tiêu ở dòng ' + (i + 1)" pTooltip="Sửa PEO" tooltipPosition="left">
+                                        <i class="ti ti-edit" aria-hidden="true"></i>
+                                    </button>
+                                    }
+                                    @if (canDelete) {
+                                    <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
+                                        (click)="deleteRow(goal)" [disabled]="busy"
+                                        [attr.aria-label]="'Xóa mục tiêu ở dòng ' + (i + 1)" pTooltip="Xóa PEO" tooltipPosition="left">
+                                        <i class="ti ti-trash" aria-hidden="true"></i>
+                                    </button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                        } @empty {
+                        @if (state() !== 'loading') {
+                        <tr><td colspan="3" class="bo-peo-empty">Bộ CTĐT này chưa có mục tiêu PEO.</td></tr>
+                        }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        }
+    </div>
+</section>
+
+<p-drawer [(visible)]="drawerVisible" [dismissible]="!busy" [closable]="!busy" [closeOnEscape]="!busy"
+    [header]="formTitle()" [blockScroll]="true" ariaCloseLabel="Đóng biểu mẫu PEO"
+    appendTo="body" position="right" [style]="{ width: 'min(700px, 100vw)' }" styleClass="ictu-p-drawer bo-peo-drawer">
+    <div class="ictu-p-drawer__content bo-peo-drawer-content">
+        <div class="ictu-p-drawer__content__body bo-peo-drawer-body position-relative">
+            @if (saving()) {
+            <app-loading-progress heading="Đang lưu PEO..." backdropFilter="none"></app-loading-progress>
+            }
+            <form id="bo-peo-form" [formGroup]="form" (ngSubmit)="submit()" [attr.aria-busy]="saving()">
+                <fieldset class="ictu-form bo-peo-form" [disabled]="busy" [attr.inert]="busy ? '' : null" aria-label="Nội dung mục tiêu PEO">
+                    <div class="ictu-form__row">
+                        <span id="bo-peo-content-label" class="ictu-form__label ictu-form__label--required">Nội dung mục tiêu</span>
+                        <div class="bo-peo-editor" role="group" aria-labelledby="bo-peo-content-label"
+                            [attr.aria-invalid]="f.noidung.touched && f.noidung.invalid"
+                            [attr.aria-describedby]="f.noidung.touched && f.noidung.invalid ? 'bo-peo-content-error' : null">
+                            <ovic-editor height="260px" [formField]="f.noidung" [default]="f.noidung.value" [readonly]="busy"></ovic-editor>
+                        </div>
+                        @if (f.noidung.touched && f.noidung.invalid) {
+                        <span id="bo-peo-content-error" class="ictu-admin-form-error" role="alert">Vui lòng nhập nội dung mục tiêu.</span>
+                        }
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <footer class="ictu-p-drawer__content__footer ictu-admin-drawer-footer">
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button"
+                (click)="closeDrawer()" [disabled]="busy">Hủy</button>
+            <button type="submit" form="bo-peo-form" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button"
+                [disabled]="busy || form.invalid">
+                <i class="ti ti-device-floppy" aria-hidden="true"></i>{{ saving() ? 'Đang lưu...' : 'Lưu PEO' }}
+            </button>
+        </footer>
+    </div>
+</p-drawer>

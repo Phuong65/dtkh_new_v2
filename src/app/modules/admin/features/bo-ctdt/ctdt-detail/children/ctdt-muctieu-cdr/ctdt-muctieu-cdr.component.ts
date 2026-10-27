@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, WritableSignal, inject, signal } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, Subject, concatMap, defer, finalize, forkJoin, from, map, of, switchMap, takeUntil, tap, throwError, toArray } from 'rxjs';
 import { Drawer } from 'primeng/drawer';
@@ -8,6 +8,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { MatButtonModule } from '@angular/material/button';
 import { TooltipModule } from 'primeng/tooltip';
+import { Select } from 'primeng/select';
 import { HelperService } from '@core/services/helper.service';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 import { AppState } from '@core-new/models/app-state';
@@ -19,9 +20,11 @@ import { ConditionOption } from '@modules/shared/models/condition-option';
 import { Ctdt } from '@modules/shared/models/ctdt';
 import { CtdtConfig } from '@modules/shared/models/ctdt-config';
 import { CtdtMuctieuCuthe } from '@modules/shared/models/ctdt-muctieu-cuthe';
+import { CtdtBoMuctieuCuthe } from '@modules/shared/models/ctdt-bo-muctieu-cuthe';
 import { CtdtService } from '@modules/shared/services/ctdt.service';
 import { CtdtConfigService } from '@modules/shared/services/ctdt-config.service';
 import { CtdtMuctieuCutheService } from '@modules/shared/services/ctdt-muctieu-cuthe.service';
+import { CtdtBoMuctieuCutheService } from '@modules/shared/services/ctdt-bo-muctieu-cuthe.service';
 import { ConfigsService } from '@modules/shared/services/configs.service';
 import { ElngUserProfileService } from '@modules/shared/services/elearning-user-profile.service';
 import { OvicEditorComponent } from '@modules/shared/components/ovic-editor/ovic-editor.component';
@@ -44,6 +47,14 @@ interface CtdtSettingsTabItem {
     icon: string;
 }
 
+type PeoCreateMode = 'template' | 'manual';
+
+interface PeoTemplateOption extends CtdtBoMuctieuCuthe {
+    id: number;
+    label: string;
+    searchText: string;
+}
+
 interface OrientationMutation {
     kind: 'save' | 'delete';
     programmeId: number;
@@ -59,7 +70,7 @@ interface OrientationMutation {
 @Component({
     selector: 'app-ctdt-muctieu-cdr',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, Drawer, MultiSelectModule, InputTextModule,
+    imports: [CommonModule, ReactiveFormsModule, Drawer, Select, MultiSelectModule, InputTextModule,
         OvicEditorComponent, SafeHtmlDecodePipe, MatButtonModule, TooltipModule, LoadingProgressComponent, CtdtCdrComponent, CtdtHosoPhatTrienComponent],
     templateUrl: './ctdt-muctieu-cdr.component.html',
     styleUrls: ['./ctdt-muctieu-cdr.component.css']
@@ -72,6 +83,7 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
     readonly formBuilder = inject(FormBuilder);
     private readonly elngUserProfileService = inject(ElngUserProfileService);
     private readonly ctdtMuctieuCutheService = inject(CtdtMuctieuCutheService);
+    private readonly ctdtBoMuctieuCutheService = inject(CtdtBoMuctieuCutheService);
     private readonly configsService = inject(ConfigsService);
     private readonly ctdtConfigService = inject(CtdtConfigService);
     private readonly helperService = inject(HelperService);
@@ -82,6 +94,8 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
     private readonly destroy$ = new Subject<void>();
     private readonly cancelTabLoad$ = new Subject<void>();
     private readonly cancelGoalsLoad$ = new Subject<void>();
+    private readonly cancelPeoTemplateLoad$ = new Subject<void>();
+    private readonly cancelPeoDrawer$ = new Subject<void>();
     private readonly cancelOrientation$ = new Subject<void>();
     readonly settingsTabs: readonly CtdtSettingsTabItem[] = [
         { id: 'hoso-phattrien', label: 'Hồ sơ phát triển', icon: 'ti ti-file-text' },
@@ -111,7 +125,7 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
     formMuctieuCuthe: FormGroup = this.formBuilder.group({
         ctdt_id: ['', Validators.required],
         kyhieu: [''],
-        ordering: ['', Validators.required],
+        ordering: ['', [Validators.required, Validators.min(1), Validators.pattern(/^[0-9]+$/)]],
         noidung: ['', Validators.required],
         type: ['', Validators.required],
         tuongthich: [[]]
@@ -130,6 +144,16 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
     selectedKhungTrinhDo: CtdtConfig | null = null;
     selectedDinhHuong: CtdtConfig | null = null;
     selectedGoalTypeKey: string | null = null;
+    readonly peoCreateMode = signal<PeoCreateMode>('template');
+    readonly peoTemplateState: WritableSignal<AppState> = signal<AppState>('success');
+    readonly peoTemplates = signal<PeoTemplateOption[]>([]);
+    readonly selectedPeoTemplateId = new FormControl<number | null>(null, Validators.required);
+    readonly peoTemplateError = signal('');
+    readonly peoTemplateRetryable = signal(false);
+    private readonly peoTemplateBoId = signal<number | null>(null);
+    private peoTemplateToken = 0;
+    private peoDrawerToken = 0;
+    peoManualInitialValue = '';
     isMatrixExpanded = false;
     groupFormTitle = '';
     orientationFormTitle = '';
@@ -160,6 +184,130 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
 
     get generalEditorInitialValue(): string {
         return this.selectedCtdt?.muctieu || '';
+    }
+
+    get isPeoTemplateMode(): boolean {
+        return !this.isUpdated && this.peoCreateMode() === 'template';
+    }
+
+    get selectedPeoTemplate(): PeoTemplateOption | null {
+        const id = this.selectedPeoTemplateId.value;
+        return this.peoTemplates().find(template => template.id === id) ?? null;
+    }
+
+    get canSubmitPeoForm(): boolean {
+        if (this.busy || this.f['ordering'].invalid || this.f['type'].invalid) return false;
+        if (this.isPeoTemplateMode) {
+            return !!this.selectedPeoTemplate && this.peoTemplateState() === 'success'
+                && this.peoTemplateBoId() === Number(this.selectedCtdt?.ctdt_bo_id);
+        }
+        return !!this.peoPlainText(this.f['noidung'].value);
+    }
+
+    selectPeoCreateMode(mode: PeoCreateMode): void {
+        if (this.busy || this.isUpdated) return;
+        this.peoCreateMode.set(mode);
+        this.updatePeoContentValidator();
+    }
+
+    onPeoCreateModeKeydown(event: KeyboardEvent, index: number): void {
+        if (this.busy) return;
+        const modes: readonly PeoCreateMode[] = ['template', 'manual'];
+        let targetIndex: number;
+        switch (event.key) {
+            case 'ArrowRight':
+            case 'ArrowLeft':
+                targetIndex = (index + 1) % modes.length;
+                break;
+            case 'Home':
+                targetIndex = 0;
+                break;
+            case 'End':
+                targetIndex = modes.length - 1;
+                break;
+            default:
+                return;
+        }
+        event.preventDefault();
+        this.selectPeoCreateMode(modes[targetIndex]);
+        const buttons = (event.currentTarget as HTMLElement).parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+        buttons?.[targetIndex]?.focus();
+    }
+
+    private updatePeoContentValidator(): void {
+        this.f['noidung'].setValidators(this.isPeoTemplateMode ? [] : [Validators.required]);
+        this.f['noidung'].updateValueAndValidity({ emitEvent: false });
+    }
+
+    private peoPlainText(content: string): string {
+        return this.helperService.decodeHTML(content || '').replace(/<[^>]*>/g, ' ')
+            .replace(/&nbsp;/gi, ' ').replace(/[​-‍﻿]/g, '').replace(/\s+/g, ' ').trim();
+    }
+
+    loadPeoTemplates(): void {
+        if (!this.drawerVisible || this.isUpdated || this.savingGoal || this.destroyed) return;
+        const programmeId = this.selectedCtdt?.id;
+        const boId = Number(this.selectedCtdt?.ctdt_bo_id);
+        const drawerToken = this.peoDrawerToken;
+        const token = ++this.peoTemplateToken;
+        this.cancelPeoTemplateLoad$.next();
+        this.selectedPeoTemplateId.reset(null);
+        this.peoTemplates.set([]);
+        this.peoTemplateError.set('');
+        this.peoTemplateRetryable.set(false);
+        if (!Number.isSafeInteger(boId) || boId <= 0) {
+            this.peoTemplateState.set('error');
+            this.peoTemplateError.set('CTĐT chưa liên kết với Bộ CTĐT. Vui lòng chuyển sang Nhập mới.');
+            return;
+        }
+        this.peoTemplateState.set('loading');
+        this.peoTemplateBoId.set(boId);
+        this.ctdtBoMuctieuCutheService.getByPage({
+            condition: [{ conditionName: 'ctdt_bo_id', condition: OvicQueryCondition.equal, value: String(boId), orWhere: 'and' }],
+            set: [{ label: 'limit', value: '-1' }], page: null
+        }).pipe(takeUntil(this.cancelPeoTemplateLoad$), takeUntil(this.destroy$)).subscribe({
+            next: response => {
+                if (!this.isPeoDrawerCurrent(drawerToken, programmeId) || token !== this.peoTemplateToken
+                    || Number(this.selectedCtdt?.ctdt_bo_id) !== boId) return;
+                this.peoTemplates.set((response.data || []).filter(row => Number(row.ctdt_bo_id) === boId)
+                    .map(row => {
+                        const label = this.peoPlainText(row.noidung);
+                        return { ...row, id: Number(row.id), ctdt_bo_id: boId, label, searchText: label.toLowerCase() };
+                    }).filter(row => Number.isSafeInteger(row.id) && row.id > 0 && !!row.label));
+                this.peoTemplateState.set('success');
+                this.peoTemplateRetryable.set(false);
+            },
+            error: () => {
+                if (!this.isPeoDrawerCurrent(drawerToken, programmeId) || token !== this.peoTemplateToken) return;
+                this.peoTemplateState.set('error');
+                this.peoTemplateRetryable.set(true);
+                this.peoTemplateError.set('Không thể tải mẫu PEO. Vui lòng thử lại hoặc chọn Nhập mới.');
+            }
+        });
+    }
+
+    private isPeoDrawerCurrent(token: number, programmeId: number): boolean {
+        return !this.destroyed && this.drawerVisible && token === this.peoDrawerToken
+            && programmeId === this.selectedCtdt?.id;
+    }
+
+    private resetPeoDrawer(): void {
+        this.peoDrawerToken++;
+        this.peoTemplateToken++;
+        this.cancelPeoTemplateLoad$.next();
+        this.cancelPeoDrawer$.next();
+        this.drawerVisible = false;
+        this.savingGoal = false;
+        this.formMuctieuCuthe.enable({ emitEvent: false });
+        this.selectedPeoTemplateId.enable({ emitEvent: false });
+        this.selectedPeoTemplateId.reset(null);
+        this.peoTemplates.set([]);
+        this.peoTemplateBoId.set(null);
+        this.peoTemplateState.set('success');
+        this.peoTemplateError.set('');
+        this.peoTemplateRetryable.set(false);
+        this.peoCreateMode.set('template');
+        this.peoManualInitialValue = '';
     }
 
     selectSettingsTab(tabId: CtdtSettingsTabId): void {
@@ -197,10 +345,13 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
 
     ngOnChanges(changes: SimpleChanges): void {
         const change = changes['selectedCtdt'];
-        const ctdt = change?.currentValue as Ctdt | null;
-        if (ctdt?.id && ctdt.id !== change.previousValue?.id) {
-            this.activeSettingsTabId.set('muc-tieu-chung');
+        if (!change) return;
+        const ctdt = change.currentValue as Ctdt | null;
+        const previous = change.previousValue as Ctdt | null;
+        if (ctdt?.id !== previous?.id || ctdt?.ctdt_bo_id !== previous?.ctdt_bo_id) {
+            this.resetPeoDrawer();
         }
+        if (ctdt?.id && ctdt.id !== previous?.id) this.activeSettingsTabId.set('muc-tieu-chung');
         if (ctdt?.id && ctdt.id !== this.loadedCtdtId) this.loadTabData(ctdt);
     }
 
@@ -210,6 +361,10 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
         this.cancelTabLoad$.complete();
         this.cancelGoalsLoad$.next();
         this.cancelGoalsLoad$.complete();
+        this.cancelPeoTemplateLoad$.next();
+        this.cancelPeoTemplateLoad$.complete();
+        this.cancelPeoDrawer$.next();
+        this.cancelPeoDrawer$.complete();
         this.cancelOrientation$.next();
         this.cancelOrientation$.complete();
         this.destroy$.next();
@@ -235,6 +390,7 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     private loadTabData(ctdt: Ctdt, force = false): void {
+        if (this.loadedCtdtId !== ctdt.id) this.resetPeoDrawer();
         if (!this.isManager && !this.isLanhDaoKhoa) {
             this.state.set('success');
             this.router.navigate(['/admin/content-none']);
@@ -379,7 +535,13 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
         });
     }
 
-    closeForm(): void { if (!this.savingGoal) this.drawerVisible = false; }
+    closeForm(): void {
+        if (!this.savingGoal) this.resetPeoDrawer();
+    }
+
+    onPeoDrawerVisibilityChange(visible: boolean): void {
+        if (!visible) this.closeForm();
+    }
 
     resetForm(): void {
         if (!this.selectedCtdt) return;
@@ -552,11 +714,22 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
 
     addPeoToGroup(group: typeMuctieuCuthe): void {
         if (!this.selectedCtdt || this.busy || group.key === '__ungrouped__') return;
+        this.peoDrawerToken++;
         this.resetForm();
         this.selectedGoalTypeKey = group.key;
         this.formTitle = `Thêm PEO · ${group.title}`;
         this.formMuctieuCuthe.patchValue({ type: group.key });
+        this.peoCreateMode.set('template');
+        this.peoTemplateBoId.set(null);
+        this.peoTemplateState.set('success');
+        this.peoTemplateError.set('');
+        this.peoTemplates.set([]);
+        this.selectedPeoTemplateId.reset(null);
+        this.peoTemplateRetryable.set(false);
+        this.peoManualInitialValue = '';
+        this.updatePeoContentValidator();
         this.drawerVisible = true;
+        this.loadPeoTemplates();
     }
 
     deleteKhungTrinhDo(group: typeMuctieuCuthe): void {
@@ -600,14 +773,37 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
 
     saveMucTieuCuthe(): void {
         if (!this.selectedCtdt || this.savingGoal || this.deletingGoalId !== null) return;
-        this.formMuctieuCuthe.markAllAsTouched();
-        if (this.formMuctieuCuthe.invalid) return;
-        const data = { ...this.formMuctieuCuthe.getRawValue() };
-        if (!this.isUpdated && this.selectedGoalTypeKey) data.type = this.selectedGoalTypeKey;
-        data.kyhieu = `${this.kyhieuMutieuCuthe} ${data.ordering}`;
-        data.tuongthich = Array.isArray(data.tuongthich) ? data.tuongthich : [];
+        if (this.isPeoTemplateMode && !this.selectedPeoTemplate) return;
+        const programmeId = this.selectedCtdt.id;
+        const drawerToken = this.peoDrawerToken;
         const editing = this.isUpdated;
         const selectedId = this.selectedMuctieuCuthe?.id;
+        const template = this.selectedPeoTemplate;
+        this.formMuctieuCuthe.markAllAsTouched();
+        if (this.isPeoTemplateMode) {
+            if (this.peoTemplateState() !== 'success' || !template?.id
+                || Number(template.ctdt_bo_id) !== Number(this.selectedCtdt.ctdt_bo_id)) {
+                this.notificationService.toastWarning('Vui lòng chọn mẫu PEO thuộc Bộ CTĐT hiện tại.');
+                return;
+            }
+            if (!this.peoPlainText(template.noidung)) {
+                this.notificationService.toastWarning('Nội dung mẫu PEO không hợp lệ.');
+                return;
+            }
+        } else if (this.formMuctieuCuthe.invalid || !this.peoPlainText(this.f['noidung'].value)) {
+            return;
+        }
+        const data = { ...this.formMuctieuCuthe.getRawValue() };
+        if (!editing && this.selectedGoalTypeKey) data.type = this.selectedGoalTypeKey;
+        if (!data.type || (!editing && data.type !== this.selectedGoalTypeKey)) return;
+        data.noidung = this.isPeoTemplateMode ? template!.noidung : data.noidung;
+        data.kyhieu = `${this.kyhieuMutieuCuthe} ${data.ordering}`;
+        data.tuongthich = Array.isArray(data.tuongthich) ? [...new Set(data.tuongthich.map(String))] : [];
+        if (data.tuongthich.some((key: string) => !this.list_tuongthich.some(item => item.key === key))) {
+            this.notificationService.toastWarning('Định hướng đã chọn không còn hợp lệ.');
+            return;
+        }
+        if (!Number.isSafeInteger(Number(data.ordering)) || Number(data.ordering) <= 0) return;
         const condition: ConditionOption = {
             condition: [
                 { conditionName: 'kyhieu', condition: OvicQueryCondition.equal, value: data.kyhieu, orWhere: 'and' },
@@ -618,6 +814,7 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
         if (editing) condition.condition.push({ conditionName: 'id', condition: OvicQueryCondition.notEqual, value: String(selectedId), orWhere: 'and' });
         this.savingGoal = true;
         this.ctdtMuctieuCutheService.getCtdtMuctieuCutheByPageNew(condition).pipe(
+            takeUntil(this.cancelPeoDrawer$),
             switchMap(result => {
                 if (Number(result.recordsFiltered) !== 0) {
                     this.notificationService.toastWarning('Ký hiệu đã tồn tại, vui lòng nhập lại');
@@ -630,9 +827,9 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
             finalize(() => this.savingGoal = false)
         ).subscribe({
             next: saved => {
-                if (!saved) return;
+                if (!saved || this.destroyed || this.selectedCtdt?.id !== programmeId || drawerToken !== this.peoDrawerToken) return;
                 this.notificationService.toastSuccess(editing ? 'Sửa mục tiêu thành công' : 'Thêm mục tiêu thành công');
-                this.drawerVisible = false;
+                this.resetPeoDrawer();
                 this.loadMuctieuCuthe();
             },
             error: () => this.notificationService.toastError('Không thể lưu mục tiêu. Dữ liệu nhập được giữ lại, vui lòng thử lại.')
@@ -641,6 +838,7 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
 
     editMucTieuchuThe(goal: CtdtMuctieuCuthe): void {
         if (!this.selectedCtdt || this.busy) return;
+        this.resetPeoDrawer();
         this.resetForm();
         this.isUpdated = true;
         this.selectedGoalTypeKey = goal.type;
@@ -653,6 +851,9 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
             type: goal.type,
             tuongthich: Array.isArray(goal.tuongthich) ? [...goal.tuongthich] : []
         });
+        this.peoCreateMode.set('manual');
+        this.peoManualInitialValue = goal.noidung || '';
+        this.updatePeoContentValidator();
         this.drawerVisible = true;
     }
 
