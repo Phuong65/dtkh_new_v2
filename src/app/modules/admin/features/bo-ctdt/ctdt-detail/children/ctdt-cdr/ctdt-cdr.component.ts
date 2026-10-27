@@ -1,4 +1,6 @@
 import { CtdtCdrService } from '@modules/shared/services/ctdt-cdr.service';
+import { BoCtdtCdr } from '@modules/shared/models/bo-ctdt-cdr';
+import { BoCtdtCdrService } from '@modules/shared/services/ctdt-bo-cdr.service';
 import { HelperService } from '@core/services/helper.service';
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, WritableSignal, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -18,7 +20,8 @@ import { CtdtMuctieuCutheService } from '@modules/shared/services/ctdt-muctieu-c
 import { CtdtService } from '@modules/shared/services/ctdt.service';
 import { ElngUserProfileService } from '@modules/shared/services/elearning-user-profile.service';
 import { ROLES } from '@modules/shared/utils/syscat';
-import { firstValueFrom, forkJoin, of, Subject, takeUntil } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { firstValueFrom, forkJoin, Observable, of, Subject, takeUntil } from 'rxjs';
 import { Ctdt } from '@modules/shared/models/ctdt';
 import { CtdtCdr } from '@modules/shared/models/ctdt-cdr';
 import { CtdtMuctieuCuthe } from '@modules/shared/models/ctdt-muctieu-cuthe';
@@ -28,9 +31,28 @@ import { MatButtonModule } from '@angular/material/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { Drawer } from 'primeng/drawer';
 import { TooltipModule } from 'primeng/tooltip';
+import { Select } from 'primeng/select';
 
 export interface CtdtCdrParent extends CtdtCdr {
     children?: CtdtCdr[];
+}
+
+interface PloTemplate extends BoCtdtCdr {
+    label: string;
+    searchText: string;
+    children: BoCtdtCdr[];
+}
+
+type PloCreateMode = 'template' | 'manual';
+
+interface TemplateCopyState {
+    programmeId: number;
+    parentId: number | null;
+    parentAttempted: boolean;
+    uncertainChild: boolean;
+    parentPayload: Omit<CtdtCdr, 'id'>;
+    children: Omit<CtdtCdr, 'id'>[];
+    completed: number;
 }
 
 export interface CtdtCdrSummary {
@@ -54,6 +76,7 @@ export interface CtdtCdrSummary {
         MatButtonModule,
         InputTextModule,
         Drawer,
+        Select,
         TooltipModule,
         MultiSelectModule,
         OvicEditorComponent,
@@ -74,10 +97,14 @@ export class CtdtCdrComponent implements OnChanges, OnInit, OnDestroy {
     readonly formBuilder = inject(FormBuilder);
     private readonly elngUserProfileService = inject(ElngUserProfileService);
     private readonly ctdtCdrService = inject(CtdtCdrService);
+    private readonly boCtdtCdrService = inject(BoCtdtCdrService);
     private readonly ctdtMuctieuCutheService = inject(CtdtMuctieuCutheService);
     private readonly helperService = inject(HelperService);
     private readonly destroy$ = new Subject<void>();
     private readonly cancelLoad$ = new Subject<void>();
+    private readonly cancelTemplateLoad$ = new Subject<void>();
+    private readonly cancelDrawer$ = new Subject<void>();
+    private destroyed = false;
     private loadedCtdtId: number | null = null;
     private loadToken = 0;
 
@@ -115,7 +142,17 @@ export class CtdtCdrComponent implements OnChanges, OnInit, OnDestroy {
     kyhieu_cdr: string;
     drawerVisible = false;
     savingCdr = false;
+    manualEditorInitialValue = '';
     isMatrixExpanded = false;
+    readonly createMode = signal<PloCreateMode>('template');
+    readonly templateState = signal<AppState>('success');
+    readonly ploTemplates = signal<PloTemplate[]>([]);
+    readonly selectedTemplateId = signal<number | null>(null);
+    readonly templateCopyError = signal('');
+    readonly templateRetryable = signal(false);
+    private templateLoadToken = 0;
+    private drawerToken = 0;
+    private templateCopy: TemplateCopyState | null = null;
 
     readonly collapsedPlos = signal<Set<number>>(new Set<number>());
     readonly hoveredMatrixCol = signal<number | null>(null);
@@ -124,7 +161,7 @@ export class CtdtCdrComponent implements OnChanges, OnInit, OnDestroy {
     formCtdtCdr: FormGroup = this.formBuilder.group({
         ctdt_id: ['', Validators.required],
         kyhieu: [''],
-        ordering: ['', Validators.required],
+        ordering: ['', [Validators.required, Validators.min(1), Validators.pattern(/^[0-9]+$/)]],
         noidung: ['', Validators.required],
         parent_id: [''],
         tuongthich_peos: [''],
@@ -154,7 +191,19 @@ export class CtdtCdrComponent implements OnChanges, OnInit, OnDestroy {
     ngOnChanges(changes: SimpleChanges): void {
         if (!this.embedded || (!this.isLanhDaoKhoa && !this.isManager)) return;
         const ctdt = this.selectedCtdtInput;
-        if (!ctdt?.id || this.peoRefreshKey <= 0) return;
+        if (changes['selectedCtdtInput'] && (ctdt?.id !== this.selectedCtdt?.id
+            || ctdt?.ctdt_bo_id !== this.selectedCtdt?.ctdt_bo_id)) this.resetDrawerState();
+        if (!ctdt?.id) {
+            this.selectedCtdt = null;
+            return;
+        }
+        if (ctdt.id !== this.selectedCtdt?.id) {
+            this.list_ctdt_cdr = [];
+            this.compatibilityMatrix = {};
+            this.cancelLoad$.next();
+        }
+        this.selectedCtdt = ctdt;
+        if (this.peoRefreshKey <= 0) return;
         if (ctdt.id !== this.loadedCtdtId || changes['peoRefreshKey'] || changes['peoListInput']) {
             this.loadEmbeddedData(ctdt);
         }
@@ -181,8 +230,13 @@ export class CtdtCdrComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.destroyed = true;
+        this.cancelDrawer$.next();
+        this.cancelDrawer$.complete();
         this.cancelLoad$.next();
         this.cancelLoad$.complete();
+        this.cancelTemplateLoad$.next();
+        this.cancelTemplateLoad$.complete();
         this.destroy$.next();
         this.destroy$.complete();
     }
@@ -200,6 +254,7 @@ export class CtdtCdrComponent implements OnChanges, OnInit, OnDestroy {
         const requestedCtdtId = Number(ctdtId);
         const requestToken = ++this.loadToken;
         this.cancelLoad$.next();
+        if (this.selectedCtdt?.id !== requestedCtdtId) this.resetDrawerState();
         this.loadedCtdtId = requestedCtdtId;
         this.loadingHeading = 'Đang tải dữ liệu chuẩn đầu ra...';
         this.state.set('loading');
@@ -258,6 +313,94 @@ export class CtdtCdrComponent implements OnChanges, OnInit, OnDestroy {
         return this.formCtdtCdr.controls;
     }
 
+    get isNewRootPlo(): boolean {
+        return !this.isUpdated && !this.selectedParentCtdtCdr;
+    }
+
+    get isTemplateMode(): boolean {
+        return this.isNewRootPlo && this.createMode() === 'template';
+    }
+
+    get selectedTemplate(): PloTemplate | null {
+        const id = this.selectedTemplateId();
+        return this.ploTemplates().find(template => template.id === id) ?? null;
+    }
+
+    get hasTemplateCopyPending(): boolean {
+        return !!this.templateCopy?.parentAttempted;
+    }
+
+    get drawerInputsLocked(): boolean {
+        return this.savingCdr || this.hasTemplateCopyPending;
+    }
+
+    get canSubmitDrawer(): boolean {
+        if (this.savingCdr) return false;
+        if (this.hasTemplateCopyPending) return true;
+        if (this.isTemplateMode) return this.templateState() === 'success' && !!this.selectedTemplate;
+        return Number.isSafeInteger(Number(this.f['ordering'].value))
+            && Number(this.f['ordering'].value) > 0 && !!this.plainText(this.f['noidung'].value);
+    }
+
+    get templateProgress(): string {
+        const copy = this.templateCopy;
+        if (!copy?.parentAttempted) return '';
+        return copy.parentId
+            ? `Đã tạo ${copy.parentPayload.kyhieu} và ${copy.completed}/${copy.children.length} PI.`
+            : 'Đã gửi yêu cầu tạo PLO. Cần đối chiếu kết quả trước khi tiếp tục.';
+    }
+
+    selectCreateMode(mode: PloCreateMode): void {
+        if (!this.isNewRootPlo || this.drawerInputsLocked) return;
+        this.createMode.set(mode);
+    }
+
+    onCreateModeKeydown(event: KeyboardEvent, index: number): void {
+        const modes: readonly PloCreateMode[] = ['template', 'manual'];
+        let targetIndex: number;
+        switch (event.key) {
+            case 'ArrowRight':
+                targetIndex = (index + 1) % modes.length;
+                break;
+            case 'ArrowLeft':
+                targetIndex = (index - 1 + modes.length) % modes.length;
+                break;
+            case 'Home':
+                targetIndex = 0;
+                break;
+            case 'End':
+                targetIndex = modes.length - 1;
+                break;
+            default:
+                return;
+        }
+
+        event.preventDefault();
+        this.selectCreateMode(modes[targetIndex]);
+        const buttons = (event.currentTarget as HTMLElement).parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+        buttons?.[targetIndex]?.focus();
+    }
+
+    selectTemplate(templateId: number | null): void {
+        if (this.drawerInputsLocked) return;
+        this.selectedTemplateId.set(templateId ? Number(templateId) : null);
+        this.templateCopyError.set('');
+        this.templateRetryable.set(false);
+        this.templateCopy = null;
+    }
+
+    previewPloCode(): string {
+        return `PLO${Number(this.f['ordering'].value) || ''}`;
+    }
+
+    previewPiCode(index: number): string {
+        return `PI ${Number(this.f['ordering'].value) || ''}.${index + 1}`;
+    }
+
+    getTemplatePiTotal(template: PloTemplate): number {
+        return Math.round(template.children.reduce((total, pi) => total + Number(pi.percent_pi || 0), 0));
+    }
+
     loadCtdtCdr() {
         if (!this.selectedCtdt) return;
         const requestedCtdtId = this.selectedCtdt.id;
@@ -300,7 +443,7 @@ export class CtdtCdrComponent implements OnChanges, OnInit, OnDestroy {
                     this.selectedParentCtdtCdr = this.list_ctdt_cdr.find(m => m.id === this.selectedParentCtdtCdr.id);
                 }
 
-                this.resetForm();
+                if (!this.drawerVisible) this.resetForm();
                 this.state.set('success');
                 this.emitSummary('success', requestedCtdtId);
             },
@@ -313,10 +456,12 @@ export class CtdtCdrComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     resetForm() {
+        this.formCtdtCdr.enable({ emitEvent: false });
         this.formCtdtCdr.reset();
         this.f['ctdt_id'].setValue(this.selectedCtdt.id);
         this.f['parent_id'].setValue(this.selectedParentCtdtCdr ? this.selectedParentCtdtCdr.id : 0);
         this.f['ordering'].setValue(this.list_ctdt_cdr.length ? this.list_ctdt_cdr[this.list_ctdt_cdr.length - 1].ordering + 1 : 1);
+        this.manualEditorInitialValue = '';
         if (this.selectedParentCtdtCdr) {
             const child = this.selectedParentCtdtCdr.children;
             this.f['ordering'].setValue(child.length ? child[child.length - 1].ordering + 1 : 1);
@@ -325,7 +470,9 @@ export class CtdtCdrComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     openAddCtdtCdr(parent?: CtdtCdrParent) {
-        this.selectedParentCtdtCdr = null;
+        if (this.savingCdr || !this.selectedCtdt?.id || this.state() !== 'success') return;
+        this.resetDrawerState();
+        this.createMode.set(parent ? 'manual' : 'template');
         this.formTitle = parent ? 'Thêm chỉ báo PI' : 'Thêm chuẩn đầu ra PLO';
         this.kyhieu_cdr = "PLO";
         if (parent) {
@@ -333,12 +480,86 @@ export class CtdtCdrComponent implements OnChanges, OnInit, OnDestroy {
             this.kyhieu_cdr = "PI ".concat(parent.ordering.toString(), ".");
         }
         this.resetForm();
+        this.manualEditorInitialValue = '';
         this.drawerVisible = true;
+        if (!parent) this.loadPloTemplates();
     }
 
+    loadPloTemplates(): void {
+        if (!this.drawerVisible || !this.isNewRootPlo || this.drawerInputsLocked) return;
+        const boId = Number(this.selectedCtdt?.ctdt_bo_id);
+        const programmeId = Number(this.selectedCtdt?.id);
+        const drawerToken = this.drawerToken;
+        const token = ++this.templateLoadToken;
+        this.cancelTemplateLoad$.next();
+        this.selectedTemplateId.set(null);
+        this.ploTemplates.set([]);
+        this.templateRetryable.set(false);
+        if (!Number.isSafeInteger(boId) || boId <= 0) {
+            this.templateState.set('error');
+            this.templateCopyError.set('CTĐT chưa liên kết với Bộ CTĐT nên chưa thể tải mẫu.');
+            return;
+        }
+        this.templateState.set('loading');
+        this.templateCopyError.set('');
+        const condition: ConditionOption = {
+            condition: [{ conditionName: 'ctdt_bo_id', condition: OvicQueryCondition.equal, value: String(boId), orWhere: 'and' }],
+            set: [{ label: 'limit', value: '-1' }],
+            page: null
+        };
+        this.boCtdtCdrService.getByPage(condition).pipe(
+            takeUntil(this.cancelTemplateLoad$), takeUntil(this.destroy$)
+        ).subscribe({
+            next: response => {
+                if (token !== this.templateLoadToken || drawerToken !== this.drawerToken
+                    || Number(this.selectedCtdt?.id) !== programmeId || Number(this.selectedCtdt?.ctdt_bo_id) !== boId) return;
+                const rows = (response.data || []).filter(row => Number(row.ctdt_bo_id) === boId).map(row => ({
+                    ...row,
+                    id: Number(row.id),
+                    ctdt_bo_id: boId,
+                    parent_id: Number(row.parent_id)
+                })).filter(row => Number.isSafeInteger(row.id) && row.id > 0);
+                const parents = rows.filter(row => row.parent_id === 0).map(parent => ({
+                    ...parent,
+                    label: this.plainText(parent.noidung) || 'Chưa có nội dung',
+                    searchText: this.plainText(parent.noidung).toLowerCase(),
+                    children: rows.filter(child => child.parent_id === parent.id)
+                }));
+                this.ploTemplates.set(parents);
+                this.templateState.set('success');
+                this.templateRetryable.set(false);
+            },
+            error: () => {
+                if (token !== this.templateLoadToken || drawerToken !== this.drawerToken
+                    || Number(this.selectedCtdt?.id) !== programmeId) return;
+                this.templateState.set('error');
+                this.templateRetryable.set(true);
+                this.templateCopyError.set('Không thể tải mẫu PLO. Vui lòng thử lại.');
+            }
+        });
+    }
+
+    decodeTemplateContent(value: string): string {
+        return this.helperService.decodeHTML(value || '');
+    }
+
+    private plainText(value: string): string {
+        return this.decodeTemplateContent(value).replace(/<[^>]*>/g, ' ').replace(/&nbsp;/gi, ' ')
+            .replace(/[​-‍﻿]/g, '').replace(/\s+/g, ' ').trim();
+    }
 
     async saveCtdtCdr() {
+        if (this.isTemplateMode) {
+            await this.saveFromTemplate();
+            return;
+        }
         if (this.savingCdr || !this.selectedCtdt) return;
+        const ordering = Number(this.f['ordering'].value);
+        if (!Number.isSafeInteger(ordering) || ordering <= 0 || !this.plainText(this.f['noidung'].value)) {
+            this.formCtdtCdr.markAllAsTouched();
+            this.notificationService.toastWarning('Vui lòng nhập ký hiệu và nội dung hợp lệ.');
+            return;
+        }
         if (this.formCtdtCdr.invalid) {
             this.formCtdtCdr.markAllAsTouched();
             this.notificationService.toastWarning('Vui lòng nhập đầy đủ các trường bắt buộc.');
@@ -407,11 +628,219 @@ export class CtdtCdrComponent implements OnChanges, OnInit, OnDestroy {
         }
     }
 
-    closeForm() {
+    private async saveFromTemplate(): Promise<void> {
+        if (this.savingCdr || !this.isTemplateMode || !this.selectedCtdt?.id || !this.drawerVisible) return;
+        const programmeId = Number(this.selectedCtdt.id);
+        const token = this.drawerToken;
+        let copy = this.templateCopy;
+        if (!copy?.parentAttempted) {
+            this.f['ordering'].markAsTouched();
+            const ordering = Number(this.f['ordering'].value);
+            const template = this.selectedTemplate;
+            if (!Number.isSafeInteger(ordering) || ordering <= 0) {
+                this.notificationService.toastWarning('Vui lòng nhập số thứ tự PLO hợp lệ.');
+                return;
+            }
+            if (this.templateState() !== 'success' || !template?.id
+                || Number(template.ctdt_bo_id) !== Number(this.selectedCtdt.ctdt_bo_id)) {
+                this.notificationService.toastWarning('Vui lòng chọn mẫu PLO của Bộ CTĐT hiện tại.');
+                return;
+            }
+            const validTemplate = this.plainText(template.noidung) && template.children.every(child => {
+                const percent = Number(child.percent_pi);
+                return child.percent_pi !== null && child.percent_pi !== undefined && String(child.percent_pi).trim() !== ''
+                    && Number.isInteger(percent) && percent >= 0 && percent <= 100
+                    && Number(child.ctdt_bo_id) === Number(template.ctdt_bo_id)
+                    && Number(child.parent_id) === Number(template.id) && !!this.plainText(child.noidung);
+            });
+            if (!validTemplate) {
+                this.notificationService.toastError('Nội dung hoặc tỷ lệ PI trong mẫu không hợp lệ. Vui lòng kiểm tra mẫu.');
+                return;
+            }
+            const peos: number[] = Array.isArray(this.f['tuongthich_peos'].value)
+                ? [...new Set<number>(this.f['tuongthich_peos'].value.map(Number))] : [];
+            if (peos.some(id => !this.list_cdr_muctieu.some(peo => Number(peo.id) === id))) {
+                this.notificationService.toastWarning('PEO đã chọn không thuộc CTĐT hiện tại.');
+                return;
+            }
+            copy = {
+                programmeId, parentId: null, parentAttempted: false, uncertainChild: false, completed: 0,
+                parentPayload: {
+                    ctdt_id: programmeId, kyhieu: `PLO${ordering}`, ordering, parent_id: 0,
+                    noidung: template.noidung, percent_pi: 0, tuongthich_peos: peos
+                },
+                children: template.children.map((child, index) => ({
+                    ctdt_id: programmeId, kyhieu: `PI ${ordering}.${index + 1}`,
+                    ordering: index + 1, parent_id: 0,
+                    noidung: child.noidung, percent_pi: Number(child.percent_pi), tuongthich_peos: []
+                }))
+            };
+            this.templateCopy = copy;
+        }
+        if (copy.programmeId !== programmeId) return;
+        this.savingCdr = true;
+        this.formCtdtCdr.disable({ emitEvent: false });
+        this.templateCopyError.set('');
+        try {
+            // Retry resumes the snapshot; it never creates a second parent.
+            const parent = await this.findCopyRow(copy.parentPayload, token);
+            if (copy.parentAttempted) {
+                if (!parent || !this.sameCopyRow(parent, copy.parentPayload)
+                    || (copy.parentId && Number(parent.id) !== copy.parentId)) {
+                    throw new Error('Không đối chiếu được PLO đã gửi. Đóng và tải lại danh sách để kiểm tra; không tự tạo thêm PLO.');
+                }
+                copy.parentId = Number(parent.id);
+            } else {
+                if (parent) {
+                    this.templateCopy = null;
+                    this.notificationService.toastWarning('Ký hiệu đã tồn tại, vui lòng nhập lại');
+                    return;
+                }
+                copy.parentAttempted = true;
+                let response: unknown;
+                try {
+                    response = await this.drawerRequest(this.ctdtCdrService.addCtdtCdr(copy.parentPayload), token, programmeId);
+                } catch (error) {
+                    if (this.isRejectedWrite(error)) copy.parentAttempted = false;
+                    throw error;
+                }
+                copy.parentId = this.extractCreatedId(response);
+                if (!copy.parentId) {
+                    const created = await this.findCopyRow(copy.parentPayload, token);
+                    if (!created || !this.sameCopyRow(created, copy.parentPayload)) {
+                        throw new Error('Đã gửi PLO nhưng chưa xác định được ID. Bấm Tiếp tục để đối chiếu; không tạo lại PLO.');
+                    }
+                    copy.parentId = Number(created.id);
+                }
+            }
+            while (copy.completed < copy.children.length) {
+                const child = { ...copy.children[copy.completed], parent_id: copy.parentId };
+                const existing = await this.findCopyRow(child, token);
+                if (existing) {
+                    if (!copy.uncertainChild || !this.sameCopyRow(existing, child)) {
+                        throw new Error(`${child.kyhieu} đã tồn tại hoặc không khớp nội dung cần sao chép. Vui lòng kiểm tra danh sách.`);
+                    }
+                } else {
+                    if (copy.uncertainChild) {
+                        throw new Error(`Chưa xác định được kết quả ghi ${child.kyhieu}. Bấm Tiếp tục để đối chiếu hoặc đóng để kiểm tra danh sách.`);
+                    }
+                    copy.uncertainChild = true;
+                    try {
+                        await this.drawerRequest(this.ctdtCdrService.addCtdtCdr(child), token, programmeId);
+                    } catch (error) {
+                        if (this.isRejectedWrite(error)) copy.uncertainChild = false;
+                        throw error;
+                    }
+                }
+                copy.uncertainChild = false;
+                copy.completed++;
+            }
+            this.savingCdr = false;
+            this.templateCopy = null;
+            this.notificationService.toastSuccess('Đã thêm PLO và các PI từ mẫu.');
+            this.closeForm();
+            this.loadCtdtCdr();
+        } catch (error) {
+            if (!this.isDrawerCurrent(token, programmeId)) return;
+            const detail = error instanceof HttpErrorResponse
+                ? 'Không thể hoàn tất sao chép. Bấm Tiếp tục để đối chiếu phần đã lưu trước khi thử tiếp.'
+                : error instanceof Error ? error.message : 'Không thể sao chép mẫu. Vui lòng thử lại.';
+            this.templateCopyError.set(detail);
+            this.notificationService.toastError(detail);
+        } finally {
+            if (token === this.drawerToken) {
+                this.savingCdr = false;
+                if (this.formCtdtCdr.disabled) this.formCtdtCdr.enable({ emitEvent: false });
+            }
+        }
+    }
+
+    private isDrawerCurrent(token: number, programmeId: number): boolean {
+        return !this.destroyed && this.drawerVisible && token === this.drawerToken
+            && Number(this.selectedCtdt?.id) === programmeId;
+    }
+
+    private async drawerRequest<T>(request: Observable<T>, token: number, programmeId: number): Promise<T> {
+        if (!this.isDrawerCurrent(token, programmeId)) throw new Error('Phiên biểu mẫu đã thay đổi.');
+        const value = await firstValueFrom(request.pipe(takeUntil(this.cancelDrawer$), takeUntil(this.destroy$)));
+        if (!this.isDrawerCurrent(token, programmeId)) throw new Error('Phiên biểu mẫu đã thay đổi.');
+        return value;
+    }
+
+    private isRejectedWrite(error: unknown): boolean {
+        return error instanceof HttpErrorResponse && [400, 401, 403, 404, 422].includes(error.status);
+    }
+
+    private extractCreatedId(response: unknown): number | null {
+        if (Array.isArray(response)) return response.length === 1 ? this.extractCreatedId(response[0]) : null;
+        if (response && typeof response === 'object') {
+            const data = response as Record<string, unknown>;
+            return this.extractCreatedId(data['id'] ?? data['data']);
+        }
+        if (typeof response !== 'number' && typeof response !== 'string') return null;
+        const id = Number(response);
+        return Number.isSafeInteger(id) && id > 0 ? id : null;
+    }
+
+    private async findCopyRow(payload: Omit<CtdtCdr, 'id'>, token: number): Promise<CtdtCdr | null> {
+        const result = await this.drawerRequest(this.ctdtCdrService.getCtdtCdrByPageNew({
+            condition: [
+                { conditionName: 'ctdt_id', condition: OvicQueryCondition.equal, value: String(payload.ctdt_id), orWhere: 'and' },
+                { conditionName: 'kyhieu', condition: OvicQueryCondition.equal, value: payload.kyhieu, orWhere: 'and' }
+            ],
+            set: [{ label: 'limit', value: '2' }], page: null
+        }), token, payload.ctdt_id);
+        const rows = result.data || [];
+        if (rows.length > 1 || Number(result.recordsFiltered) > 1
+            || (Number(result.recordsFiltered) > 0 && !rows.length)) {
+            throw new Error(`Không thể đối chiếu duy nhất ${payload.kyhieu}. Vui lòng tải lại danh sách để kiểm tra.`);
+        }
+        if (!rows.length) return null;
+        if (!this.extractCreatedId(rows[0].id) || Number(rows[0].ctdt_id) !== payload.ctdt_id
+            || rows[0].kyhieu !== payload.kyhieu) throw new Error('Dữ liệu đối chiếu không đúng CTĐT hoặc ký hiệu.');
+        return rows[0];
+    }
+
+    private sameCopyRow(existing: CtdtCdr, expected: Omit<CtdtCdr, 'id'>): boolean {
+        const peos = (ids: number[]) => [...new Set((ids || []).map(Number))].sort((a, b) => a - b).join(',');
+        return Number(existing.ctdt_id) === expected.ctdt_id
+            && Number(existing.parent_id) === expected.parent_id
+            && Number(existing.ordering) === expected.ordering
+            && Number(existing.percent_pi || 0) === expected.percent_pi
+            && this.helperService.decodeHTML(existing.noidung || '').trim() === this.helperService.decodeHTML(expected.noidung).trim()
+            && peos(existing.tuongthich_peos) === peos(expected.tuongthich_peos);
+    }
+
+    private resetDrawerState(): void {
+        this.drawerToken++;
+        this.templateLoadToken++;
+        this.cancelTemplateLoad$.next();
+        this.cancelDrawer$.next();
+        this.savingCdr = false;
         this.drawerVisible = false;
         this.selectedParentCtdtCdr = null;
         this.selectedCtdtCdr = null;
         this.isUpdated = false;
+        this.templateState.set('success');
+        this.selectedTemplateId.set(null);
+        this.ploTemplates.set([]);
+        this.templateCopyError.set('');
+        this.templateRetryable.set(false);
+        this.templateCopy = null;
+    }
+
+    onDrawerVisibilityChange(visible: boolean): void {
+        if (!visible) this.closeForm();
+    }
+
+    closeForm() {
+        if (this.savingCdr) return;
+        const refresh = this.hasTemplateCopyPending;
+        if (refresh) {
+            this.notificationService.toastWarning('Các bản ghi đã lưu không bị hủy. Danh sách sẽ được tải lại để kiểm tra PLO và PI.');
+        }
+        this.resetDrawerState();
+        if (refresh) this.loadCtdtCdr();
     }
 
     pointQuestionKeyDown(event: KeyboardEvent) {
@@ -431,6 +860,13 @@ export class CtdtCdrComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     editCtdtCdr(ctdtCdr: CtdtCdrParent, ctdtCdrParent?: CtdtCdrParent) {
+        if (this.savingCdr || !this.selectedCtdt?.id || this.state() !== 'success') return;
+        const current = ctdtCdrParent
+            ? this.list_ctdt_cdr.find(parent => parent.id === ctdtCdrParent.id)?.children?.find(child => child.id === ctdtCdr.id)
+            : this.list_ctdt_cdr.find(parent => parent.id === ctdtCdr.id);
+        if (!current) return;
+        this.resetDrawerState();
+        this.createMode.set('manual');
         this.selectedCtdtCdr = ctdtCdr;
         this.selectedParentCtdtCdr = ctdtCdrParent ? ctdtCdrParent : null;
         this.formTitle = ctdtCdrParent ? 'Cập nhật chỉ báo PI' : 'Cập nhật chuẩn đầu ra PLO';
@@ -444,6 +880,7 @@ export class CtdtCdrComponent implements OnChanges, OnInit, OnDestroy {
         this.f['kyhieu'].setValue(ctdtCdr.kyhieu);
         this.f['ordering'].setValue(ctdtCdr.ordering);
         this.f['noidung'].setValue(ctdtCdr.noidung);
+        this.manualEditorInitialValue = ctdtCdr.noidung;
         this.f['parent_id'].setValue(ctdtCdr.parent_id);
         this.f['tuongthich_peos'].setValue(ctdtCdr.tuongthich_peos);
         this.f['percent_pi'].setValue(ctdtCdr.percent_pi);

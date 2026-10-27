@@ -1,0 +1,198 @@
+<section class="admin-section--table ictu-admin-page bo-cdr-page position-relative" aria-labelledby="bo-cdr-title">
+    <header class="admin-wrap-table__head bo-cdr-toolbar">
+        <div class="bo-cdr-heading">
+            <h1 id="bo-cdr-title" class="admin-wrap-table__heading">Chuẩn đầu ra</h1>
+            <p>{{ selectedBo?.name }} · {{ selectedBo?.code }}</p>
+        </div>
+        <button type="button" mat-flat-button class="btn ictu-badge-btn--danger-reverse ictu-admin-icon-button bo-cdr-close-button"
+            (click)="goBack()" [disabled]="busy" aria-label="Đóng"
+            pTooltip="Đóng" tooltipPosition="left">
+            <i class="ti ti-x"></i>
+        </button>
+    </header>
+
+    <div class="bo-cdr-body position-relative" [attr.aria-busy]="state() === 'loading' || busy">
+        @if (state() === 'loading') {
+        <app-loading-progress heading="Đang tải PLO/PI..." backdropFilter="none"></app-loading-progress>
+        }
+        @if (state() === 'error') {
+        <div class="admin-table__alert-danger text-center w-100" role="alert">
+            Tải PLO/PI thất bại. Vui lòng
+            <button type="button" class="bo-cdr-retry" (click)="loadRows()">tải lại</button>.
+        </div>
+        } @else {
+        <section class="admin-wrap-table ictu-admin-table-shell bo-cdr-table-card">
+            <header class="admin-wrap-table__head bo-cdr-table-header">
+                <div class="bo-cdr-table-title">
+                    <span class="bo-cdr-table-icon" aria-hidden="true"><i class="ti ti-certificate"></i></span>
+                    <h2>Chuẩn đầu ra của Bộ CTĐT</h2>
+                </div>
+                <div class="admin-wrap-table__head-actions">
+                    @if (canAdd) {
+                    <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button"
+                        (click)="openCreatePlo()" [disabled]="state() !== 'success' || busy"
+                        aria-label="Thêm PLO" pTooltip="Thêm PLO" tooltipPosition="left">
+                        <i class="ti ti-plus" aria-hidden="true"></i>
+                    </button>
+                    }
+                </div>
+            </header>
+            <div class="admin-wrap-table__body ictu-admin-table-shell__body">
+                <div class="ictu-admin-table-scroll">
+                    <table class="tbl admin-table bo-cdr-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Nội dung</th>
+                                <th scope="col" class="bo-cdr-col-percent">Tỷ lệ % của PI</th>
+                                <th scope="col" class="bo-cdr-col-actions">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (plo of rows(); track plo.id) {
+                            <tr class="bo-cdr-row-plo">
+                                <td>
+                                    <div class="bo-cdr-content ql-editor" [innerHTML]="decodeContent(plo.noidung)"></div>
+                                </td>
+                                <td class="text-center">
+                                    @if (plo.children.length) {
+                                    <span class="bo-cdr-total" [class.bo-cdr-total--complete]="getPiPercentState(plo) === 'complete'"
+                                        [class.bo-cdr-total--under]="getPiPercentState(plo) === 'under'"
+                                        [class.bo-cdr-total--over]="getPiPercentState(plo) === 'over'"
+                                        [pTooltip]="getPercentTooltip(plo)" tooltipPosition="left">
+                                        Tổng: {{ getTotalPiPercent(plo) }}%
+                                    </span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <div class="admin-table__btn-actions ictu-admin-table-actions">
+                                        @if (canAdd) {
+                                        <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button bo-cdr-add-pi"
+                                            (click)="openCreatePi(plo)" [disabled]="busy"
+                                            aria-label="Thêm PI cho PLO này" pTooltip="Thêm PI con" tooltipPosition="left">
+                                            <i class="ti ti-plus" aria-hidden="true"></i>
+                                        </button>
+                                        }
+                                        @if (canUpdate) {
+                                        <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
+                                            (click)="openEdit(plo)" [disabled]="busy"
+                                            aria-label="Sửa PLO" pTooltip="Sửa PLO" tooltipPosition="left">
+                                            <i class="ti ti-edit" aria-hidden="true"></i>
+                                        </button>
+                                        }
+                                        @if (canDelete) {
+                                        <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
+                                            (click)="deleteRow(plo)" [disabled]="busy"
+                                            aria-label="Xóa PLO"
+                                            [pTooltip]="plo.children.length ? 'Xóa các PI con trước khi xóa PLO' : 'Xóa PLO'" tooltipPosition="left">
+                                            <i class="ti ti-trash" aria-hidden="true"></i>
+                                        </button>
+                                        }
+                                        @if (plo.children.length) {
+                                        <button type="button" class="btn ictu-button-primary-light" (click)="togglePlo(plo)"
+                                            [disabled]="busy" [attr.aria-expanded]="isPloExpanded(plo)"
+                                            [attr.aria-label]="isPloExpanded(plo) ? 'Thu gọn các PI' : 'Mở các PI'"
+                                            [pTooltip]="isPloExpanded(plo) ? 'Thu gọn PI' : 'Mở danh sách PI'" tooltipPosition="left">
+                                            <i class="ti" [class.ti-chevron-down]="isPloExpanded(plo)"
+                                                [class.ti-chevron-right]="!isPloExpanded(plo)" aria-hidden="true"></i>
+                                        </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                            @if (isPloExpanded(plo)) {
+                            @for (pi of plo.children; track pi.id) {
+                            <tr class="bo-cdr-row-pi">
+                                <td>
+                                    <div class="bo-cdr-pi-content">
+                                        <i class="ti ti-arrow-forward" aria-hidden="true"></i>
+                                        <div class="bo-cdr-content ql-editor" [innerHTML]="decodeContent(pi.noidung)"></div>
+                                    </div>
+                                </td>
+                                <td class="text-center">{{ pi.percent_pi }}%</td>
+                                <td class="text-center">
+                                    <div class="admin-table__btn-actions ictu-admin-table-actions">
+                                        @if (canUpdate) {
+                                        <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
+                                            (click)="openEdit(pi, plo)" [disabled]="busy"
+                                            aria-label="Sửa PI" pTooltip="Sửa PI" tooltipPosition="left">
+                                            <i class="ti ti-edit" aria-hidden="true"></i>
+                                        </button>
+                                        }
+                                        @if (canDelete) {
+                                        <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
+                                            (click)="deleteRow(pi)" [disabled]="busy"
+                                            aria-label="Xóa PI" pTooltip="Xóa PI" tooltipPosition="left">
+                                            <i class="ti ti-trash" aria-hidden="true"></i>
+                                        </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                            }
+                            }
+                            } @empty {
+                            @if (state() !== 'loading') {
+                            <tr><td colspan="3" class="bo-cdr-empty">Bộ CTĐT này chưa có PLO.</td></tr>
+                            }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        }
+    </div>
+</section>
+
+<p-drawer [(visible)]="drawerVisible" [dismissible]="!busy" [closable]="!busy" [closeOnEscape]="!busy"
+    [header]="formTitle()" [blockScroll]="true" ariaCloseLabel="Đóng biểu"
+    appendTo="body" position="right" [style]="{ width: 'min(700px, 100vw)' }" styleClass="ictu-p-drawer bo-cdr-drawer">
+    <div class="ictu-p-drawer__content bo-cdr-drawer-content">
+        <div class="ictu-p-drawer__content__body bo-cdr-drawer-body position-relative">
+            @if (saving()) {
+            <app-loading-progress heading="Đang lưu..." backdropFilter="none"></app-loading-progress>
+            }
+            @if (selectedParent()) {
+            <div class="bo-cdr-parent-context"><strong>PI</strong><span>thuộc PLO đã chọn</span></div>
+            }
+            <form id="bo-cdr-form" [formGroup]="form" (ngSubmit)="submit()">
+                <fieldset class="ictu-form bo-cdr-form-grid" [disabled]="busy" [attr.inert]="busy ? '' : null"
+                    [attr.aria-label]="isPiForm ? 'Nhập nội dung PI' : 'Nhập nội dung PLO'">
+                    @if (isPiForm) {
+                    <div class="ictu-form__row bo-cdr-percent-row">
+                        <label class="ictu-form__label ictu-form__label--required" for="bo-cdr-percent">Tỷ lệ % của PI</label>
+                        <div class="bo-cdr-percent-control">
+                            <input id="bo-cdr-percent" type="number" min="0" max="100" step="1" class="ictu-form__input-field"
+                                formControlName="percent_pi" inputmode="numeric" placeholder="Ví dụ: 50"
+                                [attr.aria-invalid]="f.percent_pi.touched && f.percent_pi.invalid"
+                                aria-describedby="bo-cdr-percent-error">
+                            <span class="bo-cdr-percent-suffix" aria-hidden="true">%</span>
+                        </div>
+                        @if (f.percent_pi.touched && f.percent_pi.invalid) {
+                        <span id="bo-cdr-percent-error" class="ictu-admin-form-error">Nhập tỷ lệ PI là số nguyên từ 0 đến 100.</span>
+                        }
+                    </div>
+                    }
+                    <div class="ictu-form__row bo-cdr-field-full">
+                        <span id="bo-cdr-content-label" class="ictu-form__label ictu-form__label--required">Nội dung {{ isPiForm ? 'PI' : 'PLO' }}</span>
+                        <div role="group" aria-labelledby="bo-cdr-content-label" [attr.aria-invalid]="f.noidung.touched && f.noidung.invalid"
+                            aria-describedby="bo-cdr-content-error">
+                            <ovic-editor height="240px" [formField]="f.noidung" [default]="f.noidung.value" [readonly]="busy"></ovic-editor>
+                        </div>
+                        @if (f.noidung.touched && f.noidung.invalid) {
+                        <span id="bo-cdr-content-error" class="ictu-admin-form-error">Vui lòng nhập nội dung chuẩn đầu ra.</span>
+                        }
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <footer class="ictu-p-drawer__content__footer ictu-admin-drawer-footer">
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button"
+                (click)="closeDrawer()" [disabled]="busy">Hủy</button>
+            <button type="submit" form="bo-cdr-form" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button"
+                [disabled]="busy || form.invalid">
+                <i class="ti ti-device-floppy" aria-hidden="true"></i>{{ saving() ? 'Đang lưu...' : (isPiForm ? 'Lưu PI' : 'Lưu PLO') }}
+            </button>
+        </footer>
+    </div>
+</p-drawer>

@@ -45,7 +45,7 @@
                         <tr>
                             <th class="text-center ctdt-table__index">#</th>
                             <th class="ctdt-table__code">Mã CTĐT</th>
-                            <th>Tên chương trình đào tạo</th>
+                            <th>chương trình đào tạo</th>
                             <th class="text-center ctdt-table__year">Khóa</th>
                             <th>Ngành đào tạo</th>
                             <th>Khoa</th>
@@ -58,7 +58,7 @@
                         @for (ctdt of ctdtTable.data(); track trackByCtdtId($index, ctdt); let i = $index) {
                         <tr>
                             <td class="text-center">{{ ctdtTable.paginator.startIndex() + i }}</td>
-                            <td><span class="ctdt-table__code-tag">{{ ctdt.madt || '—' }}</span></td>
+                            <td>{{ ctdt.madt || '—' }}</td>
                             <td>
                                 <button type="button" class="ctdt-table__name" (click)="openCtdt(ctdt)"
                                     [attr.aria-label]="'Mở chương trình ' + ctdt.ten">

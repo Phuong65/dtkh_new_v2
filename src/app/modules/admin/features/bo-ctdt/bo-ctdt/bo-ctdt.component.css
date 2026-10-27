@@ -139,16 +139,16 @@
     background: transparent;
     color: #1d4ed8;
     font: inherit;
-    font-weight: 600;
+    font-weight: 500;
     text-align: left;
     cursor: pointer;
 }
 
-.bo-ctdt-list__name:hover { color: #000000; text-decoration: underline; }
+.bo-ctdt-list__name:hover { color: #2563eb; text-decoration: underline; }
 .bo-ctdt-list__name:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
 
 .bo-ctdt-list__actions {
-    width: 175px;
+    width: 210px;
     text-align: center;
     white-space: nowrap;
 }
@@ -347,5 +347,5 @@
         width: 100%;
     }
 
-    .bo-ctdt-list__actions { width: 150px; }
+    .bo-ctdt-list__actions { width: 210px; }
 }

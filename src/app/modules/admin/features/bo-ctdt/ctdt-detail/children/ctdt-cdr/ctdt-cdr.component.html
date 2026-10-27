@@ -217,8 +217,8 @@
     }
 </main>
 
-<p-drawer [(visible)]="drawerVisible" [dismissible]="!savingCdr" [closable]="!savingCdr" [closeOnEscape]="!savingCdr"
-    [blockScroll]="true" [header]="formTitle" ariaCloseLabel="Đóng biểu mẫu" [style]="{ width: 'min(700px, 100vw)' }"
+<p-drawer [visible]="drawerVisible" (visibleChange)="onDrawerVisibilityChange($event)" [dismissible]="!drawerInputsLocked" [closable]="!drawerInputsLocked" [closeOnEscape]="!drawerInputsLocked"
+    [blockScroll]="true" [header]="formTitle" ariaCloseLabel="Đóng biểu mẫu" [style]="{ width: 'min(900px, 100vw)' }"
     appendTo="body" position="right" styleClass="ictu-p-drawer ctdt-cdr-form-drawer">
     <div class="ictu-p-drawer__content">
         <div class="ictu-p-drawer__content__body cdr-drawer-body position-relative">
@@ -232,13 +232,13 @@
             </div>
             }
             <form id="cdr-form" [formGroup]="formCtdtCdr" (ngSubmit)="saveCtdtCdr()">
-                <div class="ictu-form cdr-form-grid">
+                <div class="ictu-form cdr-form-grid" [attr.inert]="savingCdr ? '' : null">
                     <div class="ictu-form__row form-field form-field--half">
                         <label class="ictu-form__label ictu-form__label--required" for="cdr-ordering">Ký hiệu</label>
                         <div class="ictu-form__group-control--before cdr-code-control">
                             <input pInputText (keydown)="pointQuestionKeyDown($event)" type="text" inputmode="numeric"
                                 id="cdr-ordering" class="ictu-form__input-field" formControlName="ordering"
-                                autocomplete="off" placeholder="Số thứ tự">
+                                autocomplete="off" placeholder="Số thứ tự" [readonly]="drawerInputsLocked">
                             <span class="ictu-form__after-input-field cdr-code-prefix" aria-hidden="true">{{ kyhieu_cdr
                                 }}</span>
                         </div>
@@ -257,25 +257,147 @@
                             <span class="ictu-form__after-input-field cdr-percent-suffix" aria-hidden="true">%</span>
                         </div>
                     </div>
-                    }
-
-                    @if (!selectedParentCtdtCdr) {
+                    } @else {
                     <div class="ictu-form__row form-field form-field--half">
                         <label class="ictu-form__label" for="cdr-peos">Mục tiêu PEO tương thích</label>
                         <p-multiSelect inputId="cdr-peos" optionValue="id" optionLabel="kyhieu"
                             [options]="list_cdr_muctieu" formControlName="tuongthich_peos"
                             placeholder="Chọn các mục tiêu PEO liên quan" display="chip" class="p-multiselect-custom"
-                            appendTo="body">
+                            appendTo="body" [disabled]="drawerInputsLocked">
                         </p-multiSelect>
                     </div>
                     }
 
-                    <div class="ictu-form__row form-field form-field--full">
+                    @if (isNewRootPlo) {
+                    <div class="cdr-create-tabs form-field--full" role="tablist" aria-label="Cách tạo PLO">
+                        <button type="button" class="cdr-create-tab" role="tab" id="cdr-tab-template"
+                            [class.cdr-create-tab--active]="createMode() === 'template'"
+                            [attr.aria-selected]="createMode() === 'template'" aria-controls="cdr-panel-template"
+                            [attr.tabindex]="createMode() === 'template' ? 0 : -1"
+                            (click)="selectCreateMode('template')" (keydown)="onCreateModeKeydown($event, 0)"
+                            [disabled]="drawerInputsLocked">
+                            <span class="cdr-create-tab__label">Chọn từ mẫu</span>
+                            <small class="cdr-create-tab__caption">Dùng nội dung chuẩn hóa</small>
+                        </button>
+                        <button type="button" class="cdr-create-tab" role="tab" id="cdr-tab-manual"
+                            [class.cdr-create-tab--active]="createMode() === 'manual'"
+                            [attr.aria-selected]="createMode() === 'manual'" aria-controls="cdr-panel-manual"
+                            [attr.tabindex]="createMode() === 'manual' ? 0 : -1"
+                            (click)="selectCreateMode('manual')" (keydown)="onCreateModeKeydown($event, 1)"
+                            [disabled]="drawerInputsLocked">
+                            <span class="cdr-create-tab__label">Nhập mới</span>
+                            <small class="cdr-create-tab__caption">Soạn nội dung riêng</small>
+                        </button>
+                    </div>
+                    <div class="cdr-template-panel form-field--full" role="tabpanel" id="cdr-panel-template"
+                        aria-labelledby="cdr-tab-template" [hidden]="createMode() !== 'template'">
+                        <div #cdrTemplateField class="ictu-form__row form-field">
+                            <label class="ictu-form__label ictu-form__label--required" for="cdr-template">Mẫu PLO</label>
+                            <p-select inputId="cdr-template" [options]="ploTemplates()" optionLabel="label" optionValue="id"
+                                [ngModel]="selectedTemplateId()" (ngModelChange)="selectTemplate($event)"
+                                [ngModelOptions]="{standalone: true}" [filter]="true" filterBy="searchText"
+                                [showClear]="true" appendTo="body" panelStyleClass="cdr-template-select-panel"
+                                [panelStyle]="{ width: cdrTemplateField.offsetWidth + 'px', 'max-width': 'calc(100vw - 36px)' }"
+                                placeholder="Chọn PLO của Bộ CTĐT"
+                                [loading]="templateState() === 'loading'"
+                                [disabled]="drawerInputsLocked || templateState() === 'loading'" class="cdr-template-select">
+                            </p-select>
+                        </div>
+                        @if (templateState() === 'error') {
+                        <div class="cdr-template-state cdr-template-state--error" role="alert">
+                            {{ templateCopyError() }}
+                            @if (templateRetryable()) {
+                            <button type="button" class="cdr-template-retry" (click)="loadPloTemplates()">Thử lại</button>
+                            }
+                        </div>
+                        } @else if (templateState() === 'loading') {
+                        <div class="cdr-template-state" role="status">Đang tải mẫu PLO...</div>
+                        } @else if (!ploTemplates().length) {
+                        <div class="cdr-template-state">Bộ CTĐT chưa có mẫu PLO. Có thể chuyển sang tab Nhập mới.</div>
+                        }
+                        @if (selectedTemplate; as template) {
+                        <section class="cdr-template-preview" aria-labelledby="cdr-template-preview-title">
+                            <header class="cdr-template-preview__header">
+                                <h3 id="cdr-template-preview-title">Xem trước PLO & PI</h3>
+                                <span>{{ template.children.length }} PI</span>
+                            </header>
+                            <div class="cdr-template-table-scroll" role="region" aria-labelledby="cdr-template-preview-title" tabindex="0">
+                                <table class="tbl admin-table cdr-grid-table cdr-template-table" aria-labelledby="cdr-template-preview-title">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="col-code">Ký hiệu</th>
+                                            <th scope="col" class="col-plo">PLO</th>
+                                            <th scope="col" class="col-content">Nội dung</th>
+                                            <th scope="col" class="col-percent">Tỷ lệ % của PI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="row-plo">
+                                            <td class="col-code cell-center">
+                                                <div class="plo-code-tag">{{ previewPloCode() }}</div>
+                                            </td>
+                                            <td class="col-plo cell-center">
+                                                <div class="plo-order-num">{{ f['ordering'].value }}</div>
+                                            </td>
+                                            <td class="col-content">
+                                                <div class="plo-content-wrap">
+                                                    <div class="plo-text ql-editor" [innerHTML]="decodeTemplateContent(template.noidung)"></div>
+                                                </div>
+                                            </td>
+                                            <td class="col-percent cell-center">
+                                                @if (template.children.length) {
+                                                <span class="plo-total-percent"
+                                                    [class.percent-ok]="getTemplatePiTotal(template) === 100"
+                                                    [class.percent-warn]="getTemplatePiTotal(template) < 100"
+                                                    [class.percent-danger]="getTemplatePiTotal(template) > 100">
+                                                    Tổng: {{ getTemplatePiTotal(template) }}%
+                                                </span>
+                                                }
+                                            </td>
+                                        </tr>
+                                        @for (pi of template.children; track pi.id; let piIndex = $index) {
+                                        <tr class="row-pi">
+                                            <td class="col-code cell-center">
+                                                <div class="pi-code-wrap">
+                                                    <span class="pi-branch-symbol" aria-hidden="true">↳</span>
+                                                    <span class="pi-code-tag">{{ previewPiCode(piIndex) }}</span>
+                                                </div>
+                                            </td>
+                                            <td class="col-plo"></td>
+                                            <td class="col-content">
+                                                <div class="pi-text ql-editor" [innerHTML]="decodeTemplateContent(pi.noidung)"></div>
+                                            </td>
+                                            <td class="col-percent cell-center">
+                                                <div class="pi-percent-val">{{ pi.percent_pi }}</div>
+                                            </td>
+                                        </tr>
+                                        } @empty {
+                                        <tr>
+                                            <td colspan="4" class="cdr-template-table__empty">Mẫu này chưa có PI.</td>
+                                        </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="cdr-template-note">Lưu sẽ sao chép PLO và các PI vào CTĐT hiện tại, không thay đổi mẫu gốc.</p>
+                        </section>
+                        }
+                        @if (templateCopyError() && templateState() !== 'error') {
+                        <div class="cdr-template-state cdr-template-state--error" role="alert">{{ templateCopyError() }}</div>
+                        }
+                        @if (templateProgress) {
+                        <div class="cdr-template-state" role="status">{{ templateProgress }}</div>
+                        }
+                    </div>
+                    }
+                    <div class="ictu-form__row form-field form-field--full" id="cdr-panel-manual"
+                        [attr.role]="isNewRootPlo ? 'tabpanel' : null"
+                        [attr.aria-labelledby]="isNewRootPlo ? 'cdr-tab-manual' : null" [hidden]="isTemplateMode">
                         <span class="ictu-form__label ictu-form__label--required" id="cdr-content-label">{{
                             selectedParentCtdtCdr ? 'Nội dung PI' : 'Nội dung PLO' }}</span>
-                        <div class="editor-box" role="group" aria-labelledby="cdr-content-label">
+                        <div class="editor-box" role="group" aria-labelledby="cdr-content-label" [attr.inert]="drawerInputsLocked ? '' : null">
                             <ovic-editor height="230px" [formField]="f['noidung']"
-                                [default]="f['noidung']['value']"></ovic-editor>
+                                [default]="manualEditorInitialValue"></ovic-editor>
                         </div>
                         @if (f['noidung'].touched && f['noidung'].invalid) {
                         <span class="ictu-admin-form-error" role="alert">Vui lòng nhập nội dung.</span>
@@ -286,11 +408,11 @@
         </div>
         <div class="ictu-p-drawer__content__footer ictu-admin-drawer-footer">
             <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button"
-                (click)="closeForm()" [disabled]="savingCdr">Hủy</button>
+                (click)="closeForm()" [disabled]="savingCdr">{{ hasTemplateCopyPending ? 'Đóng và kiểm tra' : 'Hủy' }}</button>
             <button type="submit" form="cdr-form" mat-flat-button
-                class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button" [disabled]="savingCdr">
+                class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button" [disabled]="!canSubmitDrawer">
                 <i class="ti ti-device-floppy" aria-hidden="true"></i>
-                {{ savingCdr ? 'Đang lưu...' : (selectedParentCtdtCdr ? 'Lưu PI' : 'Lưu PLO') }}
+                {{ savingCdr ? 'Đang lưu...' : hasTemplateCopyPending ? 'Tiếp tục' : isTemplateMode ? 'Lưu PLO và PI' : selectedParentCtdtCdr ? 'Lưu PI' : 'Lưu PLO' }}
             </button>
         </div>
     </div>

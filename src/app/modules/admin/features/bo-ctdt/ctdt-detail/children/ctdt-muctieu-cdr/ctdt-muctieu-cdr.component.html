@@ -332,55 +332,6 @@
                         [embedded]="true" [peoRefreshKey]="peoRefreshKey"
                         (summaryChange)="onCdrSummaryChange($event)"></app-ctdt-cdr>
                 </section>
-
-                <aside class="goals-workspace__aside" aria-label="Thông tin nhanh chương trình">
-                <section class="goals-summary-card">
-                    <h2><i class="ti ti-chart-bar" aria-hidden="true"></i>Thông tin nhanh</h2>
-                    <dl class="goals-summary-list">
-                        <div>
-                            <dt>PEO</dt>
-                            <dd>{{ goalsState() === 'success' && state() === 'success' ? list_muctieu_cuthe.length : '—' }}</dd>
-                        </div>
-                        <div>
-                            <dt>PLO</dt>
-                            <dd>{{ cdrSummary?.state === 'success' ? cdrSummary!.ploCount : '—' }}</dd>
-                        </div>
-                        <div>
-                            <dt>Định hướng</dt>
-                            <dd>{{ state() === 'success' ? list_tuongthich.length : '—' }}</dd>
-                        </div>
-                        <div>
-                            <dt>Khung trình độ</dt>
-                            <dd>{{ state() === 'success' ? type_ctdt_muctieu_cuthe.length : '—' }}</dd>
-                        </div>
-                    </dl>
-                </section>
-                <section class="goals-summary-card">
-                    <h2><i class="ti ti-link" aria-hidden="true"></i>Liên kết mục tiêu</h2>
-                    @if (state() === 'success' && goalsState() === 'success') {
-                    <dl class="goals-summary-list">
-                        <div>
-                            <dt>PEO đã gắn định hướng</dt>
-                            <dd>{{ list_muctieu_cuthe.length ? getLinkedPeoCount() + '/' + list_muctieu_cuthe.length : '—' }}</dd>
-                        </div>
-                        <div>
-                            <dt>Định hướng đã dùng</dt>
-                            <dd>{{ list_tuongthich.length ? getUsedOrientationCount() + '/' + list_tuongthich.length : '—' }}</dd>
-                        </div>
-                        <div>
-                            <dt>Tổng liên kết PEO–định hướng</dt>
-                            <dd>{{ getCompatibilityLinkCount() }}</dd>
-                        </div>
-                        <div>
-                            <dt>Mục tiêu chung</dt>
-                            <dd>{{ hasGeneralContent() ? 'Đã có nội dung' : 'Chưa có nội dung' }}</dd>
-                        </div>
-                    </dl>
-                    } @else {
-                    <p class="goals-helper">{{ state() === 'error' || goalsState() === 'error' ? 'Không tải được dữ liệu liên kết' : 'Đang tải liên kết...' }}</p>
-                    }
-                </section>
-                </aside>
                 </div>
             </div>
         </div>

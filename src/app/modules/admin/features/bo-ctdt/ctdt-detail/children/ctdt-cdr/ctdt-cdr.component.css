@@ -11,6 +11,7 @@
 
 /* Share colors with drawer templates rendered outside the component host. */
 :host,
+.cdr-drawer-body,
 .cdr-drawer__header-content,
 .cdr-drawer__body,
 .cdr-drawer__footer {
@@ -33,6 +34,7 @@
     --cdr-peo: #475569;
     --cdr-peo-soft: #f1f5f9;
     --cdr-radius: var(--admin-wrap-table-element-radius, 4px);
+    color: var(--cdr-ink);
     font-family: var(--primary-font-family), 'Be Vietnam Pro', 'Noto Sans', 'Segoe UI', sans-serif;
 }
 
@@ -601,6 +603,168 @@
     font-weight: 600;
 }
 
+.cdr-create-tabs {
+    display: grid;
+    min-height: 52px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid #dbe0e5;
+    border-radius: 4px;
+    background: #f3f5f7;
+}
+
+.cdr-create-tab {
+    display: flex;
+    min-width: 0;
+    min-height: 42px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 4px 8px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: #5f6d88;
+    font: inherit;
+    cursor: pointer;
+}
+
+.cdr-create-tab--active {
+    background: #ffffff;
+    color: #0d59cf;
+    box-shadow: 0 1px 4px rgb(15 23 42 / 8%);
+}
+.cdr-create-tab__label { font-size: 12.5px; font-weight: 700; line-height: 1.25; }
+.cdr-create-tab__caption { color: #7b8da1; font-size: 10px; line-height: 1.2; }
+.cdr-create-tab:not(.cdr-create-tab--active):hover { background: #eaf2ff; color: #0d59cf; }
+.cdr-create-tab:focus-visible { outline: 2px solid #0162e8; outline-offset: -2px; }
+.cdr-create-tab:disabled { cursor: not-allowed; opacity: .55; }
+
+.cdr-template-panel {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cdr-form-grid [hidden] {
+    display: none !important;
+}
+
+/* Drawer được gắn vào body, không nằm trong host của component. */
+::ng-deep .ctdt-cdr-form-drawer .cdr-template-select {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    min-height: 43px;
+    border-radius: 4px;
+    --p-select-padding-x: 10px;
+    --p-select-padding-y: 10px;
+}
+
+::ng-deep .ctdt-cdr-form-drawer .cdr-template-select .p-select-label {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+::ng-deep .cdr-template-select-panel {
+    min-width: 0 !important;
+    max-width: calc(100vw - 36px) !important;
+    overflow: hidden;
+}
+
+::ng-deep .cdr-template-select-panel .p-select-list-container,
+::ng-deep .cdr-template-select-panel .p-select-list {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+}
+
+::ng-deep .cdr-template-select-panel .p-select-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+::ng-deep .cdr-template-select-panel .p-select-option {
+    min-height: 44px;
+    align-items: flex-start;
+    padding: 10px 12px;
+    white-space: normal;
+}
+
+::ng-deep .cdr-template-select-panel .p-select-option-label {
+    width: 100%;
+    overflow: visible;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+    white-space: normal;
+}
+
+.cdr-template-state {
+    padding: 10px 12px;
+    border: 1px solid #dbe3ec;
+    border-radius: 4px;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.cdr-template-state--error {
+    border-color: #f3b7bd;
+    background: #fff5f6;
+    color: #b42318;
+}
+
+.cdr-template-retry {
+    margin-left: 8px;
+    border: 0;
+    background: transparent;
+    color: #0d59cf;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.cdr-template-preview {
+    overflow: hidden;
+    border: 1px solid #dbe3ec;
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+.cdr-template-preview__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 7px 10px;
+    border-bottom: 1px solid #edf2f7;
+    background: #f8fafc;
+}
+
+.cdr-template-preview__header h3 { margin: 0; color: #334155; font-size: 12px; font-weight: 700; }
+.cdr-template-preview__header span { color: #64748b; font-size: 11px; }
+.cdr-template-table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+::ng-deep .ctdt-cdr-form-drawer .cdr-template-table .plo-text.ql-editor p,
+::ng-deep .ctdt-cdr-form-drawer .cdr-template-table .pi-text.ql-editor p {
+    margin: 0;
+    padding: 0;
+}
+.cdr-template-table .cdr-template-table__empty { color: #64748b; text-align: center; }
+.cdr-template-note { margin: 0; padding: 7px 10px; color: #64748b; font-size: 10.5px; line-height: 1.4; }
+
 .cdr-form-grid.ictu-form {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -803,6 +967,10 @@
     .cdr-form-grid.ictu-form { grid-template-columns: 1fr; }
     .form-field--half,
     .form-field--full { grid-column: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cdr-create-tab { transition: none; }
 }
 
 /* 5. Trạng thái lỗi */

@@ -50,6 +50,7 @@ context: []
 - Chuyển khối Hồ sơ & định hướng phát triển vào tab con Hồ sơ phát triển trong Cài đặt bằng component standalone, form và payload lưu ba trường riêng; giữ card/editor cũ khỏi Thông tin chung.
 - Test hồ sơ và tab Cài đặt đạt; TypeScript app/spec và diff whitespace đạt.
 - Thanh tab giữ nền full width, nhóm 5 tab thu còn khoảng 60% desktop; mobile/tablet tự mở rộng và cuộn ngang.
+- Drawer PLO mới hỗ trợ chọn mẫu PLO/PI từ Bộ CTĐT hiện hành hoặc nhập PLO thủ công; PEO và Ký hiệu dùng chung phía trên tabs. Khi dùng mẫu, PLO/PI được sao chép sang CTĐT theo tuần tự và có đối chiếu chống ghi trùng sau lỗi một phần.
 
 - Người dùng xác nhận giữ nguyên các thay đổi ngoài phạm vi trong working tree. Không commit/push; chưa kiểm thử với backend dữ liệu thật.
 - Đổi nhãn tab ngoài, giữ `muc-tieu` làm ID và query parameter tương thích.

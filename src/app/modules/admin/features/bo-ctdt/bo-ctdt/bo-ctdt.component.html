@@ -1,3 +1,7 @@
+@if (selectedTemplateBo(); as templateBo) {
+<app-bo-ctdt-cdr [selectedBo]="templateBo" [canAdd]="canAdd" [canUpdate]="canUpdate" [canDelete]="canDelete"
+    (back)="closeCdrTemplate()"></app-bo-ctdt-cdr>
+} @else {
 <section class="admin-section--table ictu-admin-page bo-ctdt-list position-relative" aria-labelledby="bo-ctdt-list-title">
     @if (state() === 'loading') {
     <app-loading-progress heading="Đang tải danh sách bộ CTĐT..." backdropFilter="none"></app-loading-progress>
@@ -52,7 +56,7 @@
                         @for (bo of table.data(); track bo.id; let i = $index) {
                         <tr>
                             <td class="text-center">{{ table.paginator.startIndex() + i }}</td>
-                            <td class="text-center"><span class="bo-ctdt-list__code">{{ bo.code || '—' }}</span></td>
+                            <td class="text-left">{{ bo.code || '—' }}</td>
                             <td>
                                 <button type="button" class="bo-ctdt-list__name" (click)="openPrograms(bo)"
                                     [attr.aria-label]="'Xem chương trình của ' + bo.name">
@@ -63,6 +67,12 @@
                             <td class="text-center">{{ departmentNames(bo) }}</td>
                             <td class="bo-ctdt-list__actions p-0">
                                 <div class="admin-table__btn-actions ictu-admin-table-actions">
+                                <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
+                                    (click)="openCdrTemplate(bo)" [disabled]="saving() || deleting() || subjectSaving()"
+                                    [attr.aria-label]="'Nhập PLO cho ' + bo.name"
+                                    pTooltip="Nhập PLO/PI" tooltipPosition="left">
+                                    <i class="ti ti-certificate" aria-hidden="true"></i>
+                                </button>
                                 <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
                                     (click)="openSubjectDrawer(bo)" [disabled]="!canSelectSubjects || saving() || deleting()"
                                     [attr.aria-label]="'Chọn môn học cho ' + bo.name"
@@ -99,6 +109,7 @@
         </footer>
     </div>
 </section>
+}
 
 <p-drawer #drawer [(visible)]="formControl.visible" [dismissible]="!saving()" [closable]="!saving()"
     [closeOnEscape]="!saving()" [header]="formControl.heading()" [style]="{ width: '420px', 'max-width': '100%' }"

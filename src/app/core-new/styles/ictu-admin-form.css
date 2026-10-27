@@ -397,7 +397,7 @@ input.admin-wrap-table__input::placeholder,
 	width: 100%;
 	align-items: center;
 	justify-content: center;
-	gap: 8px;
+	gap: 6px;
 }
 
 .ictu-admin-drawer-footer {

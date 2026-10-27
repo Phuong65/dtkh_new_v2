@@ -1,0 +1,603 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Tạo PLO</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: quiet CTĐT workspace backdrop, focused right-side creation drawer, two-step choice before editing. */
+:root {
+  --bg: #eef3f8;
+  --bg-2: #e6edf5;
+  --surface: #ffffff;
+  --surface-soft: #f7f9fc;
+  --surface-selected: #eff6ff;
+  --line: #dbe0e5;
+  --line-strong: #cbd5e1;
+  --text: #333333;
+  --text-2: #5f6d88;
+  --text-3: #94a3b8;
+  --accent: #0162e8;
+  --accent-strong: #0d59cf;
+  --accent-soft: #dbeafe;
+  --success: #0f8a63;
+  --success-soft: #dff7ee;
+  --warning: #b66a08;
+  --danger: #c13d4d;
+  --shadow: 0 24px 70px rgb(20 44 76 / 20%);
+  --shadow-sm: 0 5px 18px rgb(20 44 76 / 9%);
+  --radius: 4px;
+  --font-body: "Roboto", "Segoe UI", Arial, sans-serif;
+  --font-display: "Roboto", "Segoe UI", Arial, sans-serif;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101923;
+    --bg-2: #162333;
+    --surface: #172435;
+    --surface-soft: #1d2d40;
+    --surface-selected: #152e52;
+    --line: #2b4056;
+    --line-strong: #405872;
+    --text: #eef5fc;
+    --text-2: #b9c9da;
+    --text-3: #8499ae;
+    --accent: #76a7ff;
+    --accent-strong: #91b8ff;
+    --accent-soft: #203d68;
+    --success: #54d3a6;
+    --success-soft: #173d35;
+    --warning: #f2bd6d;
+    --danger: #ff8e9a;
+    --shadow: 0 24px 70px rgb(0 0 0 / 38%);
+    --shadow-sm: 0 5px 18px rgb(0 0 0 / 28%);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #101923;
+  --bg-2: #162333;
+  --surface: #172435;
+  --surface-soft: #1d2d40;
+  --surface-selected: #152e52;
+  --line: #2b4056;
+  --line-strong: #405872;
+  --text: #eef5fc;
+  --text-2: #b9c9da;
+  --text-3: #8499ae;
+  --accent: #76a7ff;
+  --accent-strong: #91b8ff;
+  --accent-soft: #203d68;
+  --success: #54d3a6;
+  --success-soft: #173d35;
+  --warning: #f2bd6d;
+  --danger: #ff8e9a;
+  --shadow: 0 24px 70px rgb(0 0 0 / 38%);
+  --shadow-sm: 0 5px 18px rgb(0 0 0 / 28%);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  min-width: 0;
+  padding-block: 20px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  overflow-x: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+button, input, textarea { font: inherit; }
+button { color: inherit; }
+
+.page {
+  width: min(1480px, 100%);
+  min-height: min(900px, calc(100vh - 40px));
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg-2);
+  box-shadow: var(--shadow);
+}
+
+.app-backdrop {
+  position: absolute;
+  inset: 0;
+  min-height: 100%;
+  padding: 38px 46px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 12% 12%, rgb(37 99 235 / 13%), transparent 28%),
+    linear-gradient(145deg, var(--bg-2), var(--bg));
+}
+
+.page { position: relative; }
+.backdrop-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  color: var(--text-2);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -.02em;
+}
+.brand-mark {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--accent);
+  color: white;
+  font-weight: 800;
+}
+.backdrop-actions { display: flex; gap: 8px; }
+.ghost-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+.backdrop-copy {
+  width: min(460px, 48%);
+  padding-top: 120px;
+}
+.kicker {
+  margin: 0 0 12px;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.backdrop-copy h1 {
+  max-width: 460px;
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: clamp(30px, 4vw, 54px);
+  letter-spacing: -.055em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+.backdrop-copy p {
+  max-width: 390px;
+  margin: 18px 0 0;
+  color: var(--text-2);
+  line-height: 1.7;
+}
+.fake-cards {
+  display: grid;
+  width: min(500px, 50%);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 52px;
+}
+.fake-card {
+  min-height: 120px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+}
+.fake-card strong { display: block; font-family: var(--font-display); font-size: 24px; }
+.fake-card span { display: block; margin-top: 8px; color: var(--text-3); font-size: 12px; }
+
+.drawer {
+  position: absolute;
+  z-index: 2;
+  inset: 0 0 0 auto;
+  display: flex;
+  width: min(780px, 62%);
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border-left: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: -8px 0 24px rgb(15 23 42 / 9%);
+}
+.ictu-p-drawer .p-drawer-header {
+  display: flex;
+  min-height: 55px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-soft);
+}
+.drawer-title { min-width: 0; }
+.drawer-title h2 {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.drawer-title p { margin: 2px 0 0; color: var(--text-2); font-size: 12px; }
+.drawer-close {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+}
+.drawer-close:hover { border-color: var(--accent); color: var(--accent); }
+
+.ictu-p-drawer__content__body {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 10px;
+}
+.drawer-body {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 10px;
+}
+.mode-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface-soft);
+}
+.mode-button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.mode-button[aria-selected="true"] {
+  background: var(--surface);
+  color: var(--accent-strong);
+  box-shadow: var(--shadow-sm);
+}
+.mode-button small { display: block; margin-top: 3px; color: var(--text-3); font-size: 10px; font-weight: 500; }
+
+.form-section { margin-top: 24px; }
+.section-head { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.section-head h3 { margin: 0; font-family: var(--font-display); font-size: 14px; letter-spacing: -.01em; }
+.section-head span { color: var(--text-3); font-size: 11px; }
+.search {
+  width: 100%;
+  height: 40px;
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  outline: none;
+  background: var(--surface-soft);
+  color: var(--text);
+}
+
+/* ICTU form primitives: label-on-top rows, 43px controls, 4px radius. */
+.ictu-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.ictu-form__row { min-width: 0; }
+.ictu-form__label {
+  display: block;
+  margin: 0 0 5px;
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.ictu-form__label--required::after { content: " (*)"; color: var(--danger); }
+.ictu-form__input-field {
+  display: block;
+  width: 100%;
+  min-height: 43px;
+  padding: 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  outline: none;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.ictu-form__input-field:hover { border-color: var(--text-3); }
+.ictu-form__input-field:focus { border-color: var(--accent-strong); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 18%, transparent); }
+.ictu-form__input-field::placeholder { color: var(--text-3); }
+.ictu-form__textarea { min-height: 128px; resize: vertical; }
+.search.ictu-form__input-field { background: var(--surface-soft); }
+.search:focus, .text-input:focus, .editor:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+
+.template-layout { display: grid; grid-template-columns: minmax(190px, .9fr) minmax(0, 1.3fr); gap: 14px; }
+.template-list { display: grid; align-content: start; gap: 8px; min-width: 0; }
+.template-item {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  text-align: left;
+  cursor: pointer;
+}
+.template-item:hover { border-color: var(--accent); background: var(--surface-selected); }
+.template-item.is-selected { border-color: var(--accent); background: var(--surface-selected); box-shadow: inset 3px 0 var(--accent); }
+.template-item strong { overflow: hidden; color: var(--text); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.template-item span { color: var(--text-3); font-size: 11px; }
+.template-code { color: var(--accent-strong) !important; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 800; }
+.template-detail {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+.detail-label { color: var(--text-3); font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.template-detail h4 { margin: 7px 0 10px; color: var(--text); font-family: var(--font-display); font-size: 16px; }
+.detail-copy { margin: 0; color: var(--text-2); font-size: 13px; line-height: 1.65; }
+.detail-meta { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 15px; }
+.chip { display: inline-flex; align-items: center; min-height: 25px; padding: 0 9px; border: 1px solid var(--line); border-radius: 99px; color: var(--text-2); font-size: 11px; }
+.chip--blue { border-color: color-mix(in srgb, var(--accent) 34%, var(--line)); background: var(--accent-soft); color: var(--accent-strong); }
+.use-template {
+  width: 100%;
+  min-height: 38px;
+  margin-top: 18px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--accent);
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+}
+.use-template:hover { background: var(--accent-strong); }
+
+.form-grid { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 14px; }
+.field { min-width: 0; }
+.field label { display: block; margin-bottom: 7px; color: var(--text-2); font-size: 12px; font-weight: 700; }
+.text-input, .editor {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  outline: none;
+  background: var(--surface);
+  color: var(--text);
+}
+.text-input { height: 40px; padding: 0 11px; }
+.editor { min-height: 128px; padding: 13px; resize: vertical; line-height: 1.65; }
+.form-hint { margin: 7px 0 0; color: var(--text-3); font-size: 11px; line-height: 1.45; }
+.peo-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.peo-chip { border-color: #bce8d8; background: var(--success-soft); color: var(--success); }
+
+.drawer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  padding: 16px 30px;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+.button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.button:hover { border-color: var(--accent); color: var(--accent-strong); }
+.button--primary { border-color: var(--accent); background: var(--accent); color: #ffffff; }
+.button--primary:hover { border-color: var(--accent-strong); background: var(--accent-strong); color: #ffffff; }
+
+.new-mode { display: none; }
+body[data-mode="new"] .template-mode { display: none; }
+body[data-mode="new"] .new-mode { display: block; }
+body[data-mode="new"] .drawer-footer .button--primary { display: inline-flex; }
+
+.toast {
+  position: fixed;
+  right: max(22px, env(safe-area-inset-right, 0px));
+  bottom: max(22px, env(safe-area-inset-bottom, 0px));
+  z-index: 4;
+  display: none;
+  max-width: min(340px, calc(100vw - 32px));
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--success) 40%, var(--line));
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+  font-size: 12px;
+}
+.toast.is-visible { display: block; }
+
+@media (max-width: 980px) {
+  .drawer { width: 70%; }
+  .settings-tabs__track { width: 78%; }
+}
+@media (max-width: 700px) {
+  body { padding-block: 0; }
+  .page { min-height: 100vh; border: 0; border-radius: 0; }
+  .app-backdrop { display: none; }
+  .drawer { position: relative; width: 100%; min-height: 100vh; border: 0; }
+  .drawer-top { padding: 20px 18px 17px; }
+  .drawer-body { padding: 20px 18px 24px; }
+  .drawer-footer { padding: 14px 18px; }
+  .template-layout { grid-template-columns: 1fr; }
+  .template-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .form-grid { grid-template-columns: 1fr; gap: 12px; }
+  .settings-tabs__track { width: max-content; min-width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+</style>
+
+<div class="page" id="page">
+  <section class="app-backdrop" aria-hidden="true">
+    <header class="backdrop-header">
+      <div class="brand"><span class="brand-mark">CT</span><span>Quản lý chương trình đào tạo</span></div>
+      <div class="backdrop-actions"><span class="ghost-dot"></span><span class="ghost-dot"></span><span class="ghost-dot"></span></div>
+    </header>
+    <div class="backdrop-copy">
+      <p class="kicker">Cài đặt chương trình</p>
+      <h1>Chuẩn đầu ra được xây từ mục tiêu.</h1>
+      <p>Chọn một mẫu PLO đã chuẩn hóa hoặc nhập nội dung riêng cho chương trình đang biên soạn.</p>
+      <div class="fake-cards">
+        <div class="fake-card"><strong>12</strong><span>PLO hiện có</span></div>
+        <div class="fake-card"><strong>68%</strong><span>Ma trận PEO–PLO</span></div>
+      </div>
+    </div>
+  </section>
+
+  <aside class="drawer" aria-label="Thêm chuẩn đầu ra PLO">
+    <header class="drawer-top">
+      <div class="drawer-title">
+        <p class="kicker">Thêm chuẩn đầu ra</p>
+        <h2>Tạo PLO mới</h2>
+        <p>CTĐT · Kỹ thuật phần mềm · Khóa 2025</p>
+      </div>
+      <button class="drawer-close" type="button" aria-label="Đóng">×</button>
+    </header>
+
+    <div class="drawer-body">
+      <div class="mode-switch" role="tablist" aria-label="Cách tạo PLO">
+        <button class="mode-button" type="button" role="tab" aria-selected="true" data-mode-button="template">
+          Chọn từ mẫu
+          <small>Dùng nội dung chuẩn hóa</small>
+        </button>
+        <button class="mode-button" type="button" role="tab" aria-selected="false" data-mode-button="new">
+          Nhập mới
+          <small>Soạn nội dung riêng</small>
+        </button>
+      </div>
+
+      <section class="template-mode" aria-label="Mẫu PLO có sẵn">
+        <div class="form-section">
+          <div class="section-head"><h3>Chọn mẫu PLO</h3><span>4 mẫu khả dụng</span></div>
+          <input class="search" id="template-search" type="search" placeholder="Tìm theo mã hoặc nội dung mẫu…" aria-label="Tìm mẫu PLO">
+        </div>
+        <div class="form-section template-layout">
+          <div class="template-list" id="template-list">
+            <button class="template-item is-selected" type="button" data-template="PLO 01">
+              <span class="template-code">PLO 01</span><strong>Năng lực chuyên môn</strong><span>Đã dùng 3 lần</span>
+            </button>
+            <button class="template-item" type="button" data-template="PLO 02">
+              <span class="template-code">PLO 02</span><strong>Kỹ năng giao tiếp</strong><span>Đã dùng 2 lần</span>
+            </button>
+            <button class="template-item" type="button" data-template="PLO 03">
+              <span class="template-code">PLO 03</span><strong>Đạo đức nghề nghiệp</strong><span>Đã dùng 5 lần</span>
+            </button>
+            <button class="template-item" type="button" data-template="PLO 04">
+              <span class="template-code">PLO 04</span><strong>Tự chủ và học tập</strong><span>Đã dùng 4 lần</span>
+            </button>
+          </div>
+          <div class="template-detail" id="template-detail">
+            <span class="detail-label">Mẫu đang chọn · PLO 01</span>
+            <h4>Năng lực chuyên môn</h4>
+            <p class="detail-copy">Có khả năng vận dụng kiến thức nền tảng và chuyên sâu để phân tích, thiết kế, triển khai giải pháp phần mềm đáp ứng yêu cầu thực tiễn.</p>
+            <div class="detail-meta"><span class="chip chip--blue">Mẫu cơ sở</span><span class="chip">Tiếng Việt</span><span class="chip">Đã kiểm duyệt</span></div>
+            <button class="use-template" type="button" id="use-template">Dùng mẫu này</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="new-mode" aria-label="Nhập PLO mới">
+        <div class="form-section">
+          <div class="section-head"><h3>Thông tin PLO</h3><span>Nội dung nhập mới</span></div>
+          <div class="form-grid">
+            <div class="field"><label for="new-order">Số thứ tự</label><input class="text-input" id="new-order" value="05" inputmode="numeric"></div>
+            <div class="field"><label for="new-title">Tên ngắn</label><input class="text-input" id="new-title" placeholder="Ví dụ: Năng lực phân tích"></div>
+          </div>
+        </div>
+        <div class="form-section field"><label for="new-content">Nội dung chuẩn đầu ra</label><textarea class="editor" id="new-content" placeholder="Nhập nội dung PLO…"></textarea><p class="form-hint">Viết theo cấu trúc: động từ hành động + đối tượng + mức độ đạt được.</p></div>
+      </section>
+
+      <section class="form-section" aria-label="Thông tin bổ sung">
+        <div class="section-head"><h3>Mục tiêu PEO tương thích</h3><span>Tùy chọn</span></div>
+        <div class="peo-chips"><span class="chip peo-chip">PEO 01 · Kiến thức</span><span class="chip peo-chip">PEO 03 · Nghề nghiệp</span><span class="chip">+ Chọn thêm</span></div>
+      </section>
+    </div>
+
+    <footer class="drawer-footer">
+      <button class="button" type="button">Hủy</button>
+      <button class="button button--primary" type="button" id="save-button">Tạo PLO</button>
+    </footer>
+  </aside>
+</div>
+<div class="toast" id="toast" role="status">Đã nạp nội dung mẫu vào biểu mẫu.</div>
+
+<script>
+(() => {
+  const root = document.body;
+  const modeButtons = [...document.querySelectorAll('[data-mode-button]')];
+  const templateItems = [...document.querySelectorAll('[data-template]')];
+  const detail = document.getElementById('template-detail');
+  const toast = document.getElementById('toast');
+  const templateData = {
+    'PLO 01': ['Năng lực chuyên môn', 'Có khả năng vận dụng kiến thức nền tảng và chuyên sâu để phân tích, thiết kế, triển khai giải pháp phần mềm đáp ứng yêu cầu thực tiễn.'],
+    'PLO 02': ['Kỹ năng giao tiếp', 'Có khả năng giao tiếp, trình bày và làm việc hiệu quả trong nhóm chuyên môn và môi trường đa văn hóa.'],
+    'PLO 03': ['Đạo đức nghề nghiệp', 'Tuân thủ chuẩn mực đạo đức, pháp luật và trách nhiệm xã hội trong hoạt động nghề nghiệp.'],
+    'PLO 04': ['Tự chủ và học tập', 'Có khả năng tự chủ, thích nghi và chủ động học tập suốt đời để phát triển năng lực nghề nghiệp.']
+  };
+  let selected = 'PLO 01';
+  const renderDetail = () => {
+    const [title, copy] = templateData[selected];
+    detail.querySelector('.detail-label').textContent = `Mẫu đang chọn · ${selected}`;
+    detail.querySelector('h4').textContent = title;
+    detail.querySelector('.detail-copy').textContent = copy;
+  };
+  const showToast = (text) => {
+    toast.textContent = text;
+    toast.classList.add('is-visible');
+    window.setTimeout(() => toast.classList.remove('is-visible'), 2200);
+  };
+  modeButtons.forEach(button => button.addEventListener('click', () => {
+    const mode = button.dataset.modeButton;
+    root.dataset.mode = mode === 'new' ? 'new' : 'template';
+    modeButtons.forEach(item => item.setAttribute('aria-selected', String(item === button)));
+  }));
+  templateItems.forEach(item => item.addEventListener('click', () => {
+    selected = item.dataset.template;
+    templateItems.forEach(node => node.classList.toggle('is-selected', node === item));
+    renderDetail();
+  }));
+  document.getElementById('use-template').addEventListener('click', () => showToast(`${selected} đã được nạp vào biểu mẫu.`));
+  document.getElementById('save-button').addEventListener('click', () => showToast('Bản xem trước: PLO sẽ được tạo sau khi xác nhận.'));
+  document.getElementById('template-search').addEventListener('input', (event) => {
+    const query = event.target.value.toLowerCase().trim();
+    templateItems.forEach(item => { item.hidden = query && !item.textContent.toLowerCase().includes(query); });
+  });
+  document.querySelector('.drawer-close').addEventListener('click', () => showToast('Bản xem trước: nút đóng drawer.'));
+})();
+</script>
