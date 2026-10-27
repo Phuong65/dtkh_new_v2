@@ -1,0 +1,62 @@
+<section class="profile-card" aria-labelledby="profile-heading" [attr.aria-busy]="isSaving()">
+    @if (isSaving()) {
+    <app-loading-progress heading="Đang lưu hồ sơ phát triển..." backdropFilter="blur(2px)"></app-loading-progress>
+    }
+    <header class="profile-card__header">
+        <div class="profile-card__heading">
+            <span class="profile-card__icon" aria-hidden="true"><i class="ti ti-file-text"></i></span>
+            <h2 id="profile-heading">Hồ sơ & định hướng phát triển</h2>
+        </div>
+        <button type="submit" form="ctdt-profile-form" class="profile-save-btn"
+            [disabled]="disabled || !selectedCtdt?.id || !canEdit || isSaving()" [attr.aria-busy]="isSaving()">
+            <i class="ti ti-device-floppy" aria-hidden="true"></i>
+            {{ isSaving() ? 'Đang lưu...' : 'Lưu hồ sơ phát triển' }}
+        </button>
+    </header>
+    <div class="profile-tabs" role="tablist" aria-label="Nội dung hồ sơ">
+        <button type="button" role="tab" id="profile-tab-mota" class="profile-tab"
+            [class.profile-tab--active]="activeEditorTab() === 'mota'"
+            [attr.aria-selected]="activeEditorTab() === 'mota'" aria-controls="profile-panel-mota"
+            [attr.tabindex]="activeEditorTab() === 'mota' ? 0 : -1"
+            (click)="selectEditorTab('mota')" (keydown)="onEditorTabKeydown($event, 0)">
+            <i class="ti ti-notes" aria-hidden="true"></i> Mô tả tổng quan
+        </button>
+        <button type="button" role="tab" id="profile-tab-cohoi" class="profile-tab"
+            [class.profile-tab--active]="activeEditorTab() === 'cohoi'"
+            [attr.aria-selected]="activeEditorTab() === 'cohoi'" aria-controls="profile-panel-cohoi"
+            [attr.tabindex]="activeEditorTab() === 'cohoi' ? 0 : -1"
+            (click)="selectEditorTab('cohoi')" (keydown)="onEditorTabKeydown($event, 1)">
+            <i class="ti ti-book-2" aria-hidden="true"></i> Cơ hội học tập
+        </button>
+        <button type="button" role="tab" id="profile-tab-vitri" class="profile-tab"
+            [class.profile-tab--active]="activeEditorTab() === 'vitri'"
+            [attr.aria-selected]="activeEditorTab() === 'vitri'" aria-controls="profile-panel-vitri"
+            [attr.tabindex]="activeEditorTab() === 'vitri' ? 0 : -1"
+            (click)="selectEditorTab('vitri')" (keydown)="onEditorTabKeydown($event, 2)">
+            <i class="ti ti-briefcase" aria-hidden="true"></i> Vị trí việc làm
+        </button>
+    </div>
+    <form id="ctdt-profile-form" [formGroup]="formProfile" (ngSubmit)="saveProfile()" class="profile-content">
+        <div role="tabpanel" id="profile-panel-mota" aria-labelledby="profile-tab-mota"
+            [hidden]="activeEditorTab() !== 'mota'">
+            <div class="profile-editor">
+                <ovic-editor height="240px" [formField]="f['mota']"
+                    [default]="f['mota'].value"></ovic-editor>
+            </div>
+        </div>
+        <div role="tabpanel" id="profile-panel-cohoi" aria-labelledby="profile-tab-cohoi"
+            [hidden]="activeEditorTab() !== 'cohoi'">
+            <div class="profile-editor">
+                <ovic-editor height="240px" [formField]="f['cohoihoctap_sautotnghiep']"
+                    [default]="f['cohoihoctap_sautotnghiep'].value"></ovic-editor>
+            </div>
+        </div>
+        <div role="tabpanel" id="profile-panel-vitri" aria-labelledby="profile-tab-vitri"
+            [hidden]="activeEditorTab() !== 'vitri'">
+            <div class="profile-editor">
+                <ovic-editor height="240px" [formField]="f['vitri_lamviec_sautotnghiep']"
+                    [default]="f['vitri_lamviec_sautotnghiep'].value"></ovic-editor>
+            </div>
+        </div>
+    </form>
+</section>

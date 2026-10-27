@@ -1,0 +1,142 @@
+<section class="admin-section--table ictu-admin-page ctdt-page position-relative" aria-labelledby="ctdt-title">
+    @if (boState() === 'loading' || isSaving()) {
+    <app-loading-progress [heading]="isSaving() ? 'Đang lưu dữ liệu...' : 'Đang tải dữ liệu...'" backdropFilter="none"></app-loading-progress>
+    }
+
+    <div class="admin-wrap-table ictu-admin-table-shell ctdt-shell">
+        <header class="admin-wrap-table__head ctdt-shell__head">
+            <div class="ctdt-shell__heading">
+                <h1 id="ctdt-title">Chương trình đào tạo</h1>
+            </div>
+            <div class="admin-wrap-table__head-actions ctdt-shell__actions">
+                <p-select class="ctdt-shell__bo-select" [options]="boOptions()" optionLabel="name" optionValue="id"
+                    [ngModel]="selectedBo()?.id" (ngModelChange)="onBoSelectionChange($event)"
+                    placeholder="Chọn bộ CTĐT" [filter]="true" filterBy="name,code" appendTo="body">
+                </p-select>
+                <input class="admin-wrap-table__head-actions__search" pInputText type="text"
+                    placeholder="Tìm chương trình..." [value]="ctdtSearchValue()" (input)="onCtdtSearchChange($event)"
+                    (keyup.enter)="onCtdtSearchData()" aria-label="Tìm chương trình đào tạo">
+                @if (canAddCtdt) {
+                <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse ctdt-shell__add"
+                    (click)="openCreateCtdt()" [disabled]="!selectedBo()" aria-label="Thêm chương trình đào tạo"
+                    pTooltip="Thêm chương trình đào tạo" tooltipPosition="left">
+                    <i class="ti ti-plus" aria-hidden="true"></i>
+                </button>
+                }
+            </div>
+        </header>
+
+        <div class="admin-wrap-table__body ictu-admin-table-shell__body ctdt-shell__body">
+            @if (boState() === 'error') {
+            <div class="admin-table__alert-danger text-center w-100">
+                Tải danh sách Bộ CTĐT thất bại. Vui lòng <a href="javascript:" (click)="loadBoCtdt()">tải lại</a>.
+            </div>
+            } @else if (ctdtState() === 'loading') {
+            <app-loading-progress heading="Đang tải chương trình đào tạo..." backdropFilter="none"></app-loading-progress>
+            } @else if (ctdtState() === 'error') {
+            <div class="admin-table__alert-danger text-center w-100">
+                Tải danh sách CTĐT thất bại. Vui lòng <a href="javascript:"
+                    (click)="loadCtdt(ctdtTable.paginator.paged(), false)">tải lại</a>.
+            </div>
+            } @else {
+            <div class="ictu-admin-table-scroll">
+                <table class="tbl admin-table table-hover ctdt-table">
+                    <thead>
+                        <tr>
+                            <th class="text-center ctdt-table__index">#</th>
+                            <th class="ctdt-table__code">Mã CTĐT</th>
+                            <th>Tên chương trình đào tạo</th>
+                            <th class="text-center ctdt-table__year">Khóa</th>
+                            <th>Ngành đào tạo</th>
+                            <th>Khoa</th>
+                            <th>Hệ đào tạo</th>
+                            <th class="text-center ctdt-table__credit">Tổng tín chỉ</th>
+                            <th class="text-center ctdt-table__actions">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (ctdt of ctdtTable.data(); track trackByCtdtId($index, ctdt); let i = $index) {
+                        <tr>
+                            <td class="text-center">{{ ctdtTable.paginator.startIndex() + i }}</td>
+                            <td><span class="ctdt-table__code-tag">{{ ctdt.madt || '—' }}</span></td>
+                            <td>
+                                <button type="button" class="ctdt-table__name" (click)="openCtdt(ctdt)"
+                                    [attr.aria-label]="'Mở chương trình ' + ctdt.ten">
+                                    {{ ctdt.ten || 'Chưa đặt tên' }}
+                                </button>
+                            </td>
+                            <td class="text-center">{{ ctdt.khoa_apdung || '—' }}</td>
+                            <td>{{ getCtdtMeta(ctdt).nganh }}</td>
+                            <td>{{ getCtdtMeta(ctdt).khoa }}</td>
+                            <td>{{ getCtdtMeta(ctdt).heDaoTao }}</td>
+                            <td class="text-center">{{ getCtdtMeta(ctdt).tongTinChi ?? '—' }}</td>
+                            <td class="text-center">
+                                @if (canDeleteCtdt) {
+                                <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
+                                    (click)="deleteCtdt(ctdt)" [attr.aria-label]="'Xóa chương trình ' + ctdt.ten"
+                                    pTooltip="Xóa chương trình" tooltipPosition="left">
+                                    <i class="ti ti-trash" aria-hidden="true"></i>
+                                </button>
+                                }
+                            </td>
+                        </tr>
+                        } @empty {
+                        <tr>
+                            <td colspan="9" class="ctdt-table__empty">
+                                {{ selectedBo() ? 'Bộ CTĐT này chưa có chương trình.' : 'Vui lòng chọn Bộ CTĐT để xem danh sách.' }}
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            }
+        </div>
+        <footer class="admin-wrap-table__foot ctdt-shell__footer">
+            <ictu-paginator [control]="ctdtTable.paginator" (onChangePage)="onCtdtPageChange($event)"></ictu-paginator>
+        </footer>
+    </div>
+</section>
+
+<p-drawer [(visible)]="ctdtDrawerVisible" [dismissible]="!isSaving()" [closable]="!isSaving()"
+    header="Thêm chương trình đào tạo" [style]="{ width: 'min(560px, 100vw)' }" appendTo="body" position="right"
+    styleClass="ictu-p-drawer">
+    <div class="ictu-p-drawer__content position-relative">
+        @if (ctdtFormLoading()) {
+        <app-loading-progress heading="Đang tải danh mục CTĐT..." backdropFilter="none"></app-loading-progress>
+        }
+        <div class="ictu-p-drawer__content__body position-relative">
+            <form [formGroup]="ctdtForm" class="ctdt-form">
+                <div class="ictu-form">
+                    <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required" for="ctdt-madt">Mã CTĐT</label>
+                        <input id="ctdt-madt" type="text" formControlName="madt" (input)="uppercaseCodeInput($event)"
+                            class="ictu-form__input-field" pInputText placeholder="Nhập mã CTĐT"></div>
+                    <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required" for="ctdt-ten">Tên chương trình</label>
+                        <input id="ctdt-ten" type="text" formControlName="ten" class="ictu-form__input-field" pInputText
+                            placeholder="Nhập tên chương trình"></div>
+                    <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required" for="ctdt-category">Khoa</label>
+                        <p-select inputId="ctdt-category" class="ctdt-form__select" [options]="ctdtFormDonViOptions"
+                            optionLabel="title" optionValue="id" formControlName="category_id" (onChange)="onCtdtFormDonViChange()"
+                            placeholder="Chọn khoa" [filter]="true" filterBy="title" appendTo="body"></p-select></div>
+                    <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required" for="ctdt-nganh">Ngành đào tạo</label>
+                        <p-select inputId="ctdt-nganh" class="ctdt-form__select" [options]="ctdtFormNganhOptions"
+                            optionLabel="title" optionValue="id" formControlName="nganh_id" placeholder="Chọn ngành đào tạo"
+                            [filter]="true" filterBy="title" [disabled]="!ctdtForm.controls.category_id.value" appendTo="body"></p-select></div>
+                    <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required" for="ctdt-khoa-apdung">Khóa áp dụng</label>
+                        <input id="ctdt-khoa-apdung" type="text" formControlName="khoa_apdung" (keydown)="onCtdtKhoaKeyDown($event)"
+                            class="ictu-form__input-field" pInputText placeholder="VD: 20" inputmode="numeric"></div>
+                    <div class="ictu-form__row"><label class="ictu-form__label ictu-form__label--required" for="ctdt-he-dt">Hệ đào tạo</label>
+                        <p-select inputId="ctdt-he-dt" class="ctdt-form__select" [options]="ctdtFormHeDt"
+                            optionLabel="title" optionValue="kyhieu" formControlName="he_dt" placeholder="Chọn hệ đào tạo"
+                            [filter]="true" filterBy="title" appendTo="body"></p-select></div>
+                </div>
+            </form>
+        </div>
+        <footer class="ictu-p-drawer__content__footer ictu-admin-drawer-footer">
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button"
+                (click)="ctdtDrawerVisible = false" [disabled]="isSaving()">Hủy</button>
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button"
+                (click)="submitCtdtForm()" [disabled]="!canSubmitCtdtForm"><i class="ti ti-device-floppy" aria-hidden="true"></i> Lưu lại</button>
+        </footer>
+    </div>
+</p-drawer>

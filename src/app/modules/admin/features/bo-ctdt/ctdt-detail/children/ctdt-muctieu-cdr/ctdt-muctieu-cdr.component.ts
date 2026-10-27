@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, WritableSignal, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, WritableSignal, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, Subject, concatMap, defer, finalize, forkJoin, from, map, of, switchMap, takeUntil, tap, throwError, toArray } from 'rxjs';
@@ -28,11 +28,20 @@ import { OvicEditorComponent } from '@modules/shared/components/ovic-editor/ovic
 import { SafeHtmlDecodePipe } from '@modules/shared/pipes/safe-html-decode';
 import { ROLES } from '@modules/shared/utils/syscat';
 import { CtdtCdrComponent, CtdtCdrSummary } from '../ctdt-cdr/ctdt-cdr.component';
+import { CtdtHosoPhatTrienComponent } from '../ctdt-hoso-phattrien/ctdt-hoso-phattrien.component';
 
 export interface typeMuctieuCuthe {
     key: string;
     title: string;
     children: CtdtMuctieuCuthe[];
+}
+
+type CtdtSettingsTabId = 'hoso-phattrien' | 'muc-tieu-chung' | 'dinh-huong' | 'muc-tieu-cu-the' | 'chuan-dau-ra';
+
+interface CtdtSettingsTabItem {
+    id: CtdtSettingsTabId;
+    label: string;
+    icon: string;
 }
 
 interface OrientationMutation {
@@ -51,7 +60,7 @@ interface OrientationMutation {
     selector: 'app-ctdt-muctieu-cdr',
     standalone: true,
     imports: [CommonModule, ReactiveFormsModule, Drawer, MultiSelectModule, InputTextModule,
-        OvicEditorComponent, SafeHtmlDecodePipe, MatButtonModule, TooltipModule, LoadingProgressComponent, CtdtCdrComponent],
+        OvicEditorComponent, SafeHtmlDecodePipe, MatButtonModule, TooltipModule, LoadingProgressComponent, CtdtCdrComponent, CtdtHosoPhatTrienComponent],
     templateUrl: './ctdt-muctieu-cdr.component.html',
     styleUrls: ['./ctdt-muctieu-cdr.component.css']
 })
@@ -74,6 +83,15 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
     private readonly cancelTabLoad$ = new Subject<void>();
     private readonly cancelGoalsLoad$ = new Subject<void>();
     private readonly cancelOrientation$ = new Subject<void>();
+    readonly settingsTabs: readonly CtdtSettingsTabItem[] = [
+        { id: 'hoso-phattrien', label: 'Hồ sơ phát triển', icon: 'ti ti-file-text' },
+        { id: 'muc-tieu-chung', label: 'Mục tiêu chung', icon: 'ti ti-compass' },
+        { id: 'dinh-huong', label: 'Định hướng', icon: 'ti ti-arrows-left-right' },
+        { id: 'muc-tieu-cu-the', label: 'Mục tiêu cụ thể', icon: 'ti ti-target' },
+        { id: 'chuan-dau-ra', label: 'Chuẩn đầu ra', icon: 'ti ti-certificate' }
+    ];
+    readonly activeSettingsTabId = signal<CtdtSettingsTabId>('muc-tieu-chung');
+
     peoRefreshKey = 0;
     cdrSummary: CtdtCdrSummary | null = null;
     private orientationSession = 0;
@@ -85,6 +103,7 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
     private loadedCtdtId: number | null = null;
 
     @Input() selectedCtdt: Ctdt | null = null;
+    @Output() ctdtUpdated = new EventEmitter<Ctdt>();
 
     isLanhDaoKhoa = this.auth.userHasRole(ROLES.lanhdaokhoa);
     isManager = [ROLES.manager, ROLES.admin, ROLES.troly_pdt, ROLES.chuyenvien_pdt, ROLES.daotao_new]
@@ -143,12 +162,45 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
         return this.selectedCtdt?.muctieu || '';
     }
 
+    selectSettingsTab(tabId: CtdtSettingsTabId): void {
+        this.activeSettingsTabId.set(tabId);
+    }
+
+    onSettingsTabKeydown(event: KeyboardEvent, index: number): void {
+        let targetIndex: number;
+        switch (event.key) {
+            case 'ArrowRight':
+                targetIndex = (index + 1) % this.settingsTabs.length;
+                break;
+            case 'ArrowLeft':
+                targetIndex = (index - 1 + this.settingsTabs.length) % this.settingsTabs.length;
+                break;
+            case 'Home':
+                targetIndex = 0;
+                break;
+            case 'End':
+                targetIndex = this.settingsTabs.length - 1;
+                break;
+            default:
+                return;
+        }
+
+        event.preventDefault();
+        this.selectSettingsTab(this.settingsTabs[targetIndex].id);
+        const buttons = (event.currentTarget as HTMLElement).parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+        buttons?.[targetIndex]?.focus();
+    }
+
     ngOnInit(): void {
         if (this.selectedCtdt?.id) this.loadTabData(this.selectedCtdt);
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        const ctdt = changes['selectedCtdt']?.currentValue as Ctdt | null;
+        const change = changes['selectedCtdt'];
+        const ctdt = change?.currentValue as Ctdt | null;
+        if (ctdt?.id && ctdt.id !== change.previousValue?.id) {
+            this.activeSettingsTabId.set('muc-tieu-chung');
+        }
         if (ctdt?.id && ctdt.id !== this.loadedCtdtId) this.loadTabData(ctdt);
     }
 
@@ -882,6 +934,12 @@ export class CtdtMuctieuCdrComponent implements OnChanges, OnInit, OnDestroy {
         const item = this.list_tuongthich.find(config => config.key === key);
         const content = item?.noidung ? this.helperService.decodeHTML(item.noidung) : '';
         return content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() || this.compatibilityTitle(key);
+    }
+
+    onProfileUpdated(updated: Ctdt): void {
+        if (!updated || !this.selectedCtdt || updated.id !== this.selectedCtdt.id) return;
+        this.selectedCtdt = { ...this.selectedCtdt, ...updated };
+        this.ctdtUpdated.emit(this.selectedCtdt);
     }
 
     onCdrSummaryChange(summary: CtdtCdrSummary): void {

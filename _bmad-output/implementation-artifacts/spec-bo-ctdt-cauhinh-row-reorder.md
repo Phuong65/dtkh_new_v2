@@ -21,7 +21,7 @@ context: []
 ## Implementation Notes
 
 - Người dùng đã cho phép tiếp tục trên working tree có nhiều thay đổi chưa commit, yêu cầu không ghi đè chúng.
-- File mục tiêu: `src/app/modules/admin/features/bo-ctdt/ctdt-detail/children/ctdt-cauhinh/ctdt-cauhinh.component.html` và `.ts`.
+- File mục tiêu: `src/app/modules/admin/features/ctdt/ctdt-detail/children/ctdt-cauhinh/ctdt-cauhinh.component.html` và `.ts`.
 - PrimeNG 21 `ReorderableRow` kiểm tra `p-datatable-reorderable-row-handle` trên target/ancestor ở mousedown. Bản cài đặt hiện tại dùng Lara, không có `unstyled: true`; gắn class rõ ràng trên handle để không phụ thuộc style config.
 - `onRowDrop` của PrimeNG hoán đổi mảng trước khi phát `onRowReorder`; event chỉ có dragIndex/dropIndex. Handler chỉ đánh lại `ordering = index + 1`; `saveConfig()` đã cập nhật ordering trước PUT/POST và `loadCtdtConfig()` đã tải order ASC.
 - Giữ cùng từng nhóm `parent.ctdt_config`; không sắp xếp các section cấu hình.

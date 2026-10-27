@@ -19,12 +19,11 @@ const routes: Routes = [
     },
     {
         path: 'bo-ctdt',
-        loadComponent: () => import('@modules/admin/features/bo-ctdt/bo-ctdt-management.component').then(c => c.BoCtdtManagementComponent),
+        loadComponent: () => import('@modules/admin/features/bo-ctdt/bo-ctdt/bo-ctdt.component').then(c => c.BoCtdtComponent),
     },
     {
         path: 'chuongtrinh-daotao',
-        
-         loadComponent: () => import('@modules/admin/features/bo-ctdt/bo-ctdt-management.component').then(c => c.BoCtdtManagementComponent),
+        loadComponent: () => import('@modules/admin/features/bo-ctdt/ctdt.component').then(c => c.CtdtComponent),
         // loadChildren: () => import('@modules/admin/features/chuongtrinh-daotao/ctdt.module').then(m => m.CtdtModule)
     },
     {

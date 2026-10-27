@@ -21,7 +21,6 @@ import { ElngUserProfileService } from '@modules/shared/services/elearning-user-
 import { ElnChuyenMucService } from '@modules/shared/services/elearning-chuyen-muc.service';
 import { HeDtService } from '@modules/shared/services/he-dt.service';
 import { OvicDropdownComponent } from '@modules/shared/components/ovic-dropdown/ovic-dropdown.component';
-import { OvicEditorComponent } from '@modules/shared/components/ovic-editor/ovic-editor.component';
 import { FilterPipe } from '@modules/shared/directives/filter.pipe';
 import { ROLES, DANHHIEU_TOTNGHIEP } from '@modules/shared/utils/syscat';
 
@@ -34,7 +33,6 @@ import { ROLES, DANHHIEU_TOTNGHIEP } from '@modules/shared/utils/syscat';
         FormsModule,
         ReactiveFormsModule,
         OvicDropdownComponent,
-        OvicEditorComponent,
         FilterPipe,
         NgbTooltipModule,
         LoadingProgressComponent
@@ -52,7 +50,6 @@ export class CtdtThongtinComponent implements OnChanges, OnDestroy {
 
     isLanhDaoKhoa = false;
     isManager = false;
-    activeEditorTab = signal<'mota' | 'cohoi' | 'vitri'>('mota');
     formCtdt: FormGroup;
     readonly isLoading: WritableSignal<boolean> = signal(true);
     readonly isSaving: WritableSignal<boolean> = signal(false);
@@ -83,14 +80,11 @@ export class CtdtThongtinComponent implements OnChanges, OnDestroy {
         this.userId = this.auth.user?.id;
         this.formCtdt = this.formBuilder.group({
             ten: ['', Validators.required],
-            mota: [''],
             madt: ['', Validators.required],
             nganh_id: ['', Validators.required],
             he_dt: ['', Validators.required],
             danhhieu_totnghiep: [''],
             thoigian_daotao: [''],
-            vitri_lamviec_sautotnghiep: [''],
-            cohoihoctap_sautotnghiep: [''],
             category_id: ['', Validators.required],
             khoa_apdung: ['', Validators.required]
         });
@@ -223,14 +217,11 @@ export class CtdtThongtinComponent implements OnChanges, OnDestroy {
     private resetForm(ctdt: Ctdt): void {
         this.formCtdt.reset({
             ten: ctdt.ten,
-            mota: ctdt.mota,
             madt: ctdt.madt,
             nganh_id: ctdt.nganh_id,
             he_dt: ctdt.he_dt,
             danhhieu_totnghiep: ctdt.danhhieu_totnghiep,
             thoigian_daotao: ctdt.thoigian_daotao,
-            vitri_lamviec_sautotnghiep: ctdt.vitri_lamviec_sautotnghiep,
-            cohoihoctap_sautotnghiep: ctdt.cohoihoctap_sautotnghiep,
             category_id: ctdt.category_id,
             khoa_apdung: ctdt.khoa_apdung
         });

@@ -10,11 +10,57 @@
         <a (click)="reloadData()" href="javascript:" class="admin-table__alert-danger__btn-reload">tải lại</a>.
     </div>
     } @else if (selectedCtdt) {
+        <nav class="settings-tabs" aria-label="Cài đặt chương trình đào tạo">
+            <div class="settings-tabs__track" role="tablist">
+                @for (tab of settingsTabs; track tab.id; let i = $index) {
+                <button type="button" class="settings-tab" role="tab" [id]="'settings-tab-' + tab.id"
+                    [attr.aria-selected]="activeSettingsTabId() === tab.id"
+                    [attr.aria-controls]="'settings-panel-' + tab.id"
+                    [attr.tabindex]="activeSettingsTabId() === tab.id ? 0 : -1"
+                    [class.settings-tab--active]="activeSettingsTabId() === tab.id"
+                    (click)="selectSettingsTab(tab.id)" (keydown)="onSettingsTabKeydown($event, i)">
+                    <i [class]="tab.icon" aria-hidden="true"></i> {{ tab.label }}
+                </button>
+                }
+            </div>
+        </nav>
     <div class="goals-workspace">
         <div class="goals-workspace__grid">
-            <div class="goals-workspace__main" role="region" aria-label="Nội dung mục tiêu chương trình" tabindex="0">
+            <div class="goals-workspace__main" role="region" aria-label="Nội dung cài đặt chương trình" tabindex="0">
+                <div class="settings-tab-panel" role="tabpanel" id="settings-panel-hoso-phattrien"
+                    aria-labelledby="settings-tab-hoso-phattrien" [hidden]="activeSettingsTabId() !== 'hoso-phattrien'">
+                    <app-ctdt-hoso-phattrien [selectedCtdt]="selectedCtdt" [disabled]="busy"
+                        (ctdtUpdated)="onProfileUpdated($event)"></app-ctdt-hoso-phattrien>
+                </div>
 
+                <div class="settings-tab-panel" role="tabpanel" id="settings-panel-muc-tieu-chung"
+                    aria-labelledby="settings-tab-muc-tieu-chung"
+                    [hidden]="activeSettingsTabId() !== 'muc-tieu-chung'">
+                    <section class="goals-card" aria-labelledby="goal-general-heading">
+                        <header class="goals-card__header">
+                            <div class="goals-card__heading">
+                                <span class="goals-card__icon" aria-hidden="true"><i class="ti ti-compass"></i></span>
+                                <h2 id="goal-general-heading">Mục tiêu chung</h2>
+                            </div>
+                            <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse"
+                                (click)="saveCurrentMucTieuChung()" [disabled]="busy" [attr.aria-busy]="savingGeneral">
+                                <i class="ti ti-device-floppy" aria-hidden="true"></i>
+                                {{ savingGeneral ? 'Đang lưu...' : 'Lưu mục tiêu chung' }}
+                            </button>
+                        </header>
+                        <div class="goals-card__body">
+                            <div class="goals-editor" role="group" aria-labelledby="goal-general-heading">
+                                <ovic-editor height="220px" (changeText)="onMucTieuChungChange($event)"
+                                    [default]="generalEditorInitialValue"></ovic-editor>
+                            </div>
+                            <p class="goals-save-note"><i class="ti ti-info-circle" aria-hidden="true"></i>Mục tiêu chung
+                                được lưu riêng với danh sách PEO tại tab Mục tiêu cụ thể.</p>
+                        </div>
+                    </section>
+                </div>
 
+                <div class="settings-tab-panel" role="tabpanel" id="settings-panel-dinh-huong"
+                    aria-labelledby="settings-tab-dinh-huong" [hidden]="activeSettingsTabId() !== 'dinh-huong'">
                 <section class="goals-card goals-identity-card" aria-labelledby="goal-identity-heading">
                     <header class="goals-card__header">
                         <div class="goals-card__heading">
@@ -78,90 +124,11 @@
                     }
                 </section>
 
-                <section class="goals-card goals-matrix-card" aria-labelledby="goal-matrix-heading">
-                    <header class="goals-matrix-card__header">
-                        <button type="button" class="goals-matrix-card__toggle"
-                            (click)="isMatrixExpanded = !isMatrixExpanded" [attr.aria-expanded]="isMatrixExpanded"
-                            aria-controls="goal-matrix-panel">
-                            <span class="goals-card__icon" aria-hidden="true"><i class="ti ti-layout-grid"></i></span>
-                            <span id="goal-matrix-heading">Ma trận tương thích mục tiêu đào tạo (PEO) với định hướng cơ sở đào tạo</span>
-                            <i class="ti" [class.ti-chevron-down]="!isMatrixExpanded" [class.ti-chevron-up]="isMatrixExpanded" aria-hidden="true"></i>
-                        </button>
-                    </header>
-                    <div id="goal-matrix-panel" [hidden]="!isMatrixExpanded">
-                        @if (isMatrixExpanded) {
-                        @if (goalsState() === 'loading') {
-                        <div class="goals-inline-state" role="status">Đang cập nhật ma trận...</div>
-                        } @else if (goalsState() === 'error') {
-                        <p class="goals-inline-state">Ma trận sẽ hiển thị sau khi tải được danh sách mục tiêu.</p>
-                        } @else if (!list_tuongthich.length) {
-                        <p class="goals-inline-state">Chưa có định hướng tương thích. Thêm định hướng ở bảng phía trên để bắt đầu.</p>
-                        } @else {
-                        <div class="goals-matrix-scroll" role="region" aria-labelledby="goal-matrix-heading" tabindex="0">
-                            <table class="goals-matrix">
-                                <caption class="goals-sr-only">Tương thích giữa định hướng đào tạo và các mục tiêu PEO</caption>
-                                <thead>
-                                    <tr>
-                                        <th scope="col" rowspan="2" class="goals-matrix__corner">Định hướng</th>
-                                        <th scope="colgroup" [attr.colspan]="list_muctieu_cuthe.length || 1" class="goals-matrix__group">Mục tiêu đào tạo (PEOs)</th>
-                                    </tr>
-                                    <tr>
-                                        @for (goal of list_muctieu_cuthe; track goal.id) {
-                                        <th scope="col" class="goals-matrix__goal">{{ goal.ordering }}</th>
-                                        } @empty {
-                                        <th scope="col" class="goals-matrix__goal">Chưa có PEO</th>
-                                        }
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for (compatibility of list_tuongthich; track compatibility.key) {
-                                    <tr class="goals-matrix__orientation-row">
-                                        <th scope="row">
-                                            <div class="goals-matrix__orientation">
-                                                <strong class="goals-matrix__orientation-title">{{ compatibility.title }}</strong>
-                                            </div>
-                                        </th>
-                                        @for (goal of list_muctieu_cuthe; track goal.id) {
-                                        <td class="goals-matrix__check">
-                                            @if (checkTuongthich(compatibility.key, goal)) { <i class="ti ti-check" aria-hidden="true"></i><span class="goals-sr-only">Có tương thích</span> } @else { <span aria-hidden="true">—</span><span class="goals-sr-only">Chưa liên kết</span> }
-                                        </td>
-                                        } @empty {
-                                        <td class="goals-matrix__empty-peo">Chưa có PEO</td>
-                                        }
-                                    </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                        }
-                        }
-                    </div>
-                </section>
+                </div>
 
-                <section class="goals-card" aria-labelledby="goal-general-heading">
-                    <header class="goals-card__header">
-                        <div class="goals-card__heading">
-                            <span class="goals-card__icon" aria-hidden="true"><i class="ti ti-compass"></i></span>
-                            <div>
-                                <h2 id="goal-general-heading">Mục tiêu chung</h2>
-                            </div>
-                        </div>
-                        <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse"
-                            (click)="saveCurrentMucTieuChung()" [disabled]="busy" [attr.aria-busy]="savingGeneral">
-                            <i class="ti ti-device-floppy" aria-hidden="true"></i>
-                            {{ savingGeneral ? 'Đang lưu...' : 'Lưu mục tiêu chung' }}
-                        </button>
-                    </header>
-                    <div class="goals-card__body">
-                        <div class="goals-editor" role="group" aria-labelledby="goal-general-heading">
-                            <ovic-editor height="220px" (changeText)="onMucTieuChungChange($event)"
-                                [default]="generalEditorInitialValue"></ovic-editor>
-                        </div>
-                        <p class="goals-save-note"><i class="ti ti-info-circle" aria-hidden="true"></i>Mục tiêu chung
-                            được lưu riêng với danh sách PEO bên dưới.</p>
-                    </div>
-                </section>
-
+                <div class="settings-tab-panel" role="tabpanel" id="settings-panel-muc-tieu-cu-the"
+                    aria-labelledby="settings-tab-muc-tieu-cu-the"
+                    [hidden]="activeSettingsTabId() !== 'muc-tieu-cu-the'">
                 <section class="goals-card goals-peo-card" aria-labelledby="goal-peo-heading"
                     [attr.aria-busy]="goalsState() === 'loading'">
                     <header class="goals-card__header goals-peo-card__header">
@@ -297,14 +264,76 @@
                     }
                 </section>
 
+                <section class="goals-card goals-matrix-card" aria-labelledby="goal-matrix-heading">
+                    <header class="goals-matrix-card__header">
+                        <button type="button" class="goals-matrix-card__toggle"
+                            (click)="isMatrixExpanded = !isMatrixExpanded" [attr.aria-expanded]="isMatrixExpanded"
+                            aria-controls="goal-matrix-panel">
+                            <span class="goals-card__icon" aria-hidden="true"><i class="ti ti-layout-grid"></i></span>
+                            <span id="goal-matrix-heading">Ma trận tương thích mục tiêu đào tạo (PEO) với định hướng cơ sở đào tạo</span>
+                            <i class="ti" [class.ti-chevron-down]="!isMatrixExpanded" [class.ti-chevron-up]="isMatrixExpanded" aria-hidden="true"></i>
+                        </button>
+                    </header>
+                    <div id="goal-matrix-panel" [hidden]="!isMatrixExpanded">
+                        @if (isMatrixExpanded) {
+                        @if (goalsState() === 'loading') {
+                        <div class="goals-inline-state" role="status">Đang cập nhật ma trận...</div>
+                        } @else if (goalsState() === 'error') {
+                        <p class="goals-inline-state">Ma trận sẽ hiển thị sau khi tải được danh sách mục tiêu.</p>
+                        } @else if (!list_tuongthich.length) {
+                        <p class="goals-inline-state">Chưa có định hướng tương thích. Thêm định hướng tại tab Định hướng để bắt đầu.</p>
+                        } @else {
+                        <div class="goals-matrix-scroll" role="region" aria-labelledby="goal-matrix-heading" tabindex="0">
+                            <table class="goals-matrix">
+                                <caption class="goals-sr-only">Tương thích giữa định hướng đào tạo và các mục tiêu PEO</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col" rowspan="2" class="goals-matrix__corner">Định hướng</th>
+                                        <th scope="colgroup" [attr.colspan]="list_muctieu_cuthe.length || 1" class="goals-matrix__group">Mục tiêu đào tạo (PEOs)</th>
+                                    </tr>
+                                    <tr>
+                                        @for (goal of list_muctieu_cuthe; track goal.id) {
+                                        <th scope="col" class="goals-matrix__goal">{{ goal.ordering }}</th>
+                                        } @empty {
+                                        <th scope="col" class="goals-matrix__goal">Chưa có PEO</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (compatibility of list_tuongthich; track compatibility.key) {
+                                    <tr class="goals-matrix__orientation-row">
+                                        <th scope="row">
+                                            <div class="goals-matrix__orientation">
+                                                <strong class="goals-matrix__orientation-title">{{ compatibility.title }}</strong>
+                                            </div>
+                                        </th>
+                                        @for (goal of list_muctieu_cuthe; track goal.id) {
+                                        <td class="goals-matrix__check">
+                                            @if (checkTuongthich(compatibility.key, goal)) { <i class="ti ti-check" aria-hidden="true"></i><span class="goals-sr-only">Có tương thích</span> } @else { <span aria-hidden="true">—</span><span class="goals-sr-only">Chưa liên kết</span> }
+                                        </td>
+                                        } @empty {
+                                        <td class="goals-matrix__empty-peo">Chưa có PEO</td>
+                                        }
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        }
+                        }
+                    </div>
+                </section>
+                </div>
+
+                <div class="settings-tab-panel settings-tab-panel--cdr" role="tabpanel" id="settings-panel-chuan-dau-ra"
+                    aria-labelledby="settings-tab-chuan-dau-ra" [hidden]="activeSettingsTabId() !== 'chuan-dau-ra'">
                 <section class="goals-embedded-cdr" aria-label="Chuẩn đầu ra của chương trình đào tạo">
                     <app-ctdt-cdr [selectedCtdtInput]="selectedCtdt" [peoListInput]="list_muctieu_cuthe"
                         [embedded]="true" [peoRefreshKey]="peoRefreshKey"
                         (summaryChange)="onCdrSummaryChange($event)"></app-ctdt-cdr>
                 </section>
-            </div>
 
-            <aside class="goals-workspace__aside" aria-label="Thông tin nhanh chương trình">
+                <aside class="goals-workspace__aside" aria-label="Thông tin nhanh chương trình">
                 <section class="goals-summary-card">
                     <h2><i class="ti ti-chart-bar" aria-hidden="true"></i>Thông tin nhanh</h2>
                     <dl class="goals-summary-list">
@@ -351,7 +380,9 @@
                     <p class="goals-helper">{{ state() === 'error' || goalsState() === 'error' ? 'Không tải được dữ liệu liên kết' : 'Đang tải liên kết...' }}</p>
                     }
                 </section>
-            </aside>
+                </aside>
+                </div>
+            </div>
         </div>
     </div>
     }

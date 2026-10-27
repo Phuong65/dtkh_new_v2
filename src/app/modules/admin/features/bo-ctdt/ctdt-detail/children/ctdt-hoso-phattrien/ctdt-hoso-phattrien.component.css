@@ -1,0 +1,222 @@
+:host {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    color: #172230;
+    --border: #e2e8f0;
+    --muted: #64748b;
+    --surface: #ffffff;
+    --navy: #172230;
+    --blue: #2563eb;
+    --radius: 4px;
+}
+
+.profile-card {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #cbd5e1;
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: 0 1px 3px rgb(15 23 42 / 4%);
+}
+
+.profile-card__header {
+    position: relative;
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 9px 14px 9px 18px;
+    border-bottom: 1px solid #cbd5e1;
+    background: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
+    color: #1e3a8a;
+    flex-wrap: wrap;
+}
+
+.profile-card__header::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    background: #2563eb;
+    content: '';
+}
+
+.profile-card__heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.profile-card__heading h2 {
+    margin: 0;
+    color: #1e3a8a;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.profile-card__icon {
+    display: inline-flex;
+    width: 34px;
+    height: 34px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #bfdbfe;
+    border-radius: var(--radius);
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 17px;
+}
+
+.profile-save-btn {
+    display: inline-flex;
+    min-height: 34px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 4px;
+    background: #1d4ed8;
+    color: #ffffff;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.profile-save-btn:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+}
+
+.profile-save-btn:focus-visible,
+.profile-tab:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: -3px;
+}
+
+.profile-tabs {
+    display: flex;
+    width: 100%;
+    min-height: 54px;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 2px;
+    padding: 0 14px;
+    overflow-x: auto;
+    border-bottom: 1px solid #dbe3ec;
+    background: #ffffff;
+    scrollbar-width: none;
+}
+
+.profile-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.profile-tab {
+    position: relative;
+    display: inline-flex;
+    min-width: 180px;
+    min-height: 54px;
+    height: 54px;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 18px;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    background: transparent;
+    color: #64748b;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+}
+
+.profile-tab i {
+    color: currentColor;
+    font-size: 16px;
+}
+
+.profile-tab:not(.profile-tab--active):hover {
+    background: #f8fafc;
+    color: #1d4ed8;
+}
+
+.profile-tab--active {
+    border-bottom-color: #1d4ed8;
+    color: #1d4ed8;
+    font-weight: 700;
+}
+
+.profile-content {
+    padding: 16px 20px 20px;
+}
+
+.profile-editor {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: #ffffff;
+}
+
+:host ::ng-deep .profile-editor .p-editor-container {
+    border: 0 !important;
+}
+
+:host ::ng-deep .profile-editor .p-editor-toolbar {
+    padding: 6px 10px !important;
+    border: 0 !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    background: #eaf2ff !important;
+}
+
+:host ::ng-deep .profile-editor .p-editor-content {
+    border: 0 !important;
+}
+
+:host ::ng-deep .profile-editor .ql-editor {
+    min-height: 180px;
+    padding: 12px 14px !important;
+    color: var(--navy) !important;
+    font-family: inherit !important;
+    font-size: 13.5px !important;
+    line-height: 1.6 !important;
+}
+
+@media (max-width: 640px) {
+    .profile-card__header {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 14px;
+    }
+
+    .profile-save-btn {
+        width: 100%;
+    }
+
+    .profile-tabs {
+        padding: 0 8px;
+    }
+
+    .profile-tab {
+        min-width: 0;
+        flex: 0 0 auto;
+        padding: 0 12px;
+        font-size: 12px;
+    }
+
+    .profile-content {
+        padding: 14px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .profile-tab {
+        transition: none;
+    }
+}

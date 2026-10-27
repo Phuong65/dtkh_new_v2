@@ -12,8 +12,12 @@ const routes: Routes = [
         loadComponent: () => import('@modules/admin/features/home/home-baocao/home-baocao.component').then(c => c.HomeBaocaoComponent),
     },
     {
+        path: 'bo-ctdt',
+        loadComponent: () => import('@modules/admin/features/bo-ctdt/bo-ctdt/bo-ctdt.component').then(c => c.BoCtdtComponent),
+    },
+    {
         path: 'chuongtrinh-daotao',
-        loadComponent: () => import('@modules/admin/features/bo-ctdt/bo-ctdt-management.component').then(c => c.BoCtdtManagementComponent),
+        loadComponent: () => import('@modules/admin/features/bo-ctdt/ctdt.component').then(c => c.CtdtComponent),
     },
     {
         path: 'kehoach-hoctap',

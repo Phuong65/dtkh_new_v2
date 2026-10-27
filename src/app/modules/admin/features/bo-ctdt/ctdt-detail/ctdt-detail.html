@@ -49,7 +49,8 @@
         } @else if (activeTabId() === 'muc-tieu') {
         <section class="ctdt-tab-panel ctdt-tab-panel--form" role="tabpanel" id="panel-muc-tieu"
             aria-labelledby="tab-muc-tieu">
-            <app-ctdt-muctieu-cdr [selectedCtdt]="selectedCtdt()"></app-ctdt-muctieu-cdr>
+            <app-ctdt-muctieu-cdr [selectedCtdt]="selectedCtdt()"
+                (ctdtUpdated)="onCtdtUpdated($event)"></app-ctdt-muctieu-cdr>
         </section>
         } @else if (activeTabId() === 'noi-dung') {
         <section class="ctdt-tab-panel ctdt-tab-panel--form" role="tabpanel" id="panel-noi-dung"

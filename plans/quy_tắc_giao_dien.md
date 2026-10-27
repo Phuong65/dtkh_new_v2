@@ -1,6 +1,6 @@
 # Quy tắc giao diện chung: Bộ CTĐT và CTĐT
 
-> Tài liệu chuẩn hóa UI/UX cho `bo-ctdt-management`, `ctdt-detail` và `ctdt-thongtin`.
+> Tài liệu chuẩn hóa UI/UX cho `ctdt-management`, `ctdt-detail` và `ctdt-thongtin`.
 >
 > Phạm vi: giao diện quản lý Bộ chương trình đào tạo, danh sách Chương trình đào tạo và trang chi tiết CTĐT.
 > Mục tiêu: các tab và màn hình CTĐT dùng cùng một ngôn ngữ hình ảnh, cùng cách sắp xếp, cùng trạng thái dữ liệu và cùng hành vi responsive.
@@ -13,12 +13,12 @@
 
 | Khu vực | File tham chiếu | Vai trò |
 |---|---|---|
-| Quản lý Bộ CTĐT | `src/app/modules/admin/features/bo-ctdt/bo-ctdt-management.component.html` | Master–detail: danh sách Bộ CTĐT bên trái, bảng CTĐT bên phải |
-| Style Bộ CTĐT | `src/app/modules/admin/features/bo-ctdt/bo-ctdt-management.component.css` | Bố cục, màu, kích thước, responsive của master–detail |
-| Shell chi tiết CTĐT | `src/app/modules/admin/features/bo-ctdt/ctdt-detail/ctdt-detail.html` | Header, tab cấp trang, panel nội dung |
-| Style shell CTĐT | `src/app/modules/admin/features/bo-ctdt/ctdt-detail/ctdt-detail.css` | Header 64px, tab navigation, breakpoint |
-| Thông tin CTĐT | `src/app/modules/admin/features/bo-ctdt/ctdt-detail/children/ctdt-thongtin/ctdt-thongtin.component.html` | Form thông tin chung, editor, sidebar trạng thái |
-| Style thông tin CTĐT | `src/app/modules/admin/features/bo-ctdt/ctdt-detail/children/ctdt-thongtin/ctdt-thongtin.component.css` | Card, form grid, editor tab, aside card |
+| Quản lý Bộ CTĐT | `src/app/modules/admin/features/ctdt/ctdt-management.component.html` | Master–detail: danh sách Bộ CTĐT bên trái, bảng CTĐT bên phải |
+| Style Bộ CTĐT | `src/app/modules/admin/features/ctdt/ctdt-management.component.css` | Bố cục, màu, kích thước, responsive của master–detail |
+| Shell chi tiết CTĐT | `src/app/modules/admin/features/ctdt/ctdt-detail/ctdt-detail.html` | Header, tab cấp trang, panel nội dung |
+| Style shell CTĐT | `src/app/modules/admin/features/ctdt/ctdt-detail/ctdt-detail.css` | Header 64px, tab navigation, breakpoint |
+| Thông tin CTĐT | `src/app/modules/admin/features/ctdt/ctdt-detail/children/ctdt-thongtin/ctdt-thongtin.component.html` | Form thông tin chung, editor, sidebar trạng thái |
+| Style thông tin CTĐT | `src/app/modules/admin/features/ctdt/ctdt-detail/children/ctdt-thongtin/ctdt-thongtin.component.css` | Card, form grid, editor tab, aside card |
 | Style dùng chung | `src/app/core-new/styles/ictu-admin-form.css` | Admin shell, input, bảng, drawer, form, paginator layout |
 | Nút dùng chung | `src/app/core-new/styles/ictu-buttons.css` | Button màu, light/reverse/ghost, kích thước và radius |
 | Editor dùng chung | `src/app/modules/shared/components/ovic-editor/` | Toolbar và editor nội dung |
@@ -500,7 +500,7 @@ Trong `@media (prefers-reduced-motion: reduce)`:
 
 ### Điểm cần kiểm tra khi triển khai
 
-1. `bo-ctdt-management.component.html` đang dùng `aria-labelledby="bo-ctdt-title"`; cần bảo đảm có phần tử `id="bo-ctdt-title"`.
+1. `ctdt-management.component.html` đang dùng `aria-labelledby="bo-ctdt-title"`; cần bảo đảm có phần tử `id="bo-ctdt-title"`.
 2. Master item đang là `role="option"` nhưng chứa nhiều button action; cần chọn lại semantics để không lồng interactive control không hợp lệ.
 3. Editor tabs có ARIA nhưng cần bổ sung keyboard navigation thống nhất nếu sử dụng như tablist đầy đủ.
 4. Các label đang là `<span>` cho một số dropdown Ovic; cần bổ sung liên kết accessibility khi component hỗ trợ.

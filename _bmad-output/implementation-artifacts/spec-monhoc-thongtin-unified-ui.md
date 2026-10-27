@@ -42,7 +42,7 @@ context:
 - `src/app/modules/admin/features/course-management/course-management-detail/children/monhoc-thongtin/monhoc-thongtin.component.css` — style riêng ~1470 dòng đa sắc; rút về CTĐT form/card/aside và responsive.
 - `src/app/modules/admin/features/course-management/course-management-detail/children/monhoc-thongtin/monhoc-thongtin.component.ts` — `state`, `isSaving`, `scrollToSection`, `activeDescTab`, `saveCourse`; chỉ bổ sung xử lý UI tối thiểu, tránh đổi logic nghiệp vụ.
 - `src/app/modules/admin/features/course-management/course-management-detail/course-management-detail.{html,css}` — shell 64px/tab đã tồn tại; không sửa.
-- `src/app/modules/admin/features/bo-ctdt/ctdt-detail/children/ctdt-thongtin/ctdt-thongtin.component.{html,css}` — mẫu card/grid/aside/editor để tham chiếu, không sửa.
+- `src/app/modules/admin/features/ctdt/ctdt-detail/children/ctdt-thongtin/ctdt-thongtin.component.{html,css}` — mẫu card/grid/aside/editor để tham chiếu, không sửa.
 - `src/app/core-new/styles/ictu-admin-form.css` và `ictu-buttons.css` — reuse `admin-table`, `ictu-admin-table-scroll`, `ictu-badge-btn--primary-reverse`.
 - `src/app/modules/shared/components/ovic-dropdown/ovic-dropdown.component.ts` — wrapper select không hỗ trợ inputId/ariaLabelledBy; giữ, dùng group label ở wrapper.
 

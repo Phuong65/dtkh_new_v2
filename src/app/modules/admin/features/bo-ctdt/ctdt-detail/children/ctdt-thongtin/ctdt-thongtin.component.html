@@ -131,68 +131,6 @@
                         </div>
                     </div>
                 </section>
-
-                <section class="ctdt-card ctdt-card--editor" aria-labelledby="ctdt-profile-heading">
-                    <div class="ctdt-card__header">
-                        <div class="ctdt-card__heading">
-                            <span class="ctdt-card__icon" aria-hidden="true"><i class="ti ti-file-text"></i></span>
-                            <div>
-                                <h2 id="ctdt-profile-heading">Hồ sơ & định hướng phát triển</h2>
-                                <!-- <p>Chọn nội dung cần chỉnh sửa, mọi thay đổi sẽ được lưu cùng hồ sơ</p> -->
-                            </div>
-                        </div>
-                        <!-- <span class="ctdt-card__index">03 / 03</span> -->
-                    </div>
-                    <div class="ctdt-editor-tabs" role="tablist" aria-label="Nội dung hồ sơ">
-                        <button type="button" role="tab" id="ctdt-editor-tab-mota" class="ctdt-editor-tab"
-                            [class.ctdt-editor-tab--active]="activeEditorTab() === 'mota'"
-                            [attr.aria-selected]="activeEditorTab() === 'mota'" aria-controls="ctdt-editor-panel-mota"
-                            [attr.tabindex]="activeEditorTab() === 'mota' ? 0 : -1"
-                            (click)="activeEditorTab.set('mota')">
-                            <i class="ti ti-notes" aria-hidden="true"></i> Mô tả tổng quan
-                        </button>
-                        <button type="button" role="tab" id="ctdt-editor-tab-cohoi" class="ctdt-editor-tab"
-                            [class.ctdt-editor-tab--active]="activeEditorTab() === 'cohoi'"
-                            [attr.aria-selected]="activeEditorTab() === 'cohoi'" aria-controls="ctdt-editor-panel-cohoi"
-                            [attr.tabindex]="activeEditorTab() === 'cohoi' ? 0 : -1"
-                            (click)="activeEditorTab.set('cohoi')">
-                            <i class="ti ti-book-2" aria-hidden="true"></i> Cơ hội học tập
-                        </button>
-                        <button type="button" role="tab" id="ctdt-editor-tab-vitri" class="ctdt-editor-tab"
-                            [class.ctdt-editor-tab--active]="activeEditorTab() === 'vitri'"
-                            [attr.aria-selected]="activeEditorTab() === 'vitri'" aria-controls="ctdt-editor-panel-vitri"
-                            [attr.tabindex]="activeEditorTab() === 'vitri' ? 0 : -1"
-                            (click)="activeEditorTab.set('vitri')">
-                            <i class="ti ti-briefcase" aria-hidden="true"></i> Vị trí việc làm
-                        </button>
-                    </div>
-                    <div class="ctdt-editor-content">
-                        <div class="ctdt-editor-content__pane" role="tabpanel" id="ctdt-editor-panel-mota"
-                            aria-labelledby="ctdt-editor-tab-mota" [hidden]="activeEditorTab() !== 'mota'">
-                            <!-- <p class="ctdt-editor-content__hint">Tổng quan về cấu trúc, đặc trưng và giá trị của chương trình.</p> -->
-                            <div class="ctdt-editor-wrap">
-                                <ovic-editor height="240px" [formField]="f['mota']"
-                                    [default]="f['mota']['value']"></ovic-editor>
-                            </div>
-                        </div>
-                        <div class="ctdt-editor-content__pane" role="tabpanel" id="ctdt-editor-panel-cohoi"
-                            aria-labelledby="ctdt-editor-tab-cohoi" [hidden]="activeEditorTab() !== 'cohoi'">
-                            <!-- <p class="ctdt-editor-content__hint">Lộ trình học tập nâng cao sau khi hoàn thành chương trình.</p> -->
-                            <div class="ctdt-editor-wrap">
-                                <ovic-editor height="240px" [formField]="f['cohoihoctap_sautotnghiep']"
-                                    [default]="f['cohoihoctap_sautotnghiep']['value']"></ovic-editor>
-                            </div>
-                        </div>
-                        <div class="ctdt-editor-content__pane" role="tabpanel" id="ctdt-editor-panel-vitri"
-                            aria-labelledby="ctdt-editor-tab-vitri" [hidden]="activeEditorTab() !== 'vitri'">
-                            <!-- <p class="ctdt-editor-content__hint">Các vị trí nghề nghiệp phù hợp sau tốt nghiệp.</p> -->
-                            <div class="ctdt-editor-wrap">
-                                <ovic-editor height="240px" [formField]="f['vitri_lamviec_sautotnghiep']"
-                                    [default]="f['vitri_lamviec_sautotnghiep']['value']"></ovic-editor>
-                            </div>
-                        </div>
-                    </div>
-                </section>
             </div>
 
             <aside class="ctdt-workspace__aside" aria-label="Tổng quan và thao tác hồ sơ">
