@@ -37,7 +37,7 @@ export class CtdtDetail implements OnInit, OnDestroy {
 
     readonly tabs: readonly CtdtTabItem[] = [
         { id: 'thong-tin', label: 'Thông tin chung', icon: 'ti ti-info-circle' },
-        { id: 'muc-tieu', label: 'Cài đặt', icon: 'ti ti-settings' },
+        { id: 'muc-tieu', label: 'Đề cương', icon: 'ti ti-settings' },
         { id: 'noi-dung', label: 'Học phần', icon: 'ti ti-book' }
     ];
 
