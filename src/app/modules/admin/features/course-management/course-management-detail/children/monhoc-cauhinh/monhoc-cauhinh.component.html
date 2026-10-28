@@ -8,8 +8,9 @@
         {{ errorMessage() || 'Tải dữ liệu thất bại.' }} Vui lòng chọn
         <a (click)="reloadData()" href="javascript:" class="admin-table__alert-danger__btn-reload">tải lại</a>.
     </div>
-    } @else if (selectedCourse && plan_kiemtra) {
+    } @else if (selectedCourse && (mode === 'settings-only' || plan_kiemtra)) {
     <div class="config-workspace">
+        @if (mode === 'all') {
         <section class="admin-wrap-table ictu-admin-table-shell config-table-card" aria-labelledby="test-title">
             <header class="admin-wrap-table__head config-card-header">
                 <div>
@@ -78,11 +79,12 @@
                 </div>
             </div>
         </section>
+        }
 
         <section class="config-settings" aria-labelledby="settings-title">
             <header class="config-section-heading">
                 <div>
-                    <span class="admin-wrap-table__heading" id="test-title">THIẾT LẬP ĐIỂM HỌC PHẦN</span>
+                    <span class="admin-wrap-table__heading" id="settings-title">THIẾT LẬP ĐIỂM HỌC PHẦN</span>
                     <p>Điều chỉnh tỷ lệ điểm, số lượng đề và thời hạn làm bài.</p>
                 </div>
                 <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse"

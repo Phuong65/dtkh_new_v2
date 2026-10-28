@@ -148,6 +148,22 @@
     margin-top: 22px;
 }
 
+:host(.config-settings-only) .config-shell {
+    min-height: 0;
+    height: auto;
+    background: transparent;
+    overflow: visible;
+}
+
+:host(.config-settings-only) .config-workspace {
+    width: 100%;
+    padding: 0;
+}
+
+:host(.config-settings-only) .config-settings {
+    margin-top: 0;
+}
+
 .config-section-heading {
     display: flex;
     align-items: end;
@@ -319,6 +335,7 @@
         grid-template-columns: minmax(0, 1fr);
     }
 
+    .config-setting-card,
     .config-setting-card--wide {
         grid-column: auto;
     }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, Input, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -40,9 +40,12 @@ import { getTestType, ROLES, ROUTERS } from '@modules/shared/utils/syscat';
         LoadingProgressComponent
     ],
     templateUrl: './monhoc-cauhinh.component.html',
-    styleUrls: ['./monhoc-cauhinh.component.css']
+    styleUrls: ['./monhoc-cauhinh.component.css'],
+    host: { '[class.config-settings-only]': "mode === 'settings-only'" }
 })
 export class MonhocCauhinhComponent implements OnInit {
+    @Input() mode: 'all' | 'settings-only' = 'all';
+
     private readonly destroyRef = inject(DestroyRef);
     private readonly router = inject(Router);
     private readonly activatedRoute = inject(ActivatedRoute);
@@ -208,7 +211,7 @@ export class MonhocCauhinhComponent implements OnInit {
             this.list_config = config.data || [];
             this.list_plan = plan.data || [];
             this.convertDataCourseConfig(courseConfig.data || []);
-            await this.loadKiemtrathuongxuyen();
+            if (this.mode === 'all') await this.loadKiemtrathuongxuyen();
             if (!this.destroyRef.destroyed && version === this.loadVersion) this.state.set('success');
         } catch {
             if (this.destroyRef.destroyed || version !== this.loadVersion) return;

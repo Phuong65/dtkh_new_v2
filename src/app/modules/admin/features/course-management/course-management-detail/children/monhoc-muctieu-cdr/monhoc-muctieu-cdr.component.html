@@ -10,7 +10,24 @@
         <a (click)="reloadData()" href="javascript:" class="admin-table__alert-danger__btn-reload">tải lại</a>.
     </div>
     } @else if (selectedCourse) {
+        <nav class="cdr-subtabs" aria-label="Nhóm mục tiêu và chuẩn đầu ra">
+            <div class="cdr-subtabs__track" role="tablist" aria-label="Mục tiêu và chuẩn đầu ra">
+                @for (tab of subTabs; track tab.id; let i = $index) {
+                <button #subTabButton type="button" class="cdr-subtab" role="tab" [id]="'cdr-tab-' + tab.id"
+                    [class.cdr-subtab--active]="activeSubTabId() === tab.id"
+                    [attr.aria-selected]="activeSubTabId() === tab.id"
+                    [attr.aria-controls]="'cdr-panel-' + tab.id"
+                    [attr.tabindex]="activeSubTabId() === tab.id ? 0 : -1"
+                    (click)="selectSubTab(tab.id)" (keydown)="onSubTabKeydown($event, i)">
+                    <i [class]="tab.icon" aria-hidden="true"></i><span>{{ tab.label }}</span>
+                </button>
+                }
+            </div>
+        </nav>
+
     <div class="cdr-workspace">
+        <section id="cdr-panel-muc-tieu-chung" class="cdr-subpanel" role="tabpanel"
+            aria-labelledby="cdr-tab-muc-tieu-chung" [hidden]="activeSubTabId() !== 'muc-tieu-chung'">
         <section class="cdr-objective-card">
             <header class="cdr-section-header">
                 <div class="cdr-section-title"><i class="ti ti-target-arrow" aria-hidden="true"></i><span>MỤC TIÊU CHUNG</span></div>
@@ -27,6 +44,10 @@
             </div>
         </section>
 
+        </section>
+
+        <section id="cdr-panel-co-clo" class="cdr-subpanel" role="tabpanel"
+            aria-labelledby="cdr-tab-co-clo" [hidden]="activeSubTabId() !== 'co-clo'">
         <section class="admin-wrap-table ictu-admin-table-shell cdr-table-card">
             <header class="admin-wrap-table__head cdr-table-card__header">
                 <span class="admin-wrap-table__heading cdr-table-card__title">MỤC TIÊU CHI TIẾT (CO)</span>
@@ -156,6 +177,14 @@
                     </tr>}
                 </tbody></table>
             </div>}
+        </section>
+        </section>
+
+        <section id="cdr-panel-kiem-tra-danh-gia" class="cdr-subpanel cdr-settings-panel" role="tabpanel"
+            aria-labelledby="cdr-tab-kiem-tra-danh-gia" [hidden]="activeSubTabId() !== 'kiem-tra-danh-gia'">
+            @if (settingsVisited()) {
+            <app-monhoc-cauhinh mode="settings-only"></app-monhoc-cauhinh>
+            }
         </section>
     </div>
     }

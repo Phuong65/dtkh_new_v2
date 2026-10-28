@@ -7,7 +7,7 @@ import { Drawer } from 'primeng/drawer';
 import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { Tooltip } from 'primeng/tooltip';
-import { Observable, Subject, catchError, filter, forkJoin, map, of, switchMap, takeUntil } from 'rxjs';
+import { Observable, Subject, catchError, filter, forkJoin, from, map, mergeMap, of, switchMap, takeUntil, toArray } from 'rxjs';
 import { IctuPaginatorComponent } from '@core-new/components/ictu-paginator/ictu-paginator.component';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 import { AppState } from '@core-new/models/app-state';
@@ -21,6 +21,8 @@ import { ElnChuyenMuc } from '@modules/shared/models/Elng';
 import { HeDt } from '@modules/shared/models/he-dt';
 import { BoCtdt } from '@modules/shared/models/bo-ctdt';
 import { Ctdt } from '@modules/shared/models/ctdt';
+import { CtdtHocphan } from '@modules/shared/models/ctdt_hocphan';
+import { ElnKhoaHoc } from '@modules/shared/models/elng-khoa-hoc';
 import { BoCtdtService } from '@modules/shared/services/bo-ctdt.service';
 import { CtdtService } from '@modules/shared/services/ctdt.service';
 import { CtdtHocphanService } from '@modules/shared/services/ctdt-hocphan.service';
@@ -280,24 +282,25 @@ export class CtdtComponent implements OnInit, OnDestroy {
             condition: [{ conditionName: 'status', condition: OvicQueryCondition.greaterThan, value: '0', orWhere: 'and' }],
             set: [{ label: 'limit', value: '-1' }, { label: 'orderby', value: 'title' }, { label: 'order', value: 'ASC' }], page: null
         };
+        const ctdtIds = validRows.map(row => Number(row.id));
         forkJoin({
             nganh: this.nganhService.getChuyemucByPageNew(major),
             khoa: this.donViService.getDonviByPageNew(unit),
             heDaoTao: this.heDtService.getAllHeDt(),
-            credits: forkJoin(validRows.map(row => this.loadCtdtCredits(Number(row.id))))
+            credits: this.loadCtdtCredits(ctdtIds)
         }).pipe(
-            catchError(() => of({ nganh: { data: [] }, khoa: { data: [] }, heDaoTao: [], credits: validRows.map(() => null) })),
+            catchError(() => of({ nganh: { data: [] }, khoa: { data: [] }, heDaoTao: [], credits: null })),
             takeUntil(this.cancelCtdtMetaLoad$), takeUntil(this.destroy$)
         ).subscribe(({ nganh, khoa, heDaoTao, credits }) => {
             const nganhById = new Map((nganh.data || []).map(item => [Number(item.id), item.title]));
             const khoaById = new Map((khoa.data || []).map(item => [Number(item.id), item.title]));
             const heDaoTaoByCode = new Map((heDaoTao || []).map(item => [String((item as HeDt & { kyhieu?: string }).kyhieu ?? item.id), item.title]));
-            const metadata = validRows.reduce((result, row, index) => {
+            const metadata = validRows.reduce((result, row) => {
                 result[Number(row.id)] = {
                     khoa: khoaById.get(Number(row.category_id)) || '—',
                     nganh: nganhById.get(Number(row.nganh_id)) || '—',
                     heDaoTao: heDaoTaoByCode.get(String(row.he_dt)) || '—',
-                    tongTinChi: credits[index]
+                    tongTinChi: credits === null ? null : credits.get(Number(row.id)) ?? 0
                 };
                 return result;
             }, {} as Record<number, CtdtDisplayMeta>);
@@ -305,24 +308,68 @@ export class CtdtComponent implements OnInit, OnDestroy {
         });
     }
 
-    private loadCtdtCredits(ctdtId: number): Observable<number | null> {
+    private loadCtdtCredits(ctdtIds: number[]): Observable<Map<number, number> | null> {
+        const ids = [...new Set(ctdtIds)].filter(id => Number.isInteger(id) && id > 0);
+        if (!ids.length) return of(new Map<number, number>());
         const condition: ConditionOption = {
-            condition: [{ conditionName: 'ctdt_id', condition: OvicQueryCondition.equal, value: String(ctdtId) }],
-            set: [{ label: 'limit', value: '-1' }], page: null
+            condition: [],
+            set: [{ label: 'limit', value: '-1' }, { label: 'include', value: ids.join(',') }, { label: 'include_by', value: 'ctdt_id' }],
+            page: null
         };
-        return this.ctdtHocphanService.getCtdtHocphanByPageNew(condition).pipe(
+        return this.loadAllCtdtHocphan(condition).pipe(
             switchMap(links => {
-                const courseIds = [...new Set((links.data || []).map(link => Number(link.course_id)).filter(id => Number.isInteger(id) && id > 0))];
-                if (!courseIds.length) return of([] as { params?: { sotinchi?: number } }[]);
+                const courseIds = [...new Set(links.map(link => Number(link.course_id)).filter(id => Number.isInteger(id) && id > 0))];
+                if (!courseIds.length) return of({ links, courses: [] as ElnKhoaHoc[] });
                 const courseCondition: ConditionOption = {
                     condition: [{ conditionName: 'status', condition: OvicQueryCondition.greaterThan, value: '-1' }],
-                    set: [{ label: 'limit', value: '-1' }, { label: 'include', value: courseIds.join(',') }, { label: 'include_by', value: 'id' }], page: null
+                    set: [{ label: 'limit', value: '-1' }, { label: 'include', value: courseIds.join(',') }, { label: 'include_by', value: 'id' }],
+                    page: null
                 };
-                return this.courseService.getKhoaHocByPageNew_2(courseCondition).pipe(map(response => response.data || []));
+                return this.loadAllCourses(courseCondition).pipe(map(courses => ({ links, courses })));
             }),
-            map(courses => courses.reduce((total, course) => total + Number(course.params?.sotinchi || 0), 0)),
+            map(({ links, courses }) => {
+                const creditsByCourse = new Map(courses.map(course => [Number(course.id), Number(course.params?.sotinchi || 0)]));
+                const creditsByCtdt = new Map<number, number>();
+                const seenLinks = new Set<string>();
+                links.forEach(link => {
+                    const ctdtId = Number(link.ctdt_id);
+                    const courseId = Number(link.course_id);
+                    if (!Number.isInteger(ctdtId) || !Number.isInteger(courseId)) return;
+                    const pair = `${ctdtId}:${courseId}`;
+                    if (seenLinks.has(pair)) return;
+                    seenLinks.add(pair);
+                    creditsByCtdt.set(ctdtId, (creditsByCtdt.get(ctdtId) || 0) + (creditsByCourse.get(courseId) || 0));
+                });
+                return creditsByCtdt;
+            }),
             catchError(() => of(null))
         );
+    }
+
+    private loadAllCtdtHocphan(option: ConditionOption): Observable<CtdtHocphan[]> {
+        return this.ctdtHocphanService.getCtdtHocphanByPageNew(option).pipe(
+            switchMap(first => this.loadRemainingPages<CtdtHocphan>(first, page => this.ctdtHocphanService.getCtdtHocphanByPageNew({ ...option, page: String(page) })).pipe(map(rest => [...(first.data || []), ...rest]))),
+            takeUntil(this.cancelCtdtMetaLoad$), takeUntil(this.destroy$)
+        );
+    }
+
+    private loadAllCourses(option: ConditionOption): Observable<ElnKhoaHoc[]> {
+        return this.courseService.getKhoaHocByPageNew_2(option).pipe(
+            switchMap(first => this.loadRemainingPages<ElnKhoaHoc>(first, page => this.courseService.getKhoaHocByPageNew_2({ ...option, page: String(page) })).pipe(map(rest => [...(first.data || []), ...rest]))),
+            takeUntil(this.cancelCtdtMetaLoad$), takeUntil(this.destroy$)
+        );
+    }
+
+    private loadRemainingPages<T>(first: { data: T[]; recordsFiltered: number }, fetchPage: (page: number) => Observable<{ data: T[]; recordsFiltered: number }>): Observable<T[]> {
+        const firstData = first.data || [];
+        const total = Number(first.recordsFiltered) || firstData.length;
+        const pageSize = firstData.length || 1;
+        const pageCount = Math.ceil(total / pageSize);
+        if (pageCount <= 1) return of([]);
+        return from(Array.from({ length: pageCount - 1 }, (_, index) => index + 2)).pipe(
+            mergeMap(page => fetchPage(page), 4),
+            toArray(),
+            map(pages => pages.flatMap(page => page.data || []).slice(0, Math.max(0, total - firstData.length))));
     }
 
     getCtdtMeta(ctdt: Ctdt): CtdtDisplayMeta {

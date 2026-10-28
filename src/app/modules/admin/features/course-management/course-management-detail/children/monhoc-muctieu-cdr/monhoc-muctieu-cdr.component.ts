@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, ElementRef, OnInit, ViewChild, inject, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, OnInit, ViewChild, inject, signal, viewChildren } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -31,6 +31,9 @@ import { CourseCloContributeService } from '@modules/shared/services/course-clo-
 import { CtdtHocphanService } from '@modules/shared/services/ctdt-hocphan.service';
 import { CtdtService } from '@modules/shared/services/ctdt.service';
 import { CtdtCdrService } from '@modules/shared/services/ctdt-cdr.service';
+import { MonhocCauhinhComponent } from '../monhoc-cauhinh/monhoc-cauhinh.component';
+
+type MuctieuCdrSubTabId = 'muc-tieu-chung' | 'co-clo' | 'kiem-tra-danh-gia';
 
 interface CtdtCdrExtend extends CtdtCdr {
     items?: CtdtCdr[];
@@ -40,7 +43,8 @@ interface CtdtCdrExtend extends CtdtCdr {
     selector: 'app-monhoc-muctieu-cdr',
     standalone: true,
     imports: [CommonModule, SharedModule, FormsModule, ReactiveFormsModule, TableModule,
-        ShowLabelData, SafeHtmlDecodePipe, MatButtonModule, Drawer, LoadingProgressComponent],
+        ShowLabelData, SafeHtmlDecodePipe, MatButtonModule, Drawer, LoadingProgressComponent,
+        MonhocCauhinhComponent],
     templateUrl: './monhoc-muctieu-cdr.component.html',
     styleUrls: ['./monhoc-muctieu-cdr.component.css']
 })
@@ -67,6 +71,14 @@ export class MonhocMuctieuCdrComponent implements OnInit {
     readonly errorMessage = signal('');
     readonly generalObjectiveControl = new FormControl('', { nonNullable: true });
     readonly editingGoalId = signal<number | null>(null);
+    readonly activeSubTabId = signal<MuctieuCdrSubTabId>('muc-tieu-chung');
+    readonly settingsVisited = signal(false);
+    readonly subTabs: readonly { id: MuctieuCdrSubTabId; label: string; icon: string }[] = [
+        { id: 'muc-tieu-chung', label: 'Mục tiêu chung', icon: 'ti ti-target-arrow' },
+        { id: 'co-clo', label: 'CO / CLO', icon: 'ti ti-list-check' },
+        { id: 'kiem-tra-danh-gia', label: 'Kiểm tra đánh giá', icon: 'ti ti-clipboard-check' }
+    ];
+    readonly subTabButtons = viewChildren<ElementRef<HTMLButtonElement>>('subTabButton');
     @ViewChild('goalEditor') goalEditor?: ElementRef<HTMLTextAreaElement>;
     loadingHeading = 'Đang tải mục tiêu và chuẩn đầu ra...';
     piDrawerVisible = false;
@@ -99,6 +111,25 @@ export class MonhocMuctieuCdrComponent implements OnInit {
     reloadData(): void {
         if (this.isSaving()) return;
         void this.loadData(this.activatedRoute.snapshot.queryParamMap.get('code'));
+    }
+
+    selectSubTab(tabId: MuctieuCdrSubTabId): void {
+        if (tabId === 'kiem-tra-danh-gia') this.settingsVisited.set(true);
+        this.activeSubTabId.set(tabId);
+    }
+
+    onSubTabKeydown(event: KeyboardEvent, index: number): void {
+        let targetIndex: number | null = null;
+        switch (event.key) {
+            case 'ArrowRight': targetIndex = (index + 1) % this.subTabs.length; break;
+            case 'ArrowLeft': targetIndex = (index - 1 + this.subTabs.length) % this.subTabs.length; break;
+            case 'Home': targetIndex = 0; break;
+            case 'End': targetIndex = this.subTabs.length - 1; break;
+            default: return;
+        }
+        event.preventDefault();
+        this.selectSubTab(this.subTabs[targetIndex].id);
+        this.subTabButtons()[targetIndex]?.nativeElement.focus();
     }
 
     private condition(column: string, value: string, limit = '-1', ordered = false): ConditionOption {
