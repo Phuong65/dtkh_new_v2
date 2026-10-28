@@ -10,7 +10,7 @@ import { ConditionOption } from '@modules/shared/models/condition-option';
 import { CtdtService } from '@modules/shared/services/ctdt.service';
 import { CtdtHocphanService } from '@modules/shared/services/ctdt-hocphan.service';
 import { ElngUserProfileService } from '@modules/shared/services/elearning-user-profile.service';
-import { concatMap, defer, finalize, forkJoin, from, map, Observable, of, Subject, switchMap, takeUntil, tap, throwError, toArray } from 'rxjs';
+import { catchError, concatMap, defer, finalize, forkJoin, from, map, Observable, of, Subject, switchMap, takeUntil, tap, throwError, toArray } from 'rxjs';
 import { Ctdt } from '@modules/shared/models/ctdt';
 import { ROLES } from '@modules/shared/utils/syscat';
 import { ConfigsService } from '@modules/shared/services/configs.service';
@@ -34,7 +34,7 @@ import { HelperService } from '@core/services/helper.service';
 import { TooltipModule } from 'primeng/tooltip';
 
 type CourseConditionKey = 'hp_hoctruoc' | 'hp_tienquyet' | 'hp_songhanh';
-type CourseRow = Pick<ElnKhoaHoc, 'id' | 'title' | 'maso'> & {
+type CourseRow = Pick<ElnKhoaHoc, 'id' | 'title' | 'maso' | 'ctdt_ids'> & {
     params?: Pick<NonNullable<ElnKhoaHoc['params']>, 'sotinchi' | 'sotinchi_th'>;
     ctdt_hocphan_id?: number;
     khoikienthuc?: string;
@@ -46,10 +46,22 @@ type CourseRow = Pick<ElnKhoaHoc, 'id' | 'title' | 'maso'> & {
 };
 
 type SubjectCourseOption = CatalogSubject & { course_id: number };
-type StagedCourseAddition = { subject: SubjectCourseOption; blockKey: string; course: CourseRow };
+type StagedCourseAddition = {
+    subject: SubjectCourseOption;
+    blockKey: string;
+    course: CourseRow;
+    linkCreated: boolean;
+    membershipSynced: boolean;
+};
+type StagedCourseDeletion = {
+    linkId: number;
+    course: CourseRow;
+    linkDeleted: boolean;
+    membershipSynced: boolean;
+};
 type SubjectSyncOperation =
     | { kind: 'add'; courseId: number; addition: StagedCourseAddition }
-    | { kind: 'delete'; courseId: number; linkId: number }
+    | { kind: 'delete'; courseId: number; deletion: StagedCourseDeletion }
     | { kind: 'update'; courseId: number; course: CourseRow };
 
 export interface typeCtdtHocphan {
@@ -117,7 +129,7 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
     private courseLinks: CtdtHocphan[] = [];
     private readonly persistedCourseRows = new Map<number, CourseRow>();
     private readonly stagedAdds = new Map<number, StagedCourseAddition>();
-    private readonly stagedDeletes = new Map<number, number>();
+    private readonly stagedDeletes = new Map<number, StagedCourseDeletion>();
     private readonly dirtyCourseIds = new Set<number>();
     readonly subjectPaginator = new IctuPaginatorControl({ pageLinkSize: 5, rows: 20, showFirstLastIcon: true });
     private appliedSubjectSearch = '';
@@ -276,6 +288,7 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
                         ? { ...draft, ctdt_hocphan_id: link.id, khoikienthuc: link.khoikienthuc }
                         : {
                             ...course,
+                            ctdt_ids: Array.isArray(course.ctdt_ids) ? course.ctdt_ids.map(Number) : [],
                             ctdt_hocphan_id: link.id,
                             khoikienthuc: link.khoikienthuc,
                             hocky: link.hocky ?? null,
@@ -494,7 +507,23 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
             });
             if (Object.keys(patch).length) requests.push(() => this.ctdtHocphanService.updateCtdtHocphan(link.id, patch));
         });
-        targets.forEach(link => requests.push(() => this.ctdtHocphanService.deleteCtdtHocphan(Number(link.id))));
+        targets.forEach(link => requests.push(() => {
+            const courseId = Number(link.course_id);
+            const deletion: StagedCourseDeletion = {
+                linkId: Number(link.id),
+                course: this.persistedCourseRows.get(courseId) || {
+                    id: courseId, title: link.course_name, maso: '', khoikienthuc: blockKey
+                },
+                linkDeleted: false,
+                membershipSynced: false
+            };
+            if (this.selectedCtdt?.id === programmeId) this.stagedDeletes.set(courseId, deletion);
+            return this.saveSubjectOperation({ kind: 'delete', courseId, deletion }, { id: programmeId } as Ctdt).pipe(
+                tap(() => {
+                    if (this.stagedDeletes.get(courseId) === deletion) this.stagedDeletes.delete(courseId);
+                })
+            );
+        }));
         requests.push(() => this.ctdtHocphanService.getCtdtHocphanByPageNew({
             condition: [
                 { conditionName: 'ctdt_id', condition: OvicQueryCondition.equal, value: String(programmeId) },
@@ -687,8 +716,12 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
             return;
         }
         this.currentBlockLinks.forEach((linkId, courseId) => {
-            if (this.selectedCourseIds.has(courseId)) this.stagedDeletes.delete(courseId);
-            else this.stagedDeletes.set(courseId, linkId);
+            if (this.selectedCourseIds.has(courseId)) {
+                this.stagedDeletes.delete(courseId);
+                return;
+            }
+            const course = this.persistedCourseRows.get(courseId) || this.list_course.find(item => Number(item.id) === courseId);
+            if (course) this.stagedDeletes.set(courseId, { linkId, course, linkDeleted: false, membershipSynced: false });
         });
         this.stagedAdds.forEach((addition, courseId) => {
             if (addition.blockKey === blockKey && !this.selectedCourseIds.has(courseId)) {
@@ -698,12 +731,15 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         });
         this.selectedCourseIds.forEach(courseId => {
             if (!this.currentBlockLinks.has(courseId)) {
+                this.stagedDeletes.delete(courseId);
                 const subject = this.selectedSubjects.get(courseId);
                 if (subject && !this.stagedAdds.has(courseId)) {
                     this.stagedAdds.set(courseId, {
                         subject,
                         blockKey,
-                        course: this.buildDraftCourse(subject, blockKey)
+                        course: this.buildDraftCourse(subject, blockKey),
+                        linkCreated: false,
+                        membershipSynced: false
                     });
                 }
             }
@@ -714,19 +750,17 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     private reconcileStagedLinks(): void {
-        this.stagedDeletes.forEach((linkId, courseId) => {
-            if (!this.courseLinks.some(link => Number(link.id) === linkId && Number(link.course_id) === courseId)) {
-                this.stagedDeletes.delete(courseId);
-                this.dirtyCourseIds.delete(courseId);
-                this.persistedCourseRows.delete(courseId);
+        this.stagedDeletes.forEach((deletion, courseId) => {
+            if (!this.courseLinks.some(link => Number(link.id) === deletion.linkId && Number(link.course_id) === courseId)) {
+                deletion.linkDeleted = true;
             }
         });
-        this.stagedAdds.forEach((_, courseId) => {
-            if (this.linkedCourseIds.has(courseId)) this.stagedAdds.delete(courseId);
+        this.stagedAdds.forEach((addition, courseId) => {
+            if (this.linkedCourseIds.has(courseId)) addition.linkCreated = true;
         });
         const currentIds = new Set(this.courseLinks.map(link => Number(link.course_id)));
         this.persistedCourseRows.forEach((_, courseId) => {
-            if (!currentIds.has(courseId)) this.persistedCourseRows.delete(courseId);
+            if (!currentIds.has(courseId) && !this.stagedDeletes.has(courseId)) this.persistedCourseRows.delete(courseId);
         });
     }
 
@@ -747,6 +781,98 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         };
     }
 
+    private normalizeCtdtIds(value: unknown): number[] {
+        return [...new Set((Array.isArray(value) ? value : [])
+            .map(Number)
+            .filter(id => Number.isInteger(id) && id > 0))];
+    }
+
+    private loadCourse(courseId: number): Observable<ElnKhoaHoc> {
+        const condition: ConditionOption = {
+            condition: [{ conditionName: 'id', condition: OvicQueryCondition.equal, value: String(courseId) }],
+            set: [{ label: 'limit', value: '1' }],
+            page: null
+        };
+        return this.elnKhoaHocService.getKhoaHocByPageNew_2(condition).pipe(
+            map(response => response.data?.[0]),
+            switchMap(course => course ? of(course) : throwError(() => new Error(`Không tìm thấy học phần #${courseId}`)))
+        );
+    }
+
+    private syncCourseMembership(courseId: number, programmeId: number, add: boolean): Observable<unknown> {
+        return this.loadCourse(courseId).pipe(
+            switchMap(course => {
+                const current = this.normalizeCtdtIds(course.ctdt_ids);
+                const ctdtIds = add
+                    ? this.normalizeCtdtIds([...current, programmeId])
+                    : current.filter(id => id !== programmeId);
+                const source = Array.isArray(course.ctdt_ids) ? course.ctdt_ids : [];
+                if (ctdtIds.length === source.length && ctdtIds.every((id, index) => id === source[index])) return of(course);
+                return this.elnKhoaHocService.updateElnKhoaHoc(courseId, { ctdt_ids: ctdtIds });
+            })
+        );
+    }
+
+    private getCourseLinks(courseId: number, programmeId: number): Observable<CtdtHocphan[]> {
+        return this.ctdtHocphanService.getCtdtHocphanByPageNew({
+            condition: [
+                { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: String(courseId), orWhere: 'and' },
+                { conditionName: 'ctdt_id', condition: OvicQueryCondition.equal, value: String(programmeId), orWhere: 'and' }
+            ],
+            set: [{ label: 'limit', value: '-1' }], page: null
+        }).pipe(map(response => response.data || []));
+    }
+
+    private saveSubjectOperation(operation: SubjectSyncOperation, ctdt: Ctdt): Observable<unknown> {
+        if (operation.kind === 'delete') {
+            const { deletion } = operation;
+            const deleteLink = deletion.linkDeleted
+                ? of(null)
+                : this.ctdtHocphanService.deleteCtdtHocphan(deletion.linkId).pipe(
+                    tap(() => deletion.linkDeleted = true),
+                    catchError(error => this.getCourseLinks(operation.courseId, ctdt.id).pipe(
+                        switchMap(links => links.some(link => Number(link.id) === deletion.linkId)
+                            ? throwError(() => error) : of(null)),
+                        tap(() => deletion.linkDeleted = true)
+                    ))
+                );
+            return deleteLink.pipe(switchMap(() => deletion.membershipSynced
+                ? of(null)
+                : this.getCourseLinks(operation.courseId, ctdt.id).pipe(
+                    switchMap(links => links.some(link => Number(link.id) !== deletion.linkId)
+                        ? of(null) : this.syncCourseMembership(operation.courseId, ctdt.id, false)),
+                    tap(() => deletion.membershipSynced = true)
+                )
+            ));
+        }
+        if (operation.kind === 'add') {
+            const { addition } = operation;
+            const createLink = addition.linkCreated
+                ? of(null)
+                : this.ctdtHocphanService.addCtdtHocphan(
+                    this.buildCtdtHocphan(addition.subject, ctdt, addition.blockKey, addition.course)
+                ).pipe(
+                    tap(() => addition.linkCreated = true),
+                    catchError(error => this.getCourseLinks(operation.courseId, ctdt.id).pipe(
+                        switchMap(links => links.some(link => link.khoikienthuc === addition.blockKey)
+                            ? of(null) : throwError(() => error)),
+                        tap(() => addition.linkCreated = true)
+                    ))
+                );
+            return createLink.pipe(switchMap(() => addition.membershipSynced
+                ? of(null)
+                : this.syncCourseMembership(operation.courseId, ctdt.id, true)
+                    .pipe(tap(() => addition.membershipSynced = true))
+            ));
+        }
+        return this.ctdtHocphanService.updateCtdtHocphan(operation.course.ctdt_hocphan_id, {
+            hocky: operation.course.hocky,
+            hp_hoctruoc: operation.course.hp_hoctruoc || [],
+            hp_tienquyet: operation.course.hp_tienquyet || [],
+            hp_songhanh: operation.course.hp_songhanh || []
+        });
+    }
+
     removeCourseFromBlock(course: CourseRow, popover?: { hide: () => void }): void {
         if (!this.selectedCtdt?.id || this.blockActionsBusy || this.courseLoadError || !course?.id) return;
 
@@ -754,7 +880,8 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         if (!Number.isInteger(courseId) || courseId <= 0
             || !this.list_course.some(item => Number(item.id) === courseId && item.khoikienthuc === course.khoikienthuc)) return;
 
-        const stagedAddition = this.stagedAdds.has(courseId);
+        const pendingAddition = this.stagedAdds.get(courseId);
+        const stagedAddition = Boolean(pendingAddition && !pendingAddition.linkCreated);
         if (!stagedAddition) {
             const linkId = Number(course.ctdt_hocphan_id);
             if (!Number.isInteger(linkId) || linkId <= 0
@@ -773,13 +900,19 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
                 + (stagedAddition ? '' : ' Bấm Lưu lại để áp dụng thay đổi.')
         }).pipe(takeUntil(this.cancelKhoi$), takeUntil(this.destroy$)).subscribe(confirmed => {
             if (!confirmed || this.blockActionsBusy || this.courseLoadError || this.selectedCtdt?.id !== programmeId
-                || !this.list_course.includes(course) || this.stagedAdds.has(courseId) !== stagedAddition) return;
+                || !this.list_course.includes(course) || this.stagedAdds.get(courseId) !== pendingAddition) return;
 
             if (stagedAddition) {
                 this.stagedAdds.delete(courseId);
                 this.dirtyCourseIds.delete(courseId);
             } else {
-                this.stagedDeletes.set(courseId, Number(course.ctdt_hocphan_id));
+                this.stagedAdds.delete(courseId);
+                this.stagedDeletes.set(courseId, {
+                    linkId: Number(course.ctdt_hocphan_id),
+                    course,
+                    linkDeleted: false,
+                    membershipSynced: false
+                });
             }
 
             if (this.selectedCourseCondition?.id === courseId) {
@@ -836,10 +969,11 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         if (this.savingHp() || this.isLoadingData()) return;
         const courses = this.list_course.filter(course => this.dirtyCourseIds.has(Number(course.id)) && course.ctdt_hocphan_id);
         const additions = [...this.stagedAdds.entries()]
-            .filter(([courseId]) => !this.linkedCourseIds.has(courseId))
+            .filter(([, addition]) => !addition.linkCreated || !addition.membershipSynced)
             .map(([courseId, addition]) => ({ kind: 'add' as const, courseId, addition }));
         const deletions = [...this.stagedDeletes.entries()]
-            .map(([courseId, linkId]) => ({ kind: 'delete' as const, courseId, linkId }));
+            .filter(([, deletion]) => !deletion.linkDeleted || !deletion.membershipSynced)
+            .map(([courseId, deletion]) => ({ kind: 'delete' as const, courseId, deletion }));
         if (!courses.length && !additions.length && !deletions.length) return;
         if (this.list_course.some(course => this.dirtyCourseIds.has(Number(course.id))
             && !course.ctdt_hocphan_id && !this.stagedAdds.has(Number(course.id)))) {
@@ -870,25 +1004,20 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
                     : operation.kind === 'add'
                         ? `Đang thêm học phần ${completed + 1}/${operations.length}...`
                         : `Đang cập nhật học phần ${completed + 1}/${operations.length}...`;
-                const request = operation.kind === 'delete'
-                    ? this.ctdtHocphanService.deleteCtdtHocphan(operation.linkId)
-                    : operation.kind === 'add'
-                        ? this.ctdtHocphanService.addCtdtHocphan(this.buildCtdtHocphan(operation.addition.subject, ctdt, operation.addition.blockKey, operation.addition.course))
-                        : this.ctdtHocphanService.updateCtdtHocphan(operation.course.ctdt_hocphan_id, {
-                            hocky: operation.course.hocky,
-                            hp_hoctruoc: operation.course.hp_hoctruoc || [],
-                            hp_tienquyet: operation.course.hp_tienquyet || [],
-                            hp_songhanh: operation.course.hp_songhanh || []
-                        });
+                const request = this.saveSubjectOperation(operation, ctdt);
                 return request.pipe(tap(() => {
                     completed++;
                     this.progressValue = Math.round(completed / operations.length * 100);
                     if (operation.kind === 'delete') {
-                        this.stagedDeletes.delete(operation.courseId);
-                        this.dirtyCourseIds.delete(operation.courseId);
+                        if (operation.deletion.linkDeleted && operation.deletion.membershipSynced) {
+                            this.stagedDeletes.delete(operation.courseId);
+                            this.dirtyCourseIds.delete(operation.courseId);
+                        }
                     } else if (operation.kind === 'add') {
-                        this.stagedAdds.delete(operation.courseId);
-                        this.dirtyCourseIds.delete(operation.courseId);
+                        if (operation.addition.linkCreated && operation.addition.membershipSynced) {
+                            this.stagedAdds.delete(operation.courseId);
+                            this.dirtyCourseIds.delete(operation.courseId);
+                        }
                     } else {
                         this.dirtyCourseIds.delete(operation.courseId);
                     }
@@ -905,7 +1034,7 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
             },
             error: error => {
                 const label = current.kind === 'delete'
-                    ? `liên kết #${current.linkId}`
+                    ? `liên kết #${current.deletion.linkId}`
                     : current.kind === 'add'
                         ? current.addition.subject.name
                         : current.course.title;

@@ -140,7 +140,7 @@ export class CourseManagementComponent {
         const query = this.searchValue().trim();
         if (query) conditions.push({ conditionName: 'title', condition: OvicQueryCondition.like, value: `%${query}%`, orWhere: 'and' });
         if (this.categoryId() !== null) conditions.push({ conditionName: 'category_ids', condition: OvicQueryCondition.equal, value: String(this.categoryId()), orWhere: 'and' });
-        if (this.ctdtId() !== null) conditions.push({ conditionName: 'ctdt_id', condition: OvicQueryCondition.equal, value: String(this.ctdtId()), orWhere: 'and' });
+        if (this.ctdtId() !== null) conditions.push({ conditionName: 'ctdt_ids', condition: OvicQueryCondition.like, value: `%${this.ctdtId()}%`, orWhere: 'and' });
         const option: ConditionOption = {
             condition: conditions,
             set: [{ label: 'limit', value: String(this.table.paginator.rows()) }, { label: 'orderby', value: 'created_at' }, { label: 'order', value: 'DESC' }],

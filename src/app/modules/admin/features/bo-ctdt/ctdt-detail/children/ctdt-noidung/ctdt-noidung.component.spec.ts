@@ -38,7 +38,12 @@ describe('CtdtNoidungComponent remove course from block', () => {
         component.persistedCourseRows.set(7, course);
         component.courseLinks = [{ id: 29, course_id: 7, ctdt_id: 1, khoikienthuc: 'core' }];
         component.removeCourseFromBlock(course);
-        expect(component.stagedDeletes.get(7)).toBe(29);
+        expect(component.stagedDeletes.get(7)).toEqual({
+            linkId: 29,
+            course,
+            linkDeleted: false,
+            membershipSynced: false
+        });
         expect(component.list_course).toEqual([]);
         expect(component.hasPendingChanges()).toBeTrue();
         expect(component.persistedCourseRows.get(7)).toBe(course);
@@ -64,7 +69,12 @@ describe('CtdtNoidungComponent remove course from block', () => {
 
         confirmation.next(true);
         confirmation.complete();
-        expect(component.stagedDeletes.get(7)).toBe(29);
+        expect(component.stagedDeletes.get(7)).toEqual({
+            linkId: 29,
+            course,
+            linkDeleted: false,
+            membershipSynced: false
+        });
         expect(component.list_course).toEqual([]);
     });
 
