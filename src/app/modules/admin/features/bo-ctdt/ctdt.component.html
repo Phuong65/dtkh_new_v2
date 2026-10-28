@@ -1,46 +1,86 @@
 <section class="admin-section--table ictu-admin-page ctdt-page position-relative" aria-labelledby="ctdt-title">
-    @if (boState() === 'loading' || isSaving()) {
-    <app-loading-progress [heading]="isSaving() ? 'Đang lưu dữ liệu...' : 'Đang tải dữ liệu...'" backdropFilter="none"></app-loading-progress>
+    @if (isSaving()) {
+    <app-loading-progress heading="Đang lưu dữ liệu..." backdropFilter="none"></app-loading-progress>
     }
 
-    <div class="admin-wrap-table ictu-admin-table-shell ctdt-shell">
-        <header class="admin-wrap-table__head ctdt-shell__head">
-            <div class="ctdt-shell__heading">
-                <h1 id="ctdt-title">Chương trình đào tạo</h1>
-            </div>
-            <div class="admin-wrap-table__head-actions ctdt-shell__actions">
-                <p-select class="ctdt-shell__bo-select" [options]="boOptions()" optionLabel="name" optionValue="id"
-                    [ngModel]="selectedBo()?.id" (ngModelChange)="onBoSelectionChange($event)"
-                    placeholder="Chọn bộ CTĐT" [filter]="true" filterBy="name,code" appendTo="body">
-                </p-select>
-                <input class="admin-wrap-table__head-actions__search" pInputText type="text"
-                    placeholder="Tìm chương trình..." [value]="ctdtSearchValue()" (input)="onCtdtSearchChange($event)"
-                    (keyup.enter)="onCtdtSearchData()" aria-label="Tìm chương trình đào tạo">
-                @if (canAddCtdt) {
-                <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse ctdt-shell__add"
-                    (click)="openCreateCtdt()" [disabled]="!selectedBo()" aria-label="Thêm chương trình đào tạo"
-                    pTooltip="Thêm chương trình đào tạo" tooltipPosition="left">
-                    <i class="ti ti-plus" aria-hidden="true"></i>
+    <div class="ctdt-master-detail">
+        <aside id="ctdt-master-panel" class="ctdt-master-card" aria-labelledby="ctdt-master-title"
+            [hidden]="masterPanelCollapsed()" [attr.aria-busy]="boState() === 'loading'">
+            @if (boState() === 'loading') {
+            <app-loading-progress heading="Đang tải Bộ CTĐT..." backdropFilter="none"></app-loading-progress>
+            }
+            <header class="ctdt-master-card__header">
+                <h2 id="ctdt-master-title">Bộ CTĐT</h2>
+                <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary-reverse ictu-admin-icon-button ctdt-panel-toggle"
+                    (click)="toggleMasterPanel()" aria-label="Thu gọn danh sách Bộ CTĐT" aria-controls="ctdt-master-panel"
+                    [attr.aria-expanded]="!masterPanelCollapsed()" pTooltip="Thu gọn danh sách Bộ CTĐT" tooltipPosition="left">
+                    <i class="ti ti-chevrons-left" aria-hidden="true"></i>
                 </button>
-                }
+            </header>
+            <div class="ctdt-master-card__search">
+                <input class="admin-wrap-table__head-actions__search" pInputText type="search" placeholder="Tìm bộ CTĐT..." [value]="boSearchValue()"
+                    (input)="onBoSearchChange($event)" aria-label="Tìm bộ chương trình đào tạo">
             </div>
-        </header>
-
-        <div class="admin-wrap-table__body ictu-admin-table-shell__body ctdt-shell__body">
             @if (boState() === 'error') {
             <div class="admin-table__alert-danger text-center w-100">
-                Tải danh sách Bộ CTĐT thất bại. Vui lòng <a href="javascript:" (click)="loadBoCtdt()">tải lại</a>.
+                Tải danh sách Bộ CTĐT thất bại. Vui lòng <a href="javascript:"
+                    class="admin-table__alert-danger__btn-reload" (click)="loadBoCtdt()">tải lại</a>.
             </div>
-            } @else if (ctdtState() === 'loading') {
-            <app-loading-progress heading="Đang tải chương trình đào tạo..." backdropFilter="none"></app-loading-progress>
-            } @else if (ctdtState() === 'error') {
-            <div class="admin-table__alert-danger text-center w-100">
-                Tải danh sách CTĐT thất bại. Vui lòng <a href="javascript:"
-                    (click)="loadCtdt(ctdtTable.paginator.paged(), false)">tải lại</a>.
+            } @else if (boState() === 'success') {
+            <div class="ctdt-master-card__list" aria-labelledby="ctdt-master-title">
+                @for (bo of filteredBoOptions(); track bo.id) {
+                <button type="button" class="ctdt-master-item" [class.ctdt-master-item--active]="selectedBo()?.id === bo.id"
+                    [attr.aria-pressed]="selectedBo()?.id === bo.id" (click)="selectBo(bo)">
+                    <span class="ctdt-master-item__mark" aria-hidden="true"><i class="ti ti-folder"></i></span>
+                    <span>{{ bo.name || 'Chưa đặt tên' }}</span>
+                </button>
+                } @empty {
+                <p class="ctdt-master-card__empty">{{ boSearchValue().trim() ? 'Không tìm thấy Bộ CTĐT phù hợp.' : 'Chưa có Bộ CTĐT.' }}</p>
+                }
             </div>
-            } @else {
-            <div class="ictu-admin-table-scroll">
-                <table class="tbl admin-table table-hover ctdt-table">
+            }
+        </aside>
+
+        @if (masterPanelCollapsed()) {
+        <button type="button" class="ctdt-panel-reopen" (click)="toggleMasterPanel()"
+            aria-label="Mở danh sách Bộ CTĐT" aria-expanded="false" aria-controls="ctdt-master-panel"
+            pTooltip="Mở danh sách Bộ CTĐT" tooltipPosition="right">
+            <i class="ti ti-chevrons-right" aria-hidden="true"></i>
+        </button>
+        }
+
+        <main class="ctdt-detail" aria-labelledby="ctdt-title">
+            <div class="admin-wrap-table ictu-admin-table-shell ctdt-shell">
+                <header class="admin-wrap-table__head ctdt-shell__head">
+                    <div class="ctdt-shell__heading">
+                        <h1 id="ctdt-title">Chương trình đào tạo</h1>
+                        @if (selectedBo(); as bo) { <p>{{ bo.name }}</p> }
+                    </div>
+                    <div class="admin-wrap-table__head-actions ctdt-shell__actions">
+                        <input class="admin-wrap-table__head-actions__search" pInputText type="text"
+                            placeholder="Tìm chương trình..." [value]="ctdtSearchValue()" (input)="onCtdtSearchChange($event)"
+                            (keyup.enter)="onCtdtSearchData()" aria-label="Tìm chương trình đào tạo">
+                        @if (canAddCtdt) {
+                        <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse ctdt-shell__add"
+                            (click)="openCreateCtdt()" [disabled]="!selectedBo()" aria-label="Thêm chương trình đào tạo"
+                            pTooltip="Thêm chương trình đào tạo" tooltipPosition="left">
+                            <i class="ti ti-plus" aria-hidden="true"></i>
+                        </button>
+                        }
+                    </div>
+                </header>
+
+                <div class="admin-wrap-table__body ictu-admin-table-shell__body ctdt-shell__body">
+                    @if (ctdtState() === 'loading') {
+                    <app-loading-progress heading="Đang tải chương trình đào tạo..." backdropFilter="none"></app-loading-progress>
+                    } @else if (ctdtState() === 'error') {
+                    <div class="admin-table__alert-danger text-center w-100">
+                        Tải danh sách CTĐT thất bại. Vui lòng <a href="javascript:"
+                            class="admin-table__alert-danger__btn-reload" (click)="loadCtdt(ctdtTable.paginator.paged(), false)">tải lại</a>.
+                    </div>
+                    } @else {
+                    <div class="ictu-admin-table-scroll">
+                        <table class="tbl admin-table table-hover ctdt-table">
                     <thead>
                         <tr>
                             <th class="text-center ctdt-table__index">#</th>
@@ -92,9 +132,11 @@
             </div>
             }
         </div>
-        <footer class="admin-wrap-table__foot ctdt-shell__footer">
-            <ictu-paginator [control]="ctdtTable.paginator" (onChangePage)="onCtdtPageChange($event)"></ictu-paginator>
-        </footer>
+                <footer class="admin-wrap-table__foot ctdt-shell__footer">
+                    <ictu-paginator [control]="ctdtTable.paginator" (onChangePage)="onCtdtPageChange($event)"></ictu-paginator>
+                </footer>
+            </div>
+        </main>
     </div>
 </section>
 

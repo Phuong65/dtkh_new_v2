@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
-import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButton } from '@angular/material/button';
 import { Drawer } from 'primeng/drawer';
@@ -41,7 +41,7 @@ interface CtdtDisplayMeta {
 @Component({
     selector: 'app-ctdt',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, Drawer, InputText, Select, Tooltip,
+    imports: [CommonModule, ReactiveFormsModule, Drawer, InputText, Select, Tooltip,
         IctuPaginatorComponent, LoadingProgressComponent, MatButton],
     templateUrl: './ctdt.component.html',
     styleUrl: './ctdt.component.css'
@@ -71,6 +71,14 @@ export class CtdtComponent implements OnInit, OnDestroy {
     private creatingForBo: BoCtdt | null = null;
 
     readonly boOptions = signal<BoCtdt[]>([]);
+    readonly masterPanelCollapsed = signal(false);
+    readonly boSearchValue = signal('');
+    readonly filteredBoOptions = computed(() => {
+        const query = this.boSearchValue().trim().toLocaleLowerCase('vi');
+        return query
+            ? this.boOptions().filter(bo => (bo.name || '').toLocaleLowerCase('vi').includes(query))
+            : this.boOptions();
+    });
     readonly selectedBo = signal<BoCtdt | null>(null);
     readonly boState = signal<AppState>('loading');
     readonly ctdtState = signal<AppState>('success');
@@ -189,6 +197,14 @@ export class CtdtComponent implements OnInit, OnDestroy {
         this.selectedBo.set(bo);
         this.ctdtSearchValue.set('');
         this.loadCtdt(1, true);
+    }
+
+    toggleMasterPanel(): void {
+        this.masterPanelCollapsed.update(collapsed => !collapsed);
+    }
+
+    onBoSearchChange(event: Event): void {
+        this.boSearchValue.set((event.target as HTMLInputElement).value || '');
     }
 
     onBoSelectionChange(id: number | null): void {
