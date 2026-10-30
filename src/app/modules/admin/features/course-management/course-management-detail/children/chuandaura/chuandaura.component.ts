@@ -1,6 +1,7 @@
 import { PanelModule } from 'primeng/panel';
+import { Drawer } from 'primeng/drawer';
 import { CourseQuestionsService } from '@modules/shared/services/course-questions.service';
-import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, TemplateRef, ViewChild, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BUTTON_NO, BUTTON_YES } from '@core/models/buttons';
@@ -17,16 +18,19 @@ import { ElnKhoaHoc } from '@modules/shared/models/elng-khoa-hoc';
 import { CoursePlanActivitiesService } from '@modules/shared/services/course-plan-activities.service';
 import { CoursePlanCommentService } from '@modules/shared/services/course-plan-comment.service';
 import { CHUAN_DAU_RA, PHUONGPHAP_DANGDAY } from '@modules/shared/utils/syscat';
-import { count, firstValueFrom, forkJoin, Observable } from 'rxjs';
+import { count, finalize, firstValueFrom, forkJoin, Observable } from 'rxjs';
 import { NhanxetNoidungComponent } from '../nhanxet-noidung/nhanxet-noidung.component'
 import { CommonModule } from '@angular/common';
 import { SharedModule } from '@modules/shared/shared.module';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
+import { MatButtonModule } from '@angular/material/button';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { ListEditorComponent } from '@modules/shared/components/list-editor/list-editor.component';
 import { OvicGroupsRadioV2Component } from '@modules/shared/components/ovic-groups-radio-v2/ovic-groups-radio-v2.component';
 import { OvicDateTimePipe } from '@modules/shared/pipes/ovic-date-time.pipe';
+import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 
 
 @Component({
@@ -37,13 +41,17 @@ import { OvicDateTimePipe } from '@modules/shared/pipes/ovic-date-time.pipe';
         ReactiveFormsModule,
         FormsModule,
         PanelModule,
+        Drawer,
         NhanxetNoidungComponent,
         MultiSelectModule,
+        InputTextModule,
         ButtonModule,
+        MatButtonModule,
         NgbTooltipModule,
         ListEditorComponent,
         OvicGroupsRadioV2Component,
-        OvicDateTimePipe
+        OvicDateTimePipe,
+        LoadingProgressComponent
     ],
     selector: 'app-chuandaura',
     templateUrl: './chuandaura.component.html',
@@ -53,7 +61,7 @@ import { OvicDateTimePipe } from '@modules/shared/pipes/ovic-date-time.pipe';
 export class ChuandauraComponent implements OnInit, OnChanges {
     formBuilder = inject(FormBuilder);
     private coursePlanActivitiesService = inject(CoursePlanActivitiesService);
-    private noitifi = inject(NotificationService);
+    readonly noitifi = inject(NotificationService);
     private router = inject(Router);
     private fileService = inject(FileService);
     private helperService = inject(HelperService);
@@ -69,11 +77,8 @@ export class ChuandauraComponent implements OnInit, OnChanges {
 
     @Input() canAdded: boolean = false;
 
-    @ViewChild('templateAddChuandaura') templateAddChuandaura: TemplateRef<any>;
-
-    @ViewChild('panelplan_add') panelplan_add: ElementRef;
-
-    @ViewChild('layoutChuandaura') layoutChuandaura: ElementRef;
+    @Output() onBusy = new EventEmitter<{ active: boolean; heading?: string }>();
+    readonly isLoading = signal(false);
 
     @ViewChild(NhanxetNoidungComponent) nhanxetnoidung: NhanxetNoidungComponent;
 
@@ -84,6 +89,8 @@ export class ChuandauraComponent implements OnInit, OnChanges {
     CHUAN_DAU_RA = CHUAN_DAU_RA;
 
     isOpenAddForm = false;
+
+    isSaving = false;
 
     selectedCourse: ElnKhoaHoc;
 
@@ -135,6 +142,16 @@ export class ChuandauraComponent implements OnInit, OnChanges {
 
     }
 
+    private beginLoading(heading: string): void {
+        this.isLoading.set(true);
+        this.onBusy.emit({ active: true, heading });
+    }
+
+    private endLoading(): void {
+        this.isLoading.set(false);
+        this.onBusy.emit({ active: false });
+    }
+
     ngOnInit(): void {
         if (this.coursePlanActivities) {
             this.selectedCoursePlanActivities = this.coursePlanActivities
@@ -169,7 +186,7 @@ export class ChuandauraComponent implements OnInit, OnChanges {
 
     loadCdr() {
         this.selectCdr = null;
-        this.noitifi.isProcessing(true);
+        this.beginLoading('Đang tải chuẩn đầu ra...');
         const condition: ConditionOption = {
             condition: [
                 { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: this.selectedCourse.id.toString() },
@@ -180,6 +197,7 @@ export class ChuandauraComponent implements OnInit, OnChanges {
             set: [
                 { label: 'limit', value: '-1' },
                 { label: 'order', value: 'ASC' },
+                { label: 'cursor', value: '0' },
                 // { label: 'orderby', value: 'ordering' }
             ],
             page: null
@@ -193,6 +211,7 @@ export class ChuandauraComponent implements OnInit, OnChanges {
 
             set: [
                 { label: 'limit', value: '-1' },
+                { label: 'cursor', value: '0' },
             ],
             page: null
         }
@@ -204,7 +223,8 @@ export class ChuandauraComponent implements OnInit, OnChanges {
             ],
             set: [
                 { label: 'limit', value: '-1' },
-                { label: 'select', value: 'id, parent_id' }
+                { label: 'select', value: 'id, parent_id' },
+                { label: 'cursor', value: '0' },
             ],
             page: null
         }
@@ -262,11 +282,11 @@ export class ChuandauraComponent implements OnInit, OnChanges {
                 this.listCDR = this.helperService.sort(_cdr.data, 'kyhieu');
                 this.clearFormData();
                 // this.coursePlanActivities['children'] = this.listCDR;
-                this.noitifi.isProcessing(false);
-            },
+                this.endLoading();
+                    },
             error: () => {
-                this.noitifi.isProcessing(false);
-            }
+                this.endLoading();
+                    }
         })
 
     }
@@ -276,16 +296,12 @@ export class ChuandauraComponent implements OnInit, OnChanges {
     }
 
     onOpenAddCdr() {
-        // panelplan['animating'] = true;
-        this.isOpenAddForm = !this.isOpenAddForm;
+        this.isOpenAddForm = true;
         this.clearFormData();
-        if (this.selectCdr)
+        if (this.selectCdr) {
             this.selectCdr['open'] = false;
-        this.selectCdr = null;
-        if (this.panelplan_add) {
-            this.panelplan_add['animating'] = true;
         }
-        this.layoutChuandaura.nativeElement.scrollTop = 0;
+        this.selectCdr = null;
     }
 
     onOpenEditCdr(panelplan, panelplan_bottom, cdr) {
@@ -388,6 +404,7 @@ export class ChuandauraComponent implements OnInit, OnChanges {
     }
 
     async saveCdr() {
+        if (this.isSaving) return;
         if (this.formCDR.valid) {
 
             const data = { ...this.formCDR.getRawValue() };
@@ -426,13 +443,22 @@ export class ChuandauraComponent implements OnInit, OnChanges {
                 delete data[f];
             })
 
-            this.noitifi.isProcessing(true);
-
-            const checkKyhieu = await this.checkKyhieuCdrPromise(data);
+            this.isSaving = true;
+            this.beginLoading(this.isUpdated ? 'Đang cập nhật chuẩn đầu ra...' : 'Đang tạo chuẩn đầu ra...');
+    
+            let checkKyhieu: boolean;
+            try {
+                checkKyhieu = await this.checkKyhieuCdrPromise(data);
+            } catch {
+                this.isSaving = false;
+                this.endLoading();
+                        return this.noitifi.toastWarning('Không thể kiểm tra ký hiệu CPI, vui lòng thử lại');
+            }
 
             if (!checkKyhieu) {
-                this.noitifi.isProcessing(false);
-                return this.noitifi.toastWarning('Ký hiệu bị trùng, vui lòng nhập lại ký hiệu');
+                this.isSaving = false;
+                this.endLoading();
+                        return this.noitifi.toastWarning('Ký hiệu bị trùng, vui lòng nhập lại ký hiệu');
             }
 
             if (this.isUpdated) {
@@ -466,9 +492,9 @@ export class ChuandauraComponent implements OnInit, OnChanges {
                         this.coursePlanActivitiesService.addCoursePlanActivities(data_copy)
                     ]).subscribe({
                         next: ([_up, _id]) => {
+                            this.isSaving = false;
                             this.noitifi.toastSuccess('Sửa thành công');
-                            this.noitifi.isProcessing(false);
-                            this.clearFormData();
+                                                this.clearFormData();
                             this.loadCdr();
                             // this.courseQuestionsService.updateCourseQuestionsByCol( this.selectCdr.id, {reference_id: _id}, 'reference_id' ).subscribe( {
                             //     next: () => {
@@ -482,32 +508,35 @@ export class ChuandauraComponent implements OnInit, OnChanges {
 
                         },
                         error: () => {
-                            this.noitifi.isProcessing(false);
-                            this.noitifi.toastSuccess('Sửa thất bại');
+                            this.isSaving = false;
+                                                this.noitifi.toastSuccess('Sửa thất bại');
                         }
                     })
                 } else {
                     this.coursePlanActivitiesService.updateCoursePlanActivities(this.selectCdr.id, data).subscribe({
                         next: () => {
-                            this.noitifi.toastSuccess('Sửa thành công');
+                            this.isSaving = false;
+                                                this.noitifi.toastSuccess('Sửa thành công');
                             this.clearFormData();
                             this.loadCdr();
                         },
                         error: () => {
-                            this.noitifi.isProcessing(false);
-                            this.noitifi.toastSuccess('Sửa thất bại');
+                            this.isSaving = false;
+                                                this.noitifi.toastSuccess('Sửa thất bại');
                         }
                     })
                 }
             } else {
                 this.coursePlanActivitiesService.addCoursePlanActivities(data).subscribe({
                     next: () => {
-                        this.noitifi.toastSuccess('Tạo thành công');
+                        this.isSaving = false;
+                        this.isOpenAddForm = false;
+                                        this.noitifi.toastSuccess('Tạo thành công');
                         this.loadCdr();
                     },
                     error: () => {
-                        this.noitifi.isProcessing(false);
-                        this.noitifi.toastSuccess('Tạo thất bại');
+                        this.isSaving = false;
+                                        this.noitifi.toastSuccess('Tạo thất bại');
                     }
                 })
             }
@@ -529,38 +558,41 @@ export class ChuandauraComponent implements OnInit, OnChanges {
                 { conditionName: 'status', condition: OvicQueryCondition.notEqual, value: '-3', orWhere: 'and' }
             ],
             set: [
-                { label: 'limit', value: '1' }
+                { label: 'limit', value: '1' },
+                { label: 'cursor', value: '0' }
             ],
             page: null
         }
 
-        this.noitifi.isProcessing(true);
 
-        const question = await firstValueFrom(this.courseQuestionsService.getCourseQuestionsByPageNew(condition_question));
+        let question;
+        try {
+            question = await firstValueFrom(this.courseQuestionsService.getCourseQuestionsByPageNew(condition_question));
+        } catch {
+                return this.noitifi.toastError("Lỗi kết nối, vui lòng thử lại");
+        }
 
-        this.noitifi.isProcessing(false);
 
-        if (question.recordsFiltered !== 0) {
+        if (question && question.recordsFiltered !== 0) {
             return this.noitifi.toastWarning("CPI này đã có câu hỏi, không thể xóa");
         }
 
         this.noitifi.confirmDelete().then(a => {
             if (a) {
-                this.coursePlanActivitiesService.deleteCoursePlanActivities(cdr.id).subscribe({
+                this.beginLoading('Đang xóa chuẩn đầu ra...');
+                        this.coursePlanActivitiesService.deleteCoursePlanActivities(cdr.id).subscribe({
                     next: () => {
+                        this.endLoading();
                         this.noitifi.toastSuccess("Xóa thành công");
                         this.loadCdr();
                     },
                     error: () => {
+                        this.endLoading();
                         this.noitifi.toastError("Xóa thất bại");
                     }
                 })
             }
         })
-    }
-
-    closeForm() {
-        this.noitifi.closeSideNavigationMenu();
     }
 
     moveToQuestions(cdr: CoursePlanActivities) {

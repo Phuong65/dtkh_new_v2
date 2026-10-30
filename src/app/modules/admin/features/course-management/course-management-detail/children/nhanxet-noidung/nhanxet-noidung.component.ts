@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges, OnInit, SimpleChanges, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BUTTON_NO, BUTTON_YES } from '@core/models/buttons';
 import { OvicQueryCondition } from '@core/models/dto';
@@ -18,7 +18,7 @@ import { CoursePlanCommentService } from '@modules/shared/services/course-plan-c
 import { OvicDateTimeService } from '@modules/shared/services/ovic-date-time.service';
 import { SharedModule } from '@modules/shared/shared.module';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { forkJoin } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 import { OvicDateTimePipe } from '@modules/shared/pipes/ovic-date-time.pipe';
 
 @Component({
@@ -46,6 +46,8 @@ export class NhanxetNoidungComponent implements OnInit, OnChanges {
     @Input() course_input: ElnKhoaHoc;
 
     @Input() hideViewAction: boolean = false;
+
+    @Output() onBusy = new EventEmitter<{ active: boolean; heading?: string }>();
 
     selectedActivity: CoursePlanActivities;
 
@@ -89,12 +91,16 @@ export class NhanxetNoidungComponent implements OnInit, OnChanges {
                 { conditionName: 'parent_id', condition: OvicQueryCondition.equal, value: comment.id.toString() }
             ],
             set: [
-                { label: 'limit', value: '-1' }
+                { label: 'limit', value: '-1' },
+                { label: 'cursor', value: '0' }
             ],
             page: null
         }
 
-        this.coursePlanCommentService.getCoursePlanCommentByPageNew(condition_comment).subscribe({
+        this.onBusy.emit({ active: true, heading: 'Đang tải phản hồi...' });
+        this.coursePlanCommentService.getCoursePlanCommentByPageNew(condition_comment).pipe(
+            finalize(() => this.onBusy.emit({ active: false }))
+        ).subscribe({
             next: (_comment) => {
                 _comment.data.forEach(f => {
                     if (f.user_id === this.selectedCourse.creator_plan_id && this.userId !== f.user_id) {
@@ -123,7 +129,7 @@ export class NhanxetNoidungComponent implements OnInit, OnChanges {
 
 
     saveCommentReply(comment: CoursePlanComment, activity: CoursePlanActivities, index_comment: number) {
-        const comment_content = comment['textarea_comment'] ? comment['textarea_comment'].trim() : comment['textarea_comment'].trim();
+        const comment_content = comment['textarea_comment']?.trim();
 
         if (comment_content && comment_content !== '') {
             const data_comment: CoursePlanComment = {
@@ -135,7 +141,10 @@ export class NhanxetNoidungComponent implements OnInit, OnChanges {
                 parent_id: comment.id
             }
 
-            this.coursePlanCommentService.addCoursePlanComment(data_comment).subscribe({
+            this.onBusy.emit({ active: true, heading: 'Đang gửi phản hồi...' });
+            this.coursePlanCommentService.addCoursePlanComment(data_comment).pipe(
+                finalize(() => this.onBusy.emit({ active: false }))
+            ).subscribe({
                 next: () => {
                     this.noitifi.toastSuccess("Đã gửi phản hồi thành công");
                     comment['textarea_comment'] = '';
@@ -158,15 +167,17 @@ export class NhanxetNoidungComponent implements OnInit, OnChanges {
             '<span>- Bạn có chắc chắn yêu cầu duyệt nội dung giảng dạy này?</span>' +
             '</div>', 'Xác nhận hành động', [BUTTON_YES, BUTTON_NO]).then(a => {
                 if (a.name === 'yes') {
-                    this.noitifi.isProcessing(true);
-                    this.coursePlanActivitiesService.updateCoursePlanActivities(activities.id, { status: -2 }).subscribe({
+                    this.onBusy.emit({ active: true, heading: 'Đang gửi yêu cầu duyệt...' });
+                    this.coursePlanActivitiesService.updateCoursePlanActivities(activities.id, { status: -2 }).pipe(
+                        finalize(() => {
+                            this.onBusy.emit({ active: false });
+                        })
+                    ).subscribe({
                         next: () => {
                             activities['status'] = 0;
-                            this.noitifi.isProcessing(false);
                             this.noitifi.toastSuccess('Cập nhật thành công');
                         },
                         error: () => {
-                            this.noitifi.isProcessing(false);
                             this.noitifi.toastError('Cập nhật thất bại, Lỗi kết nối');
                         }
                     })

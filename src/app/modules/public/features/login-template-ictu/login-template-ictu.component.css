@@ -279,12 +279,6 @@
     line-height: 1.55;
 }
 
-.ictu-login__form-header .ictu-login__audience {
-    margin-top: 4px;
-    color: var(--login-primary);
-    font-weight: 600;
-}
-
 .ictu-login__loading-status {
     display: flex;
     align-items: center;
@@ -463,9 +457,8 @@
 
 .ictu-login .ictu-login__submit,
 .ictu-login .ictu-login__google,
-.login-reset-modal .login-reset-modal__submit,
-.login-reset-modal .login-reset-modal__close {
-    border-radius: 13px !important;
+.login-reset-modal .login-reset-modal__submit {
+    border-radius: var(--ictu-input-border-radius, 4px) !important;
     box-shadow: none !important;
 }
 
@@ -479,7 +472,7 @@
     justify-content: center;
     gap: 10px;
     padding: 11px 18px;
-    border-radius: 13px !important;
+    border-radius: var(--ictu-input-border-radius, 4px) !important;
     cursor: pointer;
     font: inherit;
     font-size: 15px;
@@ -544,14 +537,14 @@
 }
 
 .ictu-login__google {
-    border: 1px solid var(--login-border);
+    border: 1px solid #cbd5e1;
     background: #ffffff;
     color: #263b5e;
     box-shadow: 0 3px 12px rgba(36, 61, 96, .06);
 }
 
 .ictu-login__google:hover:not(:disabled) {
-    border-color: #afbed2;
+    border-color: #94a3b8;
     background: #f8fbff;
     box-shadow: 0 7px 16px rgba(36, 61, 96, .1);
     transform: translateY(-1px);

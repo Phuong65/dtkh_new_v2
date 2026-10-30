@@ -352,8 +352,14 @@
     <ng-template #tuluan15pBlock let-row>
         <section class="dg-lesson-section dg-lesson-section--tuluan"
             [ngClass]="isTuluan15pLessonScoreError(row['tuluan15pRows']) ? 'tuluan15p-section-error' : ''">
-            <div class="dg-lesson-section-title">
+            <div class="dg-lesson-section-title dg-lesson-section-title--actions">
                 <strong>Câu hỏi tự luận</strong>
+                <button type="button" mat-flat-button
+                    class="btn ictu-badge-btn--success-reverse tuluan15p-add-button"
+                    aria-label="Thêm câu hỏi tự luận">
+                    <i class="ti ti-plus" aria-hidden="true"></i>
+                    <span>Thêm câu hỏi tự luận</span>
+                </button>
             </div>
             <div class="tuluan15p-block">
                 <table class="tuluan15p-table">
@@ -364,6 +370,7 @@
                             <th>Số câu lấy ({{getTuluan15pTotals(row['tuluan15pRows']).totalTake}})</th>
                             <th>Điểm/ 1 Câu</th>
                             <th>Tổng điểm ({{getTuluan15pTotals(row['tuluan15pRows']).totalScore}})</th>
+                            <th class="tuluan15p-actions-heading">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -376,11 +383,18 @@
                             <td class="tuluan15p-total-score">
                                 {{(tuluanRow.questionTake || 0) * (tuluanRow.point || 0)}}
                             </td>
+                            <td class="tuluan15p-actions">
+                                <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
+                                    aria-label="Xóa câu hỏi tự luận" pTooltip="Xóa câu hỏi tự luận"
+                                    tooltipPosition="top" appendTo="body">
+                                    <i class="ti ti-trash" aria-hidden="true"></i>
+                                </button>
+                            </td>
                         </tr>
                         }
                         @if (!row['tuluan15pRows']?.length) {
                         <tr>
-                            <td colspan="5" class="tuluan15p-empty">— Chưa có câu hỏi tự luận</td>
+                            <td colspan="6" class="tuluan15p-empty">— Chưa có câu hỏi tự luận</td>
                         </tr>
                         }
                     </tbody>

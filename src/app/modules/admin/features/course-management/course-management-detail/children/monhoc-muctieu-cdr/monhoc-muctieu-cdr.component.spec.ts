@@ -3,6 +3,11 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { TableModule } from 'primeng/table';
+import { TooltipModule } from 'primeng/tooltip';
+import { SafeHtmlDecodePipe } from '@modules/shared/pipes/safe-html-decode';
+import { ShowLabelData } from '@modules/shared/pipes/show-label-data.pipe';
 import { BehaviorSubject, of } from 'rxjs';
 import { AuthService } from '@core/services/auth.service';
 import { HelperService } from '@core/services/helper.service';
@@ -42,13 +47,16 @@ describe('MonhocMuctieuCdrComponent tabs', () => {
                 { provide: Router, useValue: { navigate: jasmine.createSpy('navigate') } },
                 { provide: AuthService, useValue: { user: { id: 1 }, userHasRole: () => false, hasRouter: () => false } },
                 { provide: NotificationService, useValue: { toastSuccess: jasmine.createSpy(), toastError: jasmine.createSpy(), toastWarning: jasmine.createSpy() } },
-                { provide: HelperService, useValue: { sort: (items: unknown[]) => items } },
+                { provide: HelperService, useValue: { sort: (items: unknown[]) => items, decodeHTML: (html: string) => html } },
                 ...[[ElnKhoaHocService, service], [ElngUserProfileService, service], [CourseMuctieuChitietService, service],
                     [CourseCloService, service], [CourseCloContributeService, service], [CtdtHocphanService, service],
                     [CtdtService, service], [CtdtCdrService, service]].map(([provide, useValue]) => ({ provide, useValue }))
             ]
         }).overrideComponent(MonhocMuctieuCdrComponent, {
-            set: { imports: [CommonModule], schemas: [NO_ERRORS_SCHEMA] }
+            set: {
+                imports: [CommonModule, FormsModule, TableModule, TooltipModule, SafeHtmlDecodePipe, ShowLabelData],
+                schemas: [NO_ERRORS_SCHEMA]
+            }
         }).compileComponents();
 
         fixture = TestBed.createComponent(MonhocMuctieuCdrComponent);
@@ -83,12 +91,51 @@ describe('MonhocMuctieuCdrComponent tabs', () => {
         expect(component.activeSubTabId()).toBe('kiem-tra-danh-gia');
     });
 
+    it('chỉ mở input CLO bằng nút sửa, giữ bản nháp khi rời input', async () => {
+        const clo = { id: 2, course_id: 1, course_muctieu_chitiet_id: 1, kyhieu: 'CLO1', noidung: 'Nội dung', ordering: 1, mucdo_donggop: 0 };
+        component.list_course_clo = [clo];
+        component.selectSubTab('co-clo');
+        fixture.detectChanges();
+
+        const table = root.querySelector<HTMLTableElement>('.clo-grid-table')!;
+        table.querySelector<HTMLElement>('.editable-cell')!.click();
+        fixture.detectChanges();
+        expect(table.querySelector('textarea')).toBeNull();
+
+        table.querySelector<HTMLButtonElement>('[aria-label="Sửa chuẩn đầu ra"]')!.click();
+        fixture.detectChanges();
+        await fixture.whenStable();
+        fixture.detectChanges();
+
+        const editor = table.querySelector<HTMLTextAreaElement>('textarea')!;
+        expect(editor).not.toBeNull();
+        expect(editor.getAttribute('aria-label')).toBe('Nội dung chuẩn đầu ra CLO1');
+        editor.value = 'Nội dung đã sửa';
+        editor.dispatchEvent(new Event('input', { bubbles: true }));
+        editor.dispatchEvent(new FocusEvent('blur'));
+        fixture.detectChanges();
+
+        expect(component.editingCloId()).toBeNull();
+        expect(table.querySelector('textarea')).toBeNull();
+        expect(clo.noidung).toBe('Nội dung đã sửa');
+        expect(table.querySelector('.table-content')?.textContent).toContain('Nội dung đã sửa');
+    });
+
+    it('không mở input CLO khi đang lưu', () => {
+        const clo = { id: 2, course_id: 1, course_muctieu_chitiet_id: 1, kyhieu: 'CLO1', noidung: 'Nội dung', ordering: 1, mucdo_donggop: 0 };
+        component.isSaving.set(true);
+        component.editClo(clo);
+        expect(component.editingCloId()).toBeNull();
+    });
+
     it('giữ bản nháp và chỉ khởi tạo một màn hình cấu hình sau lần mở đầu tiên', () => {
         component.generalObjectiveControl.setValue('Nội dung nháp');
         component.selectSubTab('kiem-tra-danh-gia');
         fixture.detectChanges();
         expect(component.settingsVisited()).toBeTrue();
-        expect(root.querySelectorAll('app-monhoc-cauhinh').length).toBe(1);
+        const embeddedConfig = root.querySelector<HTMLElement>('app-monhoc-cauhinh');
+        expect(embeddedConfig).not.toBeNull();
+        expect(embeddedConfig?.getAttribute('mode')).toBe('embedded');
 
         component.selectSubTab('co-clo');
         fixture.detectChanges();
@@ -96,6 +143,7 @@ describe('MonhocMuctieuCdrComponent tabs', () => {
         fixture.detectChanges();
 
         expect(root.querySelectorAll('app-monhoc-cauhinh').length).toBe(1);
+        expect(root.querySelector('app-monhoc-cauhinh')).toBe(embeddedConfig);
         expect(component.generalObjectiveControl.value).toBe('Nội dung nháp');
     });
 });

@@ -311,8 +311,15 @@
 :host ::ng-deep .tbl-danhSachUser th,
 :host ::ng-deep .tbl-danhSachUser td {
     padding: 7px 10px;
-    border: 1px solid #edf2f7;
+    border: 1px solid #edf2f7 !important;
     vertical-align: middle;
+}
+
+:host ::ng-deep .content-table-cauhoi table,
+:host ::ng-deep .dg-lesson-table table,
+:host ::ng-deep .tbl-danhSachUser table {
+    border: 1px solid #edf2f7 !important;
+    border-collapse: collapse !important;
 }
 
 :host ::ng-deep .content-table-cauhoi th,
@@ -328,11 +335,11 @@
     background: #f8fafc;
 }
 
-:host ::ng-deep .form-de-tab-panels .form-de-tab-panel:not(.form-de-tab-panel--cc) .content-table-cauhoi table>tbody>tr:not(.background-color-red):not(.require-cdr-backgroud-color)> :is(th, td):first-child {
+:host ::ng-deep .form-de-tab-panels .form-de-tab-panel:not(.form-de-tab-panel--cc) .content-table-cauhoi .dg-lesson-section:not(.dg-lesson-section--tuluan) table>tbody>tr:not(.background-color-red):not(.require-cdr-backgroud-color)> :is(th, td):first-child {
     background: #eff6ff !important;
 }
 
-:host ::ng-deep .form-de-tab-panels .form-de-tab-panel:not(.form-de-tab-panel--cc) .content-table-cauhoi table>tbody>tr:not(.background-color-red):not(.require-cdr-backgroud-color):hover> :is(th, td):first-child {
+:host ::ng-deep .form-de-tab-panels .form-de-tab-panel:not(.form-de-tab-panel--cc) .content-table-cauhoi .dg-lesson-section:not(.dg-lesson-section--tuluan) table>tbody>tr:not(.background-color-red):not(.require-cdr-backgroud-color):hover> :is(th, td):first-child {
     background: #dbeafe !important;
 }
 
@@ -711,13 +718,46 @@
     font-weight: 600;
 }
 
+.dg-lesson-section-title--actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.tuluan15p-add-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 30px;
+    height: 30px;
+    padding: 0 10px;
+    font-size: 12.5px;
+    font-weight: 500;
+}
+
+.tuluan15p-add-button i {
+    font-size: 13px;
+}
+
 .dg-lesson-total-summary {
     padding: 10px;
     border-top: 1px solid #edf2f7;
     color: #475569;
     font-size: 14px;
     font-weight: 500;
-    text-align: right
+    text-align: right;
+}
+
+.dg-lesson-empty {
+    padding: 12px 14px;
+    border: 1px solid #edf2f7;
+    border-top: 0;
+    background: #ffffff;
+    color: #64748b;
+    font-size: 13px;
+    text-align: left;
 }
 
 /* Kiểm tra 15 phút: không kế thừa typography/kích thước bảng tự luận cũ. */
@@ -732,28 +772,43 @@
 
 .tuluan15p-table {
     width: 100%;
-    min-width: 620px;
+    min-width: 760px;
     border-collapse: collapse;
     table-layout: fixed;
+    border: 1px solid #edf2f7;
+    background: #fff;
     color: #334155;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .tuluan15p-table th,
 .tuluan15p-table td {
-    padding: 8px 10px;
-    border: 1px solid #dbe3ec;
-    font-size: 13px;
+    padding: 7px 10px;
+    border: 1px solid #edf2f7;
+    font-size: 14px;
     font-weight: 400;
-    line-height: 1.35;
+    line-height: 1.4;
     text-align: center;
     vertical-align: middle;
 }
 
 .tuluan15p-table th {
-    background: #dbeafe;
-    color: #1e3a8a;
-    font-weight: 650;
+    background: #f1f5f9;
+    color: #334155;
+    font-weight: 600;
+}
+
+.dg-lesson-section--tuluan .tuluan15p-table tbody > tr > td {
+    background-color: #ffffff !important;
+}
+
+.dg-lesson-section--tuluan .tuluan15p-table tbody > tr:hover > td:not(.tuluan15p-empty) {
+    background-color: #f8fafc !important;
+}
+
+.tuluan15p-table tbody td:first-child {
+    color: #334155;
+    font-weight: 500;
 }
 
 .tuluan15p-table th:nth-child(1) {
@@ -771,22 +826,50 @@
     width: 132px;
 }
 
+.tuluan15p-table .tuluan15p-actions-heading,
+.tuluan15p-table .tuluan15p-actions {
+    width: 72px;
+    min-width: 72px;
+}
+
+.tuluan15p-actions {
+    text-align: center;
+}
+
+.tuluan15p-actions .ictu-admin-icon-button {
+    width: 30px;
+    min-width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 4px;
+}
+
+.tuluan15p-actions .ictu-admin-icon-button i {
+    font-size: 14px;
+}
+
 .tuluan15p-table td:nth-child(2) {
     color: #475569;
-    font-weight: 600;
+    font-weight: 500;
     text-align: left;
 }
 
 .tuluan15p-table .tuluan15p-total-score {
-    color: #1d4ed8;
-    font-weight: 700;
+    color: #334155;
+    font-weight: 500;
 }
 
 .tuluan15p-table .tuluan15p-empty {
     padding: 14px;
+    border: 1px solid #edf2f7;
+    background: #fff !important;
     color: #64748b;
     font-size: 13px;
     text-align: left;
+}
+
+.dg-lesson-section--tuluan .tuluan15p-table tbody > tr:hover > .tuluan15p-empty {
+    background-color: #ffffff !important;
 }
 
 .form-de-tab-panels .form-da-duyet .form-tracnghiem-panel-content-footer {

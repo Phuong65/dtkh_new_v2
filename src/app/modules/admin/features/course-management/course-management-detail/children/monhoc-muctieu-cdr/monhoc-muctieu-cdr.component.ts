@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { Drawer } from 'primeng/drawer';
 import { TableModule } from 'primeng/table';
+import { TooltipModule } from 'primeng/tooltip';
 import { Observable, Subject, distinctUntilChanged, firstValueFrom, forkJoin, map, takeUntil } from 'rxjs';
 import { SafeHtmlDecodePipe } from '@modules/shared/pipes/safe-html-decode';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
@@ -44,7 +45,7 @@ interface CtdtCdrExtend extends CtdtCdr {
     standalone: true,
     imports: [CommonModule, SharedModule, FormsModule, ReactiveFormsModule, TableModule,
         ShowLabelData, SafeHtmlDecodePipe, MatButtonModule, Drawer, LoadingProgressComponent,
-        MonhocCauhinhComponent],
+        MonhocCauhinhComponent, TooltipModule],
     templateUrl: './monhoc-muctieu-cdr.component.html',
     styleUrls: ['./monhoc-muctieu-cdr.component.css']
 })
@@ -71,15 +72,17 @@ export class MonhocMuctieuCdrComponent implements OnInit {
     readonly errorMessage = signal('');
     readonly generalObjectiveControl = new FormControl('', { nonNullable: true });
     readonly editingGoalId = signal<number | null>(null);
+    readonly editingCloId = signal<number | null>(null);
     readonly activeSubTabId = signal<MuctieuCdrSubTabId>('muc-tieu-chung');
     readonly settingsVisited = signal(false);
     readonly subTabs: readonly { id: MuctieuCdrSubTabId; label: string; icon: string }[] = [
-        { id: 'muc-tieu-chung', label: 'Mục tiêu chung', icon: 'ti ti-target-arrow' },
+        { id: 'muc-tieu-chung', label: 'Mục tiêu chung', icon: 'ti ti-target' },
         { id: 'co-clo', label: 'CO / CLO', icon: 'ti ti-list-check' },
         { id: 'kiem-tra-danh-gia', label: 'Kiểm tra đánh giá', icon: 'ti ti-clipboard-check' }
     ];
     readonly subTabButtons = viewChildren<ElementRef<HTMLButtonElement>>('subTabButton');
     @ViewChild('goalEditor') goalEditor?: ElementRef<HTMLTextAreaElement>;
+    @ViewChild('cloEditor') cloEditor?: ElementRef<HTMLTextAreaElement>;
     loadingHeading = 'Đang tải mục tiêu và chuẩn đầu ra...';
     piDrawerVisible = false;
 
@@ -318,6 +321,22 @@ export class MonhocMuctieuCdrComponent implements OnInit {
 
     finishEditMuctieu(): void {
         this.editingGoalId.set(null);
+    }
+
+    editClo(clo: CourseClo): void {
+        if (this.isSaving()) return;
+        this.editingCloId.set(clo.id);
+        setTimeout(() => {
+            const editor = this.cloEditor?.nativeElement;
+            if (!editor) return;
+            editor.focus();
+            editor.style.height = 'auto';
+            editor.style.height = editor.scrollHeight + 'px';
+        });
+    }
+
+    finishEditClo(): void {
+        this.editingCloId.set(null);
     }
 
     saveMuctieuChitiet(): void {

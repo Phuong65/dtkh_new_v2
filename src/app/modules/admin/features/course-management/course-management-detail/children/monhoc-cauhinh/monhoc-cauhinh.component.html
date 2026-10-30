@@ -10,14 +10,17 @@
     </div>
     } @else if (selectedCourse && (mode === 'settings-only' || plan_kiemtra)) {
     <div class="config-workspace">
-        @if (mode === 'all') {
+        @if (mode !== 'settings-only') {
         <section class="admin-wrap-table ictu-admin-table-shell config-table-card" aria-labelledby="test-title">
             <header class="admin-wrap-table__head config-card-header">
-                <div>
-                    <span class="admin-wrap-table__heading" id="test-title">
-                        {{ isDttx ? 'KIỂM TRA GIỮA KỲ' : 'KIỂM TRA THƯỜNG XUYÊN' }}
-                    </span>
-                    <p class="config-card-subtitle">Thiết lập loại và thứ tự các bài kiểm tra của học phần.</p>
+                <div class="config-test-heading">
+                    <span class="setting-icon" aria-hidden="true"><i class="ti ti-clipboard-check"></i></span>
+                    <div>
+                        <span class="admin-wrap-table__heading" id="test-title">
+                            {{ isDttx ? 'Kiểm tra giữa kỳ' : 'Kiểm tra thường xuyên' }}
+                        </span>
+                        <p class="config-card-subtitle">Thiết lập loại và thứ tự các bài kiểm tra của học phần.</p>
+                    </div>
                 </div>
                 <div class="admin-wrap-table__head-actions config-actions">
                     <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button"
@@ -81,21 +84,27 @@
         </section>
         }
 
-        <section class="config-settings" aria-labelledby="settings-title">
+        <section class="config-settings"
+            [attr.aria-labelledby]="mode === 'all' ? 'settings-title' : null"
+            [attr.aria-label]="mode !== 'all' ? 'Thiết lập điểm học phần' : null">
+            @if (mode === 'all') {
             <header class="config-section-heading">
                 <div>
-                    <span class="admin-wrap-table__heading" id="settings-title">THIẾT LẬP ĐIỂM HỌC PHẦN</span>
-                    <p>Điều chỉnh tỷ lệ điểm, số lượng đề và thời hạn làm bài.</p>
+                    <span class="admin-wrap-table__heading" id="settings-title">
+                        <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>
+                        <span>Thiết lập điểm học phần</span>
+                    </span>
                 </div>
                 <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse"
                     (click)="saveCourseConfig()" [disabled]="busy || !canEdit" aria-label="Lưu cài đặt học phần">
                     <i class="ti ti-device-floppy" aria-hidden="true"></i><span>Lưu cài đặt</span>
                 </button>
             </header>
+            }
 
             <div class="config-card-grid">
                 <article class="config-setting-card">
-                    <header><span class="setting-icon setting-icon--blue"><i class="ti ti-chart-donut-4" aria-hidden="true"></i></span>
+                    <header><span class="setting-icon"><i class="ti ti-chart-donut-4" aria-hidden="true"></i></span>
                         <div><h3>Tỷ lệ điểm thành phần</h3><p>Tỷ lệ dùng để tính điểm trung bình (%)</p></div></header>
                     @for (item of course_config_object['PERCENT_SCORE_SUMMARY'] ?? []; track item.key) {
                     <div class="setting-row">
@@ -108,7 +117,7 @@
                 </article>
 
                 <article class="config-setting-card">
-                    <header><span class="setting-icon setting-icon--violet"><i class="ti ti-list-numbers" aria-hidden="true"></i></span>
+                    <header><span class="setting-icon"><i class="ti ti-list-numbers" aria-hidden="true"></i></span>
                         <div><h3>Số lượng đề kiểm tra</h3><p>Số đề trắc nghiệm tạo trong mỗi lần</p></div></header>
                     @for (item of course_config_object['NUMOF_TEST_CCTX'] ?? []; track item.key) {
                     <div class="setting-row">
@@ -121,7 +130,7 @@
                 </article>
 
                 <article class="config-setting-card config-setting-card--wide">
-                    <header><span class="setting-icon setting-icon--amber"><i class="ti ti-clock" aria-hidden="true"></i></span>
+                    <header><span class="setting-icon"><i class="ti ti-clock" aria-hidden="true"></i></span>
                         <div><h3>Luyện tập tại nhà</h3><p>Thiết lập thời hạn và thời gian làm bài</p></div></header>
                     @for (item of course_config_object['PRACTICE_TIME_FOR_A_TEST'] ?? []; track item.key) {
                         @if (item.key !== 'EXCEPT') {
@@ -152,7 +161,7 @@
                 </article>
 
                 <article class="config-setting-card">
-                    <header><span class="setting-icon setting-icon--teal"><i class="ti ti-calendar-off" aria-hidden="true"></i></span>
+                    <header><span class="setting-icon"><i class="ti ti-calendar-off" aria-hidden="true"></i></span>
                         <div><h3>Điểm danh</h3><p>Số ngày sinh viên được phép nghỉ (%)</p></div></header>
                     @for (item of course_config_object['PERCENT_OF_LEAVE_ALLOWED'] ?? []; track item.key) {
                     <div class="setting-row">
@@ -161,6 +170,15 @@
                             inputmode="numeric" [disabled]="busy || !canEdit" [value]="item.value"
                             (input)="sanitizeNumericValue($event, item)" (keydown)="pointQuestionKeyDown($event)">
                     </div>
+                    }
+
+                    @if (mode !== 'all') {
+                    <footer class="config-settings-footer">
+                        <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button"
+                            (click)="saveCourseConfig()" [disabled]="busy || !canEdit" aria-label="Lưu cài đặt học phần">
+                            <i class="ti ti-device-floppy" aria-hidden="true"></i><span>Lưu cài đặt</span>
+                        </button>
+                    </footer>
                     }
                 </article>
             </div>

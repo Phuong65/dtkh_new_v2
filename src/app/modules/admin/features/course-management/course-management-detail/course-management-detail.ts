@@ -14,7 +14,6 @@ import { MonhocNoidungComponent } from './children/monhoc-noidung/monhoc-noidung
 import { MonhocQuestionCdrComponent } from './children/monhoc-question-cdr/monhoc-question-cdr.component';
 import { MonhocFormdeComponent } from './children/monhoc-formde/monhoc-formde.component';
 import { MonhocKiemtraDanhgiaComponent } from './children/monhoc-kiemtra-danhgia/monhoc-kiemtra-danhgia.component';
-import { MonhocCauhinhComponent } from './children/monhoc-cauhinh/monhoc-cauhinh.component';
 
 export type CourseManagementTabId =
     | 'thong-tin'
@@ -22,8 +21,7 @@ export type CourseManagementTabId =
     | 'noi-dung'
     | 'phan-bo-cdr-cau-hoi'
     | 'form-de'
-    | 'kiem-tra-danh-gia'
-    | 'cau-hinh';
+    | 'kiem-tra-danh-gia';
 
 export interface CourseManagementTabItem {
     id: CourseManagementTabId;
@@ -42,8 +40,7 @@ export interface CourseManagementTabItem {
         MonhocNoidungComponent,
         MonhocQuestionCdrComponent,
         MonhocFormdeComponent,
-        MonhocKiemtraDanhgiaComponent,
-        MonhocCauhinhComponent
+        MonhocKiemtraDanhgiaComponent
     ],
     templateUrl: './course-management-detail.html',
     styleUrl: './course-management-detail.css',
@@ -62,8 +59,7 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
         { id: 'noi-dung', label: 'Nội dung', icon: 'ti ti-book' },
         { id: 'phan-bo-cdr-cau-hoi', label: 'Phân bổ câu hỏi CDR', icon: 'ti ti-chart-donut' },
         { id: 'form-de', label: 'Form đề', icon: 'ti ti-forms' },
-        { id: 'kiem-tra-danh-gia', label: 'Kiểm tra - Đánh giá', icon: 'ti ti-clipboard-check' },
-        { id: 'cau-hinh', label: 'Cấu hình', icon: 'ti ti-settings' }
+        { id: 'kiem-tra-danh-gia', label: 'Kiểm tra - Đánh giá', icon: 'ti ti-clipboard-check' }
     ];
 
     readonly activeTabId = signal<CourseManagementTabId>('thong-tin');

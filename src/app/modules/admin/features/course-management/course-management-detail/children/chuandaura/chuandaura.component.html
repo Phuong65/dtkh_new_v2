@@ -1,77 +1,47 @@
-<div class="chuandaura chuandaura-layout" #layoutChuandaura>
+<div class="chuandaura chuandaura-layout position-relative" #layoutChuandaura [attr.aria-busy]="isLoading()">
+    @if (isLoading()) {
+    <app-loading-progress [heading]="'Đang tải và cập nhật chuẩn đầu ra...'" backdropFilter="blur(2px)"></app-loading-progress>
+    }
     <header class="cdr-page-header">
-        <div class="cdr-page-header__main">
-            <span class="cdr-page-header__icon fa fa-bullseye" aria-hidden="true"></span>
-            <div class="cdr-page-header__identity">
-                <span class="cdr-page-header__eyebrow">Chuẩn đầu ra bài học</span>
-                <h3 class="cdr-page-header__title">Chuẩn đầu ra cần đạt</h3>
-                <p class="cdr-page-header__hint">Thiết lập các CPI cần đạt cho nội dung bài học.</p>
-            </div>
+        <div class="cdr-page-header__left">
+            <span class="cdr-page-header__icon fa fa-check-square-o" aria-hidden="true"></span>
+            <h3 class="cdr-page-header__title">Chuẩn đầu ra - CPIs</h3>
         </div>
         @if (!isOpenAddForm) {
-<button type="button" (click)="onOpenAddCdr()"
-            class="btn btn-primary cdr-add-button">
+<button mat-flat-button type="button" (click)="onOpenAddCdr()"
+            class="btn ictu-badge-btn--success-reverse cdr-add-button" [disabled]="isSaving">
             <span class="fa fa-plus" aria-hidden="true"></span>
             Thêm CPI mới
         </button>
 }
     </header>
 
-    <aside class="cdr-guidance">
-        <span class="cdr-guidance__icon fa fa-info-circle" aria-hidden="true"></span>
-        <div>
-            <h4 class="cdr-guidance__title">Lưu ý khi tạo CPI</h4>
-            <p class="cdr-guidance__text">
-                Mỗi bài học có tối đa 05 chuẩn đầu ra con. Thông tin nhập trong biểu mẫu tương ứng với một CPI.
-            </p>
-        </div>
-    </aside>
-
-    <div class="cdr-create-workspace" [class.cdr-create-workspace--open]="isOpenAddForm">
-        <p-panel #panelplan_add header="Title" styleClass="form-add-chuandaura cdr-form-panel"
-            [showHeader]="false" [toggleable]="true" [collapsed]="!isOpenAddForm">
-            <div class="cdr-form-shell">
-                <div class="cdr-form-heading">
-                    <span class="cdr-form-heading__icon fa fa-plus-circle" aria-hidden="true"></span>
-                    <div>
-                        <h3 class="cdr-form-heading__title">Thêm CPI mới</h3>
-                        <p class="cdr-form-heading__hint">Khai báo yêu cầu đầu ra và phương án giảng dạy tương ứng.</p>
-                    </div>
-                </div>
-
-                <ng-container *ngTemplateOutlet="formTemplateCdr"></ng-container>
-
-                <div class="cdr-form-footer">
-                    <p class="cdr-required-note">
-                        <span class="pi pi-info-circle" aria-hidden="true"></span>
-                        Trường có dấu <span class="ovic-mark">*</span> là bắt buộc.
-                    </p>
-                    <div class="cdr-form-actions">
-                        <button type="button" class="btn btn-secondary cdr-secondary-button"
-                            (click)="onOpenAddCdr()">
-                            <span class="fa fa-times" aria-hidden="true"></span>
-                            Đóng
-                        </button>
-                        <button type="button" class="btn btn-primary cdr-save-button" (click)="saveCdr()">
-                            <span class="fa fa-floppy-o" aria-hidden="true"></span>
-                            Lưu CPI
-                        </button>
-                    </div>
-                </div>
+    <div class="cdr-page-body">
+    <p-drawer [(visible)]="isOpenAddForm" [dismissible]="!isSaving" [closable]="!isSaving" [closeOnEscape]="!isSaving" [blockScroll]="true"
+        header="Thêm CPI mới" ariaCloseLabel="Đóng" [style]="{ width: 'min(700px, 100vw)' }"
+        appendTo="body" position="right" styleClass="ictu-p-drawer cdr-create-drawer">
+        <div class="ictu-p-drawer__content cdr-drawer-content position-relative">
+            @if (isSaving) {
+            <app-loading-progress heading="Đang lưu chuẩn đầu ra..." backdropFilter="blur(2px)"></app-loading-progress>
+            }
+            <div class="ictu-p-drawer__content__body position-relative">
+                <ng-container *ngTemplateOutlet="formTemplateCdr; context: { formId: 'cdr-create', formMode: 'create' }"></ng-container>
             </div>
-        </p-panel>
-    </div>
+            <footer class="ictu-p-drawer__content__footer ictu-admin-drawer-footer">
+                <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button"
+                    (click)="isOpenAddForm = false" [disabled]="isSaving">
+                    <i class="ti ti-x" aria-hidden="true"></i> Hủy
+                </button>
+                <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button"
+                    (click)="saveCdr()" [disabled]="isSaving">
+                    <i class="ti ti-device-floppy" aria-hidden="true"></i> Lưu CPI
+                </button>
+            </footer>
+        </div>
+    </p-drawer>
 
     @if (listCDR && listCDR.length) {
-<section class="cdr-list-section" aria-labelledby="cdr-list-title">
-        <header class="cdr-list-overview">
-            <div>
-                <span class="cdr-list-overview__eyebrow">Nội dung đã khai báo</span>
-                <h4 id="cdr-list-title" class="cdr-list-overview__title">Danh sách CPI</h4>
-            </div>
-            <span class="cdr-list-overview__count">{{listCDR.length}} đầu mục</span>
-        </header>
-
+<section class="cdr-list-section" aria-label="Danh sách CPI">
         <div class="cdr-list">
         @for (cdr of listCDR; track cdr) {
 <article class="cdr-card">
@@ -79,7 +49,6 @@
                 <ng-template pTemplate="header">
                     <div class="header-panel-cdr cdr-card-heading">
                         <div class="cdr-card-heading__title-row">
-                            <span class="cdr-card-heading__icon fa fa-check-square-o" aria-hidden="true"></span>
                             <strong class="cdr-card-heading__title">{{cdr['kyhieu']+'. '+cdr['title']}}</strong>
                         </div>
                         <div class="cdr-content-cdr-info cdr-info-tag">
@@ -99,13 +68,14 @@
 
                 <ng-template pTemplate="icons">
                     <div class="cdr-card-toolbar">
+                        @if (cdr.status === 1) {
+                        <span class="ictu-badge ictu-badge--success cdr-status-badge"><i class="fa fa-check-circle" aria-hidden="true"></i> Đạt</span>
+                        <span class="ictu-badge ictu-badge--success cdr-status-badge">Duyệt lúc: {{cdr['approved_at'] | ovicDateTime}}</span>
+                        }
                         <div class="cdr-card-status">
 @switch (cdr.status) {
                             @case (0) {
 <span class="box-span cho-duyet-box">Chờ duyệt</span>
-}
-                            @case (1) {
-<span class="box-span dat-box">Đạt</span>
 }
                             @case (-1) {
 <span class="box-span yeu-cau-sua-box">Yêu cầu sửa</span>
@@ -115,21 +85,16 @@
 }
                         }
 </div>
-                        @if (cdr.status === 1) {
-<span class="box-span dat-box cdr-approved-at">
-                            Duyệt lúc: {{cdr['approved_at'] | ovicDateTime}}
-                        </span>
-}
                         @if (canAdded && cdr['status'] !== 1) {
 <div class="cdr-card-actions">
                             <button type="button" (click)="onOpenEditCdr(panelplan,panelplan_bottom,cdr)"
                                 ngbTooltip="{{!cdr['open']?'Sửa':'Đóng'}}" placement="top" container="body"
-                                class="btn btn-primary btn-icon btn-transparent btn-in-header-panel cdr-icon-button">
+                                class="btn ictu-button-info-light ictu-admin-icon-button cdr-icon-button">
                                 <span class="fa {{!cdr['open']?'fa-pencil':'fa-arrow-up'}}" aria-hidden="true"></span>
                             </button>
                             <button type="button" (click)="deleteCdr(cdr)" ngbTooltip="Xóa" placement="top"
                                 container="body"
-                                class="btn btn-danger btn-icon btn-transparent btn-in-header-panel cdr-icon-button cdr-icon-button--danger">
+                                class="btn ictu-button-danger-light ictu-admin-icon-button cdr-icon-button cdr-icon-button--danger">
                                 <span class="fa fa-trash" aria-hidden="true"></span>
                             </button>
                         </div>
@@ -142,21 +107,22 @@
                     <p-panel #panelplan header="Title" styleClass="form-add-chuandaura cdr-edit-panel"
                         [showHeader]="false" [toggleable]="true" [collapsed]="!cdr['open']">
                         <div class="cdr-edit-workspace">
-                            <div class="cdr-form-heading cdr-form-heading--compact">
-                                <span class="cdr-form-heading__icon fa fa-pencil" aria-hidden="true"></span>
+                            <header class="cdr-edit-panel__banner">
+                                <span class="cdr-edit-panel__icon ti ti-edit" aria-hidden="true"></span>
                                 <div>
-                                    <h3 class="cdr-form-heading__title">Chỉnh sửa CPI</h3>
-                                    <p class="cdr-form-heading__hint">Cập nhật thông tin trước khi lưu hoặc đề nghị duyệt.</p>
+                                    <span class="ictu-badge ictu-badge--light">CHỈNH SỬA CPI</span>
+                                    <h3>Chỉnh sửa CPI</h3>
+                                    <p>Cập nhật thông tin CPI trước khi lưu thay đổi.</p>
                                 </div>
-                            </div>
+                            </header>
 
-                            <ng-container *ngTemplateOutlet="formTemplateCdr"></ng-container>
+                            <ng-container *ngTemplateOutlet="formTemplateCdr; context: { formId: 'cdr-edit-' + cdr.id, formMode: 'edit' }"></ng-container>
 
                             @if (canAdded && cdr['status'] !== 1) {
 <div class="cdr-edit-actions">
                                 @if (cdr['status'] === -1) {
 <button type="button"
-                                    class="btn btn-primary cdr-review-button" (click)="yeucauduyet(cdr)">
+                                    class="btn ictu-badge-btn--primary-reverse cdr-review-button" (click)="yeucauduyet(cdr)">
                                     <span class="fa fa-paper-plane-o" aria-hidden="true"></span>
                                     Đã sửa, đề nghị duyệt
                                 </button>
@@ -164,12 +130,12 @@
                                 <div class="cdr-edit-actions__main">
                                     <button type="button" [disabled]="!cdr['open']"
                                         (click)="onOpenEditCdr(panelplan,panelplan_bottom,cdr)"
-                                        class="btn btn-secondary cdr-secondary-button">
+                                        class="btn ictu-badge-btn--secondary cdr-secondary-button">
                                         <span class="fa fa-times" aria-hidden="true"></span>
                                         Đóng
                                     </button>
                                     <button type="button" [disabled]="!cdr['open']" (click)="saveCdr()"
-                                        class="btn btn-primary cdr-save-button">
+                                        class="btn ictu-badge-btn--primary-reverse cdr-save-button">
                                         <span class="fa fa-floppy-o" aria-hidden="true"></span>
                                         Lưu thay đổi
                                     </button>
@@ -206,7 +172,7 @@
                         </div>
                     </p-panel>
 
-                    <app-nhanxet-noidung [activity_input]="cdr" [course_input]="selectedCourse">
+                    <app-nhanxet-noidung [activity_input]="cdr" [course_input]="selectedCourse" (onBusy)="onBusy.emit($event)">
                     </app-nhanxet-noidung>
                 </div>
             </p-panel>
@@ -217,49 +183,29 @@
 }
 
     @if (!listCDR || !listCDR.length) {
-<section class="cdr-empty-state">
+<section class="cdr-empty-state" role="status">
         <span class="cdr-empty-state__icon fa fa-bullseye" aria-hidden="true"></span>
         <span class="cdr-empty-state__eyebrow">Chuẩn đầu ra bài học</span>
         <h4>Chưa có CPI</h4>
         <p>Thêm CPI để xác định yêu cầu người học cần đạt sau bài học.</p>
         @if (canAdded && !isOpenAddForm) {
 <button type="button" (click)="onOpenAddCdr()"
-            class="btn btn-primary cdr-add-button cdr-empty-state__action">
+            class="btn ictu-badge-btn--success-reverse cdr-add-button cdr-empty-state__action">
             <span class="fa fa-plus" aria-hidden="true"></span>
             Thêm CPI mới
         </button>
 }
     </section>
 }
+    </div>
 </div>
 
-<ng-template #templateAddChuandaura>
-    <div class="ovic-over-right-section cdr-side-form">
-        <div class="ovic-over-right-section__head">
-            <h3 class="ovic-over-right-section__header">Thêm chuẩn đầu ra</h3>
-            <button type="button" class="btn ovic-over-right-section__close-button" (click)="closeForm()"></button>
-        </div>
-        <div class="ovic-over-right-section__body cdr-side-form__body">
-            <ng-container *ngTemplateOutlet="formTemplateCdr"></ng-container>
-        </div>
-        <div class="ovic-dynamic-right-section__foot">
-            <p class="ovic-form-notes ovic-over-right-section__foot-ovic-input-line">
-                <span class="pi pi-info-circle" aria-hidden="true"></span>
-                Trường có dấu <span class="ovic-mark">*</span> là bắt buộc.
-            </p>
-            <p class="ovic-over-right-section__foot-wrap-buttons">
-                <button type="button" class="btn ovic-over-right-section__foot-btn btn-primary"
-                    (click)="saveCdr()">
-                    <span class="fa fa-floppy-o" aria-hidden="true"></span>
-                    Lưu CPI
-                </button>
-            </p>
-        </div>
-    </div>
-</ng-template>
 
-<ng-template #formTemplateCdr>
-    <form [formGroup]="formCDR" class="cdr-form">
+<ng-template #formTemplateCdr let-formId="formId" let-formMode="formMode">
+    <form [formGroup]="formCDR" class="ictu-form cdr-ictu-form"
+        [class.cdr-ictu-form--create]="formMode === 'create'"
+        [class.cdr-ictu-form--edit]="formMode === 'edit'"
+        [class.cdr-ictu-form--side]="formMode === 'side'">
         <section class="cdr-form-section">
             <div class="cdr-form-section__header">
                 <span class="cdr-form-section__index">01</span>
@@ -269,26 +215,26 @@
                 </div>
             </div>
             <div class="cdr-form-section__body cdr-form-grid cdr-form-grid--identity">
-                <div class="cdr-form-field">
-                    <label>Tiêu đề CPI <span class="ovic-mark">*</span></label>
-                    <input type="text" formControlName="title" class="ovic-input-field"
+                <div class="ictu-form__row cdr-form-field">
+                    <label class="ictu-form__label ictu-form__label--required" [for]="formId + '-title'">Tiêu đề CPI</label>
+                    <input [id]="formId + '-title'" type="text" formControlName="title" class="ictu-form__input-field" pInputText
                         placeholder="Nhập tiêu đề CPI">
                 </div>
-                <div class="cdr-form-field">
-                    <label>Ký hiệu <span class="ovic-mark">*</span></label>
-                    <div class="p-inputgroup cdr-code-input">
+                <div class="ictu-form__row ictu-form__row--group-before cdr-form-field cdr-code-field">
+                    <label class="ictu-form__label ictu-form__label--required" [for]="formId + '-code'">Ký hiệu</label>
+                    <div class="cdr-code-input" [class.ictu-form__group-control--before]="!!selectedCoursePlanActivities">
+                        <input [id]="formId + '-code'" (keydown)="keyupCheckyhieu($event)" type="text" formControlName="kyhieu"
+                            class="ictu-form__input-field" pInputText inputmode="numeric">
                         @if (selectedCoursePlanActivities) {
-<span class="p-inputgroup-addon cdr-code-prefix">
+                        <span class="ictu-form__after-input-field cdr-code-prefix">
                             CPI {{selectedCoursePlanActivities.week + '.'}}
                         </span>
-}
-                        <input (keydown)="keyupCheckyhieu($event)" type="text" formControlName="kyhieu"
-                            class="ovic-input-field" inputmode="numeric">
+                        }
                     </div>
                 </div>
-                <div class="cdr-form-field cdr-form-field--full">
-                    <label>Mức độ yêu cầu CPI <span class="ovic-mark">*</span></label>
-                    <ovic-groups-radio-v2 [disabled_item]="true" group_name="CHUAN_DAU_RA" optionLabel="label"
+                <div class="ictu-form__row cdr-form-field cdr-form-field--full">
+                    <label class="ictu-form__label ictu-form__label--required" [id]="formId + '-level-label'">Mức độ yêu cầu CPI</label>
+                    <ovic-groups-radio-v2 [attr.aria-labelledby]="formId + '-level-label'" [disabled_item]="true" group_name="CHUAN_DAU_RA" optionLabel="label"
                         [columns]="6" [options]="CHUAN_DAU_RA" [defaultValue]="fcdr['level_require']['value']"
                         [formField]="fcdr['level_require']" optionId="id">
                     </ovic-groups-radio-v2>
@@ -305,26 +251,26 @@
                 </div>
             </div>
             <div class="cdr-form-section__body cdr-form-grid cdr-form-grid--teaching">
-                <div class="cdr-form-field">
-                    <label>Phương pháp giảng dạy <span class="ovic-mark">*</span></label>
-                    <p-multiSelect appendTo="body" [options]="PHUONGPHAP_DANGDAY"
+                <div class="ictu-form__row cdr-form-field">
+                    <label class="ictu-form__label ictu-form__label--required" [for]="formId + '-method'">Phương pháp giảng dạy</label>
+                    <p-multiSelect [inputId]="formId + '-method'" appendTo="body" [options]="PHUONGPHAP_DANGDAY"
                         formControlName="method"></p-multiSelect>
                 </div>
-                <div class="cdr-form-field">
-                    <label>Thời lượng (tiết) <span class="ovic-mark">*</span></label>
-                    <ovic-dropdown optionLabel="label" [options]="OPTION_THOILUONG"
+                <div class="ictu-form__row cdr-form-field">
+                    <label class="ictu-form__label ictu-form__label--required" [id]="formId + '-time-label'">Thời lượng (tiết)</label>
+                    <ovic-dropdown [attr.aria-labelledby]="formId + '-time-label'" optionLabel="label" [options]="OPTION_THOILUONG"
                         [defaultValue]="fcdr['time_learning']['value']" [formField]="fcdr['time_learning']"
                         optionId="id">
                     </ovic-dropdown>
                 </div>
-                <div class="cdr-form-field cdr-form-field--full">
-                    <label>Tiêu đề giảng dạy <span class="ovic-mark">*</span></label>
-                    <input type="text" formControlName="desc_title" class="ovic-input-field"
+                <div class="ictu-form__row cdr-form-field cdr-form-field--full">
+                    <label class="ictu-form__label ictu-form__label--required" [for]="formId + '-desc-title'">Tiêu đề giảng dạy</label>
+                    <input [id]="formId + '-desc-title'" type="text" formControlName="desc_title" class="ictu-form__input-field" pInputText
                         placeholder="Nhập tiêu đề nội dung giảng dạy">
                 </div>
-                <div class="cdr-form-field cdr-form-field--full background-grey-list cdr-content-editor">
-                    <label>Nội dung giảng dạy <span class="ovic-mark">*</span></label>
-                    <app-list-editor
+                <div class="ictu-form__row cdr-form-field cdr-form-field--full cdr-content-editor">
+                    <label class="ictu-form__label ictu-form__label--required" [id]="formId + '-desc-cpi-label'">Nội dung giảng dạy</label>
+                    <app-list-editor [attr.aria-labelledby]="formId + '-desc-cpi-label'"
                         [resetTrigger]="fcdr['desc_cpi'].value && fcdr['desc_cpi'].value.length ? false : true"
                         [formField]="fcdr['desc_cpi']">
                     </app-list-editor>

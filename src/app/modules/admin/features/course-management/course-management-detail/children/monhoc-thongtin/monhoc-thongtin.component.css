@@ -106,7 +106,7 @@
     gap: 12px;
     padding: 9px 14px 9px 18px;
     border-bottom: 1px solid var(--mh-border);
-    background: #eaf2ff;
+    background: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
 }
 
 .mh-card__header::before {

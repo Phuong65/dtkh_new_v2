@@ -1,0 +1,1 @@
+- finding 19 (nền xanh vẫn ghi đè row tự luận): fixed — Loại trừ `.dg-lesson-section--tuluan` khỏi rule nền xanh của bảng trắc nghiệm; ép các ô dữ liệu tự luận nền trắng bằng selector scoped và giữ hover xám nhạt.

@@ -25,12 +25,15 @@
             </div>
         </nav>
 
-    <div class="cdr-workspace">
+    <div class="cdr-workspace" [class.cdr-workspace--settings]="activeSubTabId() === 'kiem-tra-danh-gia'">
         <section id="cdr-panel-muc-tieu-chung" class="cdr-subpanel" role="tabpanel"
             aria-labelledby="cdr-tab-muc-tieu-chung" [hidden]="activeSubTabId() !== 'muc-tieu-chung'">
         <section class="cdr-objective-card">
             <header class="cdr-section-header">
-                <div class="cdr-section-title"><i class="ti ti-target-arrow" aria-hidden="true"></i><span>MỤC TIÊU CHUNG</span></div>
+                <div class="cdr-section-title">
+                    <span class="cdr-header-icon" aria-hidden="true"><i class="ti ti-target"></i></span>
+                    <span>Mục tiêu chung</span>
+                </div>
             </header>
             <div class="cdr-objective-body">
                 <ovic-editor height="180px" [formField]="generalObjectiveControl"
@@ -50,14 +53,19 @@
             aria-labelledby="cdr-tab-co-clo" [hidden]="activeSubTabId() !== 'co-clo'">
         <section class="admin-wrap-table ictu-admin-table-shell cdr-table-card">
             <header class="admin-wrap-table__head cdr-table-card__header">
-                <span class="admin-wrap-table__heading cdr-table-card__title">MỤC TIÊU CHI TIẾT (CO)</span>
+                <span class="admin-wrap-table__heading cdr-table-card__title">
+                    <span class="cdr-header-icon" aria-hidden="true"><i class="ti ti-list-check"></i></span>
+                    <span>Mục tiêu chi tiết (CO)</span>
+                </span>
                 <div class="admin-wrap-table__head-actions cdr-table-card__actions">
                     <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button"
-                        (click)="addMuctieu()" [disabled]="isSaving()" aria-label="Thêm mục tiêu">
+                        (click)="addMuctieu()" [disabled]="isSaving()" aria-label="Thêm mục tiêu"
+                        pTooltip="Thêm mục tiêu" tooltipPosition="top" appendTo="body">
                         <i class="ti ti-plus" aria-hidden="true"></i>
                     </button>
                     <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-icon-button"
-                        (click)="saveMuctieuChitiet()" [disabled]="isSaving() || !list_course_muctieu.length" aria-label="Lưu mục tiêu">
+                        (click)="saveMuctieuChitiet()" [disabled]="isSaving() || !list_course_muctieu.length" aria-label="Lưu mục tiêu"
+                        pTooltip="Lưu mục tiêu" tooltipPosition="top" appendTo="body">
                         <i class="ti ti-device-floppy" aria-hidden="true"></i>
                     </button>
                 </div>
@@ -82,11 +90,13 @@
                                     }
                                 </td>
                                 <td class="cell-center"><div class="btn-group-actions">
-                                    <button class="btn ictu-button-info-light ictu-admin-icon-button"
-                                        (click)="editMuctieu(goal)" [disabled]="isSaving()" aria-label="Sửa mục tiêu">
+                                    <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
+                                        (click)="editMuctieu(goal)" [disabled]="isSaving()" aria-label="Sửa mục tiêu"
+                                        pTooltip="Sửa mục tiêu" tooltipPosition="top" appendTo="body">
                                         <i class="ti ti-edit" aria-hidden="true"></i></button>
-                                    <button class="btn ictu-button-danger-light ictu-admin-icon-button"
-                                        (click)="deleteCourseMuctieuchitiet(goal)" [disabled]="isSaving()" aria-label="Xóa mục tiêu">
+                                    <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
+                                        (click)="deleteCourseMuctieuchitiet(goal)" [disabled]="isSaving()" aria-label="Xóa mục tiêu"
+                                        pTooltip="Xóa mục tiêu" tooltipPosition="top" appendTo="body">
                                         <i class="ti ti-trash" aria-hidden="true"></i></button>
                                 </div></td>
                             </tr>
@@ -99,14 +109,19 @@
 
         <section class="admin-wrap-table ictu-admin-table-shell cdr-table-card">
             <header class="admin-wrap-table__head cdr-table-card__header">
-                <span class="admin-wrap-table__heading cdr-table-card__title">CHUẨN ĐẦU RA HỌC PHẦN (CLO)</span>
+                <span class="admin-wrap-table__heading cdr-table-card__title">
+                    <span class="cdr-header-icon" aria-hidden="true"><i class="ti ti-certificate"></i></span>
+                    <span>Chuẩn đầu ra học phần (CLO)</span>
+                </span>
                 <div class="admin-wrap-table__head-actions cdr-table-card__actions">
                     <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button"
-                        (click)="addClo()" [disabled]="isSaving()" aria-label="Thêm chuẩn đầu ra">
+                        (click)="addClo()" [disabled]="isSaving()" aria-label="Thêm chuẩn đầu ra"
+                        pTooltip="Thêm chuẩn đầu ra" tooltipPosition="top" appendTo="body">
                         <i class="ti ti-plus" aria-hidden="true"></i>
                     </button>
                     <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-icon-button"
-                        (click)="saveClo()" [disabled]="isSaving() || !list_course_clo.length" aria-label="Lưu chuẩn đầu ra">
+                        (click)="saveClo()" [disabled]="isSaving() || !list_course_clo.length" aria-label="Lưu chuẩn đầu ra"
+                        pTooltip="Lưu chuẩn đầu ra" tooltipPosition="top" appendTo="body">
                         <i class="ti ti-device-floppy" aria-hidden="true"></i>
                     </button>
                 </div>
@@ -122,27 +137,40 @@
                             <tr [pReorderableRow]="rowIndex">
                                 <td class="cell-center"><i class="ti ti-grip-vertical drag-handle" pReorderableRowHandle></i></td>
                                 <td class="cell-center"><span class="pi-code-tag">{{ clo.kyhieu }}</span></td>
-                                <td class="editable-cell" pEditableColumn title="Nhấn để chỉnh sửa nội dung">
-                                    <p-cellEditor>
-                                        <ng-template pTemplate="input"><textarea class="editor-in-table" [(ngModel)]="clo.noidung"
-                                            (focus)="autoResize($event)" (input)="autoResize($event)" (keydown)="blockArrowKeys($event)"
-                                            placeholder="Nhập nội dung chuẩn đầu ra"></textarea></ng-template>
-                                        <ng-template pTemplate="output"><div class="table-content ql-editor" [class.is-empty]="!clo.noidung"><i class="ti ti-edit" aria-hidden="true"></i><span [innerHTML]="clo.noidung || 'Nhấn để nhập nội dung chuẩn đầu ra' | safeHtmlDecode"></span></div></ng-template>
-                                    </p-cellEditor>
+                                <td class="editable-cell">
+                                    @if (editingCloId() === clo.id) {
+                                    <textarea #cloEditor class="editor-in-table" [(ngModel)]="clo.noidung"
+                                        [attr.aria-label]="'Nội dung chuẩn đầu ra ' + clo.kyhieu"
+                                        (focus)="autoResize($event)" (input)="autoResize($event)" (keydown)="blockArrowKeys($event)"
+                                        (blur)="finishEditClo()" placeholder="Nhập nội dung chuẩn đầu ra"></textarea>
+                                    } @else {
+                                    <div class="table-content ql-editor" [class.is-empty]="!clo.noidung">
+                                        <span [innerHTML]="clo.noidung || 'Chưa nhập nội dung chuẩn đầu ra' | safeHtmlDecode"></span>
+                                    </div>
+                                    }
                                 </td>
                                 @for (goal of list_course_muctieu; track goal.id) {
                                 <td class="matrix-cell matrix-cell--choice" [class.matrix-cell--checked]="goal.id === clo.course_muctieu_chitiet_id">
                                     <button type="button" class="matrix-choice" (click)="chooseMuctieuForClo(clo, goal)"
                                         [disabled]="isSaving()" [attr.aria-pressed]="goal.id === clo.course_muctieu_chitiet_id"
-                                        [attr.aria-label]="'Liên kết ' + clo.kyhieu + ' với ' + goal.kyhieu">
+                                        [attr.aria-label]="'Liên kết ' + clo.kyhieu + ' với ' + goal.kyhieu"
+                                        [pTooltip]="'Liên kết ' + clo.kyhieu + ' với ' + goal.kyhieu" tooltipPosition="top" appendTo="body">
                                         @if (goal.id === clo.course_muctieu_chitiet_id) {<i class="ti ti-check" aria-hidden="true"></i>}
                                         @else {<span class="matrix-dash" aria-hidden="true">—</span>}
                                     </button>
                                 </td>}
-                                <td class="cell-center"><button
-                                    class="btn ictu-button-danger-light ictu-admin-icon-button"
-                                    (click)="deleteClo(clo)" [disabled]="isSaving()" aria-label="Xóa chuẩn đầu ra">
-                                    <i class="ti ti-trash" aria-hidden="true"></i></button></td>
+                                <td class="cell-center"><div class="btn-group-actions">
+                                    <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
+                                        (click)="editClo(clo)" [disabled]="isSaving()" aria-label="Sửa chuẩn đầu ra"
+                                        pTooltip="Sửa chuẩn đầu ra" tooltipPosition="top" appendTo="body">
+                                        <i class="ti ti-edit" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
+                                        (click)="deleteClo(clo)" [disabled]="isSaving()" aria-label="Xóa chuẩn đầu ra"
+                                        pTooltip="Xóa chuẩn đầu ra" tooltipPosition="top" appendTo="body">
+                                        <i class="ti ti-trash" aria-hidden="true"></i>
+                                    </button>
+                                </div></td>
                             </tr>
                         </ng-template>
                         <ng-template pTemplate="emptymessage"><tr><td [attr.colspan]="list_course_muctieu.length + 4" class="cell-empty">Chưa có chuẩn đầu ra học phần.</td></tr></ng-template>
@@ -153,8 +181,10 @@
 
         <section class="cdr-matrix-card">
             <header class="cdr-matrix-card__header">
-                <div class="cdr-matrix-card__title"><i class="ti ti-layout-grid" aria-hidden="true"></i>
-                    <span>MA TRẬN ĐỐI CHIẾU CLO – PLO/PI</span></div>
+                <div class="cdr-matrix-card__title">
+                    <span class="cdr-header-icon" aria-hidden="true"><i class="ti ti-layout-grid"></i></span>
+                    <span>Ma trận đối chiếu CLO – PLO/PI</span>
+                </div>
                 <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse"
                     (click)="savePiOnClo()" [disabled]="isSaving() || !list_ctdt.length">Lưu liên kết</button>
             </header>
@@ -183,7 +213,7 @@
         <section id="cdr-panel-kiem-tra-danh-gia" class="cdr-subpanel cdr-settings-panel" role="tabpanel"
             aria-labelledby="cdr-tab-kiem-tra-danh-gia" [hidden]="activeSubTabId() !== 'kiem-tra-danh-gia'">
             @if (settingsVisited()) {
-            <app-monhoc-cauhinh mode="settings-only"></app-monhoc-cauhinh>
+            <app-monhoc-cauhinh mode="embedded"></app-monhoc-cauhinh>
             }
         </section>
     </div>

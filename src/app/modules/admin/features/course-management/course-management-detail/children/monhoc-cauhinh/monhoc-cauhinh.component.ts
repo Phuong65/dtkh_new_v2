@@ -41,10 +41,10 @@ import { getTestType, ROLES, ROUTERS } from '@modules/shared/utils/syscat';
     ],
     templateUrl: './monhoc-cauhinh.component.html',
     styleUrls: ['./monhoc-cauhinh.component.css'],
-    host: { '[class.config-settings-only]': "mode === 'settings-only'" }
+    host: { '[class.config-settings-only]': "mode !== 'all'" }
 })
 export class MonhocCauhinhComponent implements OnInit {
-    @Input() mode: 'all' | 'settings-only' = 'all';
+    @Input() mode: 'all' | 'settings-only' | 'embedded' = 'all';
 
     private readonly destroyRef = inject(DestroyRef);
     private readonly router = inject(Router);
@@ -211,7 +211,7 @@ export class MonhocCauhinhComponent implements OnInit {
             this.list_config = config.data || [];
             this.list_plan = plan.data || [];
             this.convertDataCourseConfig(courseConfig.data || []);
-            if (this.mode === 'all') await this.loadKiemtrathuongxuyen();
+            if (this.mode !== 'settings-only') await this.loadKiemtrathuongxuyen();
             if (!this.destroyRef.destroyed && version === this.loadVersion) this.state.set('success');
         } catch {
             if (this.destroyRef.destroyed || version !== this.loadVersion) return;

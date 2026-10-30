@@ -1,20 +1,21 @@
 import { ClassesService } from '@shared/services/classes.service';
-import { request } from 'http';
 import { CourseCloService } from '@modules/shared/services/course-clo.service';
 import { CoursePlanCommentService } from '@modules/shared/services/course-plan-comment.service';
 import { CoursePlanActivitiesService } from '@modules/shared/services/course-plan-activities.service';
-import { AfterViewChecked, AfterViewInit, Component, DestroyRef, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, DestroyRef, ElementRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { CHUAN_DAU_RA, ROLES, ROUTERS } from '@modules/shared/utils/syscat';
+import { AppState } from '@core-new/models/app-state';
 import { AuthService } from '@core/services/auth.service';
 import { SharedModule } from '@modules/shared/shared.module';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { OvicQueryCondition } from '@core/models/dto';
 import { ConditionOption } from '@modules/shared/models/condition-option';
-import { distinctUntilChanged, firstValueFrom, forkJoin, mergeMap, Observable, of } from 'rxjs';
+import { BehaviorSubject, concatMap, defer, distinctUntilChanged, finalize, firstValueFrom, forkJoin, from, map, mergeMap, Observable, of, tap, toArray } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NotificationService } from '@core/services/notification.service';
+import { NotificationService as CoreNewNotificationService, ProgressAnimationEvent } from '@core-new/service/notification.service';
 import { ElngUserProfileService } from '@modules/shared/services/elearning-user-profile.service';
 import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
 import { ElnKhoaHoc } from '@modules/shared/models/elng-khoa-hoc';
@@ -33,13 +34,13 @@ import { ClassPlanActivities } from '@modules/shared/models/class-plan-activitie
 import { NhanxetNoidungComponent } from "../nhanxet-noidung/nhanxet-noidung.component";
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NORMAL_MODAL_OPTIONS } from '@core/utils/syscat';
-import { DialogModule } from 'primeng/dialog';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { CourseQuestionsService } from '@modules/shared/services/course-questions.service';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 import { OpenFileManagerDraDropComponent } from "@modules/shared/components/open-file-manager-dra-drop/open-file-manager-dra-drop.component";
 import { OpenFileManagerV2Component } from '@modules/shared/components/open-file-manager-v2/open-file-manager-v2.component';
 import { OvicCkeditorDocumentComponent } from '@modules/shared/components/ovic-ckeditor-document/ovic-ckeditor-document.component';
@@ -61,11 +62,11 @@ import { ShowLabelData } from '@modules/shared/pipes/show-label-data.pipe';
         ChuandauraComponent,
         MatTabsModule,
         NhanxetNoidungComponent,
-        DialogModule,
-        MatProgressBarModule,
         DragDropModule,
         MatIconModule,
         MatMenuModule,
+        InputTextModule,
+        LoadingProgressComponent,
         OpenFileManagerDraDropComponent,
         OpenFileManagerV2Component,
         OvicCkeditorDocumentComponent,
@@ -79,6 +80,7 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
     private readonly destroyRef = inject(DestroyRef);
     private auth = inject(AuthService);
     private notificationService = inject(NotificationService);
+    private coreNewNotification = inject(CoreNewNotificationService);
     private activatedRoute = inject(ActivatedRoute);
     private router = inject(Router);
     private elnKhoaHocService = inject(ElnKhoaHocService);
@@ -175,9 +177,54 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
 
     list_clo: CourseClo[];
 
+    readonly state = signal<AppState>('loading');
+    readonly loadingHeading = signal<string>('Đang tải nội dung học phần...');
+    readonly errorMessage = signal<string>('');
+    readonly busyCount = signal(0);
+    readonly busyHeading = signal('Đang xử lý...');
+    readonly isBusy = computed(() => this.busyCount() > 0 || this.state() === 'loading');
+    private progressControl: BehaviorSubject<ProgressAnimationEvent> | null = null;
+    progressDialogOpened = false;
     displayComment: boolean = false;
 
-    loading: boolean = true;
+    beginBusy(heading: string): void {
+        this.busyHeading.set(heading);
+        this.busyCount.update(count => count + 1);
+    }
+
+    endBusy(): void {
+        this.busyCount.update(count => Math.max(0, count - 1));
+    }
+
+    private beginProgress(heading: string): void {
+        if (this.progressDialogOpened) return;
+        this.progressDialogOpened = true;
+        this.progressControl = new BehaviorSubject<ProgressAnimationEvent>({ heading, percent: 0 });
+        this.coreNewNotification.startProgressAnimation(this.progressControl.asObservable(), heading).pipe(
+            takeUntilDestroyed(this.destroyRef)
+        ).subscribe();
+    }
+
+    private updateProgress(percent: number): void {
+        this.progressControl?.next({ percent: Math.min(100, Math.max(0, percent)) });
+    }
+
+    private endProgress(completed = false): void {
+        if (!this.progressDialogOpened) return;
+        this.progressDialogOpened = false;
+        if (completed) this.updateProgress(100);
+        this.progressControl?.next({ disabled: true });
+        this.progressControl?.complete();
+        this.progressControl = null;
+    }
+
+    onChildBusy(event: { active: boolean; heading?: string }): void {
+        if (event.active) {
+            this.beginBusy(event.heading || 'Đang xử lý nội dung...');
+        } else {
+            this.endBusy();
+        }
+    }
 
     formTitle: string;
 
@@ -196,13 +243,21 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
     isAddThaoLuan: boolean = false;
 
     list_thaoluan: CoursePlanActivities[] = [];
+    private loadVersion = 0;
+
+    deletableLessonMap: Record<number, boolean> = {};
+    deletableThaoluanMap: Record<number, boolean> = {};
 
     app_configs = APP_CONFIGS;
 
     /** Inserted by Angular inject() migration for backwards compatibility */
     constructor(...args: unknown[]);
     constructor() {
-        this.isManager = this.auth.userHasRole(ROLES.manager) || this.auth.userHasRole(ROLES.admin) || this.auth.userHasRole(ROLES.troly_pdt) || this.auth.userHasRole(ROLES.chuyenvien_pdt) ? true : false;
+        this.isManager = this.auth.userHasRole(ROLES.manager)
+            || this.auth.userHasRole(ROLES.admin)
+            || this.auth.userHasRole(ROLES.troly_pdt)
+            || this.auth.userHasRole(ROLES.chuyenvien_pdt)
+            || this.auth.userHasRole(ROLES.daotao_new);
 
         this.isLanhDaoKhoa = this.auth.userHasRole(ROLES.lanhdaokhoa);
 
@@ -210,7 +265,8 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
 
         this.routerAdmin = this.auth.hasRouter(ROUTERS.admin, '/monhoc-noidung');
 
-        this.routerDaotao = this.auth.hasRouter(ROUTERS.daotao, '/monhoc-noidung');
+        this.routerDaotao = this.auth.hasRouter(ROUTERS.daotao, '/monhoc-noidung')
+            || this.auth.hasRouter(ROUTERS.daotao);
 
         this.routerLanhdaokhoa = this.auth.hasRouter(ROUTERS.lanhdao_khoa, '/monhoc-noidung');
 
@@ -268,177 +324,220 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
         });
     }
 
+    reloadData(): void {
+        if (this.state() === 'loading') return;
+        void this.loadContent(this.activatedRoute.snapshot.queryParams?.['code']);
+    }
+
+    private setLoading(heading: string): void {
+        this.loadingHeading.set(heading);
+        this.errorMessage.set('');
+        this.state.set('loading');
+    }
+
+    private setError(message: string): void {
+        this.errorMessage.set(message);
+        this.state.set('error');
+    }
+
     ngOnInit(): void {
         this.activatedRoute.queryParams.pipe(
             distinctUntilChanged((previous, current) => previous['code'] === current['code']),
             takeUntilDestroyed(this.destroyRef)
-        ).subscribe(async (params) => {
-            if (params && params['code']) {
-                this.notificationService.isProcessing(true);
-
-                const course_id = params['code'];
-
-                const contition_course: ConditionOption = {
-                    condition: [
-                        { conditionName: 'id', condition: OvicQueryCondition.equal, value: course_id.toString(), orWhere: 'and' },
-                    ],
-                    set: [
-                        { label: 'limit', value: '1' }
-                    ],
-                    page: null
-                }
-
-                if (this.routerGiangvien) {
-                    contition_course.condition.push({ conditionName: 'creator_plan_id', condition: OvicQueryCondition.equal, value: this.userId.toString(), orWhere: 'and' })
-                }
-
-                const condition_user: ConditionOption = {
-                    condition: [
-                        { conditionName: 'user_id', condition: OvicQueryCondition.equal, value: this.userId.toString(), orWhere: 'and' }
-                    ],
-                    set: [
-                        { label: 'limit', value: '1' }
-                    ],
-                    page: null
-                }
-
-                const condition_plan: ConditionOption = {
-                    condition: [
-                        { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: course_id.toString(), orWhere: 'and' },
-                        { conditionName: 'week', condition: OvicQueryCondition.lessThan, value: '100', orWhere: 'and' },
-                        { conditionName: 'status', condition: OvicQueryCondition.notEqual, value: '-3', orWhere: 'and' },
-                        { conditionName: 'type', condition: OvicQueryCondition.notEqual, value: 'ACTIVITY_TEST', orWhere: 'and' }
-                    ],
-                    set: [
-                        { label: 'limit', value: '-1' },
-                        { label: 'order', value: 'ASC' },
-                        { label: 'orderby', value: 'ordering' }
-                    ],
-                    page: null
-                }
-
-                const condition_comment: ConditionOption = {
-                    condition: [
-                        { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: course_id.toString() },
-                        { conditionName: 'parent_id', condition: OvicQueryCondition.equal, value: '0', orWhere: 'and' },
-                    ],
-
-                    set: [{ label: 'limit', value: '-1' }],
-                    page: null,
-                };
-
-                const condition_reply_comment: ConditionOption = {
-                    condition: [
-                        { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: course_id.toString() },
-                        { conditionName: 'parent_id', condition: OvicQueryCondition.notEqual, value: '0', orWhere: 'and' },
-                    ],
-                    set: [
-                        { label: 'limit', value: '-1' },
-                        { label: 'select', value: 'id, parent_id' },
-                    ],
-                    page: null,
-                };
-
-                const condition_clo: ConditionOption = {
-                    condition: [
-                        { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: course_id.toString() },
-                    ],
-                    set: [
-                        { label: 'limit', value: '-1' },
-                        { label: 'order', value: 'ASC' },
-                        { label: 'orderby', value: 'ordering' }
-                    ],
-                    page: null
-                }
-
-                const condition_class: ConditionOption = {
-                    condition: [
-                        { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: course_id.toString() },
-                    ],
-                    set: [
-                        { label: 'limit', value: '1' },
-                    ],
-                    page: null
-                }
-
-                let class_;
-                try {
-                    class_ = await firstValueFrom(this.classesService.getClassesByPageNew(condition_class).pipe(takeUntilDestroyed(this.destroyRef)));
-                } catch {
-                    if (this.destroyRef.destroyed) return;
-                    this.notificationService.isProcessing(false);
-                    this.notificationService.toastError('Lỗi kết nối, vui lòng thử lại');
-                    return;
-                }
-                if (this.destroyRef.destroyed) return;
-
-                if (class_ && class_.recordsFiltered === 0 && APP_CONFIGS.dragDropLesson) {
-                    this.dragDropLesson = true;
-                }
-
-                forkJoin([
-                    this.elnKhoaHocService.getKhoaHocByPageNew_2(contition_course),
-                    this.elngUserProfileService.getUserProfileByPageNewV2(condition_user),
-                    this.coursePlanActivitiesService.getCoursePlanActivitiesByPageNew(condition_plan),
-                    this.coursePlanCommentService.getCoursePlanCommentByPageNew(condition_comment),
-                    this.coursePlanCommentService.getCoursePlanCommentByPageNew(condition_reply_comment),
-                    this.courseCloService.getCourseCloByPageNew(condition_clo)
-                ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-                    next: async ([_course, _user_profile, _plan, _comment, _comment_child, _course_clo]) => {
-                        if (_course.recordsFiltered) {
-
-                            this.selectedCourse = _course.data[0];
-
-                            this.indexByKeyServerInSotinchi = key_server == 'hvu' ? (this.selectedCourse.params.sotinchi == 2 ? 1 : ([3, 4].includes(this.selectedCourse.params.sotinchi) ? 2 : null)) : this.selectedCourse.params.sotinchi;
-
-                            if (this.routerLanhdaokhoa) {
-                                if (_user_profile.recordsFiltered === 0 || this.selectedCourse.category_ids !== _user_profile.data[0].donvi_chuyenmon_id) {
-                                    this.notificationService.toastError("Không tìm thấy môn học");
-                                    this.router.navigate(['/admin/content-none']);
-                                }
-                            }
-
-                            if (this.routerLanhdaobomon) {
-                                if (_user_profile.recordsFiltered === 0 || this.selectedCourse.nganh_bomon_id !== _user_profile.data[0].bomon_id) {
-                                    this.notificationService.toastError("Không tìm thấy môn học");
-                                    this.router.navigate(['/admin/content-none']);
-                                }
-                            }
-
-                            if (this.routerDaotao || this.routerLanhdaobomon || this.routerLanhdaokhoa || this.userId === this.selectedCourse.creator_plan_id) {
-                                this.canAdded = true;
-                            } else {
-                                this.canAdded = false;
-                            }
-
-                            this.list_plan = this.setNewData(_plan.data.filter(m => m.week !== 0), _comment.data, _comment_child.data);
-
-                            if (this.list_plan.length)
-                                this.onChangePlan(this.list_plan[0], 'muctieu');
-
-                            this.list_clo = _course_clo.data;
-
-                            this.loading = false;
-
-                            this.list_thaoluan = await this.getThaoLuanPromise();
-
-                            this.notificationService.isProcessing(false);
-
-                        } else {
-                            this.notificationService.toastError("Không tìm thấy môn học");
-                            this.router.navigate(['/admin/content-none']);
-                        }
-                    },
-                    error: () => {
-                        this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
-                    }
-                })
-            } else {
-                this.router.navigate(['/admin/content-none']);
-            }
-        })
+        ).subscribe(params => {
+            void this.loadContent(params?.['code']);
+        });
     }
 
+    private async loadContent(course_id: string | number | null): Promise<void> {
+        const version = ++this.loadVersion;
+        this.list_plan = [];
+        this.list_thaoluan = [];
+        this.selectPlan = null;
+        this.selectedPlanActivity = null;
+        this.selectedCourse = null;
+        this.canAdded = false;
+        this.dragDropLesson = false;
+        this.errorMessage.set('');
+        if (course_id) {
+            this.setLoading('Đang tải nội dung học phần...');
+
+            const contition_course: ConditionOption = {
+                condition: [
+                    { conditionName: 'id', condition: OvicQueryCondition.equal, value: course_id.toString(), orWhere: 'and' },
+                ],
+                set: [
+                    { label: 'limit', value: '1' }
+                ],
+                page: null
+            }
+
+            if (this.routerGiangvien) {
+                contition_course.condition.push({ conditionName: 'creator_plan_id', condition: OvicQueryCondition.equal, value: this.userId.toString(), orWhere: 'and' })
+            }
+
+            const condition_user: ConditionOption = {
+                condition: [
+                    { conditionName: 'user_id', condition: OvicQueryCondition.equal, value: this.userId.toString(), orWhere: 'and' }
+                ],
+                set: [
+                    { label: 'limit', value: '1' }
+                ],
+                page: null
+            }
+
+            const condition_plan: ConditionOption = {
+                condition: [
+                    { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: course_id.toString(), orWhere: 'and' },
+                    { conditionName: 'week', condition: OvicQueryCondition.lessThan, value: '100', orWhere: 'and' },
+                    { conditionName: 'status', condition: OvicQueryCondition.notEqual, value: '-3', orWhere: 'and' },
+                    { conditionName: 'type', condition: OvicQueryCondition.notEqual, value: 'ACTIVITY_TEST', orWhere: 'and' }
+                ],
+                set: [
+                    { label: 'limit', value: '-1' },
+                    { label: 'order', value: 'ASC' },
+                    { label: 'orderby', value: 'ordering' },
+                    { label: 'cursor', value: '0' }
+                ],
+                page: null
+            }
+
+            const condition_comment: ConditionOption = {
+                condition: [
+                    { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: course_id.toString() },
+                    { conditionName: 'parent_id', condition: OvicQueryCondition.equal, value: '0', orWhere: 'and' },
+                ],
+
+                set: [
+                    { label: 'limit', value: '-1' },
+                    { label: 'cursor', value: '0' }
+                ],
+                page: null,
+            };
+
+            const condition_reply_comment: ConditionOption = {
+                condition: [
+                    { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: course_id.toString() },
+                    { conditionName: 'parent_id', condition: OvicQueryCondition.notEqual, value: '0', orWhere: 'and' },
+                ],
+                set: [
+                    { label: 'limit', value: '-1' },
+                    { label: 'select', value: 'id, parent_id' },
+                    { label: 'cursor', value: '0' }
+                ],
+                page: null,
+            };
+
+            const condition_clo: ConditionOption = {
+                condition: [
+                    { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: course_id.toString() },
+                ],
+                set: [
+                    { label: 'limit', value: '-1' },
+                    { label: 'order', value: 'ASC' },
+                    { label: 'orderby', value: 'ordering' },
+                    { label: 'cursor', value: '0' }
+                ],
+                page: null
+            }
+
+            const condition_class: ConditionOption = {
+                condition: [
+                    { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: course_id.toString() },
+                ],
+                set: [
+                    { label: 'limit', value: '1' },
+                ],
+                page: null
+            }
+
+            let class_;
+            try {
+                class_ = await firstValueFrom(this.classesService.getClassesByPageNew(condition_class).pipe(takeUntilDestroyed(this.destroyRef)));
+            } catch {
+                if (this.destroyRef.destroyed || version !== this.loadVersion) return;
+                this.setError('Lỗi kết nối, vui lòng thử lại');
+                this.notificationService.toastError('Lỗi kết nối, vui lòng thử lại');
+                return;
+            }
+            if (this.destroyRef.destroyed || version !== this.loadVersion) return;
+
+            if (class_ && class_.recordsFiltered === 0 && APP_CONFIGS.dragDropLesson) {
+                this.dragDropLesson = true;
+            }
+
+            forkJoin([
+                this.elnKhoaHocService.getKhoaHocByPageNew_2(contition_course),
+                this.elngUserProfileService.getUserProfileByPageNewV2(condition_user),
+                this.coursePlanActivitiesService.getCoursePlanActivitiesByPageNew(condition_plan),
+                this.coursePlanCommentService.getCoursePlanCommentByPageNew(condition_comment),
+                this.coursePlanCommentService.getCoursePlanCommentByPageNew(condition_reply_comment),
+                this.courseCloService.getCourseCloByPageNew(condition_clo)
+            ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+                next: async ([_course, _user_profile, _plan, _comment, _comment_child, _course_clo]) => {
+                    if (this.destroyRef.destroyed || version !== this.loadVersion) return;
+                    if (_course.recordsFiltered || _course.data?.length) {
+
+                        this.selectedCourse = _course.data[0];
+
+                        this.indexByKeyServerInSotinchi = key_server == 'hvu' ? (this.selectedCourse.params.sotinchi == 2 ? 1 : ([3, 4].includes(this.selectedCourse.params.sotinchi) ? 2 : null)) : this.selectedCourse.params.sotinchi;
+
+                        if (this.routerLanhdaokhoa) {
+                            if (_user_profile.recordsFiltered === 0 || this.selectedCourse.category_ids !== _user_profile.data[0].donvi_chuyenmon_id) {
+                                this.setError("Không tìm thấy môn học");
+                                this.notificationService.toastError("Không tìm thấy môn học");
+                                this.router.navigate(['/admin/content-none']);
+                                return;
+                            }
+                        }
+
+                        if (this.routerLanhdaobomon) {
+                            if (_user_profile.recordsFiltered === 0 || this.selectedCourse.nganh_bomon_id !== _user_profile.data[0].bomon_id) {
+                                this.setError("Không tìm thấy môn học");
+                                this.notificationService.toastError("Không tìm thấy môn học");
+                                this.router.navigate(['/admin/content-none']);
+                                return;
+                            }
+                        }
+
+                        const hasContentCreationPermission = this.isManager
+                            || this.isLanhDaoKhoa
+                            || this.routerDaotao
+                            || this.routerLanhdaokhoa
+                            || this.routerLanhdaobomon
+                            || this.userId === this.selectedCourse.creator_plan_id;
+                        this.canAdded = hasContentCreationPermission;
+
+                        this.list_plan = this.setNewData(_plan.data.filter(m => m.week !== 0), _comment.data, _comment_child.data);
+
+                        if (this.list_plan.length)
+                            this.onChangePlan(this.list_plan[0], 'muctieu');
+
+                        this.list_clo = _course_clo.data;
+
+                        this.list_thaoluan = await this.getThaoLuanPromise();
+                        if (this.destroyRef.destroyed || version !== this.loadVersion) return;
+                        this.updateDeletableState();
+
+                        this.state.set('success');
+
+                    } else {
+                        this.setError("Không tìm thấy môn học");
+                        this.notificationService.toastError("Không tìm thấy môn học");
+                        this.router.navigate(['/admin/content-none']);
+                    }
+                },
+                error: () => {
+                    if (this.destroyRef.destroyed || version !== this.loadVersion) return;
+                    this.setError("Lỗi kết nối, vui lòng thử lại");
+                    this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
+                }
+            })
+        } else {
+            this.setError("ID học phần không hợp lệ.");
+            this.router.navigate(['/admin/content-none']);
+        }
+    }
 
     ngAfterViewChecked() {
         if (this.keyScroll) {
@@ -457,7 +556,7 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
 
 
     loadPlan() {
-        this.notificationService.isProcessing(true);
+        this.beginBusy('Đang cập nhật nội dung học phần...');
         const condition_plan: ConditionOption = {
             condition: [
                 { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: this.selectedCourse.id.toString(), orWhere: 'and' },
@@ -468,7 +567,8 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
             set: [
                 { label: 'limit', value: '-1' },
                 { label: 'order', value: 'ASC' },
-                { label: 'orderby', value: 'ordering' }
+                { label: 'orderby', value: 'ordering' },
+                { label: 'cursor', value: '0' }
             ],
             page: null
         }
@@ -479,7 +579,10 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
                 { conditionName: 'parent_id', condition: OvicQueryCondition.equal, value: '0', orWhere: 'and' },
             ],
 
-            set: [{ label: 'limit', value: '-1' }],
+            set: [
+                { label: 'limit', value: '-1' },
+                { label: 'cursor', value: '0' }
+            ],
             page: null,
         };
 
@@ -491,6 +594,7 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
             set: [
                 { label: 'limit', value: '-1' },
                 { label: 'select', value: 'id, parent_id' },
+                { label: 'cursor', value: '0' }
             ],
             page: null,
         };
@@ -503,11 +607,12 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
             next: ([_plan, _comment, _comment_child]) => {
 
                 this.list_plan = this.setNewData(_plan.data.filter(m => m.week !== 0), _comment.data, _comment_child.data);
+                this.updateDeletableState();
 
-                this.notificationService.isProcessing(false);
+                this.endBusy();
             },
             error: () => {
-                this.notificationService.isProcessing(false);
+                this.endBusy();
             }
         })
     }
@@ -524,7 +629,8 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
                 set: [
                     { label: 'limit', value: '-1' },
                     { label: 'order', value: 'ASC' },
-                    { label: 'orderby', value: 'ordering' }
+                    { label: 'orderby', value: 'ordering' },
+                    { label: 'cursor', value: '0' }
                 ],
                 page: null
             }
@@ -549,8 +655,7 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
                     resolve(parent);
                 },
                 error: () => {
-                    this.notificationService.isProcessing(false);
-                    this.notificationService.toastError(
+                                this.notificationService.toastError(
                         'Lỗi kết nối, vui lòng thử lại, hoặc liên hệ với kỹ thuật viên nếu thử lại không thành công'
                     );
                     resolve([]);
@@ -784,50 +889,45 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
     deleteThaoLuan(plan: CoursePlanActivities) {
         this.notificationService.confirmDelete().then(a => {
             if (a) {
-                this.notificationService.isProcessing(true);
-                this.coursePlanActivitiesService.deleteCoursePlanActivities(plan.id).subscribe({
+                this.beginBusy('Đang xóa thảo luận...');
+                        this.coursePlanActivitiesService.deleteCoursePlanActivities(plan.id).subscribe({
                     next: async () => {
                         this.list_thaoluan = await this.getThaoLuanPromise();
-                        this.notificationService.isProcessing(false);
-                    },
+                        this.updateDeletableState();
+                        this.endBusy();
+                                    },
                     error: () => {
-                        this.notificationService.isProcessing(false);
-                        this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
+                        this.endBusy();
+                                        this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
                     }
                 })
             }
         })
     }
 
-    checkDeleteThaoluan(index: number) {
-        let result = false;
-        if (this.list_thaoluan[0]) {
-            const data = this.list_thaoluan[0].children;
-
-            if (index === data.length - 1) {
-                result = true;
+    updateDeletableState(): void {
+        this.deletableLessonMap = {};
+        if (this.unlimitLesson && Array.isArray(this.list_plan)) {
+            const data = this.list_plan.filter(m => m.week < 100);
+            const lastIndex = data.length - 1;
+            if (lastIndex >= 0 && this.list_plan[lastIndex] && this.list_plan[lastIndex].week !== 0) {
+                this.deletableLessonMap[lastIndex] = true;
             }
         }
-        return result;
-    }
 
-    checkDeleteBaigiang(index: number) {
-        let result = false;
-
-        const data = this.list_plan.filter(m => m.week < 100);
-
-        if (index === data.length - 1 && this.list_plan[index] && this.list_plan[index].week !== 0 && this.unlimitLesson) {
-            result = true;
+        this.deletableThaoluanMap = {};
+        const firstThaoluan = this.list_thaoluan?.[0];
+        if (firstThaoluan && Array.isArray(firstThaoluan.children) && firstThaoluan.children.length > 0) {
+            this.deletableThaoluanMap[firstThaoluan.children.length - 1] = true;
         }
-
-        return result;
     }
+
 
     deletePlan(plan: CoursePlanActivities) {
         this.notificationService.confirmDelete().then((a) => {
             if (a) {
-                this.notificationService.isProcessing(true);
-                const condition_question: ConditionOption = {
+                this.beginBusy('Đang xóa bài học...');
+                        const condition_question: ConditionOption = {
                     condition: [
                         {
                             conditionName: 'week',
@@ -844,7 +944,8 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
                     ],
                     set: [
                         { label: 'limit', value: '1' },
-                        { label: 'select', value: 'id' }
+                        { label: 'select', value: 'id' },
+                        { label: 'cursor', value: '0' }
                     ],
                     page: null
                 }
@@ -852,8 +953,8 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
                 this.courseQuestionsService.getCourseQuestionsByPageNew(condition_question).subscribe({
                     next: (a) => {
                         if (a.recordsFiltered) {
-                            this.notificationService.isProcessing(false);
-                            this.notificationService.toastInfo("Bài này đã có câu hỏi, không thể xóa");
+                            this.endBusy();
+                                                this.notificationService.toastInfo("Bài này đã có câu hỏi, không thể xóa");
                         } else {
                             forkJoin([
                                 this.coursePlanActivitiesService.deleteCoursePlanActivities(plan.id),
@@ -861,19 +962,20 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
                             ]).subscribe({
                                 next: () => {
                                     this.notificationService.toastSuccess('Xóa thành công');
+                                    this.endBusy();
                                     this.loadPlan();
                                 },
                                 error: () => {
-                                    this.notificationService.isProcessing(false);
-                                    this.notificationService.toastSuccess('Xóa thất bài');
+                                    this.endBusy();
+                                                                this.notificationService.toastSuccess('Xóa thất bài');
                                 },
                             });
 
                         }
                     },
                     error: () => {
-                        this.notificationService.isProcessing(false);
-                        this.notificationService.toastSuccess('Xóa thất bài');
+                        this.endBusy();
+                                        this.notificationService.toastSuccess('Xóa thất bài');
                     }
                 })
 
@@ -888,44 +990,6 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
     onOpenAddCdr() {
         this.chuandauraComponent.onOpenAddCdr();
     }
-    // loadPlanChildren() {
-    //     this.notificationService.isProcessing(true);
-    //     const condition_child: ConditionOption = {
-    //         condition: [
-    //             { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: this.selectedCourse.id.toString(), orWhere: 'and' },
-    //             { conditionName: 'parent_id', condition: OvicQueryCondition.equal, value: this.selectPlan.id.toString(), orWhere: 'and' },
-    //             { conditionName: 'status', condition: OvicQueryCondition.notEqual, value: '-3', orWhere: 'and' }
-    //         ],
-    //         set: [
-    //             { label: 'limit', value: '-1' }
-    //         ],
-    //         page: null
-    //     }
-
-    //     forkJoin([
-    //         this.coursePlanActivitiesService.getCoursePlanActivitiesByPageNew(condition_child)
-    //     ]).subscribe({
-    //         next: ([_plan_child]) => {
-    //             this.list_plan_activity = _plan_child.data;
-    //             this.notificationService.isProcessing(false);
-    //         },
-    //         error: () => {
-    //             this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
-    //             this.notificationService.isProcessing(false);
-    //         }
-    //     })
-    // }
-
-    autoResize(event: Event) {
-        const textarea = event.target as HTMLTextAreaElement;
-        textarea.style.height = 'auto';
-        textarea.style.height = textarea.scrollHeight + 'px';
-    }
-
-    tapViewLesson() {
-
-    }
-
     scroll(name: string) {
         switch (name) {
             case 'muctieu':
@@ -956,25 +1020,27 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
 
     resetForm() {
         this.formTailieu.reset();
+        this.formMuctieu.reset();
+        this.formThaoLuan.reset();
     }
 
     saveTailieu() {
         const data = { ...this.formTailieu.getRawValue() };
         if (((data['files'] && data['files'].length > 0) || (data['slides'] && data['slides'].length > 0)) && this.planTailieu) {
-            this.notificationService.isProcessing(true);
-            const data = { ...this.formTailieu.getRawValue() };
-            data['video'] = data['video'] && data['video'].length ? data['video'][0] : null;
+            this.beginBusy('Đang lưu tài liệu giảng dạy...');
+                data['video'] = data['video'] && data['video'].length ? data['video'][0] : null;
             if (!APP_CONFIGS.isDttx || this.keyServer === 'hvu') {
                 delete data['videos'];
             }
             this.coursePlanActivitiesService.updateCoursePlanActivities(this.planTailieu.id, data).subscribe({
                 next: () => {
-                    this.loadPlan();
+                    this.endBusy();
+                                this.loadPlan();
                     this.notificationService.toastSuccess("Lưu thành công");
                 },
                 error: () => {
-                    this.notificationService.isProcessing(false);
-                    this.notificationService.toastSuccess("Lưu thất bại");
+                    this.endBusy();
+                                this.notificationService.toastError("Lưu thất bại");
                 }
             })
         } else {
@@ -984,8 +1050,8 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
 
     saveMuctieu() {
         if (this.formMuctieu.valid) {
-            this.notificationService.isProcessing(true);
-            const data = { ...this.formMuctieu.getRawValue() };
+            this.beginBusy('Đang lưu mục tiêu bài học...');
+                const data = { ...this.formMuctieu.getRawValue() };
             const data_muctieu = {
                 kynang: data['kynang'],
                 kienthuc: data['kienthuc']
@@ -1002,12 +1068,13 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
                 this.coursePlanActivitiesService.updateCoursePlanActivities(this.selectPlan.id, data_plan)
             ]).subscribe({
                 next: () => {
-                    this.loadPlan();
+                    this.endBusy();
+                                this.loadPlan();
                     this.notificationService.toastSuccess("Lưu thành công");
                 },
                 error: () => {
-                    this.notificationService.isProcessing(false);
-                    this.notificationService.toastSuccess("Lưu thất bại");
+                    this.endBusy();
+                                this.notificationService.toastError("Lưu thất bại");
                 }
             })
         } else {
@@ -1050,10 +1117,8 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
             return;
         }
 
-        this.notificationService.isProcessing(false);
+        this.beginProgress('Đang khởi tạo nội dung giảng dạy...');
         this.progressValue = 0;
-        this.displayModal = true;
-        this.titleWaiting = 'Đang khởi tạo, vui lòng chờ';
         let lesson = add_lesson ? add_lesson : 9;
         if (!this.unlimitLesson) {
             lesson = Number(this.selectedCourse.params.sotinchi) * 3;
@@ -1069,7 +1134,7 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
                     this.loopAddPlan(first, lesson);
                 } else {
                     this.notificationService.toastWarning('Bài học cho môn học này đã đạt số lượng tối đa, không thể thêm');
-                    this.displayModal = false;
+                    this.endProgress();
                 }
             } else {
                 this.loopAddPlan(first, lesson);
@@ -1082,6 +1147,7 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
     loopAddPlan(key: number, length: number) {
         if (key <= length) {
             this.progressValue = (key / length) * 100;
+            this.updateProgress(this.progressValue);
             const data = {
                 ordering: key,
                 course_id: this.selectedCourse.id,
@@ -1133,7 +1199,7 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
                             },
                             error: () => {
                                 this.notificationService.toastError('Lỗi kết nối, vui lòng thử lại');
-                                this.displayModal = false;
+                                this.endProgress();
                             },
                         });
                     } else {
@@ -1142,24 +1208,23 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
                 },
                 error: () => {
                     this.notificationService.toastError('Lỗi kết nối, vui lòng thử lại');
-                    this.displayModal = false;
+                    this.endProgress();
                 },
             });
         } else {
+            this.updateProgress(100);
+            this.endProgress();
             if (this.isLanhDaoKhoa || this.isManager) {
                 this.elnKhoaHocService.updateElnKhoaHoc(this.selectedCourse.id, { creator_plan_id: this.auth.user.id }).subscribe({
                     next: () => {
-                        this.displayModal = false;
                         this.notificationService.toastSuccess('Khởi tạo thành công');
                         this.loadPlan();
                     },
                     error: () => {
-                        this.displayModal = false;
                         this.notificationService.toastError('Khởi tạo thất bại');
                     },
                 });
             } else {
-                this.displayModal = false;
                 this.notificationService.toastSuccess('Khởi tạo thành công');
                 this.loadPlan();
             }
@@ -1198,6 +1263,7 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
 
     drop(event: CdkDragDrop<string[]>) {
         moveItemInArray(this.list_plan, event.previousIndex, event.currentIndex);
+        this.updateDeletableState();
     }
 
     saveOrderingLesson() {
@@ -1209,13 +1275,14 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
             ],
             set: [
                 { label: 'limit', value: '-1' },
+                { label: 'cursor', value: '0' },
                 { label: 'include', value: parent_id.toString() },
                 { label: 'include_by', value: 'parent_id' }
             ],
             page: null
         }
 
-        this.displayModal = true;
+        this.beginBusy('Đang cập nhật thứ tự nội dung...');
         this.progressValue = 0;
         this.coursePlanActivitiesService.getCoursePlanActivitiesByPageNew(condition_cdr).subscribe({
             next: (_cdr) => {
@@ -1241,18 +1308,21 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
                 if (request.length) {
                     this.loopAddForm(request, 0).subscribe({
                         next: () => {
-                            this.displayModal = false;
+                            this.endBusy();
                             this.loadPlan();
                             this.notificationService.toastSuccess("Cập nhật thành công");
                         },
                         error: () => {
-                            this.notificationService.toastSuccess("Cập nhật thất bại");
-                            this.displayModal = false;
+                            this.endBusy();
+                            this.notificationService.toastError("Cập nhật thất bại");
                         }
                     })
+                } else {
+                    this.endBusy();
                 }
             },
             error: () => {
+                this.endBusy();
                 this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
             }
         })
@@ -1277,7 +1347,7 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
     }
 
     async onAddThaoLuan() {
-        this.notificationService.isProcessing(true);
+        this.beginBusy('Đang thêm bài thảo luận...');
         const number_lesson = parseInt(this.numberAddLesson.toString());
         const request: Observable<any>[] = [];
         if (this.list_thaoluan.length) {
@@ -1326,11 +1396,17 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
                 exam_type: this.selectedCourse.params.exam_type
             }
 
-            const id_parent = await firstValueFrom(this.coursePlanActivitiesService.addCoursePlanActivities(_plan_thaoluan));
+            let id_parent: number;
+            try {
+                id_parent = await firstValueFrom(this.coursePlanActivitiesService.addCoursePlanActivities(_plan_thaoluan));
+            } catch {
+                this.endBusy();
+                        return this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
+            }
 
             if (!id_parent) {
-                this.notificationService.isProcessing(false);
-                return this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
+                this.endBusy();
+                        return this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
             }
 
             for (let i = 1; i <= number_lesson; i++) {
@@ -1358,11 +1434,12 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
         forkJoin(request).subscribe({
             next: async () => {
                 this.list_thaoluan = await this.getThaoLuanPromise();
-                this.notificationService.isProcessing(false);
-            },
+                this.updateDeletableState();
+                this.endBusy();
+                    },
             error: () => {
-                this.notificationService.isProcessing(false);
-                this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
+                this.endBusy();
+                        this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
             }
         })
     }
@@ -1370,16 +1447,17 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
     saveThaoLuan() {
         if (this.formThaoLuan.valid) {
             const data = { ...this.formThaoLuan.getRawValue() };
-            this.notificationService.isProcessing(true);
-            this.coursePlanActivitiesService.updateCoursePlanActivities(this.selectedPlanActivity.id, data).subscribe({
+            this.beginBusy('Đang lưu bài thảo luận...');
+                this.coursePlanActivitiesService.updateCoursePlanActivities(this.selectedPlanActivity.id, data).subscribe({
                 next: async () => {
                     this.list_thaoluan = await this.getThaoLuanPromise();
+                    this.updateDeletableState();
+                    this.endBusy();
                     this.notificationService.toastSuccess("Cập nhật thành công");
-                    this.notificationService.isProcessing(false);
-                },
+                            },
                 error: () => {
-                    this.notificationService.isProcessing(false);
-                    this.notificationService.toastError("Cập nhật thất bại");
+                    this.endBusy();
+                                this.notificationService.toastError("Cập nhật thất bại");
                 }
             })
         }

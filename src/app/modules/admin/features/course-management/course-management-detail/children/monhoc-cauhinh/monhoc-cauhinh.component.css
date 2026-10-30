@@ -37,27 +37,22 @@
 }
 
 .config-card-header.admin-wrap-table__head {
-    display: flex;
-    align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    min-height: 68px;
-    padding: 10px 16px;
     border: 0;
-    border-bottom: 1px solid #dbe3ec;
-    background: #fff;
 }
 
-.config-card-header .admin-wrap-table__heading {
-    color: #334155;
-    font-size: 14.5px;
-    font-weight: 600;
-    letter-spacing: .02em;
+.config-test-heading {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 12px;
 }
 
-.config-card-subtitle,
-.config-section-heading p,
-.config-setting-card header p {
+.config-test-heading > div {
+    min-width: 0;
+}
+
+.config-section-heading p {
     margin: 4px 0 0;
     color: #64748b;
     line-height: 1.45;
@@ -150,18 +145,39 @@
 
 :host(.config-settings-only) .config-shell {
     min-height: 0;
-    height: auto;
+    height: 100%;
     background: transparent;
-    overflow: visible;
+    overflow: hidden;
 }
 
 :host(.config-settings-only) .config-workspace {
     width: 100%;
+    height: 100%;
+    min-height: 0;
     padding: 0;
+    overflow: auto;
 }
 
 :host(.config-settings-only) .config-settings {
     margin-top: 0;
+}
+
+:host(.config-settings-only) .config-table-card + .config-settings {
+    margin-top: 16px;
+}
+
+:host(.config-settings-only) .config-card-grid {
+    gap: 16px;
+}
+
+:host(.config-settings-only) .config-shell > app-loading-progress {
+    position: absolute !important;
+    inset: 0 !important;
+    display: flex !important;
+    width: 100% !important;
+    height: 100% !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .config-section-heading {
@@ -170,9 +186,9 @@
     justify-content: space-between;
     gap: 16px;
     padding: 14px 16px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #bfdbfe;
     border-radius: var(--admin-wrap-table-element-radius, 4px);
-    background: #fff;
+    background: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
     border-top: none;
 }
 
@@ -183,11 +199,25 @@
     letter-spacing: .09em;
 }
 
+.config-section-heading .admin-wrap-table__heading {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.config-section-heading .admin-wrap-table__heading i {
+    color: #2563eb;
+    font-size: 16px;
+}
+
+.config-section-heading .admin-wrap-table__heading,
 .config-section-heading h2 {
-    margin: 2px 0 0;
-    color: #334155;
-    font-size: 19px;
-    font-weight: 650;
+    margin: 0;
+    color: #1e3a8a;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: normal;
+    text-transform: none;
 }
 
 .config-card-grid {
@@ -201,27 +231,69 @@
     border-radius: var(--admin-wrap-table-element-radius, 4px);
     background: #fff;
     overflow: hidden;
-    grid-column: span 2
+    grid-column: span 2;
 }
 
 .config-setting-card--wide {
     grid-column: span 2;
 }
 
+.config-card-header.admin-wrap-table__head,
 .config-setting-card>header {
+    position: relative;
     display: flex;
+    min-height: 48px;
     align-items: center;
-    gap: 11px;
-    min-height: 68px;
-    padding: 12px 16px;
-    border-bottom: 1px solid #edf2f7;
+    gap: 12px;
+    padding: 9px 14px 9px 18px;
+    border-bottom: 1px solid #cbd5e1;
+    background: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
 }
 
+.config-card-header::before,
+.config-setting-card>header::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    background: #2563eb;
+    content: '';
+}
+
+.config-setting-card header>div {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.config-test-heading .config-card-subtitle,
+.config-setting-card header p {
+    margin: 2px 0 0;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.config-card-header .admin-wrap-table__heading,
 .config-setting-card h3 {
     margin: 0;
-    color: #334155;
-    font-size: 14px;
-    font-weight: 600;
+    color: #1e3a8a;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.config-test-heading .setting-icon,
+.config-setting-card .setting-icon {
+    display: inline-flex;
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #bfdbfe;
+    border-radius: var(--admin-wrap-table-element-radius, 4px);
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 17px;
 }
 
 .setting-icon {
@@ -365,6 +437,30 @@
 }
 
 
+
+.config-settings-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 16px;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--admin-wrap-table-element-radius, 4px);
+    background: #fff;
+}
+
+.config-setting-card .config-settings-footer {
+    margin-top: 0;
+    border: 0;
+    border-top: 1px solid #e2e8f0;
+    border-radius: 0;
+}
+
+.config-settings-footer button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
 
 .label-setting-row {
     font-weight: 500;

@@ -64,7 +64,7 @@ describe('MonhocCauhinhComponent mode', () => {
         root = fixture.nativeElement;
     });
 
-    async function render(mode: 'all' | 'settings-only' = 'all'): Promise<void> {
+    async function render(mode: 'all' | 'settings-only' | 'embedded' = 'all'): Promise<void> {
         fixture.componentRef.setInput('mode', mode);
         fixture.detectChanges();
         await fixture.whenStable();
@@ -83,6 +83,15 @@ describe('MonhocCauhinhComponent mode', () => {
         }));
     });
 
+    it('embedded hiển thị kiểm tra thường xuyên và bốn nhóm điểm', async () => {
+        await render('embedded');
+        expect(root.querySelector('.config-table-card')).not.toBeNull();
+        expect(root.querySelector('.config-card-header')?.textContent).toContain('Kiểm tra thường xuyên');
+        expect(root.querySelectorAll('.config-setting-card').length).toBe(4);
+        expect(planLoad).toHaveBeenCalledTimes(2);
+        expect(planLoad.calls.allArgs().some(args => JSON.stringify(args).includes('1000'))).toBeTrue();
+    });
+
     it('settings-only hiển thị điểm dù chưa có kế hoạch kiểm tra, không tải tuần 1000', async () => {
         await render('settings-only');
         expect(component.plan_kiemtra).toBeNull();
@@ -91,8 +100,9 @@ describe('MonhocCauhinhComponent mode', () => {
         expect(planLoad).toHaveBeenCalledTimes(1);
         expect(planLoad.calls.allArgs().some(args => JSON.stringify(args).includes('1000'))).toBeFalse();
         expect(component.list_plan.length).toBe(1);
-        expect(root.querySelector('.config-settings')?.getAttribute('aria-labelledby')).toBe('settings-title');
-        expect(root.querySelector('#settings-title')?.textContent).toContain('THIẾT LẬP ĐIỂM HỌC PHẦN');
+        expect(root.querySelector('.config-settings')?.getAttribute('aria-label')).toBe('Thiết lập điểm học phần');
+        expect(root.querySelector('#settings-title')).toBeNull();
+        expect(root.querySelector('.config-settings-footer [aria-label="Lưu cài đặt học phần"]')).not.toBeNull();
     });
 
     it('giữ API lưu và tải lại cấu hình trong settings-only', async () => {

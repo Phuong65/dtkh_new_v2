@@ -1,27 +1,46 @@
-<div class="layout_component_container course-content-shell">
-    @if (list_plan && list_plan.length) {
+<div class="layout_component_container course-content-shell" [attr.aria-busy]="isBusy()">
+    @if (isBusy()) {
+    <app-loading-progress [heading]="state() === 'loading' ? loadingHeading() : busyHeading()" backdropFilter="blur(2px)"></app-loading-progress>
+    }
+    @if (state() === 'error') {
+    <section class="course-content-error" role="alert">
+        <span class="course-content-error__icon ti ti-alert-circle" aria-hidden="true"></span>
+        <h2>Không thể tải nội dung học phần</h2>
+        <p>{{ errorMessage() || 'Lỗi kết nối, vui lòng thử lại.' }}</p>
+        <button type="button" class="btn ictu-badge-btn--primary-reverse" (click)="reloadData()">
+            <i class="ti ti-refresh" aria-hidden="true"></i>Tải lại
+        </button>
+    </section>
+    } @else if (state() === 'loading') {
+    } @else if (list_plan && list_plan.length) {
 <div class="lesson-baihocv2" [ngClass]="closeLeft?'close-left-body':''">
-        <aside class="menu-lesson-baihocv2" aria-label="Mục lục nội dung môn học">
-            <button type="button" (click)="closeLeftBody()" class="button-close-left-body"
-                [attr.aria-label]="closeLeft ? 'Mở mục lục' : 'Thu gọn mục lục'"
-                [attr.title]="closeLeft ? 'Mở mục lục' : 'Thu gọn mục lục'">
-                <i [ngClass]="closeLeft?'pi pi-angle-double-right':'pi pi-angle-double-left'" aria-hidden="true"></i>
-            </button>
-
+        @if (closeLeft) {
+        <button type="button" (click)="closeLeftBody()" class="button-close-left-body course-outline-reopen"
+            aria-label="Mở mục lục" aria-expanded="false" aria-controls="course-content-outline"
+            ngbTooltip="Mở mục lục" placement="right" container="body">
+            <i class="ti ti-chevrons-right" aria-hidden="true"></i>
+            <span class="sr-only">Mở mục lục</span>
+        </button>
+        }
+        <aside class="menu-lesson-baihocv2" aria-label="Mục lục nội dung môn học" [attr.inert]="closeLeft ? '' : null">
             <header class="course-outline-header">
                 <div class="course-outline-heading">
-                    <span class="course-outline-heading__icon fa fa-list-ul" aria-hidden="true"></span>
                     <div class="course-outline-heading__text">
-                        <span class="course-outline-heading__eyebrow">Nội dung môn học</span>
                         <h2 class="course-outline-heading__title">Mục lục</h2>
                     </div>
-                    <span class="course-outline-heading__count">{{list_plan.length}} {{label_parent_kehoach | lowercase}}</span>
+                    <button type="button" (click)="closeLeftBody()"
+                        class="btn ictu-badge-btn--secondary-reverse ictu-admin-icon-button button-close-left-body course-outline-toggle"
+                        aria-label="Thu gọn mục lục" aria-expanded="true" aria-controls="course-content-outline"
+                        ngbTooltip="Thu gọn mục lục" placement="left" container="body">
+                        <i class="ti ti-chevrons-left" aria-hidden="true"></i>
+                        <span class="sr-only">Thu gọn mục lục</span>
+                    </button>
                 </div>
 
                 @if (canAdded) {
 <div class="course-outline-actions">
                     @if (dragDropLesson) {
-<button type="button" (click)="saveOrderingLesson()" class="course-outline-action"
+<button type="button" (click)="saveOrderingLesson()" class="btn ictu-badge-btn--primary-reverse course-outline-action"
                        >
                         <i class="fa fa-floppy-o" aria-hidden="true"></i>
                         <span>Lưu thứ tự</span>
@@ -29,7 +48,7 @@
 }
 
                     @if (!isDttx) {
-<button type="button" class="course-outline-action course-outline-action--primary"
+<button type="button" class="btn ictu-badge-btn--success-reverse course-outline-action course-outline-action--primary"
                         (click)="openFormAddLesson()">
                         <i class="fa fa-plus" aria-hidden="true"></i>
                         <span>{{!unlimitLesson?"Bổ sung "+label_parent_kehoach+" còn thiếu":"Thêm "+label_parent_kehoach}}</span>
@@ -37,9 +56,11 @@
 }
 
                     @if (isDttx) {
-<button type="button" class="course-outline-more" mat-icon-button
-                        [matMenuTriggerFor]="menuButtonTop" aria-label="Mở các thao tác thêm nội dung">
-                        <mat-icon>more_vert</mat-icon>
+<button type="button" class="btn ictu-badge-btn--secondary ictu-admin-icon-button course-outline-more" mat-icon-button
+                        [matMenuTriggerFor]="menuButtonTop" aria-label="Mở các thao tác thêm nội dung"
+                        ngbTooltip="Thêm nội dung" container="body">
+                        <mat-icon aria-hidden="true">more_vert</mat-icon>
+                        <span class="sr-only">Thêm nội dung</span>
                     </button>
 }
                     <mat-menu #menuButtonTop="matMenu">
@@ -56,11 +77,7 @@
 }
             </header>
 
-            <nav class="menu-list-lessonv2" aria-label="Danh sách nội dung">
-                <div class="outline-section-label">
-                    <span>Bài học</span>
-                    <span>{{list_plan.length}}</span>
-                </div>
+            <nav id="course-content-outline" class="menu-list-lessonv2" aria-label="Danh sách nội dung">
                 <div class="meunu-list-lessons" cdkDropList (cdkDropListDropped)="drop($event)">
                     @for (parent of list_plan; track parent; let keyParent = $index) {
 <div cdkDrag class="parent-lesson-layout">
@@ -88,20 +105,6 @@
         </aside>
 
         <main class="lesson-content-right-monhoc-v2 content-form-lesson-right-top">
-            @if (selectPlan) {
-<div class="content-context-bar">
-                <div class="content-context-bar__identity">
-                    <span class="content-context-bar__label">Đang biên soạn</span>
-                    @if (selectPlan.week < 1000) {
-<strong>{{label_parent_kehoach}} {{selectPlan.week}}</strong>
-}
-                    @if (selectPlan.week >= 1000) {
-<strong>{{selectedPlanActivity?.title || selectPlan.title}}</strong>
-}
-                </div>
-                <span class="content-context-bar__hint">Chọn đầu mục bên trái để chuyển nhanh nội dung</span>
-            </div>
-}
 
             @if (selectPlan && selectedCourse && selectPlan.week < 1000) {
 <div>
@@ -115,11 +118,11 @@
                         </ng-container>
 }
                         @case ('CDR') {
-<div class="layout-panel cdr-layout" #cpisElm>
-                            <app-chuandaura [canAdded]="canAdded" [coursePlanActivities]="selectPlan"
-                                [courses]="selectedCourse" style="height: 100%;">
+<section class="layout-panel cdr-layout course-big-card" #cpisElm aria-label="Chuẩn đầu ra / CPIs">
+                            <app-chuandaura class="course-content-cpi" [canAdded]="canAdded" [coursePlanActivities]="selectPlan"
+                                [courses]="selectedCourse" (onBusy)="onChildBusy($event)">
                             </app-chuandaura>
-                        </div>
+                        </section>
 }
                         @case ('ACTIVITY') {
 <ng-container [ngTemplateOutlet]="templateTailieu"
@@ -148,20 +151,19 @@
             
         </main>
     </div>
-}
-
+    } @else {
     @if (!list_plan || !list_plan.length) {
-<section class="course-content-empty">
+    <section class="course-content-empty">
         <div class="course-content-empty__visual" aria-hidden="true">
             <span class="fa fa-book"></span>
         </div>
         <span class="course-content-empty__eyebrow">Nội dung môn học</span>
         <h2>Chưa có nội dung giảng dạy</h2>
         <p>Khởi tạo các bài học để bắt đầu cập nhật mục tiêu, chuẩn đầu ra và học liệu.</p>
-        @if (canAdded && !loading) {
+        @if (canAdded) {
             @if (unlimitLesson || hasValidCredits) {
 <button type="button" (click)="openFormAddLesson()"
-            class="btn btn-primary course-content-empty__action">
+            class="btn ictu-badge-btn--success-reverse course-content-empty__action">
             <span class="fa fa-plus" aria-hidden="true"></span>
             Khởi tạo nội dung giảng dạy
         </button>
@@ -171,62 +173,64 @@
             <span>Vui lòng nhập số tín chỉ trước khi khởi tạo nội dung giảng dạy.</span>
         </div>
 <button type="button" (click)="goToCourseInformation()"
-            class="btn course-content-empty__credit-action">
+            class="btn ictu-button-info-light course-content-empty__credit-action">
             <span class="fa fa-pencil" aria-hidden="true"></span>
             Nhập số tín chỉ
         </button>
             }
 }
     </section>
-}
+    }
+    }
 </div>
 
 <ng-template #formAddBaigiang let-c="close" let-d="dismiss">
-    <div class="ovic-over-right-section">
-        <div class="ovic-over-right-section__head">
-            <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
-            <button class="btn ovic-over-right-section__close-button" (click)="closeForm(d)"></button>
-        </div>
-        <div class="ovic-over-right-section__body users-layout-form" style="height: auto;">
-            <div class="ovic-vertical__inputs">
-                <div class="form-row">
-                    <label for="name">Nhập vào số lượng {{isAddThaoLuan?'thảo luận':'bài giảng'}}:
-                        <span class="ovic-mark">*</span></label>
-                    <input #inputLesson (keydown)="numberCheck($event,inputLesson)" [(ngModel)]="numberAddLesson"
-                        type="number" id="name" class="form-control">
-                </div>
+    <div class="course-content-modal">
+        <header class="course-content-modal__header">
+            <h3><i class="ti ti-files" aria-hidden="true"></i>{{ formTitle }}</h3>
+            <button type="button" class="btn ictu-badge-btn--secondary ictu-admin-icon-button"
+                (click)="closeForm(d)" aria-label="Đóng biểu mẫu" ngbTooltip="Đóng" container="body">
+                <i class="ti ti-x" aria-hidden="true"></i><span class="sr-only">Đóng</span>
+            </button>
+        </header>
+        <div class="course-content-modal__body ictu-form">
+            <div class="ictu-form__row">
+                <label class="ictu-form__label ictu-form__label--required" for="lesson-count">
+                    Số lượng {{ isAddThaoLuan ? 'thảo luận' : 'bài giảng' }}
+                </label>
+                <input #inputLesson (keydown)="numberCheck($event,inputLesson)" [(ngModel)]="numberAddLesson"
+                    type="number" id="lesson-count" class="ictu-form__input-field" pInputText min="1" inputmode="numeric">
             </div>
         </div>
-        <div class="ovic-over-right-section__foot-wrap-buttons flex-footer-right">
-            <button (click)="saveAddLesson(d)" type="button" class="btn btn-primary">
-                <i class="fa fa-floppy-o"></i>Lưu lại
+        <footer class="course-content-modal__footer">
+            <button type="button" class="btn ictu-badge-btn--secondary" (click)="closeForm(d)">
+                <i class="ti ti-x" aria-hidden="true"></i>Hủy
             </button>
-        </div>
+            <button (click)="saveAddLesson(d)" type="button" class="btn ictu-badge-btn--primary-reverse">
+                <i class="ti ti-device-floppy" aria-hidden="true"></i>Lưu lại
+            </button>
+        </footer>
     </div>
 </ng-template>
 
-<p-dialog styleClass="dialog-waiting" appendTo="body" [showHeader]="false" [closable]="false" [(visible)]="displayModal"
-    [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="1099" [draggable]="false" [resizable]="false">
-    <div class="popup-waiting-loading">
-        <label style="width: 100%;">{{titleWaiting}}</label>
-        <div class="tn-import-student-progressbar">
-            <mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
-        </div>
-    </div>
-</p-dialog>
-
 <ng-template #templateMuctieu let-muctieuPlan="muctieuPlan">
-    <div class="layout-panel muctieu-layout" #muctieuElm>
-        <p-panel header="{{selectPlan?label_parent_kehoach +' '+selectPlan.week:''}}">
+    <section class="layout-panel muctieu-layout course-big-card" #muctieuElm aria-label="Mục tiêu bài học">
+        <p-panel>
+            <ng-template pTemplate="header">
+                <div class="muctieu-card-header">
+                    <span class="muctieu-card-header__icon fa fa-bullseye" aria-hidden="true"></span>
+                    <h3 class="muctieu-card-header__title">Mục tiêu</h3>
+                </div>
+            </ng-template>
             <ng-template pTemplate="icons">
-                <div style="display: flex; align-items: center;">
+                <div class="content-panel-status">
                     <div>
 @switch (muctieuPlan.status) {
                         @case (0) {
 <span class="box-span cho-duyet-box">Chờ duyệt</span>
 }
                         @case (1) {
-<span class="box-span dat-box">Đạt</span>
+<span class="ictu-badge ictu-badge--success course-status-badge">Đạt</span>
 }
                         @case (-1) {
 <span class="box-span yeu-cau-sua-box">Yêu cầu sửa</span>
@@ -237,8 +241,8 @@
                     }
 </div>
                     @if (muctieuPlan.status === 1) {
-<div style="margin-right: 5px;">
-                        <span style="margin-left: 5px;" class="box-span dat-box">
+<div>
+                        <span class="ictu-badge ictu-badge--success course-status-badge">
                             Duyệt lúc: {{muctieuPlan['approved_at'] | ovicDateTime}}
                         </span>
                     </div>
@@ -246,10 +250,9 @@
                 </div>
             </ng-template>
             <div class="ovic-vertical__inputs muctieu-workspace">
-                <form [formGroup]="formMuctieu" class="muctieu-form">
+                <form [formGroup]="formMuctieu" class="ictu-form muctieu-form">
                     <section class="muctieu-section muctieu-section--lesson">
                         <div class="muctieu-section__header">
-                            <span class="muctieu-section__icon fa fa-book" aria-hidden="true"></span>
                             <div>
                                 <h3 class="muctieu-section__title">Thông tin bài học</h3>
                                 <p class="muctieu-section__hint">Xác định nội dung và chuẩn đầu ra của bài học.</p>
@@ -257,15 +260,15 @@
                         </div>
 
                         <div class="muctieu-section__body">
-                            <div class="row form-row form-row-flex-row muctieu-primary-fields">
-                                <div class="col-9 flex-div muctieu-field">
-                                    <label for="muctieu-title">Tiêu đề bài<span class="ovic-mark">*</span></label>
+                            <div class="muctieu-primary-fields">
+                                <div class="ictu-form__row muctieu-field">
+                                    <label class="ictu-form__label ictu-form__label--required" for="muctieu-title">Tiêu đề bài</label>
                                     <input id="muctieu-title" type="text" formControlName="title"
-                                        class="ovic-input-field" placeholder="Nhập tiêu đề bài học">
+                                        class="ictu-form__input-field" pInputText placeholder="Nhập tiêu đề bài học">
                                 </div>
-                                <div class="col-3 flex-div muctieu-field">
-                                    <label>Chuẩn đầu ra<span class="ovic-mark">*</span></label>
-                                    <ovic-dropdown placeholder="Chọn chuẩn đầu ra" [options]="list_clo" optionId="id"
+                                <div class="ictu-form__row muctieu-field">
+                                    <label class="ictu-form__label ictu-form__label--required" id="muctieu-clo-label">Chuẩn đầu ra</label>
+                                    <ovic-dropdown aria-labelledby="muctieu-clo-label" placeholder="Chọn chuẩn đầu ra" [options]="list_clo" optionId="id"
                                         optionLabel="kyhieu" [filter]="true" [formField]="fM['course_clo_id']"
                                         [defaultValue]="fM['course_clo_id']['value']" filterBy="kyhieu">
                                     </ovic-dropdown>
@@ -284,9 +287,8 @@
                             </div>
 }
 
-                            <div class="muctieu-editor-card muctieu-editor-card--content edit-hight-200">
+                            <div class="ictu-form__row muctieu-editor-card muctieu-editor-card--content edit-hight-200">
                                 <div class="muctieu-editor-card__heading">
-                                    <span class="muctieu-editor-card__mark" aria-hidden="true"></span>
                                     <label>Nội dung tóm tắt:</label>
                                 </div>
                                 <ovic-editor height="auto" [formField]="fM['desc']"
@@ -298,7 +300,6 @@
 
                     <section class="muctieu-section muctieu-section--outcomes">
                         <div class="muctieu-section__header">
-                            <span class="muctieu-section__icon fa fa-bullseye" aria-hidden="true"></span>
                             <div>
                                 <h3 class="muctieu-section__title">Mục tiêu năng lực</h3>
                                 <p class="muctieu-section__hint">Mô tả điều người học đạt được sau bài học.</p>
@@ -306,18 +307,16 @@
                         </div>
 
                         <div class="muctieu-section__body muctieu-outcome-list">
-                            <div class="muctieu-editor-card muctieu-editor-card--knowledge edit-hight-200">
+                            <div class="ictu-form__row muctieu-editor-card muctieu-editor-card--knowledge edit-hight-200">
                                 <div class="muctieu-editor-card__heading">
-                                    <span class="muctieu-editor-card__index">KT</span>
                                     <label>Về kiến thức</label>
                                 </div>
                                 <ovic-editor height="auto" [formField]="fM['kienthuc']"
                                     [default]="fM['kienthuc']['value']"></ovic-editor>
                             </div>
 
-                            <div class="muctieu-editor-card muctieu-editor-card--skill edit-hight-200">
+                            <div class="ictu-form__row muctieu-editor-card muctieu-editor-card--skill edit-hight-200">
                                 <div class="muctieu-editor-card__heading">
-                                    <span class="muctieu-editor-card__index">KN</span>
                                     <label>Về kỹ năng</label>
                                 </div>
                                 <ovic-editor height="auto" [formField]="fM['kynang']"
@@ -329,7 +328,7 @@
                     <div class="muctieu-actions">
                         <div class="view-comment-action muctieu-comment-action">
                             @if (muctieuPlan && muctieuPlan['comments'] && muctieuPlan['comments'].length) {
-<button type="button" class="muctieu-comment-toggle" (click)="showComment('muctieu')"
+<button type="button" class="btn muctieu-comment-toggle" (click)="showComment('muctieu')"
                                >
                                 <span class="fa fa-comments-o" aria-hidden="true"></span>
                                 {{appNhanxetMuctieu.displayComment?'Ẩn nhận xét':'Hiển thị nhận xét'}}
@@ -337,7 +336,7 @@
                             </button>
 }
                         </div>
-                        <button type="button" (click)="saveMuctieu()" class="btn btn-primary muctieu-save-button">
+                        <button type="button" (click)="saveMuctieu()" class="btn ictu-badge-btn--primary-reverse muctieu-save-button">
                             <span class="fa fa-floppy-o" aria-hidden="true"></span>
                             Lưu nội dung
                         </button>
@@ -346,13 +345,13 @@
                 <div class="row form-row">
                     <div class="col-12">
                         <app-nhanxet-noidung #appNhanxetMuctieu [hideViewAction]="true" [activity_input]="muctieuPlan"
-                            [course_input]="selectedCourse">
+                            [course_input]="selectedCourse" (onBusy)="onChildBusy($event)">
                         </app-nhanxet-noidung>
                     </div>
                 </div>
             </div>
         </p-panel>
-    </div>
+    </section>
 </ng-template>
 
 <ng-template #templateThaoLuan let-thaoluanPlan="thaoluanPlan">
@@ -372,7 +371,6 @@
                 <form [formGroup]="formThaoLuan" class="discussion-form">
                     <section class="discussion-section">
                         <div class="discussion-section__header">
-                            <span class="fa fa-align-left" aria-hidden="true"></span>
                             <div>
                                 <h4>Nội dung thảo luận</h4>
                                 <p>Nêu chủ đề, yêu cầu và cách thức tham gia.</p>
@@ -386,7 +384,6 @@
 
                     <section class="discussion-section">
                         <div class="discussion-section__header">
-                            <span class="fa fa-paperclip" aria-hidden="true"></span>
                             <div>
                                 <h4>Tài liệu đính kèm</h4>
                                 <p>Định dạng hỗ trợ: PDF, PPT, PPTX.</p>
@@ -400,7 +397,7 @@
                     </section>
 
                     <div class="discussion-actions">
-                        <button type="button" (click)="saveThaoLuan()" class="btn btn-primary discussion-save-button">
+                        <button type="button" (click)="saveThaoLuan()" class="btn ictu-badge-btn--primary-reverse discussion-save-button">
                             <span class="fa fa-floppy-o" aria-hidden="true"></span>
                             Lưu nội dung
                         </button>
@@ -413,15 +410,11 @@
 </ng-template>
 
 <ng-template #templateTailieu let-tailieuPlan="tailieuPlan">
-    <div class="layout-panel tailieu-layout" #tailieuElm>
+    <section class="layout-panel tailieu-layout course-big-card" #tailieuElm aria-label="Tài liệu giảng dạy">
         <header class="layout-tailieu-giangday tailieu-header">
             <div class="tailieu-header__main">
                 <span class="tailieu-header__icon fa fa-folder-open" aria-hidden="true"></span>
-                <div class="tailieu-header__identity">
-                    <span class="tailieu-header__eyebrow">Học liệu bài học</span>
-                    <h3 class="tailieu-header__title">Tài liệu giảng dạy</h3>
-                    <p class="tailieu-header__hint">Quản lý học liệu chính, video bổ trợ và tài liệu tham khảo.</p>
-                </div>
+                <h3 class="tailieu-header__title">Tài liệu giảng dạy</h3>
             </div>
             <div class="tailieu-header__status">
                 <div>
@@ -430,7 +423,7 @@
 <span class="box-span cho-duyet-box">Chờ duyệt</span>
 }
                     @case (1) {
-<span class="box-span dat-box">Đạt</span>
+<span class="ictu-badge ictu-badge--success course-status-badge">Đạt</span>
 }
                     @case (-1) {
 <span class="box-span yeu-cau-sua-box">Yêu cầu sửa</span>
@@ -442,7 +435,7 @@
 </div>
                 @if (tailieuPlan.status === 1) {
 <div>
-                    <span class="box-span dat-box">
+                    <span class="ictu-badge ictu-badge--success course-status-badge">
                         Duyệt lúc: {{tailieuPlan['approved_at'] | ovicDateTime}}
                     </span>
                 </div>
@@ -464,10 +457,9 @@
 
         <p-panel styleClass="panel-tailieu-noheader tailieu-panel" [showHeader]="false">
             <div class="ovic-vertical__inputs tailieu-workspace">
-                <form [formGroup]="formTailieu" class="tailieu-form">
+                <form [formGroup]="formTailieu" class="ictu-form tailieu-form">
                     <section class="tailieu-section tailieu-section--primary">
                         <div class="tailieu-section__header">
-                            <span class="tailieu-section__index">01</span>
                             <div>
                                 <h3 class="tailieu-section__title">
                                     Tài liệu chính <span class="tailieu-required">Bắt buộc</span>
@@ -476,9 +468,8 @@
                             </div>
                         </div>
                         <div class="tailieu-section__body tailieu-upload-list">
-                            <div class="tailieu-upload-field">
+                            <div class="ictu-form__row tailieu-upload-field">
                                 <div class="tailieu-upload-field__heading">
-                                    <span class="fa fa-file-pdf-o" aria-hidden="true"></span>
                                     <label>PDF bài giảng<span class="ovic-mark">*</span></label>
                                 </div>
                                 <p class="tailieu-upload-field__hint">Định dạng: PDF, PPT, PPTX</p>
@@ -487,9 +478,8 @@
                                 </open-file-manager-v2>
                             </div>
 
-                            <div class="tailieu-upload-field">
+                            <div class="ictu-form__row tailieu-upload-field">
                                 <div class="tailieu-upload-field__heading">
-                                    <span class="fa fa-file-powerpoint-o" aria-hidden="true"></span>
                                     <label>Slide bài giảng<span class="ovic-mark">*</span></label>
                                 </div>
                                 <p class="tailieu-upload-field__hint">Định dạng: PPT, PPTX, PDF</p>
@@ -502,16 +492,14 @@
 
                     <section class="tailieu-section tailieu-section--video">
                         <div class="tailieu-section__header">
-                            <span class="tailieu-section__index">02</span>
                             <div>
                                 <h3 class="tailieu-section__title">Video</h3>
                                 <p class="tailieu-section__hint">Một video minh họa hoặc mở rộng nội dung bài học.</p>
                             </div>
                         </div>
                         <div class="tailieu-section__body " [ngClass]="app_configs.isDttx || keyServer === 'hvu'?'tailieu-upload-list': ''">
-                            <div class="tailieu-upload-field">
+                            <div class="ictu-form__row tailieu-upload-field">
                                 <div class="tailieu-upload-field__heading">
-                                    <span class="fa fa-file-video-o" aria-hidden="true"></span>
                                     <label>Video</label>
                                 </div>
                                 <p class="tailieu-upload-field__hint">Định dạng: MP4, AVI, MOV</p>
@@ -521,9 +509,8 @@
                                 </open-file-manager-v2>
                             </div>
                             @if (app_configs.isDttx || keyServer === 'hvu') {
-<div class="tailieu-upload-field">
+<div class="ictu-form__row tailieu-upload-field">
                                 <div class="tailieu-upload-field__heading">
-                                    <span class="fa fa-file-video-o" aria-hidden="true"></span>
                                     <label>Video bổ trợ</label>
                                 </div>
                                 <p class="tailieu-upload-field__hint">Định dạng: MP4, AVI, MOV</p>
@@ -538,7 +525,6 @@
 
                     <section class="tailieu-section tailieu-section--reference">
                         <div class="tailieu-section__header">
-                            <span class="tailieu-section__index">03</span>
                             <div>
                                 <h3 class="tailieu-section__title">Tài liệu tham khảo</h3>
                                 <p class="tailieu-section__hint">Bổ sung nội dung đọc thêm hoặc nguồn tham khảo liên quan.</p>
@@ -558,7 +544,7 @@
                     <div class="tailieu-actions">
                         <div class="tailieu-comment-action">
                             @if (tailieuPlan && tailieuPlan['comments'] && tailieuPlan['comments'].length) {
-<button type="button" class="tailieu-comment-toggle" (click)="showComment('tailieu')"
+<button type="button" class="btn tailieu-comment-toggle" (click)="showComment('tailieu')"
                                >
                                 <span class="fa fa-comments-o" aria-hidden="true"></span>
                                 {{appNhanxetTailieu.displayComment?'Ẩn nhận xét':'Hiển thị nhận xét'}}
@@ -566,7 +552,7 @@
                             </button>
 }
                         </div>
-                        <button type="button" (click)="saveTailieu()" class="btn btn-primary tailieu-save-button">
+                        <button type="button" (click)="saveTailieu()" class="btn ictu-badge-btn--primary-reverse tailieu-save-button">
                             <span class="fa fa-floppy-o" aria-hidden="true"></span>
                             Lưu tài liệu
                         </button>
@@ -576,13 +562,13 @@
                 <div class="row form-row">
                     <div class="col-12">
                         <app-nhanxet-noidung #appNhanxetTailieu [hideViewAction]="true" [activity_input]="tailieuPlan"
-                            [course_input]="selectedCourse">
+                            [course_input]="selectedCourse" (onBusy)="onChildBusy($event)">
                         </app-nhanxet-noidung>
                     </div>
                 </div>
             </div>
         </p-panel>
-    </div>
+    </section>
 </ng-template>
 
 <ng-template #menuLesson let-parent let-keyP="keyP">
@@ -595,20 +581,12 @@
 <i (click)="$event.stopPropagation()" cdkDragHandle
                     class="pi pi-arrows-alt" aria-label="Kéo để thay đổi thứ tự"></i>
 }
-                @if (parent.week !== 0 && parent.week < 1000) {
-<span class="parent-order">{{parent.week}}</span>
-}
                 <span class="parent-title-wrap">
                     @if (parent.week !== 0 && parent.week < 1000) {
 <span class="parent-title">{{label_parent_kehoach}} {{parent.week}}</span>
 }
                     @if (parent.week === 0 || parent.week >= 1000) {
 <span class="parent-title">{{parent.title}}</span>
-}
-                    @if (parent['children'] && parent['children'].length) {
-<span class="parent-subtitle">
-                        {{parent['children'].length}} đầu mục
-                    </span>
 }
                 </span>
             </button>
@@ -635,11 +613,13 @@
 }
                 }
 </div>
-                @if (checkDeleteBaigiang(keyP)) {
+                @if (deletableLessonMap[keyP]) {
 <button type="button" (click)="$event.stopPropagation(); deletePlan(parent)"
                     container="body" placement="top" ngbTooltip="Xóa bài"
-                    class="outline-icon-button outline-icon-button--danger" aria-label="Xóa bài">
+                    class="btn ictu-button-danger-light ictu-admin-icon-button outline-icon-button outline-icon-button--danger" aria-label="Xóa bài"
+                    >
                     <i class="fa fa-trash" aria-hidden="true"></i>
+                    <span class="sr-only">Xóa bài</span>
                 </button>
 }
             </div>
@@ -684,7 +664,7 @@
 <span class="child-status child-status--pending">Chờ duyệt</span>
 }
                             @case (1) {
-<span class="child-status child-status--approved">Đạt</span>
+<span class="ictu-badge ictu-badge--success course-status-badge">Đạt</span>
 }
                             @case (-1) {
 <span class="child-status child-status--revision">Chưa đạt</span>
@@ -695,11 +675,13 @@
                         }
 </div>
 }
-                        @if (checkDeleteThaoluan(index) && parent.week === 2000) {
+                        @if (deletableThaoluanMap[index] && parent.week === 2000) {
 <button type="button" (click)="$event.stopPropagation(); deleteThaoLuan(children)"
                            
-                            class="outline-icon-button outline-icon-button--danger" aria-label="Xóa bài thảo luận">
+                            class="btn ictu-button-danger-light ictu-admin-icon-button outline-icon-button outline-icon-button--danger" aria-label="Xóa bài thảo luận"
+                            container="body" placement="top" ngbTooltip="Xóa bài thảo luận">
                             <i class="fa fa-trash" aria-hidden="true"></i>
+                            <span class="sr-only">Xóa bài thảo luận</span>
                         </button>
 }
                     </div>

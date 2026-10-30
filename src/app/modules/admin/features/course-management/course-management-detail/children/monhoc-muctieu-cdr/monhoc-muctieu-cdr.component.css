@@ -18,6 +18,7 @@
     --cdr-surface: #ffffff;
     --cdr-bg: #f3f4f6;
     --cdr-head-bg: #f1f5f9;
+    --cdr-header-gradient: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
     --cdr-plo-bg: #e2e8f0;
     --cdr-radius: var(--admin-wrap-table-element-radius, 4px);
     font-family: var(--primary-font-family), 'Be Vietnam Pro', 'Noto Sans', 'Segoe UI', sans-serif;
@@ -94,7 +95,9 @@
     background: transparent;
     color: #64748b;
     font: inherit;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: none;
     white-space: nowrap;
     cursor: pointer;
     transition: background-color .15s ease, color .15s ease, border-color .15s ease;
@@ -102,7 +105,7 @@
 
 .cdr-subtab i { color: currentColor; font-size: 16px; }
 .cdr-subtab:not(.cdr-subtab--active):hover { background: #f8fafc; color: #1d4ed8; }
-.cdr-subtab--active { border-bottom-color: #1d4ed8; background: transparent; color: #1d4ed8; font-weight: 700; }
+.cdr-subtab--active { border-bottom-color: #1d4ed8; background: transparent; color: #1d4ed8; }
 .cdr-subtab:focus-visible { outline: 2px solid #2563eb; outline-offset: -3px; }
 .cdr-subpanel[hidden] { display: none; }
 .cdr-settings-panel { min-width: 0; }
@@ -118,25 +121,29 @@
     box-shadow: none;
 }
 
-.cdr-table-card__header.admin-wrap-table__head {
+.cdr-table-card__header.admin-wrap-table__head,
+.cdr-section-header,
+.cdr-matrix-card__header {
+    position: relative;
     display: flex;
+    min-height: 48px;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    padding: 10px 16px;
-    min-height: 48px;
+    gap: 12px;
+    padding: 9px 14px 9px 18px;
     border: 0;
-    border-bottom: 1px solid #dbe3ec;
-    background: white;
+    border-bottom: 1px solid #cbd5e1;
+    background: var(--cdr-header-gradient);
 }
 
-.cdr-table-card__title.admin-wrap-table__heading {
-    margin: 0;
-    color: var(--cdr-text);
-    font-size: 14.5px;
-    font-weight: 600;
-    letter-spacing: .02em;
-    text-transform: uppercase;
+.cdr-table-card__header.admin-wrap-table__head::before,
+.cdr-section-header::before,
+.cdr-matrix-card__header::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    background: #2563eb;
+    content: '';
 }
 
 .cdr-table-responsive.ictu-admin-table-scroll {
@@ -232,6 +239,11 @@
 }
 
 .cdr-grid-table .ictu-admin-icon-button i { font-size: 14px !important; }
+.cdr-table-card__actions { display: inline-flex; align-items: center; gap: 6px; }
+.cdr-workspace--settings { display: flex; flex-direction: column; overflow: hidden; }
+.cdr-workspace--settings .cdr-settings-panel { flex: 1 1 auto; min-height: 0; }
+.cdr-workspace--settings app-monhoc-cauhinh { display: block; height: 100%; min-height: 0; }
+
 :host ::ng-deep .cdr-grid-table .cell-empty { text-align: center; padding: 32px 16px; color: var(--cdr-muted); }
 
 .cdr-objective-card,
@@ -242,29 +254,39 @@
 }
 
 .cdr-matrix-card { margin-top: 18px; }
-.cdr-section-header,
-.cdr-matrix-card__header {
-    display: flex;
+.cdr-header-icon {
+    display: inline-flex;
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 9px 16px;
-    border-bottom: 1px solid var(--cdr-divider);
-    background: white;
+    justify-content: center;
+    border: 1px solid #bfdbfe;
+    border-radius: var(--cdr-radius);
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 17px;
 }
 
 .cdr-section-title,
-.cdr-matrix-card__title {
+.cdr-matrix-card__title,
+.cdr-table-card__title.admin-wrap-table__heading {
     display: flex;
     align-items: center;
-    gap: 7px;
-    color: var(--cdr-ink);
-    font-size: 13px;
-    font-weight: 600;
+    gap: 12px;
+    min-width: 0;
+    margin: 0;
+    color: #1e3a8a;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: 0;
+    text-transform: none;
 }
 
-.cdr-section-title i,
-.cdr-matrix-card__title i { color: var(--cdr-muted); font-size: 16px; }
+.cdr-section-title .cdr-header-icon i,
+.cdr-matrix-card__title .cdr-header-icon i,
+.cdr-table-card__title .cdr-header-icon i { color: #2563eb; font-size: 17px; }
 .cdr-objective-body { padding: 16px; }
 .cdr-section-footer { display: flex; justify-content: flex-end; padding-top: 12px; }
 .cdr-section-footer button { display: inline-flex; align-items: center; gap: 8px; }

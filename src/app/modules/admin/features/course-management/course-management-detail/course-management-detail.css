@@ -250,8 +250,7 @@
 .course-detail-tab-panel > app-monhoc-noidung,
 .course-detail-tab-panel > app-monhoc-question-cdr,
 .course-detail-tab-panel > app-monhoc-formde,
-.course-detail-tab-panel > app-monhoc-kiemtra-danhgia,
-.course-detail-tab-panel > app-monhoc-cauhinh {
+.course-detail-tab-panel > app-monhoc-kiemtra-danhgia {
     display: block;
     width: 100%;
     min-height: 100%;
