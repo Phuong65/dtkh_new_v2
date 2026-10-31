@@ -1,117 +1,74 @@
-@if (selectedActivity) {
-<div class="class-duyet-layout"
-    [ngClass]="hideViewAction && !displayComment?'hide-template-comment':''">
-    @if (selectedActivity['comments'] && selectedActivity['comments'].length) {
-<div style="width: 100%; padding: 15px;"
-        class="list-comment-layout">
-        @if (!hideViewAction) {
-<div style="text-align: left;">
-            <!-- <label style="font-weight: 600; margin-bottom: 10px;">Ý KIẾN NHẬN XÉT CỦA THÀNH VIÊN HỘI ĐỒNG: </label> -->
-            <div class="view-comment-action" style="text-align: center;">
-                <span (click)="showComment()">{{displayComment?'Ẩn nhận xét':'Hiển thị nhận xét'}}</span>
-            </div>
-        </div>
-}
+@if (selectedActivity && selectedActivity['comments']?.length) {
+<section class="nx-shell" [class.nx-shell--hidden]="hideViewAction && !displayComment" aria-label="Nhận xét nội dung">
+    @if (!hideViewAction) {
+    <button type="button" class="nx-toggle" (click)="showComment()" [attr.aria-expanded]="displayComment">
+        <i class="fa fa-comments-o" aria-hidden="true"></i>
+        {{ displayComment ? 'Ẩn nhận xét' : 'Hiển thị nhận xét' }}
+        <span class="nx-toggle__count">{{ selectedActivity['comments'].length }}</span>
+    </button>
+    }
 
-        <!-- <div style="padding-bottom: 10px; border-bottom: 1px solid #c8c8c8; margin-bottom: 10px;"
-            *ngIf="selectedActivity['status'] === 1 || selectedActivity['status'] === -1">
-            <div>
-                <label style="width: 150px;">- Duyệt lúc:</label> {{selectedActivity['approved_at'] | ovicDateTime}}
-            </div>
-            <div style="display: flex; align-items: center;">
-                <div style="flex: 1">
-                    <label style="width: 150px;">- Trạng thái duyệt:</label>
-                    {{selectedActivity['status'] === 1?'Đạt':'Yêu cầu sửa'}}
-                </div>
-            </div>
-        </div> -->
+    @if (displayComment) {
+    <div class="nx-content">
+        <header class="nx-heading">
+            <i class="fa fa-comments-o" aria-hidden="true"></i>
+            <h4>Ý kiến nhận xét</h4>
+        </header>
 
-        @if (displayComment) {
-<div >
-            @for (comment of selectedActivity['comments']; track comment; let index = $index) {
-<div class="comment-box">
-                <div class="inner-comment">
-                    <div class="inner-comment-header">
-                        <div style="flex: 1;">
-                            <span style="font-weight: 600; margin-right: 10px; text-decoration: underline;">
-                                {{'Ủy viên'+(index + 1)+':'}}
-                            </span>
-                        </div>
+        @for (comment of selectedActivity['comments']; track comment; let index = $index) {
+        <article class="nx-group">
+            <div class="nx-author">
+                <span class="nx-author__avatar" aria-hidden="true"><i class="fa fa-user-o"></i></span>
+                <strong>Ủy viên {{ index + 1 }}</strong>
+            </div>
+
+            @if (comment['children']?.length) {
+            <div class="nx-group__items">
+                @for (children of comment['children']; track children) {
+                <div class="nx-comment">
+                    <div class="nx-bubble" [class.nx-bubble--approved]="children['status'] === 1"
+                        [class.nx-bubble--revision]="children['status'] !== 1">
+                        <div [innerHTML]="children.comment"></div>
+                    </div>
+                    <div class="nx-comment__meta">
+                        <time>{{ children.created_at | ovicDateTime }}</time>
+                        <button type="button" class="nx-reply-toggle" (click)="openReply(children, index)"
+                            [attr.aria-expanded]="children['reply_open'] === true">
+                            <i class="fa fa-reply" aria-hidden="true"></i>
+                            Phản hồi ({{ children['count_reply'] || 0 }})
+                        </button>
                     </div>
 
-                    @if (comment['children'] && comment['children'].length) {
-<div>
-                        @for (children of comment['children']; track children) {
-<div style="margin-bottom: 15px; ">
-                            <div [ngClass]="children['status'] === 1?'duyet-comment':'yeucausua-comment'"
-                                class="conten-comment-box">
-                                <div class="conten-comment-inner-box" [innerHTML]="children.comment">
-
-                                </div>
-                            </div>
-                            <div style="margin-left: 20px; margin-top: 5px;">
-                                <span
-                                    style="font-size: 12px; color: #898989; margin-right: 20px; font-style: italic;">{{children.created_at
-                                    | ovicDateTime}}</span>
-                                <span style="color: #898989; cursor: pointer;" (click)="openReply(children,index)">Phản
-                                    hồi ({{children['count_reply']}})</span>
-                            </div>
-                            @if (children['reply_open'] === true) {
-<div class="reply-layout">
-                                <div class="list_reply_comments">
-                                    @for (reply_comment of children['reply_comments']; track reply_comment) {
-<div style="margin-bottom: 15px;"
-                                       >
-                                        <div style="text-align: right; margin-bottom: 5px;">
-                                            <span>{{reply_comment['display_name']}}</span>
-                                        </div>
-                                        <div class="conten-comment-box-left"
-                                            [ngClass]="reply_comment['my_reply_comment']?'my-reply-comment':''">
-                                            <div class="conten-comment-inner-box-left"
-                                                [innerHTML]="reply_comment.comment">
-
-                                            </div>
-                                        </div>
-                                        <div style="margin-right: 20px; margin-top: 5px; text-align: right;">
-                                            <span
-                                                style="font-size: 12px; color: #898989; font-style: italic;">{{reply_comment.created_at
-                                                | ovicDateTime}}</span>
-                                        </div>
-
-                                    </div>
-}
-                                </div>
-
-                                @if (selectedCourse && userId === selectedCourse.creator_plan_id) {
-<div style="display: flex; position: relative;"
-                                   >
-                                    <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;"><img
-                                            style="width: 100%;" src="../../../assets/images/a_none.jpg"></div>
-                                    <textarea style="height: 40px; margin-left: 10px; flex: 1; padding-right: 130px;"
-                                        placeholder="Nhập phản hồi... "
-                                        [(ngModel)]="children['textarea_comment']"></textarea>
-                                    <button (click)="saveCommentReply(children , selectedActivity, index)"
-                                        style="position: absolute; bottom: 5px; right:5px" class="btn btn-primary"><i
-                                            class="fa fa-paper-plane" ></i>Gửi
-                                        phản hồi</button>
-                                </div>
-}
-                            </div>
-}
+                    @if (children['reply_open'] === true) {
+                    <div class="nx-thread">
+                        @for (reply_comment of children['reply_comments']; track reply_comment) {
+                        <div class="nx-thread__item" [class.nx-thread__item--mine]="reply_comment['my_reply_comment']">
+                            <div class="nx-thread__author">{{ reply_comment['display_name'] }}</div>
+                            <div class="nx-thread__bubble" [innerHTML]="reply_comment.comment"></div>
+                            <time class="nx-thread__time">{{ reply_comment.created_at | ovicDateTime }}</time>
                         </div>
-}
+                        }
+
+                        @if (selectedCourse && userId === selectedCourse.creator_plan_id) {
+                        <div class="nx-reply-form">
+                            <label class="nx-reply-form__label" [for]="'nx-reply-' + children.id">Phản hồi của bạn</label>
+                            <textarea [id]="'nx-reply-' + children.id" rows="3" placeholder="Nhập phản hồi..."
+                                [(ngModel)]="children['textarea_comment']"></textarea>
+                            <button type="button" class="btn nx-reply-form__submit" (click)="saveCommentReply(children, selectedActivity, index)">
+                                <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                                Gửi phản hồi
+                            </button>
+                        </div>
+                        }
                     </div>
-}
+                    }
                 </div>
+                }
             </div>
-}
-        </div>
-}
+            }
+        </article>
+        }
     </div>
-}
-    <!-- <div *ngIf="selectedCourse && userId === selectedCourse['creator_plan_id'] && selectedActivity['status'] === -1"
-        style="padding: 0px 15px 15px 15px; text-align: right;">
-        <button class="btn btn-primary" (click)="yeucauduyet(selectedActivity)">Đã sửa, yêu cầu duyệt</button>
-    </div> -->
-</div>
+    }
+</section>
 }

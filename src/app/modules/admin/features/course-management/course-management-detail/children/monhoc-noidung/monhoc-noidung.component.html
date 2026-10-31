@@ -289,7 +289,7 @@
 
                             <div class="ictu-form__row muctieu-editor-card muctieu-editor-card--content edit-hight-200">
                                 <div class="muctieu-editor-card__heading">
-                                    <label>Nội dung tóm tắt:</label>
+                                    <label class="muctieu-editor-card__label">Nội dung tóm tắt</label>
                                 </div>
                                 <ovic-editor height="auto" [formField]="fM['desc']"
                                     [default]="fM['desc']['value']">
@@ -309,7 +309,7 @@
                         <div class="muctieu-section__body muctieu-outcome-list">
                             <div class="ictu-form__row muctieu-editor-card muctieu-editor-card--knowledge edit-hight-200">
                                 <div class="muctieu-editor-card__heading">
-                                    <label>Về kiến thức</label>
+                                    <label class="muctieu-editor-card__label">Về kiến thức</label>
                                 </div>
                                 <ovic-editor height="auto" [formField]="fM['kienthuc']"
                                     [default]="fM['kienthuc']['value']"></ovic-editor>
@@ -317,7 +317,7 @@
 
                             <div class="ictu-form__row muctieu-editor-card muctieu-editor-card--skill edit-hight-200">
                                 <div class="muctieu-editor-card__heading">
-                                    <label>Về kỹ năng</label>
+                                    <label class="muctieu-editor-card__label">Về kỹ năng</label>
                                 </div>
                                 <ovic-editor height="auto" [formField]="fM['kynang']"
                                     [default]="fM['kynang']['value']"></ovic-editor>
@@ -372,7 +372,7 @@
                     <section class="discussion-section">
                         <div class="discussion-section__header">
                             <div>
-                                <h4>Nội dung thảo luận</h4>
+                                <h4 class="ictu-form__label--required">Nội dung thảo luận</h4>
                                 <p>Nêu chủ đề, yêu cầu và cách thức tham gia.</p>
                             </div>
                         </div>
@@ -470,7 +470,7 @@
                         <div class="tailieu-section__body tailieu-upload-list">
                             <div class="ictu-form__row tailieu-upload-field">
                                 <div class="tailieu-upload-field__heading">
-                                    <label>PDF bài giảng<span class="ovic-mark">*</span></label>
+                                    <label class="ictu-form__label ictu-form__label--required">PDF bài giảng</label>
                                 </div>
                                 <p class="tailieu-upload-field__hint">Định dạng: PDF, PPT, PPTX</p>
                                 <open-file-manager-v2 [filesDefault]="fT['files'].value" [formField]="fT['files']"
@@ -480,7 +480,7 @@
 
                             <div class="ictu-form__row tailieu-upload-field">
                                 <div class="tailieu-upload-field__heading">
-                                    <label>Slide bài giảng<span class="ovic-mark">*</span></label>
+                                    <label class="ictu-form__label ictu-form__label--required">Slide bài giảng</label>
                                 </div>
                                 <p class="tailieu-upload-field__hint">Định dạng: PPT, PPTX, PDF</p>
                                 <open-file-manager-v2 [filesDefault]="fT['slides'].value" [formField]="fT['slides']"

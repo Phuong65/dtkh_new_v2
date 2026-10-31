@@ -18,7 +18,8 @@ import { Drawer } from 'primeng/drawer';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
 import { MatButtonModule } from '@angular/material/button';
-import { Component, ElementRef, Input, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren, inject, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, QueryList, SimpleChanges, TemplateRef, ViewChild, ViewChildren, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ConditionOption } from '@modules/shared/models/condition-option';
 import { Router } from '@angular/router';
@@ -64,6 +65,22 @@ export interface LessonFormRow {
     error: string;
 }
 
+export interface Essay15pContext {
+    lessonId: number;
+    week: number;
+    cdr: number | null;
+    action: 'form' | 'list' | 'create';
+    canEdit: boolean;
+}
+
+export interface Essay15pLessonData {
+    courseId: number;
+    lessonId: number;
+    week: number;
+    formRows: CourseFormTuluan15p[];
+    questions: CoursePlanActivityTuluan[];
+}
+
 @Component({
     selector: 'app-cauhoi-tuluan-15p',
     standalone: true,
@@ -98,7 +115,8 @@ export interface LessonFormRow {
     templateUrl: './cauhoi-tuluan-15p.component.html',
     styleUrls: ['./cauhoi-tuluan-15p.component.css']
 })
-export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
+export class CauhoiTuluan15pComponent implements OnInit, OnChanges, OnDestroy {
+    private readonly destroyRef = inject(DestroyRef);
     private notificationService = inject(NotificationService);
     private coursePlanActivitiesService = inject(CoursePlanActivitiesService);
     private router = inject(Router);
@@ -116,6 +134,27 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
 
 
     @Input() courseSelected: ElnKhoaHoc;
+    @Input() context: Essay15pContext | null = null;
+    @Output() closed = new EventEmitter<void>();
+    @Output() changed = new EventEmitter<Essay15pLessonData>();
+
+    embeddedQuestionEditing = false;
+    embeddedError = '';
+    private embeddedActionPending = true;
+    private closeAfterLessonLoad = false;
+    private closeFormDrawerOnHide = false;
+    private destroyed = false;
+
+    get embeddedMode(): boolean { return this.context !== null; }
+    get formOnly(): boolean { return this.context?.action === 'form'; }
+    get embeddedCanEdit(): boolean {
+        return !this.context || (this.context.canEdit && (this.isManager || this.routerDaotao
+            || this.routerLanhdaokhoa || this.routerLanhdaobomon
+            || this.userId === this.selectedCourse?.creator_plan_id));
+    }
+    get contextualCdrLabel(): string {
+        return CHUAN_DAU_RA.find(item => item.id === this.context?.cdr)?.label || '';
+    }
 
     @ViewChild('templateQuestion') templateQuestion: TemplateRef<any>;
 
@@ -349,7 +388,11 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
     }
 
     onDrawerHide(): void {
-        this.closeDrawer();
+        this.drawerTemplate = null;
+        if (this.embeddedMode && this.formOnly && !this.closeFormDrawerOnHide && !this.destroyed) {
+            this.closed.emit();
+        }
+        this.closeFormDrawerOnHide = false;
     }
 
     get drawerBusy(): boolean {
@@ -365,7 +408,14 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
         return this.displayModal ? `${this.waitting_title || 'Đang lưu tiêu chí...'} (${Math.round(this.progressValue)}%)` : this.loadingHeading;
     }
 
+    ngOnChanges(changes: SimpleChanges): void {
+        if (!this.context || !this.selectedCourse || !this.lessons.length) return;
+        if (changes['context']) this.activateContext();
+    }
+
     ngOnDestroy(): void {
+        this.destroyed = true;
+        this.lessonSelectionToken++;
         this.questionCdrSubscription?.unsubscribe();
         this.cancelAiRubricRequest();
         this.cancelCardRubricRequest();
@@ -444,7 +494,7 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
                 return of(null)
             })),
             this.courseFormDuyetService.getCourseFormDuyetByPageNew(condition_course_form_duyet)
-        ]).subscribe({
+        ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
             next: ([_user_profile, _thanhvien, _form_duyet]) => {
 
                 if (_thanhvien) {
@@ -487,12 +537,14 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
             page: null
         };
 
-        this.coursePlanActivitiesService.getCoursePlanActivitiesByPageNew(lessonConditions).subscribe({
+        this.coursePlanActivitiesService.getCoursePlanActivitiesByPageNew(lessonConditions).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
             next: (_lessons) => {
                 this.lessons = _lessons.data;
                 this.isLoadingLessons = false;
-                if (this.lessons.length) {
+                if (this.lessons.length && !this.embeddedMode) {
                     this.onSelectLesson(this.lessons[0]);
+                } else if (this.embeddedMode) {
+                    this.activateContext();
                 }
             },
             error: () => {
@@ -524,6 +576,34 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
         this.loadCauhoi();
     }
 
+    private activateContext(): void {
+        if (!this.context || !this.selectedCourse || this.isLoadingLessons) return;
+        this.embeddedError = '';
+        this.embeddedQuestionEditing = false;
+        this.embeddedActionPending = true;
+        const lesson = this.lessons.find(item => Number(item.id) === Number(this.context.lessonId));
+        if (!lesson || Number(lesson.week) !== Number(this.context.week)) {
+            this.embeddedError = 'Không tìm thấy bài học được chọn';
+            this.state.set('success');
+            return;
+        }
+        this.onSelectLesson(lesson);
+    }
+
+    requestEmbeddedClose(): void {
+        if (this.busy || this.drawerBusy) return;
+        if (this.embeddedQuestionEditing && this.formData.dirty) {
+            firstValueFrom(this.notificationService.confirmDelete2({
+                heading: 'Đóng phần nhập câu hỏi?',
+                htmlMessage: 'Nội dung đang nhập chưa được lưu. Bạn có muốn đóng không?'
+            })).then(confirmed => {
+                if (confirmed) this.closed.emit();
+            });
+            return;
+        }
+        this.closed.emit();
+    }
+
     loadCauhoi() {
         if (!this.selectedLesson?.id || !this.selectedCourse?.id) {
             return;
@@ -542,7 +622,7 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
         forkJoin({
             questions: this.coursePlanActivityTuluanService.getCoursePlanActivityTuluanByPageNew(this.getQuestionCondition(selectedLessonId)),
             lessonForm: this.courseFormTuluan15pService.getByPage(this.getLessonFormCondition(selectedLessonId, selectedLessonWeek))
-        }).subscribe({
+        }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
             next: ({ questions, lessonForm }) => {
                 if (!this.isCurrentLessonRequest(selectionToken, selectedLessonId, selectedLessonWeek)) {
                     return;
@@ -578,11 +658,30 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
 
                 this.list_cauhoi = loadedQuestions;
                 this.lessonFormRows = loadedRows;
+                if (this.embeddedMode && this.context.cdr !== null) {
+                    this.selectedQuestionCdr = this.context.cdr;
+                    if (!loadedRows.some(row => Number(row.cdr) === Number(this.context.cdr))) {
+                        this.embeddedError = 'CDR này không còn trong form của bài';
+                    }
+                }
                 this.updateLessonFormState();
+                if (this.embeddedMode && this.context.cdr !== null) this.selectedQuestionCdr = this.context.cdr;
                 this.updateCdrFilteredQuestions();
                 this.isLoadingQuestions = false;
                 this.isLoadingLessonForm = false;
                 this.state.set('success');
+                if (this.embeddedMode) {
+                    this.changed.emit({ courseId: this.selectedCourse.id, lessonId: selectedLessonId, week: selectedLessonWeek,
+                        formRows: [...loadedRows], questions: [...loadedQuestions] });
+                    if (this.closeAfterLessonLoad) {
+                        this.closeAfterLessonLoad = false;
+                        this.closed.emit();
+                    } else if (this.embeddedActionPending && !this.embeddedError) {
+                        this.embeddedActionPending = false;
+                        if (this.context.action === 'form') this.openLessonForm();
+                        else if (this.context.action === 'create') this.startEmbeddedQuestion();
+                    }
+                }
             },
             error: () => {
                 if (!this.isCurrentLessonRequest(selectionToken, selectedLessonId, selectedLessonWeek)) {
@@ -632,7 +731,7 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
     }
 
     private isCurrentLessonRequest(token: number, lessonId: number, week: number): boolean {
-        return token === this.lessonSelectionToken
+        return !this.destroyed && token === this.lessonSelectionToken
             && Number(this.selectedLesson?.id) === Number(lessonId)
             && Number(this.selectedLesson?.week) === Number(week);
     }
@@ -655,9 +754,10 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
     }
 
     private updateCdrFilteredQuestions() {
-        this.cdrFilteredQuestions = this.selectedQuestionCdr === null
-            ? [...this.list_cauhoi]
-            : this.list_cauhoi.filter(question => Number(question.cdr) === Number(this.selectedQuestionCdr));
+        const selectedCdr = this.embeddedMode ? this.context?.cdr : this.selectedQuestionCdr;
+        this.cdrFilteredQuestions = selectedCdr === null || selectedCdr === undefined
+            ? (this.embeddedMode ? [] : [...this.list_cauhoi])
+            : this.list_cauhoi.filter(question => Number(question.cdr) === Number(selectedCdr));
     }
 
     retryLoadLessonData() {
@@ -665,6 +765,10 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
     }
 
     openLessonForm() {
+        if (this.embeddedMode && (!this.context?.canEdit || !this.embeddedCanEdit)) {
+            this.embeddedError = 'Bạn không có quyền cấu hình form tự luận';
+            return;
+        }
         if (!this.selectedLesson || this.isLoadingLessonForm || this.isSavingLessonForm || this.lessonFormLoadError) {
             return;
         }
@@ -748,6 +852,7 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
     }
 
     saveLessonForm() {
+        if (this.embeddedMode && !this.embeddedCanEdit) return;
         if (this.isSavingLessonForm || !this.selectedLesson?.id) {
             return;
         }
@@ -762,7 +867,7 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
         this.isSavingLessonForm = true;
         this.state.set('loading');
 
-        this.courseFormTuluan15pService.getByPage(this.getLessonFormCondition(lessonId, lessonWeek)).subscribe({
+        this.courseFormTuluan15pService.getByPage(this.getLessonFormCondition(lessonId, lessonWeek)).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
             next: result => {
                 const serverRows = result.data || [];
                 const serverIds = serverRows.map(row => row.id).filter(id => !!id).sort();
@@ -889,7 +994,11 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
         this.isSavingLessonForm = false;
         this.state.set('success');
         this.notificationService.toastSuccess('Lưu form thành công');
+        this.closeFormDrawerOnHide = true;
         this.closeDrawer();
+        if (this.embeddedMode && this.formOnly) {
+            this.closeAfterLessonLoad = true;
+        }
         this.loadCauhoi();
     }
 
@@ -927,6 +1036,10 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
     }
 
     openAddCauhoi() {
+        if (this.embeddedMode && !this.embeddedCanEdit) {
+            this.notificationService.toastWarning('Bạn không có quyền thêm câu hỏi');
+            return;
+        }
         if (this.isLoadingLessonForm || this.isSavingLessonForm || !this.hasLessonForm) {
             this.notificationService.toastWarning('Vui lòng tạo và lưu form nhập câu hỏi cho bài này trước');
             return;
@@ -934,8 +1047,15 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
 
         this.formTitle = "Thêm câu hỏi";
         this.formReset();
+        if (this.embeddedMode && this.context?.cdr !== null && this.context?.cdr !== undefined) {
+            this.f['cdr'].setValue(this.context.cdr);
+        }
         this.selectedCauhoi = null;
-        this.openDrawer(this.templateQuestion, this.formTitle || 'Câu hỏi tự luận');
+        if (this.embeddedMode) {
+            this.embeddedQuestionEditing = true;
+        } else {
+            this.openDrawer(this.templateQuestion, this.formTitle || 'Câu hỏi tự luận');
+        }
     }
 
     formReset() {
@@ -952,6 +1072,13 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
         this.resetAiRubric();
     }
 
+    private startEmbeddedQuestion(): void {
+        if (this.context?.cdr !== null && this.context?.cdr !== undefined) {
+            this.selectedQuestionCdr = this.context.cdr;
+        }
+        this.openAddCauhoi();
+    }
+
     private syncQuestionPointByCdr(cdr: unknown) {
         const selectedFormRow = this.lessonFormRows.find(row => Number(row.cdr) === Number(cdr));
         this.selectedQuestionPoint = selectedFormRow ? Number(selectedFormRow.point) : null;
@@ -959,6 +1086,10 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
     }
 
     editCauhoi(cauhoi: CoursePlanActivityTuluan) {
+        if (this.embeddedMode && !this.embeddedCanEdit) {
+            this.notificationService.toastWarning('Bạn không có quyền sửa câu hỏi');
+            return;
+        }
         if (!this.hasLessonForm || !this.lessonFormRows.some(row => Number(row.cdr) === Number(cauhoi.cdr))) {
             this.notificationService.toastWarning('CDR của câu hỏi không còn thuộc form bài hiện tại');
             return;
@@ -973,7 +1104,11 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
         this.f['rubric_markdown'].setValue(cauhoi.rubric_markdown || '');
         this.f['cdr'].setValue(cauhoi.cdr);
         this.isUpdated = true;
-        this.openDrawer(this.templateQuestion, this.formTitle || 'Câu hỏi tự luận');
+        if (this.embeddedMode) {
+            this.embeddedQuestionEditing = true;
+        } else {
+            this.openDrawer(this.templateQuestion, this.formTitle || 'Câu hỏi tự luận');
+        }
     }
 
     generateAiRubric() {
@@ -1266,6 +1401,7 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
                         this.isSavingQuestion = false;
                         this.notificationService.toastSuccess("Sửa thành công");
                         this.closeSideMenu();
+                        this.embeddedQuestionEditing = false;
                         this.loadCauhoi();
                     },
                     error: () => {
@@ -1280,6 +1416,7 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
                         this.isSavingQuestion = false;
                         this.notificationService.toastSuccess("Thêm thành công");
                         this.formReset();
+                        this.embeddedQuestionEditing = false;
                         this.loadCauhoi();
                     },
                     error: () => {
@@ -1296,6 +1433,10 @@ export class CauhoiTuluan15pComponent implements OnInit, OnDestroy {
     }
 
     deleteCauhoi(cauhoi: CoursePlanActivityTuluan) {
+        if (this.embeddedMode && !this.embeddedCanEdit) {
+            this.notificationService.toastWarning('Bạn không có quyền xóa câu hỏi');
+            return;
+        }
         firstValueFrom(this.notificationService.confirmDelete2({ heading: 'Xác nhận xóa' })).then(a => {
             if (a) {
                 this.deletingQuestionId = cauhoi.id;

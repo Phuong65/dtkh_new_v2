@@ -44,10 +44,14 @@ import { HoidongThamdinhMonhocThanhvien } from '@modules/shared/models/hoidong-t
 
 import { CourseFormTuluan15pService } from '@modules/shared/services/course-form-tuluan-15p.service';
 import { CourseFormTuluan15p } from '@modules/shared/models/course-form-tuluan-15p';
+import { CoursePlanActivityTuluanService } from '@modules/shared/services/course-plan-activity-tuluan.service';
+import { CoursePlanActivityTuluan } from '@modules/shared/models/course-plan-activity-tuluan';
+import { CauhoiTuluan15pComponent, Essay15pContext, Essay15pLessonData } from '../cauhoi-tuluan-15p/cauhoi-tuluan-15p.component';
 import { ShowLabelData } from '@modules/shared/pipes/show-label-data.pipe';
 import { DuyetFormDeComponent } from '@modules/admin/features/duyetnoidung/duyet-form-de/duyet-form-de.component';
 
 interface Tuluan15pRow {
+    id?: number;
     lessonWeek: number;
     coursePlanActivityId: number;
     cdrId: number;
@@ -55,6 +59,7 @@ interface Tuluan15pRow {
     cdrLabel: string;
     point: number | null;
     questionTake: number | null;
+    questionCount?: number;
 }
 
 @Component({
@@ -74,6 +79,7 @@ interface Tuluan15pRow {
         ShowLabelData,
         BadgeModule,
         DuyetFormDeComponent,
+        CauhoiTuluan15pComponent,
         MatButtonModule,
         Drawer,
         TooltipModule,
@@ -98,6 +104,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     private courseFormTxService = inject(CourseFormTxService);
     private courseFormDgService = inject(CourseFormDgService);
     private courseFormTuluan15pService = inject(CourseFormTuluan15pService);
+    private coursePlanActivityTuluanService = inject(CoursePlanActivityTuluanService);
     private courseFormDuyetService = inject(CourseFormDuyetService);
     private hoidongThamdinhService = inject(HoidongThamdinhService);
     private hoidongThamdinhMonhocService = inject(HoidongThamdinhMonhocService);
@@ -173,6 +180,10 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     list_test_dg: PlanActivityCdr[];
 
     tuluan15pRows: Tuluan15pRow[] = [];
+    essayContext: Essay15pContext | null = null;
+    get essayFormOnly(): boolean {
+        return this.essayContext?.action === 'form';
+    }
 
     label_week: string = "Bài";
 
@@ -231,6 +242,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
             const version = ++this.courseLoadVersion;
             this.cancelCourseLoad$.next();
             this.cancelTabLoad$.next();
+            this.essayContext = null;
             this.selectedCourse = null;
             if (code && Number.isSafeInteger(Number(code)) && Number(code) > 0) {
                 this.state.set('loading');
@@ -545,6 +557,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     onTabIndexChange(index: string | number) {
+        if (this.essayContext) return;
         this.activeIndexTab = Number(index);
         this.changeTabView();
     }
@@ -2767,22 +2780,31 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
         };
     }
 
-    private buildTuluan15pRows(lessons: PlanActivityCdr[], serverData: CourseFormTuluan15p[]): Tuluan15pRow[] {
+    private buildTuluan15pRows(lessons: PlanActivityCdr[], serverData: CourseFormTuluan15p[], allQuestions: CoursePlanActivityTuluan[] = []): Tuluan15pRow[] {
         return serverData
             .filter(item => lessons.some(lesson =>
                 Number(lesson.id) === Number(item.course_plan_activity_id)
                 && Number(lesson.week) === Number(item.week)
             ))
             .sort((first, second) => Number(first.ordering) - Number(second.ordering))
-            .map(item => ({
-                lessonWeek: Number(item.week),
-                coursePlanActivityId: Number(item.course_plan_activity_id),
-                cdrId: Number(item.cdr),
-                stt: Number(item.ordering),
-                cdrLabel: this.chuandaura.find(cdr => Number(cdr.id) === Number(item.cdr))?.label || `CDR ${item.cdr}`,
-                point: item.point,
-                questionTake: item.question_take
-            }));
+            .map(item => {
+                const questionCount = allQuestions.filter(q =>
+                    Number(q.course_id) === Number(item.course_id)
+                    && Number(q.course_plan_activity_id) === Number(item.course_plan_activity_id)
+                    && Number(q.cdr) === Number(item.cdr)
+                ).length;
+                return {
+                    id: item.id,
+                    lessonWeek: Number(item.week),
+                    coursePlanActivityId: Number(item.course_plan_activity_id),
+                    cdrId: Number(item.cdr),
+                    stt: Number(item.ordering),
+                    cdrLabel: this.chuandaura.find(cdr => Number(cdr.id) === Number(item.cdr))?.label || `CDR ${item.cdr}`,
+                    point: item.point,
+                    questionTake: item.question_take,
+                    questionCount
+                };
+            });
     }
 
     private attachTuluan15pRows(lessons: PlanActivityCdr[]) {
@@ -2813,6 +2835,48 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
     isTuluan15pLessonScoreError(rows: Tuluan15pRow[] = []): boolean {
         return this.getTuluan15pTotals(rows).totalScore > 10;
+    }
+
+    canEditEssayForm(row: PlanActivityCdr): boolean {
+        return !!row?.canEdit && this.course_form_duyet['DG']?.status !== 1
+            && (this.isManager || this.canAdded);
+    }
+
+    openEssayContext(row: PlanActivityCdr, action: Essay15pContext['action'], tuluanRow?: Tuluan15pRow): void {
+        if (!row?.id || this.essayContext || this.isLoading() || this.state() !== 'success') return;
+        if (!this.list_test_dg?.includes(row)) return;
+        if (action !== 'form' && (!tuluanRow || !row['tuluan15pRows']?.includes(tuluanRow))) return;
+        const canEdit = this.canEditEssayForm(row);
+        if (action !== 'list' && !canEdit) return;
+        this.essayContext = {
+            lessonId: Number(row.id),
+            week: Number(row.week),
+            cdr: tuluanRow?.cdrId ?? null,
+            action,
+            canEdit
+        };
+    }
+
+    closeEssayContext(): void {
+        this.essayContext = null;
+    }
+
+    onEssayDataChanged(data: Essay15pLessonData): void {
+        if (!this.selectedCourse || !this.essayContext || this.destroyRef.destroyed
+            || Number(data.courseId) !== Number(this.selectedCourse.id)
+            || Number(data.lessonId) !== this.essayContext.lessonId || Number(data.week) !== this.essayContext.week) return;
+        if (data.formRows.some(item => Number(item.course_id) !== Number(data.courseId)
+            || Number(item.course_plan_activity_id) !== Number(data.lessonId) || Number(item.week) !== Number(data.week))) return;
+        const lesson = this.list_test_dg?.find(item => Number(item.id) === Number(data.lessonId)
+            && Number(item.week) === Number(data.week));
+        if (!lesson) return;
+        const updatedRows = this.buildTuluan15pRows([lesson], data.formRows, data.questions);
+        this.tuluan15pRows = [
+            ...this.tuluan15pRows.filter(item => Number(item.coursePlanActivityId) !== Number(data.lessonId)
+                || Number(item.lessonWeek) !== Number(data.week)),
+            ...updatedRows
+        ];
+        this.attachTuluan15pRows(this.list_test_dg);
     }
 
     /** Kiểm tra đầu giờ type 0 */
@@ -2898,9 +2962,10 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
             this.courseFormDgService.getCourseFormDgByPage(condition_form_cc),
             this.coursePlanBankService.getCoursePlanBankByPageNew(condition_plan_bank),
             this.courseQuestionsService.getCourseQuestionsByPageNew(condition_question),
-            this.courseFormTuluan15pService.getByPage(this.getTuluan15pCondition())
+            this.courseFormTuluan15pService.getByPage(this.getTuluan15pCondition()),
+            this.coursePlanActivityTuluanService.getCoursePlanActivityTuluanByPageNew(this.getTuluan15pCondition())
         ]).pipe(takeUntil(this.cancelTabLoad$), takeUntilDestroyed(this.destroyRef)).subscribe({
-            next: ([_plan_activity, _form_cc, _plan_bank, _question, _tuluan15pForm]) => {
+            next: ([_plan_activity, _form_cc, _plan_bank, _question, _tuluan15pForm, _essayQuestions]) => {
 
                 this.stopLoading();
 
@@ -3003,7 +3068,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                     f['children'] = this.helperService.sort(children, 'kyhieu_stt');
                 })
 
-                this.tuluan15pRows = this.buildTuluan15pRows(parent, _tuluan15pForm.data || []);
+                this.tuluan15pRows = this.buildTuluan15pRows(parent, _tuluan15pForm.data || [], _essayQuestions.data || []);
                 this.attachTuluan15pRows(parent);
                 this.list_test_dg = parent;
             },
@@ -3173,9 +3238,10 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
             this.courseFormDgService.getCoursePlansByPageNew(condition_form_cc),
             this.courseQuestionsService.getCourseQuestionsByPageNew(condition_question),
             this.coursePlanBankService.getCoursePlanBankByPageNew(condition_plan_bank),
-            this.courseFormTuluan15pService.getByPage(this.getTuluan15pCondition())
+            this.courseFormTuluan15pService.getByPage(this.getTuluan15pCondition()),
+            this.coursePlanActivityTuluanService.getCoursePlanActivityTuluanByPageNew(this.getTuluan15pCondition())
         ]).pipe(takeUntil(this.cancelTabLoad$), takeUntilDestroyed(this.destroyRef)).subscribe({
-            next: ([_plan_activity, _form_cc, _question, _plan_bank, _tuluan15pForm]) => {
+            next: ([_plan_activity, _form_cc, _question, _plan_bank, _tuluan15pForm, _essayQuestions]) => {
 
                 this.stopLoading();
 
@@ -3314,7 +3380,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
                 });
 
-                this.tuluan15pRows = this.buildTuluan15pRows(parent, _tuluan15pForm.data || []);
+                this.tuluan15pRows = this.buildTuluan15pRows(parent, _tuluan15pForm.data || [], _essayQuestions.data || []);
                 this.attachTuluan15pRows(parent);
                 this.list_test_dg = parent;
             },

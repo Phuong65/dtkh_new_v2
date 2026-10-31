@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MatMenuModule } from '@angular/material/menu';
 import { PanelModule } from 'primeng/panel';
+import { MessageService } from 'primeng/api';
 import { EMPTY, of } from 'rxjs';
 import { AuthService } from '@core/services/auth.service';
 import { NotificationService } from '@core/services/notification.service';
@@ -47,6 +48,7 @@ describe('MonhocNoidungComponent presentation', () => {
                 { provide: ActivatedRoute, useValue: { queryParams: EMPTY } },
                 { provide: Router, useValue: router },
                 { provide: AuthService, useValue: { user: { id: 1 }, userHasRole: () => false, hasRouter: () => false } },
+                { provide: MessageService, useValue: { add: jasmine.createSpy('add'), clear: jasmine.createSpy('clear') } },
                 { provide: NotificationService, useValue: jasmine.createSpyObj('notification', ['isProcessing', 'toastSuccess', 'toastError', 'toastWarning']) },
                 { provide: CoursePlanActivitiesService, useValue: planApi },
                 { provide: NgbModal, useValue: { open: jasmine.createSpy('open') } },

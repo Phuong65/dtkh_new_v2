@@ -19,7 +19,7 @@
                     @for (panel of list_tab; track panel.key; let tabIndex = $index) {
                     <button type="button" class="form-de-tab assessment-tab" role="tab" [class.active]="activeIndexTab === tabIndex"
                         [class.is-active]="activeIndexTab === tabIndex" [attr.aria-selected]="activeIndexTab === tabIndex"
-                        [attr.aria-controls]="'formde-panel-' + panel.key" (click)="onTabIndexChange(tabIndex)">
+                        [attr.aria-controls]="'formde-panel-' + panel.key" [disabled]="!!essayContext" (click)="onTabIndexChange(tabIndex)">
                         <span class="assessment-tab__icon" aria-hidden="true"><i [class]="tabIcon(panel.key)"></i></span>
                         <span class="assessment-tab__label"><ng-container [ngTemplateOutlet]="panelHeader"
                             [ngTemplateOutletContext]="{ type: panel.key}"></ng-container></span>
@@ -356,9 +356,11 @@
                 <strong>Câu hỏi tự luận</strong>
                 <button type="button" mat-flat-button
                     class="btn ictu-badge-btn--success-reverse tuluan15p-add-button"
-                    aria-label="Thêm câu hỏi tự luận">
+                    [attr.aria-label]="row['tuluan15pRows']?.length ? 'Cấu hình form tự luận' : 'Thêm form tự luận'"
+                    [disabled]="!canEditEssayForm(row) || isLoading()"
+                    (click)="openEssayContext(row, 'form')">
                     <i class="ti ti-plus" aria-hidden="true"></i>
-                    <span>Thêm câu hỏi tự luận</span>
+                    <span>{{ row['tuluan15pRows']?.length ? 'Cấu hình form tự luận' : 'Thêm form tự luận' }}</span>
                 </button>
             </div>
             <div class="tuluan15p-block">
@@ -367,7 +369,8 @@
                         <tr>
                             <th style="width:50px">STT</th>
                             <th>Mức độ/trình độ năng lực (CDR)</th>
-                            <th>Số câu lấy ({{getTuluan15pTotals(row['tuluan15pRows']).totalTake}})</th>
+                            <th>Số câu lấy</th>
+                            <th>Đã nhập</th>
                             <th>Điểm/ 1 Câu</th>
                             <th>Tổng điểm ({{getTuluan15pTotals(row['tuluan15pRows']).totalScore}})</th>
                             <th class="tuluan15p-actions-heading">Thao tác</th>
@@ -379,22 +382,29 @@
                             <td>{{tuluanRow.stt}}</td>
                             <td>{{tuluanRow.cdrLabel}}</td>
                             <td>{{tuluanRow.questionTake}}</td>
+                            <td>{{tuluanRow.questionCount || 0}}</td>
                             <td>{{tuluanRow.point}}</td>
                             <td class="tuluan15p-total-score">
                                 {{(tuluanRow.questionTake || 0) * (tuluanRow.point || 0)}}
                             </td>
                             <td class="tuluan15p-actions">
-                                <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
-                                    aria-label="Xóa câu hỏi tự luận" pTooltip="Xóa câu hỏi tự luận"
-                                    tooltipPosition="top" appendTo="body">
-                                    <i class="ti ti-trash" aria-hidden="true"></i>
+                                <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
+                                    (click)="openEssayContext(row, 'list', tuluanRow)"
+                                    aria-label="Xem câu hỏi tự luận" pTooltip="Xem câu hỏi" tooltipPosition="top" appendTo="body">
+                                    <i class="ti ti-eye" aria-hidden="true"></i>
+                                </button>
+                                <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button"
+                                    (click)="openEssayContext(row, 'create', tuluanRow)"
+                                    [disabled]="!canEditEssayForm(row) || isLoading()" aria-label="Thêm câu hỏi tự luận"
+                                    pTooltip="Thêm câu hỏi" tooltipPosition="top" appendTo="body">
+                                    <i class="ti ti-plus" aria-hidden="true"></i>
                                 </button>
                             </td>
                         </tr>
                         }
                         @if (!row['tuluan15pRows']?.length) {
                         <tr>
-                            <td colspan="6" class="tuluan15p-empty">— Chưa có câu hỏi tự luận</td>
+                            <td colspan="7" class="tuluan15p-empty">— Chưa có form câu hỏi tự luận</td>
                         </tr>
                         }
                     </tbody>
@@ -402,6 +412,13 @@
             </div>
         </section>
     </ng-template>
+    @if (essayContext && !essayFormOnly) {
+    <section class="essay-context-panel" aria-label="Quản lý câu hỏi tự luận">
+        <app-cauhoi-tuluan-15p [courseSelected]="selectedCourse"
+            [context]="essayContext" (closed)="closeEssayContext()"
+            (changed)="onEssayDataChanged($event)"></app-cauhoi-tuluan-15p>
+    </section>
+    } @else {
     <div class="container-form-tracnghiem"
         [ngClass]="course_form_duyet[typeTest] && course_form_duyet[typeTest]['status'] === 1?'form-da-duyet':''">
         <div class="form-tracnghiem-panel-content">
@@ -700,6 +717,12 @@
             }
         </div>
     </div>
+    }
+    @if (essayContext && essayFormOnly) {
+    <app-cauhoi-tuluan-15p [courseSelected]="selectedCourse"
+        [context]="essayContext" (closed)="closeEssayContext()"
+        (changed)="onEssayDataChanged($event)"></app-cauhoi-tuluan-15p>
+    }
 </ng-template>
 
 <ng-template #formDeTx let-typeTest="typeTest">

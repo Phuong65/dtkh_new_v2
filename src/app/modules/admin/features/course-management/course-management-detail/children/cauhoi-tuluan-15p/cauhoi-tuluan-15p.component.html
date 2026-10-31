@@ -1,9 +1,30 @@
-﻿<main class="cauhoi-15p-shell" [attr.aria-busy]="busy">
+﻿<main class="cauhoi-15p-shell" [attr.aria-busy]="busy" [class.cauhoi-15p-shell--form-only]="formOnly">
     @if (busy) {
     <app-loading-progress [heading]="progressHeading" backdropFilter="blur(2px)"></app-loading-progress>
     }
 
-    <div class="cauhoi-15p-layout" [class.cauhoi-15p-layout--collapsed]="closeLeft">
+    @if (embeddedMode && !formOnly) {
+    <header class="cauhoi-15p-embedded-header">
+        <div class="cauhoi-15p-embedded-header__info">
+            <span class="cauhoi-15p-embedded-header__icon" aria-hidden="true"><i class="ti ti-notes"></i></span>
+            <div>
+                <strong>Bài {{selectedLesson?.week}} · Câu hỏi tự luận</strong>
+                @if (contextualCdrLabel) {
+                <small>{{contextualCdrLabel}}</small>
+                }
+            </div>
+        </div>
+        <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
+            aria-label="Đóng" pTooltip="Đóng" tooltipPosition="left" appendTo="body"
+            [disabled]="drawerBusy" (click)="requestEmbeddedClose()">
+            <i class="ti ti-x" aria-hidden="true"></i>
+        </button>
+    </header>
+    }
+
+    @if (!formOnly) {
+    <div class="cauhoi-15p-layout" [class.cauhoi-15p-layout--collapsed]="closeLeft" [class.cauhoi-15p-layout--embedded]="embeddedMode">
+        @if (!embeddedMode) {
         <aside class="cauhoi-15p-sidebar" aria-label="Danh sách bài học">
             <header class="cauhoi-15p-sidebar__header">
                 <span class="cauhoi-15p-sidebar__icon" aria-hidden="true"><i class="ti ti-notebook"></i></span>
@@ -36,16 +57,27 @@
                 }
             </div>
         </aside>
+        }
 
         <section class="cauhoi-15p-main">
-            @if (selectedLesson && selectedCourse) {
+            @if (embeddedError) {
+            <div class="cauhoi-15p-empty-state cauhoi-15p-empty-state--error" role="alert">
+                <i class="ti ti-alert-circle" aria-hidden="true"></i>
+                <strong>{{embeddedError}}</strong>
+                <button type="button" mat-flat-button class="btn ictu-badge-btn--primary" (click)="retryLoadLessonData()">Tải lại</button>
+            </div>
+            } @else if (embeddedQuestionEditing) {
+            <ng-container [ngTemplateOutlet]="templateQuestion"></ng-container>
+            } @else if (selectedLesson && selectedCourse) {
             <ng-container [ngTemplateOutlet]="templateListCauhoi"></ng-container>
             } @else if (!isLoadingLessons) {
             <div class="cauhoi-15p-state cauhoi-15p-state--main"><i class="ti ti-click" aria-hidden="true"></i><strong>Chọn một bài học</strong><span>Chọn bài học bên trái để quản lý câu hỏi tự luận 15 phút.</span></div>
             }
         </section>
     </div>
+    }
 
+    @if (!embeddedMode || formOnly) {
     <p-drawer [(visible)]="drawerVisible" position="right" [header]="drawerTitle"
         [style]="{ width: 'min(1024px, 100vw)', maxWidth: '100vw' }" appendTo="body" [blockScroll]="true"
         [closable]="!drawerBusy" [dismissible]="!drawerBusy" [closeOnEscape]="!drawerBusy"
@@ -57,6 +89,7 @@
             </div>
         </div>
     </p-drawer>
+    }
 
 <ng-template #templateListCauhoi>
     <section class="admin-wrap-table ictu-admin-table-shell cauhoi-15p-workspace">
@@ -104,6 +137,7 @@
                 </div>
             </div>
             <div class="cauhoi-15p-page-header__actions">
+                @if (!embeddedMode) {
                 <label class="cauhoi-15p-filter cauhoi-15p-toolbar-control" for="cauhoi-15p-cdr-filter-select">
                     <span class="sr-only">Lọc câu hỏi theo CDR</span>
                     <select id="cauhoi-15p-cdr-filter-select" [(ngModel)]="selectedQuestionCdr"
@@ -117,6 +151,7 @@
 }
                     </select>
                 </label>
+                }
                 <label class="cauhoi-15p-search cauhoi-15p-toolbar-control" for="cauhoi-15p-search-input">
                     <span class="sr-only">Tìm theo mã câu hỏi</span>
                     <i class="ti ti-search" aria-hidden="true"></i>
@@ -130,7 +165,7 @@
                     <span>Tải lại</span>
                 </button>
 }
-                @if (!lessonFormLoadError) {
+                @if (!embeddedMode && !lessonFormLoadError) {
 <button type="button" (click)="openLessonForm()"
                     mat-flat-button class="btn ictu-badge-btn--primary cauhoi-15p-toolbar-control"
                     [disabled]="isLoadingLessonForm || isSavingLessonForm">
@@ -139,7 +174,7 @@
                 </button>
 }
                 <button type="button" mat-flat-button (click)="openAddCauhoi()" class="btn ictu-badge-btn--primary-reverse cauhoi-15p-toolbar-control"
-                    [disabled]="!hasLessonForm || isLoadingLessonForm || isSavingLessonForm">
+                    [disabled]="!hasLessonForm || isLoadingLessonForm || isSavingLessonForm || (embeddedMode && !embeddedCanEdit)">
                     <i class="ti ti-plus" aria-hidden="true"></i>
                     <span>Thêm câu hỏi</span>
                 </button>
@@ -209,13 +244,14 @@
                             </div>
                             <div class="cauhoi-15p-question-card__actions">
                                 <button type="button" (click)="editCauhoi(cauhoi)"
-                                    mat-flat-button class="btn ictu-badge-btn--primary">
+                                    mat-flat-button class="btn ictu-badge-btn--primary"
+                                    [disabled]="embeddedMode && !embeddedCanEdit">
                                     <i class="ti ti-edit" aria-hidden="true"></i>
                                     <span>Sửa</span>
                                 </button>
                                 <button type="button" (click)="deleteCauhoi(cauhoi)"
                                     class="btn ictu-button-danger-light cauhoi-15p-text-button"
-                                    [disabled]="deletingQuestionId === cauhoi.id">
+                                    [disabled]="deletingQuestionId === cauhoi.id || (embeddedMode && !embeddedCanEdit)">
                                     <i [ngClass]="deletingQuestionId === cauhoi.id ? 'ti ti-loader cauhoi-15p-spin' : 'ti ti-trash'"
                                         aria-hidden="true"></i>
                                     <span>{{deletingQuestionId === cauhoi.id ? 'Đang xóa' : 'Xóa'}}</span>
@@ -248,7 +284,8 @@
                         <h3>Chưa có câu hỏi</h3>
                         <p>Thêm câu hỏi đầu tiên cho Bài {{selectedLesson.week}} để bắt đầu.</p>
                         <button type="button" (click)="openAddCauhoi()"
-                            mat-flat-button class="btn ictu-badge-btn--primary-reverse">
+                            mat-flat-button class="btn ictu-badge-btn--primary-reverse"
+                            [disabled]="embeddedMode && !embeddedCanEdit">
                             <i class="ti ti-plus" aria-hidden="true"></i>
                             <span>Thêm câu hỏi</span>
                         </button>
@@ -284,7 +321,7 @@
                 <div class="cauhoi-15p-form-toolbar">
                     <div><strong id="cauhoi-15p-form-table-title">Cấu hình CDR</strong><small>Thiết lập điểm mỗi câu và số lượng câu cần lấy.</small></div>
                     <button type="button" mat-flat-button class="btn ictu-badge-btn--primary"
-                        (click)="addLessonFormRow()" [disabled]="isSavingLessonForm || lessonFormDraftRows.length >= lessonFormCdrOptions.length">
+                        (click)="addLessonFormRow()" [disabled]="!embeddedCanEdit || isSavingLessonForm || lessonFormDraftRows.length >= lessonFormCdrOptions.length">
                         <i class="ti ti-plus" aria-hidden="true"></i>Thêm dòng CDR
                     </button>
                 </div>
@@ -365,7 +402,7 @@
                             <div id="cauhoi-15p-cdr-label" class="ictu-form__label ictu-form__label--required cauhoi-15p-form-label">
                                 Mức độ/trình độ năng lực trong form câu hỏi
                             </div>
-                            <ovic-groups-radio-v2 [disabled_item]="true" group_name="CHUAN_DAU_RA" optionLabel="label"
+                            <ovic-groups-radio-v2 [disabled]="embeddedMode" [disabled_item]="true" group_name="CHUAN_DAU_RA" optionLabel="label"
                                 [columns]="3" [options]="questionCdrOptions"
                                 [defaultValue]="formData.controls['cdr'].value" [formField]="formData.controls['cdr']"
                                 optionId="id" styleClass="cauhoi-15p-cdr-radio" role="radiogroup"
@@ -516,7 +553,7 @@
                         aria-hidden="true"></i>
                     <span>{{isGeneratingAiRubric ? 'AI đang tạo rubric...' : 'Tạo rubric chấm điểm bằng AI'}}</span>
                 </button>
-                @if (selectedCauhoi && selectedCauhoi.status === -1) {
+                @if (!embeddedMode && selectedCauhoi && selectedCauhoi.status === -1) {
 <button (click)="saveCauhoi(true)" type="button"
                     mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button" [disabled]="isSavingQuestion">
                     <i [ngClass]="isSavingQuestion ? 'ti ti-loader cauhoi-15p-spin' : 'ti ti-send'"
@@ -524,6 +561,12 @@
                     <span>Lưu và yêu cầu duyệt</span>
                 </button>
 }
+                @if (embeddedMode) {
+                <button type="button" mat-flat-button (click)="embeddedQuestionEditing = false"
+                    class="btn ictu-badge-btn--secondary ictu-admin-footer-button" [disabled]="isSavingQuestion">
+                    <span>Hủy</span>
+                </button>
+                }
                 <button (click)="saveCauhoi()" type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button"
                     [disabled]="isSavingQuestion">
                     <i [ngClass]="isSavingQuestion ? 'ti ti-loader cauhoi-15p-spin' : 'ti ti-device-floppy'" aria-hidden="true"></i>

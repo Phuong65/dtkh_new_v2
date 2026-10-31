@@ -46,6 +46,43 @@
     transition: grid-template-columns .2s ease;
 }
 
+.cauhoi-15p-shell--form-only {
+    background: #ffffff;
+}
+
+.cauhoi-15p-embedded-header {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 52px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--essay-line);
+    background: #ffffff;
+}
+
+.cauhoi-15p-embedded-header strong {
+    color: var(--essay-ink);
+    font-size: 15px;
+    font-weight: 650;
+    margin-right: 8px;
+}
+
+.cauhoi-15p-embedded-header small {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border: 1px solid #bfdbfe;
+    border-radius: 4px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.cauhoi-15p-layout--embedded { grid-template-columns: 1fr; }
+.cauhoi-15p-layout--embedded .cauhoi-15p-sidebar { display: none !important; }
 .cauhoi-15p-layout--collapsed { grid-template-columns: 52px minmax(0, 1fr); }
 
 .cauhoi-15p-sidebar {
