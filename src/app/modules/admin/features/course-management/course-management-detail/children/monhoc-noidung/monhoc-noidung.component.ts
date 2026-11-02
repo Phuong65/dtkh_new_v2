@@ -37,6 +37,7 @@ import { NORMAL_MODAL_OPTIONS } from '@core/utils/syscat';
 import { CourseQuestionsService } from '@modules/shared/services/course-questions.service';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MatIconModule } from '@angular/material/icon';
+import { TooltipModule } from 'primeng/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -64,6 +65,7 @@ import { ShowLabelData } from '@modules/shared/pipes/show-label-data.pipe';
         NhanxetNoidungComponent,
         DragDropModule,
         MatIconModule,
+        TooltipModule,
         MatMenuModule,
         InputTextModule,
         LoadingProgressComponent,

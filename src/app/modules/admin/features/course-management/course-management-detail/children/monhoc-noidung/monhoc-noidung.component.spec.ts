@@ -6,6 +6,8 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatButtonModule } from '@angular/material/button';
+import { TooltipModule } from 'primeng/tooltip';
 import { PanelModule } from 'primeng/panel';
 import { MessageService } from 'primeng/api';
 import { EMPTY, of } from 'rxjs';
@@ -57,7 +59,7 @@ describe('MonhocNoidungComponent presentation', () => {
             ]
         }).overrideComponent(MonhocNoidungComponent, {
             set: {
-                imports: [CommonModule, FormsModule, ReactiveFormsModule, MatMenuModule, PanelModule, SafeHtmlDecodePipe, OvicDateTimePipe, ShowLabelData],
+                imports: [CommonModule, FormsModule, ReactiveFormsModule, MatButtonModule, MatMenuModule, TooltipModule, PanelModule, SafeHtmlDecodePipe, OvicDateTimePipe, ShowLabelData],
                 schemas: [NO_ERRORS_SCHEMA]
             }
         }).compileComponents();
@@ -142,6 +144,30 @@ describe('MonhocNoidungComponent presentation', () => {
         component.state.set('loading');
         fixture.detectChanges();
         expect(root.querySelector('.course-content-empty__action')).toBeNull();
+    });
+
+    it('đặt nút thêm cạnh nút thu gọn và giữ đúng quyền hiển thị', () => {
+        component.list_plan = [plan(10, 1)];
+        fixture.detectChanges();
+        const actions = root.querySelector('.course-outline-heading__actions')!;
+        const addButton = actions.querySelector<HTMLButtonElement>('[aria-label^="Bổ sung"]')!;
+        const collapseButton = actions.querySelector<HTMLButtonElement>('.course-outline-toggle')!;
+        expect(addButton.classList).toContain('ictu-badge-btn--success-reverse');
+        expect(collapseButton.classList).toContain('ictu-badge-btn--secondary-reverse');
+        expect(addButton.classList).toContain('mat-mdc-unelevated-button');
+        expect(collapseButton.classList).toContain('mat-mdc-unelevated-button');
+        expect(addButton.querySelector('.ti-plus')).not.toBeNull();
+        expect(addButton.textContent?.trim()).toBe('');
+        expect(root.querySelector('.course-outline-actions')).toBeNull();
+        expect(actions.children[0]).toBe(addButton);
+        expect(actions.children[1]).toBe(collapseButton);
+        const add = spyOn(component, 'openFormAddLesson');
+        addButton.click();
+        expect(add).toHaveBeenCalledTimes(1);
+        component.canAdded = false;
+        fixture.detectChanges();
+        expect(root.querySelector('.course-outline-heading__actions [aria-label^="Bổ sung"]')).toBeNull();
+        expect(root.querySelector('.course-outline-toggle')).not.toBeNull();
     });
 
     it('thu gọn mục lục mà không hủy dữ liệu đang chọn', () => {

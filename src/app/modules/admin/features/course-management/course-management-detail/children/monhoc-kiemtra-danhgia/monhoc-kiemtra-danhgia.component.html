@@ -21,13 +21,6 @@
                 <i class="ti ti-clipboard-check" aria-hidden="true"></i>
                 <span>{{ isDttx && key_server !== 'hvu' ? 'Kiểm tra giữa kỳ' : 'Kiểm tra thường xuyên' }}</span>
             </button>
-            @if (key_server === 'ictu') {
-            <button type="button" role="tab" [class.is-active]="tabIndex === 2" [attr.aria-selected]="tabIndex === 2"
-                aria-controls="assessment-panel-essay" (click)="onTabIndexChange(2)" [disabled]="busy">
-                <i class="ti ti-writing" aria-hidden="true"></i>
-                <span>Nhập câu hỏi tự luận 15P</span>
-            </button>
-            }
         </nav>
 
         <section id="assessment-panel-practice" class="assessment-panel" role="tabpanel" [hidden]="tabIndex !== 0">
@@ -167,11 +160,6 @@
             }
         </section>
 
-        @if (key_server === 'ictu') {
-        <section id="assessment-panel-essay" class="assessment-panel" role="tabpanel" [hidden]="tabIndex !== 2">
-            @if (tabIndex === 2) { <div class="assessment-child-card"><app-cauhoi-tuluan-15p [courseSelected]="selectedCourse"></app-cauhoi-tuluan-15p></div> }
-        </section>
-        }
     </div>
     }
 </main>

@@ -28,7 +28,6 @@ import { CourseQuestionsService } from '@modules/shared/services/course-question
 import { ROLES, ROUTERS } from '@modules/shared/utils/syscat';
 import { ThuongxuyenTuluanV2Component } from '../thuongxuyen-tuluan-v2/thuongxuyen-tuluan-v2.component';
 import { ThuongxuyenDuanComponent } from '../thuongxuyen-duan/thuongxuyen-duan.component';
-import { CauhoiTuluan15pComponent } from '../cauhoi-tuluan-15p/cauhoi-tuluan-15p.component';
 
 @Component({
     selector: 'app-monhoc-kiemtra-danhgia',
@@ -42,8 +41,7 @@ import { CauhoiTuluan15pComponent } from '../cauhoi-tuluan-15p/cauhoi-tuluan-15p
         MatButtonModule,
         LoadingProgressComponent,
         ThuongxuyenTuluanV2Component,
-        ThuongxuyenDuanComponent,
-        CauhoiTuluan15pComponent
+        ThuongxuyenDuanComponent
     ],
     templateUrl: './monhoc-kiemtra-danhgia.component.html',
     styleUrls: ['./monhoc-kiemtra-danhgia.component.css']

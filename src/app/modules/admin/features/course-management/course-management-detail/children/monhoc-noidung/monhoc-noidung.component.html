@@ -28,30 +28,32 @@
                     <div class="course-outline-heading__text">
                         <h2 class="course-outline-heading__title">Mục lục</h2>
                     </div>
-                    <button type="button" (click)="closeLeftBody()"
-                        class="btn ictu-badge-btn--secondary-reverse ictu-admin-icon-button button-close-left-body course-outline-toggle"
-                        aria-label="Thu gọn mục lục" aria-expanded="true" aria-controls="course-content-outline"
-                        ngbTooltip="Thu gọn mục lục" placement="left" container="body">
-                        <i class="ti ti-chevrons-left" aria-hidden="true"></i>
-                        <span class="sr-only">Thu gọn mục lục</span>
-                    </button>
+                    <div class="course-outline-heading__actions">
+                        @if (canAdded && !isDttx) {
+                        <button type="button" mat-flat-button (click)="openFormAddLesson()"
+                            class="btn ictu-badge-btn--success-reverse course-outline-header-button"
+                            [attr.aria-label]="!unlimitLesson ? 'Bổ sung ' + label_parent_kehoach + ' còn thiếu' : 'Thêm ' + label_parent_kehoach"
+                            [pTooltip]="!unlimitLesson ? 'Bổ sung ' + label_parent_kehoach + ' còn thiếu' : 'Thêm ' + label_parent_kehoach"
+                            tooltipPosition="top" appendTo="body">
+                            <i class="ti ti-plus" aria-hidden="true"></i>
+                        </button>
+                        }
+                        <button type="button" mat-flat-button (click)="closeLeftBody()"
+                            class="btn ictu-badge-btn--secondary-reverse course-outline-header-button button-close-left-body course-outline-toggle"
+                            aria-label="Thu gọn mục lục" aria-expanded="true" aria-controls="course-content-outline"
+                            pTooltip="Thu gọn mục lục" tooltipPosition="top" appendTo="body">
+                            <i class="ti ti-chevrons-left" aria-hidden="true"></i>
+                        </button>
+                    </div>
                 </div>
 
-                @if (canAdded) {
+                @if (canAdded && (dragDropLesson || isDttx)) {
 <div class="course-outline-actions">
                     @if (dragDropLesson) {
 <button type="button" (click)="saveOrderingLesson()" class="btn ictu-badge-btn--primary-reverse course-outline-action"
                        >
                         <i class="fa fa-floppy-o" aria-hidden="true"></i>
                         <span>Lưu thứ tự</span>
-                    </button>
-}
-
-                    @if (!isDttx) {
-<button type="button" class="btn ictu-badge-btn--success-reverse course-outline-action course-outline-action--primary"
-                        (click)="openFormAddLesson()">
-                        <i class="fa fa-plus" aria-hidden="true"></i>
-                        <span>{{!unlimitLesson?"Bổ sung "+label_parent_kehoach+" còn thiếu":"Thêm "+label_parent_kehoach}}</span>
                     </button>
 }
 
