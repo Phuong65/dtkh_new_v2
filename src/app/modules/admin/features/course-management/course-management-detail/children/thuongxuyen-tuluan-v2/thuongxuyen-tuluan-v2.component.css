@@ -20,6 +20,31 @@
     background: #fff;
 }
 
+:host ::ng-deep .ovic-over-right-section__head .ovic-over-right-section__header {
+    margin: 0;
+    color: #1e3a8a;
+    font-size: 16px;
+    font-weight: 650;
+    line-height: 1.3;
+}
+
+:host ::ng-deep .ovic-over-right-section__close-button,
+:host ::ng-deep .essay-drawer__header > button {
+    display: inline-flex;
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #bfdbfe;
+    border-radius: 4px;
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+:host ::ng-deep .ovic-over-right-section__close-button::before,
+:host ::ng-deep .ovic-over-right-section__close-button::after { background-color: currentColor; }
+
 :host ::ng-deep .ovic-over-right-section__body { background: #fff; }
 :host ::ng-deep .ovic-input-field,
 :host ::ng-deep .admin-wrap-table__input { border-color: #cbd5e1 !important; font-size: 14px !important; }
@@ -45,27 +70,50 @@
 }
 
 .top-tuluan-layout.admin-wrap-table__head {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 14px;
-    min-height: 58px;
-    padding: 10px 16px;
+    min-height: 56px;
+    padding: 10px 16px 10px 20px;
     border: 0;
-    border-bottom: 1px solid #e2e8f0;
-    background: #fff;
+    border-bottom: 1px solid #cbd5e1;
+    background: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
+}
+
+.top-tuluan-layout.admin-wrap-table__head::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    background: #2563eb;
+    content: '';
+}
+
+.top-tuluan-layout .admin-wrap-table__heading {
+    color: #1e3a8a;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+@media (max-width: 560px) {
+    .top-tuluan-layout.admin-wrap-table__head { flex-wrap: wrap; }
+    .top-tuluan-layout .admin-wrap-table__heading { min-width: 0; overflow-wrap: anywhere; }
 }
 
 .body-tuluan-layout { background: #fff; }
+:host ::ng-deep .tuluan-table-card .p-datatable-wrapper { overflow-x: auto; }
 .tuluan-legacy-caption { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; font-size: 14px; }
-.tuluan-title-cell { display: flex; align-items: center; gap: 10px; }
-.tuluan-title-cell > strong { flex: 1; min-width: 0; }
-.action-button-tuluan { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
+.tuluan-title-cell { display: flex; min-width: 0; align-items: center; gap: 10px; }
+.tuluan-title-cell > strong { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.action-button-tuluan { display: inline-flex; flex: 0 0 auto; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 5px; }
 
-:host ::ng-deep .tuluan-table-card .admin-table { min-width: 780px; }
-:host ::ng-deep .tuluan-table-card th,
-:host ::ng-deep .tuluan-table-card td { vertical-align: middle; }
-.activity-row { background: #eff6ff !important; }
+:host ::ng-deep .tuluan-table-card .admin-table { width: 100%; min-width: 780px; border-collapse: collapse; }
+:host ::ng-deep .tuluan-table-card .admin-table th,
+:host ::ng-deep .tuluan-table-card .admin-table td { padding: 8px 10px; border: 1px solid #edf2f7 !important; vertical-align: middle; }
+:host ::ng-deep .tuluan-table-card .admin-table th { background: #f1f5f9; color: #334155; font-weight: 600; text-align: center; }
+:host ::ng-deep .tuluan-table-card .admin-table tbody tr:hover td { background: #f8fafc; }
+.activity-row td { background: #eff6ff !important; }
 
 .assessment-drawer-body { position: relative; width: 100%; height: 100%; min-height: 0; background: #fff; font-size: 14px; overflow: hidden; }
 .assessment-drawer-body > app-loading-progress { z-index: 40; }
@@ -151,7 +199,142 @@
 .essay-drawer__editor .essay-field { gap: 10px; }
 .essay-drawer__header,
 .essay-drawer__footer { flex-shrink: 0; }
-.essay-drawer__footer { display: flex; min-height: 64px; align-items: center; justify-content: flex-end; gap: 8px; padding: 10px 18px; border-top: 1px solid #dbe3ec; background: #fff; }
+.essay-drawer__footer { display: flex; min-height: 64px; align-items: center; justify-content: flex-end; gap: 8px; padding: 10px 18px; border-top: 1px solid #dbe3ec; background: #fff; flex-wrap: wrap; }
+.essay-drawer__footer .ictu-admin-footer-button { min-width: 100px; }
+
+::ng-deep .essay-form-drawer .tuluan-criteria-drawer,
+::ng-deep body .tuluan-criteria-drawer {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    flex-direction: column;
+    background: #f8fafc;
+}
+
+.tuluan-criteria-drawer__header {
+    display: flex;
+    min-height: 58px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #fff;
+}
+
+.tuluan-criteria-drawer__heading { display: flex; min-width: 0; align-items: center; gap: 10px; }
+.tuluan-criteria-drawer__icon { display: inline-flex; width: 34px; height: 34px; align-items: center; justify-content: center; border: 1px solid #bfdbfe; border-radius: 4px; background: #eff6ff; color: #2563eb; }
+.tuluan-criteria-drawer__heading div { display: flex; min-width: 0; flex-direction: column; gap: 2px; }
+.tuluan-criteria-drawer__heading strong { color: #1e3a8a; font-size: 15px; font-weight: 700; }
+.tuluan-criteria-drawer__heading small { color: #64748b; font-size: 12px; }
+.tuluan-criteria-drawer__close {
+    display: inline-flex !important;
+    width: 34px !important;
+    min-width: 34px !important;
+    height: 34px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 1px solid #bfdbfe !important;
+    border-radius: 4px !important;
+    background: #eff6ff !important;
+    color: #2563eb !important;
+    padding: 0 !important;
+    cursor: pointer;
+}
+.tuluan-criteria-drawer__close:hover {
+    background: #2563eb !important;
+    color: #ffffff !important;
+    border-color: #2563eb !important;
+}
+.tuluan-criteria-drawer__close i {
+    font-size: 18px !important;
+    line-height: 18px !important;
+}
+.tuluan-criteria-drawer__body { flex: 1 1 auto; min-height: 0; overflow: hidden; padding: 0; }
+.tuluan-criteria-drawer__body > p-splitter { display: flex; width: 100%; height: 100%; min-height: 0; }
+.tuluan-criteria-preview { width: 100%; height: 100%; min-width: 0; overflow: auto; background: #f8fafc; }
+.tuluan-criteria-preview .view-tuluan-layout { width: 100%; min-width: 0; height: 100%; padding: 12px; box-sizing: border-box; }
+/* The drawer is appended to body; scope deep child styles through its global style class. */
+::ng-deep .essay-form-drawer .tuluan-criteria-preview .view-tuluan-layout,
+::ng-deep .essay-form-drawer .tuluan-criteria-preview .document-editor__editable {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+::ng-deep .essay-form-drawer .tuluan-criteria-preview .document-editor__editable {
+    min-height: auto;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+::ng-deep .essay-form-drawer .tuluan-criteria-preview .document-editor__editable-header {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 20px !important;
+}
+
+::ng-deep .essay-form-drawer .tuluan-criteria-preview .document-editor__editable-header > div {
+    min-width: 0;
+}
+
+::ng-deep .essay-form-drawer .tuluan-criteria-preview .document-editor__editable-header .col-5,
+::ng-deep .essay-form-drawer .tuluan-criteria-preview .document-editor__editable-header .col-7 {
+    width: 100%;
+    flex: 0 0 100%;
+}
+
+::ng-deep .essay-form-drawer .tuluan-criteria-splitter-root { min-width: 0; }
+::ng-deep .essay-form-drawer .tuluan-criteria-splitter { min-width: 0; }
+::ng-deep .essay-form-drawer .tuluan-criteria-panel > .p-panel-header { min-width: 0; padding: 0; }
+::ng-deep .essay-form-drawer .tuluan-criteria-panel .p-panel-header-actions { align-self: center; flex: 0 0 auto; margin-right: 8px; }
+
+.tuluan-criteria-editor { display: flex; width: 100%; height: 100%; min-width: 0; min-height: 0; flex-direction: column; background: #fff; }
+.tuluan-criteria-editor__header { display: flex; min-height: 56px; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; }
+.tuluan-criteria-editor__header > div:first-child { display: flex; min-width: 0; flex-direction: column; gap: 2px; }
+.tuluan-criteria-editor__header strong { color: #334155; font-size: 14px; }
+.tuluan-criteria-editor__header small { color: #64748b; font-size: 12px; }
+.tuluan-criteria-editor__actions { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; }
+.tuluan-criteria-editor__body { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 10px; }
+.tuluan-criteria-panel { display: block; margin-bottom: 8px; border: 1px solid #e2e8f0; border-radius: 4px; background: #fff; overflow: hidden; }
+.tuluan-criteria-form { display: flex; flex: 1 1 auto; min-width: 0; align-items: flex-start; gap: 10px; padding: 12px 10px; background: #fff; }
+.tuluan-criteria-form__fields { display: grid; width: 100%; min-width: 0; grid-template-columns: 100px minmax(0, 1fr) 40px; gap: 12px; align-items: end; }
+.tuluan-criteria-form .ictu-form__row { display: flex; flex-direction: column; gap: 6px; min-width: 0; margin: 0; }
+.tuluan-criteria-form .ictu-form__label { position: static; margin: 0; padding: 0; line-height: 1.5; }
+.tuluan-criteria-form .ictu-form__input-field { margin-top: 0; }
+.tuluan-criteria-form__title { grid-column: 1 / -1; }
+.tuluan-criteria-form textarea.ictu-form__input-field { min-height: 76px; resize: vertical; }
+.tuluan-criteria-form__point input.ictu-form__input-field,
+.tuluan-criteria-form__cdr p-select { height: 40px; min-height: 40px; }
+.tuluan-criteria-form__action { display: flex; align-items: center; justify-content: center; height: 40px; }
+.tuluan-criteria-form__action .ictu-admin-icon-button { width: 40px; min-width: 40px !important; height: 40px; padding: 0; }
+.tuluan-criteria-guide-form { padding: 10px; border-top: 1px solid #edf2f7; background: #f8fafc; }
+.tuluan-criteria-guide-form .ictu-form__row { margin: 0; }
+.tuluan-criteria-drawer__footer { flex: 0 0 auto; background: #fff; }
+.tuluan-criteria-empty { display: flex; min-height: 180px; align-items: center; justify-content: center; flex-direction: column; gap: 8px; color: #64748b; text-align: center; }
+.tuluan-criteria-empty > i { color: #94a3b8; font-size: 28px; }
+.tuluan-criteria-empty strong { color: #334155; }
+
+@media (max-width: 640px) {
+    ::ng-deep .essay-form-drawer .tuluan-criteria-splitter-root { flex-direction: column !important; }
+    ::ng-deep .essay-form-drawer .tuluan-criteria-splitter-root > .p-splitterpanel {
+        width: 100% !important;
+        height: calc(50% - 4px) !important;
+        flex: 0 0 calc(50% - 4px) !important;
+    }
+    ::ng-deep .essay-form-drawer .tuluan-criteria-splitter-root > .p-splitter-gutter {
+        width: 100% !important;
+        height: 8px !important;
+        flex: 0 0 8px !important;
+    }
+}
+
+@media (max-width: 560px) {
+    .essay-drawer__footer { align-items: stretch; flex-direction: column; padding: 10px 12px; }
+    .essay-drawer__footer .ictu-admin-footer-button { width: 100%; }
+}
 @media (max-width: 760px) { .essay-form-grid, .essay-form-grid--program { grid-template-columns: 1fr; } .essay-field--wide { grid-column: auto; } .essay-drawer__header { padding: 12px; } .essay-drawer__section { padding: 14px 12px; } .essay-drawer__footer { padding: 10px 12px; } ::ng-deep .essay-form-drawer .group-radio-v2:is(.essay-access-radio, .essay-cdr-radio) { gap: 10px 16px; } }
 
 

@@ -21,7 +21,7 @@ export type CourseManagementTabId =
     | 'noi-dung'
     | 'phan-bo-cdr-cau-hoi'
     | 'form-de'
-    | 'kiem-tra-danh-gia';
+    | 'sinh-de';
 
 export interface CourseManagementTabItem {
     id: CourseManagementTabId;
@@ -59,7 +59,7 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
         { id: 'noi-dung', label: 'Nội dung', icon: 'ti ti-book' },
         { id: 'phan-bo-cdr-cau-hoi', label: 'Phân bổ câu hỏi CDR', icon: 'ti ti-chart-donut' },
         { id: 'form-de', label: 'Form đề', icon: 'ti ti-forms' },
-        { id: 'kiem-tra-danh-gia', label: 'Kiểm tra - Đánh giá', icon: 'ti ti-clipboard-check' }
+        { id: 'sinh-de', label: 'Sinh đề', icon: 'ti ti-clipboard-check' }
     ];
 
     readonly activeTabId = signal<CourseManagementTabId>('thong-tin');

@@ -19,14 +19,6 @@
         <div class="admin-wrap-table__body ictu-admin-table-shell__body body-tuluan-layout">
             <div class="ictu-admin-table-scroll">
                 <p-table [value]="list_tuluan" tableStyleClass="admin-table">
-                    <!-- <ng-template pTemplate="caption">
-                <div class="tuluan-legacy-caption">
-                    <span>Danh sách đề: {{activity.title}}</span>
-                    <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse" (click)="createCodeTuluan()">
-                        <i class="ti ti-plus" aria-hidden="true"></i>Tạo đề mới
-                    </button>
-                </div>
-            </ng-template> -->
                     <ng-template pTemplate="header">
                         <tr>
                             <th style="width: 80px;text-align: center;">Mã đề</th>
@@ -35,7 +27,6 @@
                             <th style="width: 150px; text-align: center;">Mức độ truy cập</th>
                             <th style="width: 100px; text-align: center;">Điểm</th>
                             <th style="width: 100px;text-align: center;">Trạng thái</th>
-                            <!-- <th style="width: 100px; text-align: center;">Thao tác</th> -->
                         </tr>
                     </ng-template>
                     <ng-template pTemplate="body" let-test let-rowIndex="rowIndex">
@@ -43,17 +34,10 @@
                             <td style="width: 80px;text-align: center;">
                                 {{test['id']}}
                             </td>
-                            <td class="tuluan-title-cell">
-                                <strong>{{test['title']}}</strong>
-                                <div class="action-button-tuluan">
-                                    <!-- <button *ngIf="test['status'] !== 1" style="margin-right: 5px;"
-                                class="btn btn-primary btn-icon btn-transparent">
-                                <i class="fa fa-external-link"></i>
-                            </button>
-                            <button *ngIf="test['status'] !== 1" (click)="deleteTuluan(test)"
-                                class="btn btn-danger btn-icon btn-transparent">
-                                <i class="fa fa-trash"></i>
-                            </button> -->
+                            <td>
+                                <div class="tuluan-title-cell">
+                                    <strong>{{test['title']}}</strong>
+                                    <div class="action-button-tuluan">
                                     @if (test['status'] !== 1 && selectedActivity['ordering'] !== 0 &&
                                     test['list_tieuchi'] && test['list_tieuchi'].length === 0) {
                                     <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
@@ -84,7 +68,8 @@
                                             aria-hidden="true"></i></button>
                                     }
                                 </div>
-                            </td>
+                            </div>
+                        </td>
                             <td style="width: 150px; text-align: center;">
                                 {{test['list_tieuchi'].length}}
                             </td>
@@ -120,14 +105,6 @@
                                     }
                                 </div>
                             </td>
-                            <!-- <td style="width: 100px; text-align: center;">
-                    <div>
-                        <button *ngIf="test['status'] !== 1" (click)="editCodeTuluan(test)" style="margin-right: 5px;"
-                            class="btn btn-primary btn-icon"><i class="fa fa-external-link"></i></button>
-                        <button *ngIf="test['status'] !== 1" (click)="deleteTuluan(test)"
-                            class="btn btn-danger btn-icon"><i class="fa fa-trash"></i></button>
-                    </div>
-                </td> -->
                         </tr>
                     </ng-template>
                     <ng-template pTemplate="emptymessage" let-car let-columns="columns">
@@ -142,7 +119,8 @@
         </div>
     </section>
 
-    <p-drawer [(visible)]="drawerVisible" position="right" [style]="{ width: 'min(1024px, 100vw)' }" appendTo="body"
+    <p-drawer [(visible)]="drawerVisible" position="right"
+        [style]="{ width: drawerTemplate === this.templateFormAddTieuchicham ? 'min(1400px, 98vw)' : 'min(1024px, 100vw)' }" appendTo="body"
         [blockScroll]="true" [closable]="!busy" [dismissible]="!busy" [closeOnEscape]="!busy"
         styleClass="ictu-p-drawer essay-form-drawer">
         <ng-template pTemplate="headless">
@@ -348,8 +326,8 @@
                         <h2>{{ formTitle }}</h2>
                     </div>
                 </div>
-                <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button" (click)="closeForm()"
-                    aria-label="Đóng biểu mẫu"><i class="ti ti-x"></i></button>
+                <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button" (click)="closeForm()"
+                    aria-label="Đóng biểu mẫu" pTooltip="Đóng" tooltipPosition="left" appendTo="body"><i class="ti ti-x" aria-hidden="true"></i></button>
             </header>
             <form id="essay-form" [formGroup]="formData" class="essay-drawer__form">
                 <div class="ictu-form essay-drawer__ictu-form">
@@ -398,7 +376,7 @@
                     </section>
                 </div>
             </form>
-            <footer class="essay-drawer__footer">
+            <footer class="essay-drawer__footer ictu-admin-drawer-footer">
                 <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button"
                     (click)="closeForm()" [disabled]="busy">Hủy</button>
                 @if (selectedTuluan && selectedTuluan.status === -1) {<button type="button" mat-flat-button
@@ -411,126 +389,121 @@
         </section>
     </ng-template>
 
-    <ng-template #templateFormAddTieuchicham let-c="close" let-d="dismiss">
-        <div class="ovic-over-right-section right-slide-class">
-            <div class="ovic-over-right-section__head">
-                <h3 class="ovic-over-right-section__header">{{formTitle}}</h3>
-                <button class="btn ovic-over-right-section__close-button btn-recss-close-right-button"
-                    (click)="closeForm()"></button>
-            </div>
-            <div style="line-height: 1.25; padding: 0px; height: calc(100vh - 57px);"
-                class="ovic-over-right-section__body footer-no-hint">
-                <p-splitter panelStyleClass="class-tieuchi-spliter-panel" [panelSizes]="[50,50]"
-                    [style]="{'height': '100%'}">
+    <ng-template #templateFormAddTieuchicham>
+        <div class="ictu-p-drawer__content tuluan-criteria-drawer">
+            <header class="tuluan-criteria-drawer__header">
+                <div class="tuluan-criteria-drawer__heading">
+                    <span class="tuluan-criteria-drawer__icon" aria-hidden="true"><i class="ti ti-list-check"></i></span>
+                    <div>
+                        <strong>{{formTitle}}</strong>
+                        <small>Thiết lập tiêu chí và hướng dẫn chấm cho đề tự luận.</small>
+                    </div>
+                </div>
+                <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button tuluan-criteria-drawer__close" (click)="closeForm()"
+                    [disabled]="busy" aria-label="Đóng" pTooltip="Đóng" tooltipPosition="left" appendTo="body">
+                    <i class="ti ti-x" aria-hidden="true"></i>
+                </button>
+            </header>
+            <div class="ictu-p-drawer__content__body tuluan-criteria-drawer__body">
+                @if (selectedTuluan) {
+                <p-splitter styleClass="tuluan-criteria-splitter-root" panelStyleClass="tuluan-criteria-splitter"
+                    [panelSizes]="[38,62]" [style]="{'height': '100%'}">
                     <ng-template pTemplate>
-                        <div style="height: 100%; width: 100%;">
-                            <app-view-thuongxuyen-tuluan [courseSelected]="courseSelected" [tuluan]="selectedTuluan">
-                            </app-view-thuongxuyen-tuluan>
+                        <div class="tuluan-criteria-preview">
+                            <app-view-thuongxuyen-tuluan [courseSelected]="courseSelected" [tuluan]="selectedTuluan"></app-view-thuongxuyen-tuluan>
                         </div>
                     </ng-template>
                     <ng-template pTemplate>
-                        <div class="content-mat-tab-tieuchicham" style="height: 100%; width: 100%;">
-                            <div style="padding: 5px; display: flex; align-items: center; border-bottom: 1px solid #c8c8c8; background-color: rgba(0, 0, 0, .1);"
-                                class="content-mat-tab-tieuchicham-top">
-                                <span style="flex:1; margin-right: 5px;">
-                                    <strong>Tổng tiêu chí:</strong> {{list_tieuchi_chamdiem.length}}
-                                    - <strong>Tổng điểm tiêu chí:</strong> {{returnTotalPointTieuChi()}}
-                                </span>
-                                @if (selectedTuluan && selectedTuluan.status !== 1) {
-                                <button (click)="addOneTieuchiChams()" style="line-height: 1; margin-right: 5px;"
-                                    class="btn btn-success">
-                                    <i class="fa fa-plus"></i>
-                                    Thêm tiêu chí
-                                </button>
+                        <section class="tuluan-criteria-editor">
+                            <header class="tuluan-criteria-editor__header">
+                                <div>
+                                    <strong>Tiêu chí chấm</strong>
+                                    <small>{{list_tieuchi_chamdiem.length}} tiêu chí · {{returnTotalPointTieuChi()}} / {{selectedTuluan.point}} điểm</small>
+                                </div>
+                                @if (selectedTuluan.status !== 1) {
+                                <div class="tuluan-criteria-editor__actions">
+                                    <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse"
+                                        (click)="addOneTieuchiChams()">
+                                        <i class="ti ti-plus" aria-hidden="true"></i>Thêm tiêu chí
+                                    </button>
+                                    @if (list_tieuchi_chamdiem.length) {
+                                    <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse"
+                                        (click)="addTieuchiChams(true)">
+                                        <i class="ti ti-device-floppy" aria-hidden="true"></i>Lưu lại
+                                    </button>
+                                    }
+                                </div>
                                 }
-                                @if (list_tieuchi_chamdiem.length && selectedTuluan && selectedTuluan.status !== 1) {
-                                <button (click)="addTieuchiChams(true)" style="line-height: 1;" class="btn btn-primary">
-                                    <i class="fa fa-floppy-o"></i>
-                                    Lưu lại
-                                </button>
-                                }
-                            </div>
-                            @if (list_tieuchi_chamdiem && list_tieuchi_chamdiem.length) {
-                            <div style="height: calc(100% - 41px); padding: 5px; overflow: auto;">
+                            </header>
+                            <div class="tuluan-criteria-editor__body">
+                                @if (list_tieuchi_chamdiem.length) {
                                 @for (item of list_tieuchi_chamdiem; track item; let i = $index) {
-                                <div class="tieuchicham-card-panel">
-                                    <p-panel #panel_tieuchi [collapsed]="item['collapsed']" [toggleable]="true">
-                                        <ng-template pTemplate="header">
-                                            <div style="width: 100%;">
-                                                <div style="display: flex;">
-                                                    <div class="row form-row" style="flex: 1;margin-right: 5px;">
-                                                        <div class="col-9">
-                                                            <textarea
-                                                                [disabled]="selectedTuluan && selectedTuluan.status === 1? true: false"
-                                                                style="width: 100%; resize: none; height: -webkit-fill-available;"
-                                                                cols="2"
-                                                                placeholder="Nhập tiêu đề cho tiêu chí {{i + 1}}"
-                                                                class="admin-wrap-table__input"
-                                                                [(ngModel)]="item.title">
-                                                        </textarea>
-                                                        </div>
-                                                        <div class="col-3">
-                                                            <div style="margin-bottom: 5px;" class="p-inputgroup">
-                                                                <span style="border-radius: 0px; padding: 0px;"
-                                                                    class="p-inputgroup-addon">Điểm:</span>
-                                                                <input style="width: inherit;"
-                                                                    [disabled]="selectedTuluan && selectedTuluan.status === 1? true: false"
-                                                                    #input_point_tieuchi
-                                                                    (keydown)="pointQuestionKeyDown($event,input_point_tieuchi)"
-                                                                    type="text" class="admin-wrap-table__input"
-                                                                    [(ngModel)]="item.point">
-                                                            </div>
-                                                            <div>
-                                                                <p-select
-                                                                    [disabled]="selectedTuluan && selectedTuluan.status === 1? true: false"
-                                                                    [style]="{'width': '100%'}"
-                                                                    optionDisabled="disabled" optionValue="id"
-                                                                    [options]="chuandaura" [(ngModel)]="item.cdr"
-                                                                    optionLabel="label">
-                                                                </p-select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <button (click)="deleteTieuchi(item.id)"
-                                                            class="btn btn-danger btn-icon btn-transparent">
-                                                            <i class="fa fa-trash"></i>
-                                                        </button>
-                                                    </div>
+                                <p-panel #panel_tieuchi styleClass="tuluan-criteria-panel" [(collapsed)]="item['collapsed']" [toggleable]="true">
+                                    <ng-template pTemplate="header">
+                                        <div class="ictu-form tuluan-criteria-form">
+                                            <div class="tuluan-criteria-form__fields">
+                                                <label class="ictu-form__row tuluan-criteria-form__title">
+                                                    <span class="ictu-form__label">Tiêu chí {{i + 1}}</span>
+                                                    <textarea [disabled]="selectedTuluan.status === 1" rows="2"
+                                                        placeholder="Nhập tiêu đề cho tiêu chí {{i + 1}}"
+                                                        class="ictu-form__input-field" [(ngModel)]="item.title"></textarea>
+                                                </label>
+                                                <label class="ictu-form__row tuluan-criteria-form__point">
+                                                    <span class="ictu-form__label">Điểm</span>
+                                                    <input [disabled]="selectedTuluan.status === 1" #input_point_tieuchi
+                                                        (keydown)="pointQuestionKeyDown($event,input_point_tieuchi)" type="text"
+                                                        class="ictu-form__input-field" [(ngModel)]="item.point">
+                                                </label>
+                                                <label class="ictu-form__row tuluan-criteria-form__cdr">
+                                                    <span class="ictu-form__label">Mức CDR</span>
+                                                    <p-select [disabled]="selectedTuluan.status === 1" [style]="{'width': '100%'}"
+                                                        optionDisabled="disabled" optionValue="id" [options]="chuandaura"
+                                                        [(ngModel)]="item.cdr" optionLabel="label" appendTo="body"></p-select>
+                                                </label>
+                                                @if (selectedTuluan.status !== 1) {
+                                                <div class="tuluan-criteria-form__action">
+                                                    <button type="button" (click)="deleteTieuchi(item.id)"
+                                                        class="btn ictu-button-danger-light ictu-admin-icon-button"
+                                                        aria-label="Xóa tiêu chí" pTooltip="Xóa tiêu chí" tooltipPosition="top" appendTo="body">
+                                                        <i class="ti ti-trash" aria-hidden="true"></i>
+                                                    </button>
                                                 </div>
-                                                <div style="padding-top: 0.75rem;">
-                                                    <span (click)="openHuongdancham(panel_tieuchi,item)"
-                                                        class="text-open-huong-dancham">
-                                                        <i class="fa fa-angle-double-down"></i>
-                                                        Nhập hướng dẫn chấm
-                                                    </span>
-                                                </div>
+                                                }
                                             </div>
-                                        </ng-template>
-                                        <div class="ovic-vertical__inputs form-setting-lesson edit-hight-200"
-                                            style="padding: 0px;">
-                                            @if (!item['collapsed']) {
-                                            <div class="row form-row form-row-flex-row">
-                                                <div class="col-12">
-                                                    <label>Hướng dẫn chấm:</label>
-                                                    <ovic-ckeditor-document
-                                                        (onSaveData)="onChangeEditorTieuchi($event,item)"
-                                                        [changeId]="item.id" [autoSave]="true" [default]="item.desc"
-                                                        styleClass="vietbaocao-doctument-content">
-                                                    </ovic-ckeditor-document>
-                                                </div>
-                                            </div>
-                                            }
                                         </div>
-                                    </p-panel>
+                                    </ng-template>
+                                    @if (!item['collapsed']) {
+                                    <div class="ictu-form tuluan-criteria-guide-form">
+                                        <div class="ictu-form__row">
+                                            <span class="ictu-form__label">Hướng dẫn chấm</span>
+                                            <ovic-ckeditor-document (onSaveData)="onChangeEditorTieuchi($event,item)"
+                                                [changeId]="item.id" [autoSave]="true" [default]="item.desc"
+                                                styleClass="vietbaocao-doctument-content"></ovic-ckeditor-document>
+                                        </div>
+                                    </div>
+                                    }
+                                </p-panel>
+                                }
+                                } @else {
+                                <div class="tuluan-criteria-empty">
+                                    <i class="ti ti-list-check" aria-hidden="true"></i>
+                                    <strong>Chưa có tiêu chí chấm</strong>
+                                    @if (selectedTuluan.status !== 1) {
+                                    <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse"
+                                        (click)="addOneTieuchiChams()"><i class="ti ti-plus" aria-hidden="true"></i>Thêm tiêu chí</button>
+                                    }
                                 </div>
                                 }
                             </div>
-                            }
-                        </div>
+                        </section>
                     </ng-template>
                 </p-splitter>
+                }
             </div>
+            <footer class="ictu-p-drawer__content__footer tuluan-criteria-drawer__footer">
+                <button type="button" mat-flat-button class="btn ictu-badge-btn--secondary ictu-admin-footer-button"
+                    (click)="closeForm()">Đóng</button>
+            </footer>
         </div>
     </ng-template>
 
