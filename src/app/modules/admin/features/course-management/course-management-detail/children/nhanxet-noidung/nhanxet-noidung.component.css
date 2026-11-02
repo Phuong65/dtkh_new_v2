@@ -14,7 +14,6 @@
 
 .nx-shell {
     margin-top: 14px;
-    border: 1px solid #bfdbfe;
     border-radius: 6px;
     background: #ffffff;
     box-shadow: none;
@@ -167,8 +166,14 @@
     cursor: pointer;
 }
 
-.nx-reply-toggle:hover {
+.nx-reply-toggle:hover:not(:disabled) {
     background: #eff6ff;
+}
+
+.nx-reply-toggle:disabled {
+    color: #94a3b8;
+    cursor: default;
+    opacity: .7;
 }
 
 .nx-thread {

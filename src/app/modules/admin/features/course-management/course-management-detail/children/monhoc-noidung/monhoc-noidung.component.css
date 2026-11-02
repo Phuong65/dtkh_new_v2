@@ -299,7 +299,46 @@
 .muctieu-clo-summary { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; padding: 12px; border-left: 3px solid var(--content-primary); background: var(--content-selected); color: var(--content-text); }
 .muctieu-clo-summary__label { flex-shrink: 0; color: var(--content-primary); font-weight: 600; }
 .muctieu-clo-summary__content { min-width: 0; overflow-wrap: anywhere; }
-.muctieu-outcome-list { display: grid; gap: 20px; }
+.muctieu-outcome-list { display: grid; gap: 14px; }
+.muctieu-tabs {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px;
+    border: 1px solid #dbeafe;
+    border-radius: 6px;
+    background: #f8fafc;
+    width: fit-content;
+}
+.muctieu-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 4px 14px;
+    border: 0;
+    border-radius: 4px;
+    color: #475569;
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color .15s ease, color .15s ease;
+}
+.muctieu-tab:hover:not(.is-active) {
+    color: #1d4ed8;
+    background: #eff6ff;
+}
+.muctieu-tab.is-active {
+    color: #1e40af;
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgb(15 23 42 / 8%);
+}
+.muctieu-tab:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 1px;
+}
 .muctieu-editor-card__heading { display: flex; align-items: center; margin-bottom: 8px; padding: 0; border: 0; background: transparent; }
 .muctieu-editor-card__heading .muctieu-editor-card__label { margin: 0; color: var(--content-text); font-size: 13px; font-weight: 600; line-height: 1.5; }
 .muctieu-editor-card ovic-editor,

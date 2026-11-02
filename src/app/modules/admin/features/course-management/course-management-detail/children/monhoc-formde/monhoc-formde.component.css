@@ -742,6 +742,36 @@
     gap: 12px;
 }
 
+.dg-question-heading {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dg-question-heading__icon {
+    display: inline-flex;
+    width: 26px;
+    height: 26px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #bfdbfe;
+    border-radius: 4px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 14px;
+}
+
+.tuluan15p-manage-button {
+    display: inline-flex;
+    min-height: 30px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 10px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
 .tuluan15p-add-button {
     display: inline-flex;
     align-items: center;
@@ -844,8 +874,8 @@
 
 .tuluan15p-table .tuluan15p-actions-heading,
 .tuluan15p-table .tuluan15p-actions {
-    width: 80px;
-    min-width: 80px;
+    width: 160px;
+    min-width: 160px;
 }
 
 .tuluan15p-actions {

@@ -14,3 +14,45 @@
     display: flex;
     align-items: center;
 }
+
+.list-editor-actions {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.list-editor-add-btn {
+    display: inline-flex;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 1px solid #2563eb;
+    border-radius: 4px;
+    color: #ffffff;
+    background: #2563eb;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.list-editor-add-btn:hover {
+    border-color: #1d4ed8;
+    background: #1d4ed8;
+}
+
+.list-editor-clear-btn {
+    flex: 0 0 auto;
+}
+
+@media (max-width: 640px) {
+    .list-editor-actions--button-mode {
+        flex-wrap: wrap;
+    }
+    .list-editor-add-btn {
+        flex: 1 1 auto;
+    }
+}

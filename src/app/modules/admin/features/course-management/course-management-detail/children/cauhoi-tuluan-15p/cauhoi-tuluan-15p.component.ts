@@ -1079,6 +1079,20 @@ export class CauhoiTuluan15pComponent implements OnInit, OnChanges, OnDestroy {
         this.openAddCauhoi();
     }
 
+    cancelEmbeddedQuestionEdit(): void {
+        if (!this.embeddedQuestionEditing || this.isSavingQuestion) return;
+        if (this.formData.dirty) {
+            firstValueFrom(this.notificationService.confirmDelete2({
+                heading: 'Hủy nhập câu hỏi?',
+                htmlMessage: 'Nội dung đang nhập chưa được lưu. Bạn có muốn hủy không?'
+            })).then(confirmed => {
+                if (confirmed) this.embeddedQuestionEditing = false;
+            });
+            return;
+        }
+        this.embeddedQuestionEditing = false;
+    }
+
     private syncQuestionPointByCdr(cdr: unknown) {
         const selectedFormRow = this.lessonFormRows.find(row => Number(row.cdr) === Number(cdr));
         this.selectedQuestionPoint = selectedFormRow ? Number(selectedFormRow.point) : null;

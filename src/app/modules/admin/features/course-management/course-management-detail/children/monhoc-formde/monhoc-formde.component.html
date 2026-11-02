@@ -353,14 +353,17 @@
         <section class="dg-lesson-section dg-lesson-section--tuluan"
             [ngClass]="isTuluan15pLessonScoreError(row['tuluan15pRows']) ? 'tuluan15p-section-error' : ''">
             <div class="dg-lesson-section-title dg-lesson-section-title--actions">
-                <strong>Câu hỏi tự luận</strong>
+                <div class="dg-question-heading tuluan15p-heading">
+                    <span class="dg-question-heading__icon" aria-hidden="true"><i class="ti ti-writing"></i></span>
+                    <strong>Câu hỏi tự luận</strong>
+                </div>
                 <button type="button" mat-flat-button
-                    class="btn ictu-badge-btn--success-reverse tuluan15p-add-button"
-                    [attr.aria-label]="row['tuluan15pRows']?.length ? 'Cấu hình form tự luận' : 'Thêm form tự luận'"
+                    class="btn ictu-badge-btn--primary-reverse tuluan15p-add-button"
+                    [attr.aria-label]="row['tuluan15pRows']?.length ? 'Cấu hình form tự luận' : 'Tạo form tự luận'"
                     [disabled]="!canEditEssayForm(row) || isLoading()"
                     (click)="openEssayContext(row, 'form')">
-                    <i class="ti ti-plus" aria-hidden="true"></i>
-                    <span>{{ row['tuluan15pRows']?.length ? 'Cấu hình form tự luận' : 'Thêm form tự luận' }}</span>
+                    <i [class]="row['tuluan15pRows']?.length ? 'ti ti-settings' : 'ti ti-plus'" aria-hidden="true"></i>
+                    <span>{{ row['tuluan15pRows']?.length ? 'Cấu hình form' : 'Tạo form tự luận' }}</span>
                 </button>
             </div>
             <div class="tuluan15p-block">
@@ -388,16 +391,10 @@
                                 {{(tuluanRow.questionTake || 0) * (tuluanRow.point || 0)}}
                             </td>
                             <td class="tuluan15p-actions">
-                                <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
+                                <button type="button" mat-flat-button class="btn ictu-button-info-light tuluan15p-manage-button"
                                     (click)="openEssayContext(row, 'list', tuluanRow)"
-                                    aria-label="Xem câu hỏi tự luận" pTooltip="Xem câu hỏi" tooltipPosition="top" appendTo="body">
-                                    <i class="ti ti-eye" aria-hidden="true"></i>
-                                </button>
-                                <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button"
-                                    (click)="openEssayContext(row, 'create', tuluanRow)"
-                                    [disabled]="!canEditEssayForm(row) || isLoading()" aria-label="Thêm câu hỏi tự luận"
-                                    pTooltip="Thêm câu hỏi" tooltipPosition="top" appendTo="body">
-                                    <i class="ti ti-plus" aria-hidden="true"></i>
+                                    aria-label="Quản lý câu hỏi tự luận">
+                                    <i class="ti ti-settings" aria-hidden="true"></i><span>Quản lý câu hỏi</span>
                                 </button>
                             </td>
                         </tr>
@@ -436,7 +433,10 @@
                         </header>
                         <section class="dg-lesson-section">
                             <div class="dg-lesson-section-title">
-                                <strong>Câu hỏi trắc nghiệm</strong>
+                                <div class="dg-question-heading">
+                                    <span class="dg-question-heading__icon" aria-hidden="true"><i class="ti ti-list-check"></i></span>
+                                    <strong>Câu hỏi trắc nghiệm</strong>
+                                </div>
                             </div>
                             <p-table [value]="row['children'] || []"
                                 styleClass="tbl-danhSachUser table-reBorder table-scroll-able dg-lesson-table">
@@ -576,7 +576,10 @@
                         </header>
                         <section class="dg-lesson-section">
                             <div class="dg-lesson-section-title">
-                                <strong>Câu hỏi trắc nghiệm</strong>
+                                <div class="dg-question-heading">
+                                    <span class="dg-question-heading__icon" aria-hidden="true"><i class="ti ti-list-check"></i></span>
+                                    <strong>Câu hỏi trắc nghiệm</strong>
+                                </div>
                             </div>
                             <p-table [value]="row['children'] || []"
                                 styleClass="tbl-danhSachUser table-reBorder table-scroll-able dg-lesson-table">

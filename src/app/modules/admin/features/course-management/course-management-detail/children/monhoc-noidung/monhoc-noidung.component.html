@@ -307,21 +307,35 @@
                         </div>
 
                         <div class="muctieu-section__body muctieu-outcome-list">
-                            <div class="ictu-form__row muctieu-editor-card muctieu-editor-card--knowledge edit-hight-200">
-                                <div class="muctieu-editor-card__heading">
-                                    <label class="muctieu-editor-card__label">Về kiến thức</label>
-                                </div>
+                            <div class="muctieu-tabs" role="tablist" aria-label="Mục tiêu năng lực">
+                                <button type="button" role="tab" class="muctieu-tab"
+                                    [class.is-active]="activeMuctieuTab === 'kienthuc'"
+                                    [attr.aria-selected]="activeMuctieuTab === 'kienthuc'"
+                                    [attr.tabindex]="activeMuctieuTab === 'kienthuc' ? 0 : -1"
+                                    (click)="selectMuctieuTab('kienthuc')">
+                                    Về kiến thức
+                                </button>
+                                <button type="button" role="tab" class="muctieu-tab"
+                                    [class.is-active]="activeMuctieuTab === 'kynang'"
+                                    [attr.aria-selected]="activeMuctieuTab === 'kynang'"
+                                    [attr.tabindex]="activeMuctieuTab === 'kynang' ? 0 : -1"
+                                    (click)="selectMuctieuTab('kynang')">
+                                    Về kỹ năng
+                                </button>
+                            </div>
+                            @if (activeMuctieuTab === 'kienthuc') {
+                            <div class="ictu-form__row muctieu-editor-card muctieu-editor-card--knowledge edit-hight-200"
+                                role="tabpanel">
                                 <ovic-editor height="auto" [formField]="fM['kienthuc']"
                                     [default]="fM['kienthuc']['value']"></ovic-editor>
                             </div>
-
-                            <div class="ictu-form__row muctieu-editor-card muctieu-editor-card--skill edit-hight-200">
-                                <div class="muctieu-editor-card__heading">
-                                    <label class="muctieu-editor-card__label">Về kỹ năng</label>
-                                </div>
+                            } @else {
+                            <div class="ictu-form__row muctieu-editor-card muctieu-editor-card--skill edit-hight-200"
+                                role="tabpanel">
                                 <ovic-editor height="auto" [formField]="fM['kynang']"
                                     [default]="fM['kynang']['value']"></ovic-editor>
                             </div>
+                            }
                         </div>
                     </section>
 

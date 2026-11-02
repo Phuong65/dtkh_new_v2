@@ -78,6 +78,9 @@ export class NhanxetNoidungComponent implements OnInit, OnChanges {
     }
 
     openReply(comment: CoursePlanComment, index_comment: number) {
+        const replyCount = Number(comment['count_reply'] || 0);
+        if (!replyCount) return;
+
         comment['reply_open'] = !comment['reply_open'];
         this.selectedComment = comment;
         if (comment['reply_open'] === true) {

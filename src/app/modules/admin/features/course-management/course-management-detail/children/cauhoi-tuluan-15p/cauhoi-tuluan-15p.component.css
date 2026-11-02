@@ -56,10 +56,39 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    min-height: 52px;
+    min-height: 56px;
     padding: 10px 16px;
     border-bottom: 1px solid var(--essay-line);
     background: #ffffff;
+}
+
+.cauhoi-15p-embedded-header__info {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 10px;
+}
+
+.cauhoi-15p-embedded-header__info > div {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.cauhoi-15p-embedded-header__icon {
+    display: inline-flex;
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #bfdbfe;
+    border-radius: 4px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 17px;
 }
 
 .cauhoi-15p-embedded-header strong {
@@ -241,8 +270,37 @@
 .cauhoi-15p-page-header__actions .cauhoi-15p-filter select { height: 38px; min-height: 38px; border-radius: 4px !important; }
 .cauhoi-15p-form-table select.ictu-form__input-field { height: 43px; min-height: 43px; }
 
+.cauhoi-15p-embedded-subbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 12px 16px 0;
+    padding: 10px 12px;
+    border: 1px solid var(--essay-line);
+    border-radius: 5px;
+    background: #ffffff;
+}
+
+.cauhoi-15p-embedded-subbar__count {
+    color: var(--essay-muted);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.cauhoi-15p-embedded-subbar__add {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 6px;
+}
+
 .cauhoi-15p-question-scroll { display: block; flex: 1 1 auto; min-height: 0; padding: 16px; overflow: auto; }
 .cauhoi-15p-question-list { display: flex; width: min(1080px, 100%); min-width: 0; margin: 0 auto; flex-direction: column; gap: 12px; }
+
+.cauhoi-15p-shell--form-only .cauhoi-15p-layout { display: block; }
+.cauhoi-15p-shell--form-only .cauhoi-15p-main { height: 100%; }
+.cauhoi-15p-shell--form-only .cauhoi-15p-empty-state { min-height: 180px; }
 .cauhoi-15p-question-list > * { flex: 0 0 auto; }
 .cauhoi-15p-loading,
 .cauhoi-15p-empty-state { display: flex; width: 100%; min-height: 240px; align-items: center; justify-content: center; flex-direction: column; gap: 8px; padding: 24px; color: var(--essay-muted); text-align: center; }

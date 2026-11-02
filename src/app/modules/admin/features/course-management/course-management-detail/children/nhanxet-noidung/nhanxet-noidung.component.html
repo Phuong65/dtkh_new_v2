@@ -33,7 +33,7 @@
                     <div class="nx-comment__meta">
                         <time>{{ children.created_at | ovicDateTime }}</time>
                         <button type="button" class="nx-reply-toggle" (click)="openReply(children, index)"
-                            [attr.aria-expanded]="children['reply_open'] === true">
+                            [disabled]="!children['count_reply']" [attr.aria-expanded]="children['reply_open'] === true">
                             <i class="fa fa-reply" aria-hidden="true"></i>
                             Phản hồi ({{ children['count_reply'] || 0 }})
                         </button>

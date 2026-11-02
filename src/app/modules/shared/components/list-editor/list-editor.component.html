@@ -8,24 +8,30 @@
         </div>
         <div class="example-custom-placeholder" *cdkDragPlaceholder></div>
         @if (listValue.length !== 1) {
-          <button class="btn btn-secondary btn-icon btn-transparent" cdkDragHandle>
-            <i class="fa fa-arrows"></i>
+          <button type="button" class="btn btn-secondary btn-icon btn-transparent" cdkDragHandle aria-label="Kéo để đổi thứ tự">
+            <i class="fa fa-arrows" aria-hidden="true"></i>
           </button>
         }
         @if (listValue.length !== 1) {
-          <button (click)="deleteList(i)"
-            class="btn btn-danger btn-icon btn-transparent">
-            <i class="fa fa-trash grey"></i>
+          <button type="button" (click)="deleteList(i)"
+            class="btn btn-danger btn-icon btn-transparent" aria-label="Xóa nội dung">
+            <i class="fa fa-trash grey" aria-hidden="true"></i>
           </button>
         }
       </li>
     }
   </ul>
-  <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
-    <span class="red">Nhấn <strong>Tab</strong> để xuống hoặc thêm dòng (nếu con trỏ chuột ở dòng cuối)</span>
+  <div class="list-editor-actions" [class.list-editor-actions--button-mode]="addByButton">
+    @if (addByButton) {
+      <button type="button" class="btn ictu-badge-btn--primary-reverse list-editor-add-btn" (click)="addItemByButton()">
+        <i class="fa fa-plus" aria-hidden="true"></i> Thêm nội dung
+      </button>
+    } @else {
+      <span class="red">Nhấn <strong>Tab</strong> để xuống hoặc thêm dòng (nếu con trỏ chuột ở dòng cuối)</span>
+    }
     @if (listValue && listValue.length) {
       <button (click)="deleteAllList()" pButton pRipple icon="pi pi-trash"
-      type="button" label="Xóa tất cả" class="p-button-danger p-button-text"></button>
+      type="button" label="Xóa tất cả" class="p-button-danger p-button-text list-editor-clear-btn"></button>
     }
   </div>
 </div>

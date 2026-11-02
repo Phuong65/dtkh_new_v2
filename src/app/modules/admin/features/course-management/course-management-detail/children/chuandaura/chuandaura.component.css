@@ -246,20 +246,6 @@
     color: var(--cdr-header-text);
     background: var(--cdr-section-bg);
 }
-::ng-deep .cdr-create-drawer .cdr-form-section__index,
-.cdr-form-section__index {
-    display: inline-flex;
-    flex: 0 0 32px;
-    width: 32px;
-    height: 32px;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--cdr-radius);
-    color: var(--cdr-primary);
-    background: #ffffff;
-    font-size: 13px;
-    font-weight: 700;
-}
 ::ng-deep .cdr-create-drawer .cdr-form-section__title,
 .cdr-form-section__title {
     margin: 0;

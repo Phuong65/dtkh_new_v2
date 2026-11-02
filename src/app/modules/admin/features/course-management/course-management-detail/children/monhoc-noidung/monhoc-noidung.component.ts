@@ -186,6 +186,11 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
     private progressControl: BehaviorSubject<ProgressAnimationEvent> | null = null;
     progressDialogOpened = false;
     displayComment: boolean = false;
+    activeMuctieuTab: 'kienthuc' | 'kynang' = 'kienthuc';
+
+    selectMuctieuTab(tab: 'kienthuc' | 'kynang'): void {
+        this.activeMuctieuTab = tab;
+    }
 
     beginBusy(heading: string): void {
         this.busyHeading.set(heading);
@@ -845,6 +850,7 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
         this.selectPlan = plan;
         this.selectedPlanActivity = children;
         this.keyScroll = name;
+        this.activeMuctieuTab = 'kienthuc';
         this.planMuctieu = null;
         this.planTailieu = null;
         if (plan.week < 1000) {

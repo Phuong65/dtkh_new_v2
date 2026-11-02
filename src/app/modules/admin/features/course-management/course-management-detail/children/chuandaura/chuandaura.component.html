@@ -208,7 +208,6 @@
         [class.cdr-ictu-form--side]="formMode === 'side'">
         <section class="cdr-form-section">
             <div class="cdr-form-section__header">
-                <span class="cdr-form-section__index">01</span>
                 <div>
                     <h4 class="cdr-form-section__title">Thông tin CPI</h4>
                     <p class="cdr-form-section__hint">Định danh và mức độ yêu cầu của chuẩn đầu ra.</p>
@@ -244,7 +243,6 @@
 
         <section class="cdr-form-section cdr-form-section--teaching">
             <div class="cdr-form-section__header">
-                <span class="cdr-form-section__index">02</span>
                 <div>
                     <h4 class="cdr-form-section__title">Thiết kế giảng dạy</h4>
                     <p class="cdr-form-section__hint">Xác định phương pháp, thời lượng và nội dung triển khai.</p>
@@ -270,7 +268,7 @@
                 </div>
                 <div class="ictu-form__row cdr-form-field cdr-form-field--full cdr-content-editor">
                     <label class="ictu-form__label ictu-form__label--required" [id]="formId + '-desc-cpi-label'">Nội dung giảng dạy</label>
-                    <app-list-editor [attr.aria-labelledby]="formId + '-desc-cpi-label'"
+                    <app-list-editor [attr.aria-labelledby]="formId + '-desc-cpi-label'" [addByButton]="true"
                         [resetTrigger]="fcdr['desc_cpi'].value && fcdr['desc_cpi'].value.length ? false : true"
                         [formField]="fcdr['desc_cpi']">
                     </app-list-editor>

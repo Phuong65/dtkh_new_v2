@@ -1,5 +1,5 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, Input, OnChanges, OnInit, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormsModule } from '@angular/forms';
 import { DragDropModule } from '@angular/cdk/drag-drop';
@@ -22,6 +22,8 @@ export class ListEditorComponent implements OnInit, OnChanges {
         }
     }
 
+    @Input() addByButton: boolean = false;
+
     @ViewChild('lastEditor') lastEditor!: ElementRef<HTMLDivElement>;
 
     @ViewChildren('editor') editors!: QueryList<ElementRef<HTMLDivElement>>;
@@ -39,8 +41,8 @@ export class ListEditorComponent implements OnInit, OnChanges {
     constructor() { }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes['defaultValue']) {
-
+        if (changes['formField'] && this.formField && Array.isArray(this.formField.value)) {
+            this.updateListValue(this.formField.value);
         }
     }
 
@@ -62,7 +64,7 @@ export class ListEditorComponent implements OnInit, OnChanges {
 
         this.listValue = value.map(v => ({ value: v }));
 
-        if (!this.listValue.length || this.listValue[this.listValue.length - 1].value !== '') {
+        if (!this.listValue.length || (!this.addByButton && this.listValue[this.listValue.length - 1].value !== '')) {
             this.listValue.push({ value: '' });
         }
     }
@@ -76,13 +78,20 @@ export class ListEditorComponent implements OnInit, OnChanges {
 
             event.preventDefault();
 
+            if (!this.listValue.length) {
+                this.listValue.push({ value: '' });
+            }
+
+            const lastItem = this.listValue[this.listValue.length - 1];
+            const hasEmptyLastItem = lastItem && !lastItem.value?.trim();
+
             json.forEach((f, key) => {
-                if (key === 0) {
-                    this.listValue[this.listValue.length - 1]['value'] = f;
+                if (key === 0 && (!this.addByButton || hasEmptyLastItem)) {
+                    lastItem.value = f;
                 } else {
                     this.listValue.push({ value: f });
                 }
-            })
+            });
 
             this.setForm();
         }
@@ -126,11 +135,12 @@ export class ListEditorComponent implements OnInit, OnChanges {
 
     deleteList(index) {
         this.listValue.splice(index, 1);
+        if (this.addByButton && !this.listValue.length) this.listValue.push({ value: '' });
         this.setForm();
     }
 
     deleteAllList() {
-        this.listValue = [{ value: '' }, { value: '' }];
+        this.listValue = this.addByButton ? [] : [{ value: '' }, { value: '' }];
         this.setForm();
     }
 
@@ -161,8 +171,26 @@ export class ListEditorComponent implements OnInit, OnChanges {
     //     // return el.contains(sel.anchorNode);
     // }
 
+    addItemByButton(): void {
+        const lastItem = this.listValue[this.listValue.length - 1];
+        if (lastItem && !lastItem.value?.trim()) {
+            setTimeout(() => {
+                const editors = this.editors?.toArray() || [];
+                editors[editors.length - 1]?.nativeElement.focus();
+            });
+            return;
+        }
+
+        this.listValue.push({ value: '' });
+        this.setForm();
+        setTimeout(() => {
+            const editors = this.editors?.toArray() || [];
+            editors[editors.length - 1]?.nativeElement.focus();
+        });
+    }
+
     onKeyDown(event, index) {
-        if (event.key === 'Tab') {
+        if (event.key === 'Tab' && !this.addByButton) {
             event.preventDefault(); // chặn indent mặc định
 
             const editorsArray = this.editors.toArray();

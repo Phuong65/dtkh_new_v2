@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { ListEditorComponent } from '@modules/shared/components/list-editor/list-editor.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
@@ -42,7 +44,7 @@ describe('ChuandauraComponent presentation', () => {
             ]
         }).overrideComponent(ChuandauraComponent, {
             set: {
-                imports: [CommonModule, FormsModule, ReactiveFormsModule, PanelModule, Drawer, MatButtonModule, MultiSelectModule, InputTextModule],
+                imports: [CommonModule, FormsModule, ReactiveFormsModule, PanelModule, Drawer, MatButtonModule, MultiSelectModule, InputTextModule, ListEditorComponent],
                 schemas: [NO_ERRORS_SCHEMA]
             }
         }).compileComponents();
@@ -101,6 +103,9 @@ describe('ChuandauraComponent presentation', () => {
         expect(form.querySelector('.ovic-mark')).toBeNull();
         expect(form.querySelectorAll('input.ictu-form__input-field').length).toBe(3);
         expect(form.querySelector('.cdr-form-section + .cdr-form-section')).not.toBeNull();
+        expect(form.querySelectorAll('.cdr-form-section__index').length).toBe(0);
+        const listEditor = fixture.debugElement.query(By.directive(ListEditorComponent));
+        expect(listEditor?.componentInstance.addByButton).toBeTrue();
         for (const field of ['title', 'code', 'method', 'desc-title']) {
             const input = form.querySelector<HTMLElement>('#cdr-create-' + field);
             expect(input).not.toBeNull();
