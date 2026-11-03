@@ -89,13 +89,24 @@
 }
 
 .assessment-card-head.admin-wrap-table__head {
+    position: relative;
     display: flex;
     min-height: 82px;
     align-items: center;
     padding: 13px 18px;
     border: 0;
-    border-bottom: 1px solid #dbe3ec;
-    background: linear-gradient(110deg, #f8fbff 0%, #fff 62%);
+    border-bottom: 1px solid #cbd5e1;
+    border-radius: var(--admin-wrap-table-element-radius, 4px) var(--admin-wrap-table-element-radius, 4px) 0 0;
+    background: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
+}
+
+.assessment-card-head.admin-wrap-table__head::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    border-top-left-radius: var(--admin-wrap-table-element-radius, 4px);
+    background: #2563eb;
+    content: '';
 }
 
 .assessment-card-head .admin-wrap-table__heading {

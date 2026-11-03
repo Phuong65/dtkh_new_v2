@@ -22,3 +22,6 @@
 - source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-bo-ctdt-row-action-one-row-colors.md`
   summary: Xóa dòng ghi nhận kết quả build và diff-check bị lặp.
   evidence: Review phát hiện ghi chú xác minh bị lặp trong spec của thay đổi màu nút Bộ CTĐT; đây là tài liệu thuộc yêu cầu trước, không sửa trong phạm vi giảm viền bảng PEO/PLO.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-home-practice-table-header-style.md`
+  summary: Thêm kiểm thử UI cho màu nút Sửa Bộ CTĐT.
+  evidence: Review phát hiện chưa có UI assertion cho class màu `ictu-button-info-light`; thay đổi class màu thuộc yêu cầu Bộ CTĐT trước đó, không thuộc chỉnh header Luyện tập tại nhà và được giữ nguyên theo yêu cầu người dùng.
