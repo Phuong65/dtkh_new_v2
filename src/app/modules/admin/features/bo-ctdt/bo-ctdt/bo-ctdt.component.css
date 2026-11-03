@@ -170,16 +170,6 @@
     transition: background-color .15s ease, color .15s ease, transform .15s ease;
 }
 
-.bo-ctdt-list__actions .bo-ctdt-list__action--edit:not(:disabled) {
-    background-color: rgba(var(--c2-success-rgb), 0.1);
-    color: rgb(var(--c2-success-rgb));
-}
-
-.bo-ctdt-list__actions .bo-ctdt-list__action--edit:not(:disabled):hover {
-    background-color: rgb(var(--c2-success-rgb));
-    color: #ffffff;
-}
-
 .bo-ctdt-list__actions .ictu-admin-icon-button:hover:not(:disabled) {
     transform: translateY(-1px);
 }

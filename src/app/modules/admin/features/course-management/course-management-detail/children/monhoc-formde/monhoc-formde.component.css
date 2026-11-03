@@ -8,6 +8,8 @@
 }
 
 .formde-shell {
+    --formde-table-border: #b8c4d1;
+    --formde-table-header-bg: #f1f5f9;
     position: relative;
     width: 100%;
     height: 100%;
@@ -1166,8 +1168,19 @@
     font-weight: 500 !important;
 }
 
-:host ::ng-deep .formde-shell table > :is(thead, tbody, tfoot) > tr:not(.cc-lesson-row) > :is(th, td) {
-    border-color: #858585 !important;
+/* Viền ô và viền ngoài đồng nhất giữa các tab, không đổi màu hàng nhóm/cảnh báo. */
+:host ::ng-deep .formde-shell .form-de-tab-panels .form-de-tab-panel :is(.tbl-danhSachUser table, table.tuluan15p-table) {
+    border: 1px solid var(--formde-table-border) !important;
+    border-collapse: collapse !important;
+    border-spacing: 0;
+}
+
+:host ::ng-deep .formde-shell .form-de-tab-panels .form-de-tab-panel :is(.tbl-danhSachUser table, table.tuluan15p-table) > :is(thead, tbody, tfoot) > tr > :is(th, td) {
+    border: 1px solid var(--formde-table-border) !important;
+}
+
+:host ::ng-deep .formde-shell .form-de-tab-panels .form-de-tab-panel :is(.tbl-danhSachUser table, table.tuluan15p-table) > thead > tr > th {
+    background-color: var(--formde-table-header-bg) !important;
 }
 
 @media (max-width: 768px) {

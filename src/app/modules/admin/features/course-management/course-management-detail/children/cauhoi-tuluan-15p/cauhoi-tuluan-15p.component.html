@@ -1,4 +1,5 @@
-﻿<main class="cauhoi-15p-shell" [attr.aria-busy]="busy" [class.cauhoi-15p-shell--form-only]="formOnly">
+﻿<main class="cauhoi-15p-shell" [attr.aria-busy]="busy" [class.cauhoi-15p-shell--form-only]="formOnly"
+    [class.cauhoi-15p-shell--embedded]="embeddedMode && !formOnly">
     @if (busy) {
     <app-loading-progress [heading]="progressHeading" backdropFilter="blur(2px)"></app-loading-progress>
     }
@@ -14,11 +15,21 @@
                 }
             </div>
         </div>
-        <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
-            aria-label="Đóng" pTooltip="Đóng" tooltipPosition="left" appendTo="body"
-            [disabled]="drawerBusy" (click)="requestEmbeddedClose()">
-            <i class="ti ti-x" aria-hidden="true"></i>
-        </button>
+        <div class="cauhoi-15p-embedded-header__actions">
+            @if (!embeddedQuestionEditing) {
+            <button type="button" mat-flat-button (click)="openAddCauhoi()"
+                class="btn ictu-badge-btn--primary-reverse cauhoi-15p-embedded-header__add"
+                [disabled]="!hasLessonForm || isLoadingLessonForm || isSavingLessonForm || !embeddedCanEdit">
+                <i class="ti ti-plus" aria-hidden="true"></i>
+                <span>Thêm câu hỏi</span>
+            </button>
+            }
+            <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button cauhoi-15p-embedded-header__close"
+                aria-label="Đóng" pTooltip="Đóng" tooltipPosition="left" appendTo="body"
+                [disabled]="drawerBusy" (click)="requestEmbeddedClose()">
+                <i class="ti ti-x" aria-hidden="true"></i>
+            </button>
+        </div>
     </header>
     }
 
@@ -62,13 +73,11 @@
         <section class="cauhoi-15p-main">
             @if (embeddedMode && !embeddedQuestionEditing) {
             <div class="cauhoi-15p-embedded-subbar">
+                <div class="cauhoi-15p-embedded-subbar__title">
+                    <i class="ti ti-list-details" aria-hidden="true"></i>
+                    <strong>Danh sách câu hỏi</strong>
+                </div>
                 <span class="cauhoi-15p-embedded-subbar__count">{{ cdrFilteredQuestions.length }} câu hỏi</span>
-                <button type="button" mat-flat-button (click)="openAddCauhoi()"
-                    class="btn ictu-badge-btn--primary-reverse cauhoi-15p-embedded-subbar__add"
-                    [disabled]="!hasLessonForm || isLoadingLessonForm || isSavingLessonForm || !embeddedCanEdit">
-                    <i class="ti ti-plus" aria-hidden="true"></i>
-                    <span>Thêm câu hỏi</span>
-                </button>
             </div>
             }
             @if (embeddedError) {
@@ -241,7 +250,7 @@
                                 <div class="cauhoi-15p-question-card__meta">
                                     <strong>Câu hỏi #{{cauhoi['id']}}</strong>
                                     <span class="cauhoi-15p-chip cauhoi-15p-chip--cdr">
-                                        {{cauhoi['cdr'] | showlabel : chuandaura: 'id' : 'label' }}
+                                        CĐR: {{cauhoi['cdr'] | showlabel : chuandaura: 'id' : 'label' }}
                                     </span>
                                     <span class="cauhoi-15p-chip cauhoi-15p-chip--point">
                                         <i class="ti ti-star" aria-hidden="true"></i>
@@ -257,7 +266,7 @@
                             </div>
                             <div class="cauhoi-15p-question-card__actions">
                                 <button type="button" (click)="editCauhoi(cauhoi)"
-                                    mat-flat-button class="btn ictu-badge-btn--primary"
+                                    mat-flat-button class="btn ictu-button-info-light cauhoi-15p-text-button"
                                     [disabled]="embeddedMode && !embeddedCanEdit">
                                     <i class="ti ti-edit" aria-hidden="true"></i>
                                     <span>Sửa</span>
