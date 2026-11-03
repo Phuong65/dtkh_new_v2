@@ -135,7 +135,7 @@
 .bo-peo-table th,
 .bo-peo-table td {
     padding: 8px 10px;
-    border: 1px solid var(--bo-peo-border);
+    border: 0.5px solid var(--bo-peo-border);
     vertical-align: middle;
 }
 

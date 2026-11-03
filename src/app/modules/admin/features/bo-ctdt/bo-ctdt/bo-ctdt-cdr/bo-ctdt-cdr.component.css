@@ -144,7 +144,7 @@
 .bo-cdr-table th,
 .bo-cdr-table td {
     padding: 8px 10px;
-    border: 1px solid var(--bo-cdr-border);
+    border: 0.5px solid var(--bo-cdr-border);
     color: var(--bo-cdr-text);
     font-size: 14px;
     vertical-align: middle;
