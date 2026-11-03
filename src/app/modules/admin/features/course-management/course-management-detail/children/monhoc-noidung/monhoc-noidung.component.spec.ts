@@ -185,6 +185,86 @@ describe('MonhocNoidungComponent presentation', () => {
         expect(root.querySelector('.course-status-badge')).toBeNull();
     });
 
+    it('dùng chung nút nhận xét và badge vuông cho trạng thái header', () => {
+        const goal = Object.assign(plan(11, 1), {
+            type: 'MUCTIEU',
+            status: 1,
+            approved_at: '2026-11-03T00:00:00Z',
+            comments: [{}, {}] as unknown[] | undefined,
+            kienthuc: '',
+            kynang: ''
+        });
+        const material = Object.assign(plan(12, 1), {
+            type: 'ACTIVITY',
+            status: 1,
+            approved_at: '2026-11-03T00:00:00Z',
+            comments: [{}] as unknown[] | undefined,
+            files: [],
+            slides: [],
+            desc: '',
+            videos: [],
+            video: null
+        });
+        const selected = plan(10, 1, [goal, material]);
+        component.list_plan = [selected];
+        component.onChangePlan(selected, 'muctieu');
+        fixture.detectChanges();
+
+        const commentButtons = Array.from(root.querySelectorAll<HTMLButtonElement>('.content-comment-toggle'));
+        expect(commentButtons.length).toBe(2);
+        expect(commentButtons.map(button => button.querySelector('.content-comment-count')?.textContent?.trim())).toEqual(['2', '1']);
+        expect(root.querySelector('.muctieu-comment-toggle, .tailieu-comment-toggle, .view-comment-action')).toBeNull();
+
+        const statusCases = [
+            { status: 0, label: 'Chờ duyệt', badgeClass: 'ictu-badge--warning' },
+            { status: 1, label: 'Đạt', badgeClass: 'ictu-badge--success' },
+            { status: -1, label: 'Yêu cầu sửa', badgeClass: 'ictu-badge--danger' },
+            { status: -2, label: 'Đã sửa', badgeClass: 'ictu-badge--primary' }
+        ];
+        for (const { status, label, badgeClass } of statusCases) {
+            goal.status = status;
+            material.status = status;
+            fixture.detectChanges();
+
+            const goalBadge = root.querySelector<HTMLElement>('.content-panel-status .course-status-badge');
+            const materialBadge = root.querySelector<HTMLElement>('.tailieu-header__status .course-status-badge');
+            expect(goalBadge?.textContent?.trim()).toBe(label);
+            expect(materialBadge?.textContent?.trim()).toBe(label);
+            expect(goalBadge?.classList).toContain(badgeClass);
+            expect(materialBadge?.classList).toContain(badgeClass);
+
+            if (status === 1) {
+                expect(root.querySelectorAll('.content-panel-status .course-status-badge').length).toBe(2);
+                expect(root.querySelectorAll('.tailieu-header__status .course-status-badge').length).toBe(2);
+                const approvalBadges = root.querySelectorAll<HTMLElement>(
+                    '.content-panel-status .course-status-badge, .tailieu-header__status .course-status-badge'
+                );
+                expect(approvalBadges[1].textContent?.trim()).toContain('Duyệt lúc:');
+                expect(approvalBadges[3].textContent?.trim()).toContain('Duyệt lúc:');
+            } else {
+                expect(root.querySelectorAll('.content-panel-status .course-status-badge').length).toBe(1);
+                expect(root.querySelectorAll('.tailieu-header__status .course-status-badge').length).toBe(1);
+            }
+            root.querySelectorAll<HTMLElement>(
+                '.content-panel-status .course-status-badge, .tailieu-header__status .course-status-badge'
+            ).forEach(badge => expect(getComputedStyle(badge).borderRadius).toBe('4px'));
+        }
+
+        const goalCommentToggle = jasmine.createSpy('goalCommentToggle');
+        const materialCommentToggle = jasmine.createSpy('materialCommentToggle');
+        component.appNhanxetMuctieu = { showComment: goalCommentToggle } as unknown as typeof component.appNhanxetMuctieu;
+        component.appNhanxetTailieu = { showComment: materialCommentToggle } as unknown as typeof component.appNhanxetTailieu;
+        commentButtons[0].click();
+        commentButtons[1].click();
+        expect(goalCommentToggle).toHaveBeenCalledTimes(1);
+        expect(materialCommentToggle).toHaveBeenCalledTimes(1);
+
+        goal.comments = undefined;
+        material.comments = [];
+        fixture.detectChanges();
+        expect(root.querySelector('.content-comment-toggle')).toBeNull();
+    });
+
     it('thu gọn mục lục mà không hủy dữ liệu đang chọn', () => {
         const selected = plan(10, 1);
         component.list_plan = [selected];

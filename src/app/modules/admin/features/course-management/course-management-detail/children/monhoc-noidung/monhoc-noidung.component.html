@@ -229,22 +229,22 @@
                     <div>
 @switch (muctieuPlan.status) {
                         @case (0) {
-<span class="course-status-text course-status-text--pending">Chờ duyệt</span>
+<span class="ictu-badge ictu-badge--warning course-status-badge">Chờ duyệt</span>
 }
                         @case (1) {
-<span class="course-status-text course-status-text--approved">Đạt</span>
+<span class="ictu-badge ictu-badge--success course-status-badge">Đạt</span>
 }
                         @case (-1) {
-<span class="course-status-text course-status-text--revision">Yêu cầu sửa</span>
+<span class="ictu-badge ictu-badge--danger course-status-badge">Yêu cầu sửa</span>
 }
                         @case (-2) {
-<span class="course-status-text course-status-text--resubmitted">Đã sửa</span>
+<span class="ictu-badge ictu-badge--primary course-status-badge">Đã sửa</span>
 }
                     }
 </div>
                     @if (muctieuPlan.status === 1) {
 <div>
-                        <span class="course-status-text course-status-text--approved">
+                        <span class="ictu-badge ictu-badge--success course-status-badge">
                             Duyệt lúc: {{muctieuPlan['approved_at'] | ovicDateTime}}
                         </span>
                     </div>
@@ -342,13 +342,13 @@
                     </section>
 
                     <div class="muctieu-actions">
-                        <div class="view-comment-action muctieu-comment-action">
+                        <div class="content-comment-action">
                             @if (muctieuPlan && muctieuPlan['comments'] && muctieuPlan['comments'].length) {
-<button type="button" class="btn muctieu-comment-toggle" (click)="showComment('muctieu')"
+<button type="button" class="btn content-comment-toggle" (click)="showComment('muctieu')"
                                >
-                                <span class="fa fa-comments-o" aria-hidden="true"></span>
+                                <span class="fa fa-comments-o content-comment-toggle__icon" aria-hidden="true"></span>
                                 {{appNhanxetMuctieu.displayComment?'Ẩn nhận xét':'Hiển thị nhận xét'}}
-                                <span class="muctieu-comment-count">{{muctieuPlan['comments'].length}}</span>
+                                <span class="content-comment-count">{{muctieuPlan['comments'].length}}</span>
                             </button>
 }
                         </div>
@@ -436,22 +436,22 @@
                 <div>
 @switch (tailieuPlan.status) {
                     @case (0) {
-<span class="course-status-text course-status-text--pending">Chờ duyệt</span>
+<span class="ictu-badge ictu-badge--warning course-status-badge">Chờ duyệt</span>
 }
                     @case (1) {
-<span class="course-status-text course-status-text--approved">Đạt</span>
+<span class="ictu-badge ictu-badge--success course-status-badge">Đạt</span>
 }
                     @case (-1) {
-<span class="course-status-text course-status-text--revision">Yêu cầu sửa</span>
+<span class="ictu-badge ictu-badge--danger course-status-badge">Yêu cầu sửa</span>
 }
                     @case (-2) {
-<span class="course-status-text course-status-text--resubmitted">Đã sửa</span>
+<span class="ictu-badge ictu-badge--primary course-status-badge">Đã sửa</span>
 }
                 }
 </div>
                 @if (tailieuPlan.status === 1) {
 <div>
-                    <span class="course-status-text course-status-text--approved">
+                    <span class="ictu-badge ictu-badge--success course-status-badge">
                         Duyệt lúc: {{tailieuPlan['approved_at'] | ovicDateTime}}
                     </span>
                 </div>
@@ -558,13 +558,13 @@
                     </section>
 
                     <div class="tailieu-actions">
-                        <div class="tailieu-comment-action">
+                        <div class="content-comment-action">
                             @if (tailieuPlan && tailieuPlan['comments'] && tailieuPlan['comments'].length) {
-<button type="button" class="btn tailieu-comment-toggle" (click)="showComment('tailieu')"
+<button type="button" class="btn content-comment-toggle" (click)="showComment('tailieu')"
                                >
-                                <span class="fa fa-comments-o" aria-hidden="true"></span>
+                                <span class="fa fa-comments-o content-comment-toggle__icon" aria-hidden="true"></span>
                                 {{appNhanxetTailieu.displayComment?'Ẩn nhận xét':'Hiển thị nhận xét'}}
-                                <span class="tailieu-comment-count">{{tailieuPlan['comments'].length}}</span>
+                                <span class="content-comment-count">{{tailieuPlan['comments'].length}}</span>
                             </button>
 }
                         </div>
