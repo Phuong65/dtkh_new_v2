@@ -15,12 +15,12 @@ context: []
 
 **Problem:** Header của bảng Luyện tập tại nhà chưa rõ cấp bậc thông tin như ảnh tham khảo; các nút Sinh đề và Xóa đang ẩn/hiện theo điều kiện nên thao tác trong bảng thiếu nhất quán.
 
-**Approach:** Làm header có biểu tượng, tiêu đề và mô tả theo ảnh mẫu. Luôn hiển thị Sinh đề và Xóa ở các ô thao tác, bật/tắt theo điều kiện form, câu hỏi, đề hiện có, quyền và trạng thái bận.
+**Approach:** Làm header có biểu tượng, tiêu đề và mô tả theo ảnh mẫu. Chỉ hiển thị Sinh đề và Xóa khi đã có form đề và câu hỏi được duyệt; trong trường hợp đủ điều kiện, khóa Xóa nếu chưa có đề, đồng thời tôn trọng quyền và trạng thái bận.
 
 </frozen-after-approval>
 
 ## Implementation Notes
 
 - Đổi tiêu đề phần Luyện tập tại nhà thành tiêu đề cấp 2, làm rõ phân cấp bằng biểu tượng, nền nhấn nhẹ và mô tả.
-- Giữ nút Sinh đề và Xóa luôn hiển thị trong từng ô thao tác. Sinh đề bị vô hiệu hóa khi thiếu form/câu hỏi đã duyệt; Xóa bị vô hiệu hóa khi chưa có đề. Cả hai cũng tôn trọng quyền thao tác và trạng thái bận.
+- Theo làm rõ của người dùng, chỉ hiển thị Sinh đề và Xóa khi đủ form đề và câu hỏi đã duyệt; nếu chưa đủ chỉ hiện thông báo. Khi đủ điều kiện, khóa Xóa nếu đề chưa tồn tại; cả hai nút vẫn tôn trọng quyền thao tác và trạng thái bận.
 - Xác minh bằng `npm run build` (thành công).
