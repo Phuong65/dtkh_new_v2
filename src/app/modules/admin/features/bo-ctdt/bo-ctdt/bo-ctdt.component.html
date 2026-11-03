@@ -89,7 +89,7 @@
                                     <i class="ti ti-book" aria-hidden="true"></i>
                                 </button>
                                 @if (canUpdate) {
-                                <button type="button" class="btn ictu-button-orange-light ictu-admin-icon-button"
+                                <button type="button" class="btn ictu-button-success-light ictu-admin-icon-button bo-ctdt-list__action--edit"
                                     (click)="openEdit(bo)" [disabled]="saving() || deleting()"
                                     [attr.aria-label]="'Sửa bộ CTĐT ' + bo.name" pTooltip="Sửa bộ CTĐT" tooltipPosition="left">
                                     <i class="ti ti-edit" aria-hidden="true"></i>
