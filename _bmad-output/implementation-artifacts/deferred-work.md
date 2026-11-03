@@ -31,3 +31,6 @@
 - source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-bo-ctdt-row-action-one-row-colors.md`
   summary: Kiểm tra trực quan cột thao tác Bộ CTĐT trên màn hình hẹp.
   evidence: Review task border Form đề phát hiện thiếu kiểm tra trình duyệt cho bố cục một hàng trên mobile; không thuộc scope border Form đề và không thay đổi ở task này.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-formde-table-border-scope.md`
+  summary: Xóa ghi chú xác minh bị lặp trong spec màu nút Bộ CTĐT.
+  evidence: Review task này tiếp tục phát hiện ghi chú build và diff-check lặp trong spec Bộ CTĐT; không sửa tài liệu ngoài phạm vi để giữ nguyên thay đổi hiện có.

@@ -1166,7 +1166,7 @@
     font-weight: 500 !important;
 }
 
-:host ::ng-deep .form-de-tab-panels .form-de-tab-panel table > :is(thead, tbody, tfoot) > tr:not(.cc-lesson-row) > :is(th, td) {
+:host ::ng-deep .formde-shell table > :is(thead, tbody, tfoot) > tr:not(.cc-lesson-row) > :is(th, td) {
     border-color: #858585 !important;
 }
 
