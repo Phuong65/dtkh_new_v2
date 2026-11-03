@@ -1167,7 +1167,7 @@
 }
 
 :host ::ng-deep .form-de-tab-panels .form-de-tab-panel table > :is(thead, tbody, tfoot) > tr:not(.cc-lesson-row) > :is(th, td) {
-    border-color: #74859a !important;
+    border-color: #858585 !important;
 }
 
 @media (max-width: 768px) {

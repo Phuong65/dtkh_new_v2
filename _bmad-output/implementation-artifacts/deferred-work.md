@@ -25,3 +25,9 @@
 - source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-home-practice-table-header-style.md`
   summary: Thêm kiểm thử UI cho màu nút Sửa Bộ CTĐT.
   evidence: Review phát hiện chưa có UI assertion cho class màu `ictu-button-info-light`; thay đổi class màu thuộc yêu cầu Bộ CTĐT trước đó, không thuộc chỉnh header Luyện tập tại nhà và được giữ nguyên theo yêu cầu người dùng.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-bo-ctdt-row-action-one-row-colors.md`
+  summary: Loại bỏ ghi chú build và diff-check bị lặp trong spec màu nút.
+  evidence: Review task border Form đề phát hiện hai dòng xác minh giống nhau trong spec Bộ CTĐT đã tồn tại; không sửa để bảo toàn thay đổi trước đó.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-bo-ctdt-row-action-one-row-colors.md`
+  summary: Kiểm tra trực quan cột thao tác Bộ CTĐT trên màn hình hẹp.
+  evidence: Review task border Form đề phát hiện thiếu kiểm tra trình duyệt cho bố cục một hàng trên mobile; không thuộc scope border Form đề và không thay đổi ở task này.
