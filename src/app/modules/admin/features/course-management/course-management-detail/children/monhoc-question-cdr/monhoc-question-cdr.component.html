@@ -16,68 +16,129 @@
 @if (state() === 'success') {
 <div class="layout_component_container">
     <div class="phanbo-cdr-layout" [ngClass]="closeLeft?'close-left-body':''">
-        <div class="phanbo-cdr-layout-left">
-            <button style="margin-left: 5px; padding: 0px; min-width: 0px; z-index: 50;" (click)="closeLeftBody()"
-                class="btn btn-success button-close-left-body">
-                <i style="margin: 0px;vertical-align: middle; font-size: 13px;"
-                    [ngClass]="closeLeft?'pi pi-angle-double-right':'pi pi-angle-double-left'"></i>
-            </button>
-            @if (selectedCourse) {
-            <div class="info-course">
+        <aside class="phanbo-cdr-layout-left cdr-sidebar" aria-label="Thông tin chuẩn đầu ra môn học">
+            <header class="cdr-sidebar__header">
+                <div class="cdr-sidebar__heading-group">
+                    <span class="cdr-sidebar__icon" aria-hidden="true"><i class="ti ti-chart-donut"></i></span>
+                    <div class="cdr-sidebar__heading">
+                        <strong>Thông tin phân bổ CĐR</strong>
+                        <small>Thống kê và điều kiện phân bổ</small>
+                    </div>
+                </div>
+                <button type="button" mat-flat-button
+                    class="btn ictu-badge-btn--secondary-reverse cdr-sidebar__close-btn"
+                    (click)="closeLeftBody()"
+                    aria-label="Thu gọn thông tin phân bổ CĐR"
+                    [attr.aria-expanded]="!closeLeft"
+                    aria-controls="cdr-sidebar-content">
+                    <i class="ti ti-chevron-left" aria-hidden="true"></i>
+                    <span>Thu gọn</span>
+                </button>
+            </header>
+            <div id="cdr-sidebar-content" class="info-course cdr-sidebar__body">
+                @if (selectedCourse) {
                 <div class="info-course-content">
                     @if (selectedCourse.params && selectedCourse.params.cdr) {
-                    <div class="cdr-percent-info padding-10px-all">
-                        <div class="info-course-item">
-                            <label>- Tổng số câu hỏi</label>:
-                            <span>{{selectedCourse.total_question}}</span>
+                    <section class="cdr-percent-info cdr-sidebar__card" aria-label="Tổng quan phân bổ CĐR">
+                        <h3 class="cdr-sidebar__card-title">Tổng quan CĐR môn học</h3>
+                        <div class="info-course-item cdr-sidebar__kpi">
+                            <div class="cdr-sidebar__kpi-icon" aria-hidden="true">
+                                <i class="ti ti-clipboard-list"></i>
+                            </div>
+                            <div class="cdr-sidebar__kpi-content">
+                                <span class="cdr-sidebar__kpi-label">Tổng số câu hỏi</span>
+                                <div class="cdr-sidebar__kpi-value">
+                                    <strong>{{selectedCourse.total_question}}</strong>
+                                    <small>câu hỏi</small>
+                                </div>
+                            </div>
                         </div>
-                        @for (item of chuandaura; track item) {
-                        <div [ngClass]="item.disabled?'disabled-none':''"
-                            class="info-course-item {{selectedCourse['class_require'] && selectedCourse['class_require'][item.id] === true?'require-cdr-backgroud-color':''}}">
-                            <label>- {{item.label}}</label>:
-                            @if (selectedCourse.cdr_percent && selectedCourse.cdr_question) {
-                            <span>
-                                {{selectedCourse.cdr_question[item.id]}} = {{selectedCourse.cdr_percent[item.id]}}%
-                            </span>
+
+                        <div class="cdr-sidebar__section-header">
+                            <span>PHÂN BỔ THEO CHUẨN ĐẦU RA</span>
+                        </div>
+
+                        <div class="cdr-sidebar__cdr-list">
+                            @for (item of chuandaura; track item) {
+                            <div [ngClass]="item.disabled?'disabled-none':''"
+                                class="info-course-item cdr-sidebar__cdr-item {{selectedCourse['class_require'] && selectedCourse['class_require'][item.id] === true?'require-cdr-backgroud-color is-required-warning':''}}">
+                                <div class="cdr-sidebar__cdr-item-top">
+                                    <span class="cdr-sidebar__cdr-tag">{{item.label}}</span>
+                                    @if (selectedCourse.cdr_percent && selectedCourse.cdr_question) {
+                                    <div class="cdr-sidebar__cdr-numbers">
+                                        <span class="cdr-sidebar__cdr-count">
+                                            <strong>{{selectedCourse.cdr_question[item.id]}}</strong> câu
+                                        </span>
+                                        <span class="cdr-sidebar__cdr-pill">
+                                            {{selectedCourse.cdr_percent[item.id]}}%
+                                        </span>
+                                    </div>
+                                    }
+                                </div>
+                                @if (selectedCourse.cdr_percent) {
+                                <div class="cdr-sidebar__progress-bar" aria-hidden="true">
+                                    <div class="cdr-sidebar__progress-fill" [style.width.%]="selectedCourse.cdr_percent[item.id] || 0"></div>
+                                </div>
+                                }
+                            </div>
                             }
                         </div>
-                        }
-                    </div>
+                    </section>
                     } @else {
-
-                    <div class="cdr-percent-info padding-10px-all"
-                        style="color: red; font-size: 14px; text-align: center;">
-                        <div style="width: 100%; margin: 0 auto;">
-                            Môn học này chưa xác định CDR, vui lòng cập nhật lại CDR hoặc liên hệ tới <strong>PHÒNG
-                                ĐÀO TẠO</strong> để được hỗ trợ
+                    <div class="cdr-percent-info cdr-sidebar__alert-card" role="alert">
+                        <div class="cdr-sidebar__alert-icon" aria-hidden="true">
+                            <i class="ti ti-alert-triangle"></i>
+                        </div>
+                        <div class="cdr-sidebar__alert-body">
+                            <strong>Chưa xác định CĐR</strong>
+                            <p>Môn học này chưa xác định CDR, vui lòng cập nhật lại CDR hoặc liên hệ <strong>PHÒNG ĐÀO TẠO</strong> để được hỗ trợ.</p>
                         </div>
                     </div>
-
                     }
 
                     @if (selectedCdr) {
-                    <div class="cdr-condition-bottom padding-10px-all ">
-                        <div class="info-course-item" style="text-align: center; color: red;">
-                            <strong>
-                                Tỉ lệ phân bổ câu hỏi cho: {{selectedCdr['kyhieu']+' - '+selectedCdr['cdr_name']}}
-                                <br>phải thỏa mãn điều kiện dưới đây
-                            </strong>
+                    <section class="cdr-condition-bottom cdr-sidebar__card cdr-sidebar__card--condition" aria-label="Điều kiện phân bổ câu hỏi">
+                        <div class="cdr-sidebar__card-header-line">
+                            <span class="cdr-sidebar__condition-badge-icon" aria-hidden="true"><i class="ti ti-target-arrow"></i></span>
+                            <h3 class="cdr-sidebar__card-title mb-0">Điều kiện phân bổ câu hỏi</h3>
                         </div>
-                        @for (item of khuyennghi; track item) {
-                        <div class="info-course-item">
-                            <label style="width: 250px;">- {{item.label}}</label>
-                            <span [innerHTML]="item.html"></span>
-                            <span>
-                                {{item['value']}}%
-                            </span>
+                        <div class="cdr-sidebar__condition-target-box">
+                            <span class="cdr-sidebar__condition-target-label">Đang chọn CĐR:</span>
+                            <strong class="cdr-sidebar__condition-target-name">{{selectedCdr['kyhieu']+' - '+selectedCdr['cdr_name']}}</strong>
                         </div>
-                        }
-                    </div>
+                        <div class="cdr-sidebar__section-header">
+                            <span>ĐIỀU KIỆN TỈ LỆ BẮT BUỘC</span>
+                        </div>
+                        <div class="cdr-sidebar__condition-list">
+                            @for (item of khuyennghi; track item) {
+                            <div class="info-course-item cdr-sidebar__condition-item">
+                                <span class="cdr-sidebar__condition-label">{{item.label}}</span>
+                                <div class="cdr-sidebar__condition-pill">
+                                    <span class="cdr-sidebar__condition-op" [innerHTML]="item.html"></span>
+                                    <strong class="cdr-sidebar__condition-num">{{item['value']}}%</strong>
+                                </div>
+                            </div>
+                            }
+                        </div>
+                    </section>
                     }
                 </div>
+                }
             </div>
-            }
-        </div>
+        </aside>
+
+        @if (closeLeft) {
+        <button type="button" mat-flat-button
+            class="btn ictu-badge-btn--secondary-reverse cdr-sidebar__floating-open-btn"
+            (click)="closeLeftBody()"
+            aria-label="Mở thông tin phân bổ CĐR"
+            [attr.aria-expanded]="false"
+            aria-controls="cdr-sidebar-content"
+            pTooltip="Mở thông tin phân bổ CĐR" tooltipPosition="right">
+            <i class="ti ti-chevron-right" aria-hidden="true"></i>
+            <span>Mở CĐR</span>
+        </button>
+        }
         <div class="phanbo-cdr-layout-right">
             <section class="admin-wrap-table cdr-question-table-shell" aria-label="Ma trận câu hỏi theo CDR">
                 <header class="admin-wrap-table__head cdr-question-table-shell__head">

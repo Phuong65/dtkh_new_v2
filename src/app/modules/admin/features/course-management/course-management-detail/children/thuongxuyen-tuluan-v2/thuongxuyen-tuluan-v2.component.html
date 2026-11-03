@@ -399,7 +399,7 @@
                         <small>Thiết lập tiêu chí và hướng dẫn chấm cho đề tự luận.</small>
                     </div>
                 </div>
-                <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button tuluan-criteria-drawer__close" (click)="closeForm()"
+                <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button tuluan-criteria-drawer__close" (click)="closeForm()"
                     [disabled]="busy" aria-label="Đóng" pTooltip="Đóng" tooltipPosition="left" appendTo="body">
                     <i class="ti ti-x" aria-hidden="true"></i>
                 </button>
@@ -438,7 +438,11 @@
                             <div class="tuluan-criteria-editor__body">
                                 @if (list_tieuchi_chamdiem.length) {
                                 @for (item of list_tieuchi_chamdiem; track item; let i = $index) {
-                                <p-panel #panel_tieuchi styleClass="tuluan-criteria-panel" [(collapsed)]="item['collapsed']" [toggleable]="true">
+                                <p-panel #panel_tieuchi styleClass="tuluan-criteria-panel" [(collapsed)]="item['collapsed']" [toggleable]="true"
+                                    [toggleButtonProps]="{ label: item['collapsed'] ? 'Nhập tiêu chí chấm' : 'Đóng trình soạn thảo', styleClass: item['collapsed'] ? 'tuluan-criteria-toggle-button is-collapsed' : 'tuluan-criteria-toggle-button is-expanded', ariaLabel: item['collapsed'] ? 'Mở trình soạn thảo tiêu chí chấm' : 'Đóng trình soạn thảo tiêu chí chấm' }">
+                                    <ng-template pTemplate="headericons" let-collapsed>
+                                        <i [class]="collapsed ? 'ti ti-edit' : 'ti ti-chevron-up'" aria-hidden="true"></i>
+                                    </ng-template>
                                     <ng-template pTemplate="header">
                                         <div class="ictu-form tuluan-criteria-form">
                                             <div class="tuluan-criteria-form__fields">

@@ -22,6 +22,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { InputTextModule } from 'primeng/inputtext';
 import { AppState } from '@core-new/models/app-state';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
+import { MatButtonModule } from '@angular/material/button';
 import { BUTTON_YES, BUTTON_NO } from '@core/models/buttons';
 import { CourseQuestionsService } from '@modules/shared/services/course-questions.service';
 import { HelperService } from '@core/services/helper.service';
@@ -78,7 +79,8 @@ export interface CoursesCdr extends ElnKhoaHoc {
         NgbTooltipModule,
         TooltipModule,
         InputTextModule,
-        LoadingProgressComponent
+        LoadingProgressComponent,
+        MatButtonModule
     ],
     templateUrl: './monhoc-question-cdr.component.html',
     styleUrls: ['./monhoc-question-cdr.component.css']

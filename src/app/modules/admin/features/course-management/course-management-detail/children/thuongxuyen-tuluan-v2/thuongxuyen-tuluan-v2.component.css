@@ -107,7 +107,6 @@
 .tuluan-title-cell { display: flex; min-width: 0; align-items: center; gap: 10px; }
 .tuluan-title-cell > strong { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .action-button-tuluan { display: inline-flex; flex: 0 0 auto; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 5px; }
-
 :host ::ng-deep .tuluan-table-card .admin-table { width: 100%; min-width: 780px; border-collapse: collapse; }
 :host ::ng-deep .tuluan-table-card .admin-table th,
 :host ::ng-deep .tuluan-table-card .admin-table td { padding: 8px 10px; border: 1px solid #edf2f7 !important; vertical-align: middle; }
@@ -235,17 +234,17 @@
     height: 34px !important;
     align-items: center !important;
     justify-content: center !important;
-    border: 1px solid #bfdbfe !important;
+    border: 1px solid #fecaca !important;
     border-radius: 4px !important;
-    background: #eff6ff !important;
-    color: #2563eb !important;
+    background: #fef2f2 !important;
+    color: #dc2626 !important;
     padding: 0 !important;
     cursor: pointer;
 }
 .tuluan-criteria-drawer__close:hover {
-    background: #2563eb !important;
+    background: #dc2626 !important;
     color: #ffffff !important;
-    border-color: #2563eb !important;
+    border-color: #dc2626 !important;
 }
 .tuluan-criteria-drawer__close i {
     font-size: 18px !important;
@@ -288,8 +287,38 @@
 
 ::ng-deep .essay-form-drawer .tuluan-criteria-splitter-root { min-width: 0; }
 ::ng-deep .essay-form-drawer .tuluan-criteria-splitter { min-width: 0; }
-::ng-deep .essay-form-drawer .tuluan-criteria-panel > .p-panel-header { min-width: 0; padding: 0; }
-::ng-deep .essay-form-drawer .tuluan-criteria-panel .p-panel-header-actions { align-self: center; flex: 0 0 auto; margin-right: 8px; }
+::ng-deep .essay-form-drawer .tuluan-criteria-panel > .p-panel-header { min-width: 0; padding: 0; flex-direction: column; align-items: stretch; gap: 0; }
+::ng-deep .essay-form-drawer .tuluan-criteria-panel .p-panel-header-actions { display: flex; align-self: stretch; flex: 0 0 auto; justify-content: flex-end; margin: 0; padding: 0 10px 12px; }
+::ng-deep .essay-form-drawer .tuluan-criteria-panel .p-panel-toggle-button {
+    display: inline-flex;
+    min-width: 158px;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 12px;
+    border: 1px solid #bfdbfe;
+    border-radius: 4px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    transition: background-color .2s, border-color .2s, color .2s;
+}
+::ng-deep .essay-form-drawer .tuluan-criteria-panel .p-panel-toggle-button:hover,
+::ng-deep .essay-form-drawer .tuluan-criteria-panel .p-panel-toggle-button:focus-visible {
+    border-color: #2563eb;
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+::ng-deep .essay-form-drawer .tuluan-criteria-panel .p-panel-toggle-button.is-expanded {
+    border-color: #93c5fd;
+    background: #fff;
+    color: #1e3a8a;
+}
+::ng-deep .essay-form-drawer .tuluan-criteria-panel .p-panel-toggle-button .ti { font-size: 15px; }
 
 .tuluan-criteria-editor { display: flex; width: 100%; height: 100%; min-width: 0; min-height: 0; flex-direction: column; background: #fff; }
 .tuluan-criteria-editor__header { display: flex; min-height: 56px; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; }
@@ -300,7 +329,7 @@
 .tuluan-criteria-editor__body { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 10px; }
 .tuluan-criteria-panel { display: block; margin-bottom: 8px; border: 1px solid #e2e8f0; border-radius: 4px; background: #fff; overflow: hidden; }
 .tuluan-criteria-form { display: flex; flex: 1 1 auto; min-width: 0; align-items: flex-start; gap: 10px; padding: 12px 10px; background: #fff; }
-.tuluan-criteria-form__fields { display: grid; width: 100%; min-width: 0; grid-template-columns: 100px minmax(0, 1fr) 40px; gap: 12px; align-items: end; }
+.tuluan-criteria-form__fields { display: grid; width: 100%; min-width: 0; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 40px; gap: 12px; align-items: end; }
 .tuluan-criteria-form .ictu-form__row { display: flex; flex-direction: column; gap: 6px; min-width: 0; margin: 0; }
 .tuluan-criteria-form .ictu-form__label { position: static; margin: 0; padding: 0; line-height: 1.5; }
 .tuluan-criteria-form .ictu-form__input-field { margin-top: 0; }
@@ -310,12 +339,41 @@
 .tuluan-criteria-form__cdr p-select { height: 40px; min-height: 40px; }
 .tuluan-criteria-form__action { display: flex; align-items: center; justify-content: center; height: 40px; }
 .tuluan-criteria-form__action .ictu-admin-icon-button { width: 40px; min-width: 40px !important; height: 40px; padding: 0; }
-.tuluan-criteria-guide-form { padding: 10px; border-top: 1px solid #edf2f7; background: #f8fafc; }
-.tuluan-criteria-guide-form .ictu-form__row { margin: 0; }
+.tuluan-criteria-guide-form { min-width: 0; padding: 10px; border-top: 1px solid #edf2f7; background: #f8fafc; }
+.tuluan-criteria-guide-form .ictu-form__row { display: flex; min-width: 0; margin: 0; flex-direction: column; gap: 6px; }
+::ng-deep .essay-form-drawer .tuluan-criteria-guide-form ovic-ckeditor-document,
+::ng-deep .essay-form-drawer .tuluan-criteria-guide-form .document-editor_basic:not(.maximize-editor-mode),
+::ng-deep .essay-form-drawer .tuluan-criteria-guide-form .document-editor_basic:not(.maximize-editor-mode) .ck-editor,
+::ng-deep .essay-form-drawer .tuluan-criteria-guide-form .document-editor_basic:not(.maximize-editor-mode) .ck-editor__main,
+::ng-deep .essay-form-drawer .tuluan-criteria-guide-form .document-editor_basic:not(.maximize-editor-mode) .ck-editor__editable_inline {
+    display: block;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+}
+::ng-deep .essay-form-drawer .tuluan-criteria-guide-form .document-editor_basic:not(.maximize-editor-mode) .ck-editor__editable_inline {
+    min-height: 180px !important;
+    overflow-wrap: anywhere;
+}
+::ng-deep .essay-form-drawer .tuluan-criteria-guide-form .document-editor_basic:not(.maximize-editor-mode) .ck-toolbar {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+}
+::ng-deep .essay-form-drawer .tuluan-criteria-guide-form .document-editor_basic:not(.maximize-editor-mode) .ck-toolbar__items {
+    min-width: 0;
+    flex-wrap: wrap;
+}
 .tuluan-criteria-drawer__footer { flex: 0 0 auto; background: #fff; }
 .tuluan-criteria-empty { display: flex; min-height: 180px; align-items: center; justify-content: center; flex-direction: column; gap: 8px; color: #64748b; text-align: center; }
 .tuluan-criteria-empty > i { color: #94a3b8; font-size: 28px; }
 .tuluan-criteria-empty strong { color: #334155; }
+
+@media (max-width: 900px) {
+    .tuluan-criteria-form__fields { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 40px; }
+}
 
 @media (max-width: 640px) {
     ::ng-deep .essay-form-drawer .tuluan-criteria-splitter-root { flex-direction: column !important; }
