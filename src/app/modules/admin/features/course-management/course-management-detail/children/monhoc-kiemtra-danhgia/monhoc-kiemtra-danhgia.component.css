@@ -279,32 +279,49 @@
 .assessment-empty-state p { margin: 0; }
 
 .assessment-mcq-card {
-    width: min(620px, 100%);
-    margin: 24px auto;
+    width: 100%;
+    margin: 0;
     border: 1px solid #e2e8f0;
     border-radius: 6px;
     background: #fff;
     overflow: hidden;
 }
 
-.assessment-mcq-header {
+.assessment-mcq-header.admin-wrap-table__head {
+    position: relative;
     display: flex;
-    min-height: 82px;
     align-items: center;
+    justify-content: space-between;
     gap: 14px;
-    padding: 16px 20px;
-    background: linear-gradient(110deg, #1d4ed8 0%, #3b82f6 62%, #60a5fa 100%);
-    color: #fff;
+    min-height: 56px;
+    padding: 10px 16px 10px 20px;
+    border: 0;
+    border-bottom: 1px solid #cbd5e1;
+    background: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
 }
 
-.assessment-mcq-icon { display: inline-grid; width: 44px; height: 44px; flex: 0 0 auto; place-items: center; border: 1px solid rgb(255 255 255 / 28%); border-radius: 50%; background: rgb(255 255 255 / 16%); color: #fff; font-size: 22px; }
-.assessment-mcq-eyebrow { display: block; margin-bottom: 3px; color: rgb(255 255 255 / 82%); font-size: 12px; font-weight: 600; letter-spacing: .04em; }
-.assessment-mcq-header h2 { margin: 0; color: #fff; font-size: 17px; font-weight: 650; line-height: 1.4; overflow-wrap: anywhere; }
+.assessment-mcq-header.admin-wrap-table__head::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    background: #2563eb;
+    content: '';
+}
+
+.assessment-mcq-header .admin-wrap-table__heading {
+    margin: 0;
+    min-width: 0;
+    color: #1e3a8a;
+    font-size: 15px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
 .assessment-mcq-body { padding: 20px; }
 .assessment-mcq-statuses,
-.assessment-mcq-actions { display: flex; align-items: center; justify-content: flex-start; flex-wrap: wrap; gap: 8px; }
+.assessment-mcq-actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; }
 .assessment-mcq-actions { margin-top: 16px; }
-.assessment-mcq-body > .assessment-warning { display: block; margin: 16px 0 0; }
+.assessment-mcq-body > .assessment-warning { display: block; margin: 16px 0 0; text-align: center; }
 @media (max-width: 900px) {
     .assessment-tabs { justify-content: flex-start; }
     .assessment-tabs button { min-width: max-content; }
@@ -319,8 +336,8 @@
     .assessment-test-list { max-height: 260px; }
     .assessment-test-workspace.is-collapsed .assessment-test-list { display: none; }
     .assessment-test-content { min-height: 480px; padding: 10px; }
-    .assessment-mcq-card { margin: 12px auto; }
-    .assessment-mcq-header { padding: 14px 16px; }
+    .assessment-mcq-header.admin-wrap-table__head { flex-wrap: wrap; }
+    .assessment-mcq-header .admin-wrap-table__heading { min-width: 0; overflow-wrap: anywhere; }
     .assessment-mcq-body { padding: 16px; }
 }
 

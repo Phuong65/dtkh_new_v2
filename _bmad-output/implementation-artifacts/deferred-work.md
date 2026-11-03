@@ -7,3 +7,15 @@
 - source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-ctdt-settings-subtabs.md`
   summary: Giữ draft tab Cài đặt khi chuyển sang tab ngoài khác.
   evidence: Parent đang dùng `@if` nên hủy component khi rời Cài đặt; yêu cầu hiện tại chỉ cam kết giữ DOM giữa bốn tab con, thay đổi parent cần phạm vi riêng.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-thuongxuyen-tracnghiem-header-style.md`
+  summary: Bổ sung accessible name cho nút phân bổ câu hỏi CĐR.
+  evidence: Review phát hiện nút chỉ có tooltip; đây là phần việc CĐR có sẵn, không thuộc chỉnh sửa header trắc nghiệm.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-thuongxuyen-tracnghiem-header-style.md`
+  summary: Hoàn thiện ARIA cho thanh cuộn ngang ma trận CĐR.
+  evidence: Review phát hiện role scrollbar chưa khai báo giá trị và vùng nội dung liên quan; đây là phần việc CĐR có sẵn, không thuộc chỉnh sửa header trắc nghiệm.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-thuongxuyen-tracnghiem-header-style.md`
+  summary: Giữ focus bàn phím khi thu gọn hoặc mở sidebar CĐR.
+  evidence: Review phát hiện nút đang focus bị ẩn mà không chuyển focus; đây là phần việc CĐR có sẵn, không thuộc chỉnh sửa header trắc nghiệm.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-thuongxuyen-tracnghiem-header-style.md`
+  summary: Thể hiện trạng thái CĐR bắt buộc không chỉ bằng màu sắc.
+  evidence: Review phát hiện trạng thái bắt buộc dùng màu để phân biệt; đây là phần việc CĐR có sẵn, không thuộc chỉnh sửa header trắc nghiệm.
