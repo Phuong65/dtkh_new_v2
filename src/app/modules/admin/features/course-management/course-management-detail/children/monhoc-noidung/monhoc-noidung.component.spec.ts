@@ -170,6 +170,21 @@ describe('MonhocNoidungComponent presentation', () => {
         expect(root.querySelector('.course-outline-toggle')).not.toBeNull();
     });
 
+    it('hiển thị trạng thái mục lục dạng chữ màu thay vì dot hoặc badge', () => {
+        const child = plan(11, 1);
+        child.status = 1;
+        const parent = plan(10, 1, [child]);
+        parent.status = -1;
+        component.list_plan = [parent];
+        fixture.detectChanges();
+
+        expect(root.querySelector('.parent-status .course-status-text--revision')?.textContent?.trim()).toBe('Chưa đạt');
+        expect(root.querySelector('.child-status .course-status-text--approved')).toBeNull();
+        expect(root.querySelector('.child-action-menu .course-status-text--approved')?.textContent?.trim()).toBe('Đạt');
+        expect(root.querySelector('.status-dot')).toBeNull();
+        expect(root.querySelector('.course-status-badge')).toBeNull();
+    });
+
     it('thu gọn mục lục mà không hủy dữ liệu đang chọn', () => {
         const selected = plan(10, 1);
         component.list_plan = [selected];

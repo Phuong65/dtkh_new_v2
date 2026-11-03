@@ -229,22 +229,22 @@
                     <div>
 @switch (muctieuPlan.status) {
                         @case (0) {
-<span class="box-span cho-duyet-box">Chờ duyệt</span>
+<span class="course-status-text course-status-text--pending">Chờ duyệt</span>
 }
                         @case (1) {
-<span class="ictu-badge ictu-badge--success course-status-badge">Đạt</span>
+<span class="course-status-text course-status-text--approved">Đạt</span>
 }
                         @case (-1) {
-<span class="box-span yeu-cau-sua-box">Yêu cầu sửa</span>
+<span class="course-status-text course-status-text--revision">Yêu cầu sửa</span>
 }
                         @case (-2) {
-<span class="box-span da-sua-box">Đã sửa</span>
+<span class="course-status-text course-status-text--resubmitted">Đã sửa</span>
 }
                     }
 </div>
                     @if (muctieuPlan.status === 1) {
 <div>
-                        <span class="ictu-badge ictu-badge--success course-status-badge">
+                        <span class="course-status-text course-status-text--approved">
                             Duyệt lúc: {{muctieuPlan['approved_at'] | ovicDateTime}}
                         </span>
                     </div>
@@ -436,22 +436,22 @@
                 <div>
 @switch (tailieuPlan.status) {
                     @case (0) {
-<span class="box-span cho-duyet-box">Chờ duyệt</span>
+<span class="course-status-text course-status-text--pending">Chờ duyệt</span>
 }
                     @case (1) {
-<span class="ictu-badge ictu-badge--success course-status-badge">Đạt</span>
+<span class="course-status-text course-status-text--approved">Đạt</span>
 }
                     @case (-1) {
-<span class="box-span yeu-cau-sua-box">Yêu cầu sửa</span>
+<span class="course-status-text course-status-text--revision">Yêu cầu sửa</span>
 }
                     @case (-2) {
-<span class="box-span da-sua-box">Đã sửa</span>
+<span class="course-status-text course-status-text--resubmitted">Đã sửa</span>
 }
                 }
 </div>
                 @if (tailieuPlan.status === 1) {
 <div>
-                    <span class="ictu-badge ictu-badge--success course-status-badge">
+                    <span class="course-status-text course-status-text--approved">
                         Duyệt lúc: {{tailieuPlan['approved_at'] | ovicDateTime}}
                     </span>
                 </div>
@@ -612,20 +612,16 @@
                 <div class="parent-status">
 @switch (parent['status']) {
                     @case (0) {
-<span container="body" placement="top" ngbTooltip="Chờ duyệt"
-                        class="status-dot status-dot--pending" aria-label="Chờ duyệt"></span>
+<span class="course-status-text course-status-text--pending">Chờ duyệt</span>
 }
                     @case (1) {
-<span container="body" placement="top" ngbTooltip="Đạt"
-                        class="status-dot status-dot--approved" aria-label="Đạt"></span>
+<span class="course-status-text course-status-text--approved">Đạt</span>
 }
                     @case (-1) {
-<span container="body" placement="top" ngbTooltip="Chưa đạt"
-                        class="status-dot status-dot--revision" aria-label="Chưa đạt"></span>
+<span class="course-status-text course-status-text--revision">Chưa đạt</span>
 }
                     @case (-2) {
-<span container="body" placement="top" ngbTooltip="Đã sửa, đề nghị duyệt"
-                        class="status-dot status-dot--resubmitted" aria-label="Đã sửa, đề nghị duyệt"></span>
+<span class="course-status-text course-status-text--resubmitted">Đã sửa, đề nghị duyệt</span>
 }
                 }
 </div>
@@ -677,16 +673,16 @@
 <div>
 @switch (children['status']) {
                             @case (0) {
-<span class="child-status child-status--pending">Chờ duyệt</span>
+<span class="course-status-text course-status-text--pending">Chờ duyệt</span>
 }
                             @case (1) {
-<span class="ictu-badge ictu-badge--success course-status-badge">Đạt</span>
+<span class="course-status-text course-status-text--approved">Đạt</span>
 }
                             @case (-1) {
-<span class="child-status child-status--revision">Chưa đạt</span>
+<span class="course-status-text course-status-text--revision">Chưa đạt</span>
 }
                             @case (-2) {
-<span class="child-status child-status--resubmitted">Yêu cầu duyệt</span>
+<span class="course-status-text course-status-text--resubmitted">Yêu cầu duyệt</span>
 }
                         }
 </div>

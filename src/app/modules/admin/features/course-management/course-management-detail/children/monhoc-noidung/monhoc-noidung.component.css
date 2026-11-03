@@ -173,12 +173,7 @@
 .parent-title,
 .child-title { overflow-wrap: anywhere; }
 .action-menu { display: flex; flex-shrink: 0; align-items: center; gap: 4px; padding-right: 10px; }
-.parent-status { display: inline-flex; padding: 6px; }
-.status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 2px #ffffff, 0 0 0 3px currentColor; }
-.status-dot--pending { color: #64748b; }
-.status-dot--approved { color: var(--content-success); }
-.status-dot--revision { color: var(--content-danger); }
-.status-dot--resubmitted { color: var(--content-primary); }
+.parent-status { display: inline-flex; max-width: 128px; min-width: 0; justify-content: flex-end; padding: 0 4px; text-align: right; }
 .outline-icon-button { flex-shrink: 0; }
 .parent-desc { padding: 8px 12px; border-bottom: 1px solid var(--content-divider); }
 .parent-desc-content { max-height: 72px; overflow: auto; color: var(--content-muted); font-size: 14px; }
@@ -192,20 +187,11 @@
 .child-icon { display: inline-flex; flex: 0 0 22px; width: 22px; height: 22px; align-items: center; justify-content: center; border-radius: 5px; color: #3974bd; background: #e6f0ff; font-size: 14px; }
 .child-title { color: #365a80; font-weight: 500; }
 .child-indicator { color: #64748b; font-size: 14px; }
-.child-status,
-.box-span { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 999px; font-size: 14px; font-weight: 600; white-space: nowrap; }
-.child-status--pending,
-.cho-duyet-box { color: #8a5a16; background: #fff8e8; border: 1px solid #f0dfb8; }
-.course-status-badge {
-    --ictu-badge-font-size: 14px;
-    --ictu-badge-padding: 5px 12px;
-    --ictu-badge-border-radius: 999px;
-    font-weight: 500;
-}
-.child-status--revision,
-.yeu-cau-sua-box { color: #914b4b; background: #fff1f1; border: 1px solid #efd2d2; }
-.child-status--resubmitted,
-.da-sua-box { color: #476b8d; background: #eef4f8; border: 1px solid #d1e0ea; }
+.course-status-text { display: inline; padding: 0; border: 0; border-radius: 0; background: transparent; font-size: 13px; font-weight: 600; line-height: inherit; white-space: normal; }
+.course-status-text--pending { color: #8a5a16; }
+.course-status-text--approved { color: var(--content-success); }
+.course-status-text--revision { color: #b91c1c; }
+.course-status-text--resubmitted { color: #1d4ed8; }
 .outline-empty-child { padding: 16px; color: var(--content-muted); text-align: center; font-size: 14px; }
 .example-custom-placeholder { min-height: 52px; border: 1px dashed var(--content-primary); border-radius: var(--content-item-radius); background: var(--content-selected); }
 :host ::ng-deep .cdk-drag-preview.parent-lesson-layout { box-sizing: border-box; background: var(--content-surface, #ffffff); border: 1px solid var(--content-divider, #e2e8f0); border-radius: 8px; }
@@ -260,6 +246,8 @@
 :host ::ng-deep .tailieu-panel > .p-panel-content-container > .p-panel-content-wrapper > .p-panel-content,
 :host ::ng-deep .discussion-panel > .p-panel-content-container > .p-panel-content-wrapper > .p-panel-content { padding: 0; }
 .content-panel-status { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.content-panel-status .course-status-text,
+.tailieu-header__status .course-status-text { font-size: 14px; }
 .muctieu-workspace,
 .tailieu-workspace,
 .discussion-workspace {

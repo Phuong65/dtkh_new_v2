@@ -34,3 +34,12 @@
 - source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-formde-table-border-scope.md`
   summary: Xóa ghi chú xác minh bị lặp trong spec màu nút Bộ CTĐT.
   evidence: Review task này tiếp tục phát hiện ghi chú build và diff-check lặp trong spec Bộ CTĐT; không sửa tài liệu ngoài phạm vi để giữ nguyên thay đổi hiện có.
+- source_spec: none
+  summary: Chuẩn hóa nút Xem nhận xét và thêm đường phân cách phía trên trong các phần tab Nội dung.
+  evidence: Tách khỏi yêu cầu hiển thị trạng thái dạng chữ để giới hạn thay đổi đầu tiên vào cách trình bày trạng thái.
+- source_spec: none
+  summary: Thu gọn footer drawer Thêm CPI.
+  evidence: Đây là chỉnh sửa bố cục độc lập, không cần thiết để thống nhất cách hiển thị trạng thái.
+- source_spec: none
+  summary: Đổi nút chọn tệp sang kiểu success của core-new.
+  evidence: Đây là chỉnh sửa giao diện upload độc lập với trạng thái duyệt ở sidebar và header.
