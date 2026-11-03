@@ -148,16 +148,16 @@
 .bo-ctdt-list__name:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
 
 .bo-ctdt-list__actions {
-    width: 250px;
+    width: 130px;
     text-align: center;
     white-space: nowrap;
 }
 
 .bo-ctdt-list__actions .ictu-admin-table-actions {
-    width: max-content;
+    width: 108px;
     max-width: 100%;
-    flex-wrap: nowrap;
-    gap: 16px;
+    flex-wrap: wrap;
+    gap: 6px;
     margin-inline: auto;
 }
 
@@ -366,7 +366,4 @@
         flex-basis: 100%;
         width: 100%;
     }
-
-    .bo-ctdt-list__actions { width: 210px; }
-    .bo-ctdt-list__actions .ictu-admin-table-actions { gap: 8px; }
 }
