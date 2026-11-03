@@ -27,10 +27,10 @@
             <div class="admin-wrap-table ictu-admin-table-shell assessment-table-card">
                 <header class="admin-wrap-table__head assessment-card-head">
                     <div>
-                        <span class="admin-wrap-table__heading assessment-card-title">
+                        <h2 class="admin-wrap-table__heading assessment-card-title">
                             <i class="ti ti-clipboard-check" aria-hidden="true"></i>
                             <span>Luyện tập tại nhà{{ !isDttx && key_server !== 'hvu' ? ' và kiểm tra 15 phút' : '' }}</span>
-                        </span>
+                        </h2>
                         <p>Quản lý form đề, câu hỏi đã duyệt và ngân hàng đề theo từng {{ label_week.toLowerCase() }}.</p>
                     </div>
                 </header>
@@ -63,38 +63,36 @@
                                         <i [class]="row['has_test_cc'] ? 'ti ti-check' : 'ti ti-minus'" aria-hidden="true"></i>
                                         {{ row['has_test_cc'] ? 'Đã có' : 'Chưa có' }}</span></td>
                                     <td class="cell-center">
-                                        @if (!row['has_form_cc'] || row['datuyet_question'] === 0) {
-                                        <span class="assessment-warning">Chưa đủ form đề hoặc câu hỏi duyệt</span>
-                                        } @else {
-                                        <div class="assessment-action-group">
+                                        <div class="assessment-action-cell">
+                                            <div class="assessment-action-group">
                                             <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse"
-                                                (click)="sinhDeByWeek(row)" [disabled]="busy || !canAdded"><i class="ti ti-sparkles" aria-hidden="true"></i>Sinh đề</button>
-                                            @if (row['has_test_cc']) {
+                                                (click)="sinhDeByWeek(row)" [disabled]="busy || !canAdded || !row['has_form_cc'] || row['datuyet_question'] === 0"><i class="ti ti-sparkles" aria-hidden="true"></i>Sinh đề</button>
                                             <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
-                                                (click)="deleteDeWeek(row)" [disabled]="busy || !canAdded" aria-label="Xóa toàn bộ đề luyện tập"
+                                                (click)="deleteDeWeek(row)" [disabled]="busy || !canAdded || !row['has_test_cc']" aria-label="Xóa toàn bộ đề luyện tập"
                                                 pTooltip="Xóa toàn bộ đề" tooltipPosition="top" appendTo="body"><i class="ti ti-trash" aria-hidden="true"></i></button>
+                                            </div>
+                                            @if (!row['has_form_cc'] || row['datuyet_question'] === 0) {
+                                            <span class="assessment-warning">Chưa đủ form đề hoặc câu hỏi duyệt</span>
                                             }
                                         </div>
-                                        }
                                     </td>
                                     @if (!isDttx && key_server !== 'hvu') {
                                     <td class="cell-center"><span class="assessment-status" [class.is-ready]="row['has_test_dg']">
                                         <i [class]="row['has_test_dg'] ? 'ti ti-check' : 'ti ti-minus'" aria-hidden="true"></i>
                                         {{ row['has_test_dg'] ? 'Đã có' : 'Chưa có' }}</span></td>
                                     <td class="cell-center">
-                                        @if (!row['has_form_dg'] || row['datuyet_question'] === 0) {
-                                        <span class="assessment-warning">Chưa đủ form đề hoặc câu hỏi duyệt</span>
-                                        } @else {
-                                        <div class="assessment-action-group">
+                                        <div class="assessment-action-cell">
+                                            <div class="assessment-action-group">
                                             <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse"
-                                                (click)="sinhDe15pByWeek(row)" [disabled]="busy || !canAdded"><i class="ti ti-sparkles" aria-hidden="true"></i>Sinh đề</button>
-                                            @if (row['has_test_dg']) {
+                                                (click)="sinhDe15pByWeek(row)" [disabled]="busy || !canAdded || !row['has_form_dg'] || row['datuyet_question'] === 0"><i class="ti ti-sparkles" aria-hidden="true"></i>Sinh đề</button>
                                             <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
-                                                (click)="delete15pDeByWeek(row)" [disabled]="busy || !canAdded" aria-label="Xóa toàn bộ đề kiểm tra 15 phút"
+                                                (click)="delete15pDeByWeek(row)" [disabled]="busy || !canAdded || !row['has_test_dg']" aria-label="Xóa toàn bộ đề kiểm tra 15 phút"
                                                 pTooltip="Xóa toàn bộ đề" tooltipPosition="top" appendTo="body"><i class="ti ti-trash" aria-hidden="true"></i></button>
+                                            </div>
+                                            @if (!row['has_form_dg'] || row['datuyet_question'] === 0) {
+                                            <span class="assessment-warning">Chưa đủ form đề hoặc câu hỏi duyệt</span>
                                             }
                                         </div>
-                                        }
                                     </td>
                                     }
                                 </tr>
