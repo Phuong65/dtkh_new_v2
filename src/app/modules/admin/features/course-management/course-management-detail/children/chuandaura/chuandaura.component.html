@@ -69,19 +69,19 @@
                 <ng-template pTemplate="icons">
                     <div class="cdr-card-toolbar">
                         @if (cdr.status === 1) {
-                        <span class="ictu-badge ictu-badge--success cdr-status-badge"><i class="fa fa-check-circle" aria-hidden="true"></i> Đạt</span>
+                        <span class="ictu-badge ictu-badge--success cdr-status-badge">Đạt</span>
                         <span class="ictu-badge ictu-badge--success cdr-status-badge">Duyệt lúc: {{cdr['approved_at'] | ovicDateTime}}</span>
                         }
                         <div class="cdr-card-status">
 @switch (cdr.status) {
                             @case (0) {
-<span class="box-span cho-duyet-box">Chờ duyệt</span>
+<span class="ictu-badge ictu-badge--warning cdr-status-badge">Chờ duyệt</span>
 }
                             @case (-1) {
-<span class="box-span yeu-cau-sua-box">Yêu cầu sửa</span>
+<span class="ictu-badge ictu-badge--danger cdr-status-badge">Yêu cầu sửa</span>
 }
                             @case (-2) {
-<span class="box-span da-sua-box">Đã sửa</span>
+<span class="ictu-badge ictu-badge--primary cdr-status-badge">Đã sửa</span>
 }
                         }
 </div>

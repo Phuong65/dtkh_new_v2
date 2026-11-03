@@ -1,4 +1,4 @@
-.ovic-media-files .call-file-picker {
+.ovic-media-files .call-file-picker:not(.ictu-badge-btn--success-reverse) {
     color: #212529;
     background-color: #f6f6f6;
     border-color: #eeeeee;

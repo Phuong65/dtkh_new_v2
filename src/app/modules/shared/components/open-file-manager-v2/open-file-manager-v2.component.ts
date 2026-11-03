@@ -14,13 +14,14 @@ import { CommonModule } from '@angular/common';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { OvicFileIconPipe } from '../../pipes/ovic-file-icon.pipe';
 import { ViewDocumentComponent } from '../view-document/view-document.component';
+import { MatButtonModule } from '@angular/material/button';
 
 
 @Component({standalone: true, 
     selector: 'open-file-manager-v2',
     templateUrl: './open-file-manager-v2.component.html',
     styleUrls: ['./open-file-manager-v2.component.css'],
-    imports: [CommonModule, NgbTooltipModule, OvicFileIconPipe, ViewDocumentComponent],
+    imports: [CommonModule, NgbTooltipModule, OvicFileIconPipe, ViewDocumentComponent, MatButtonModule],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -51,6 +52,8 @@ export class OpenFileManagerV2Component implements OnInit {
     @Input() tag = '';
 
     @Input() showDelete: boolean = true;
+
+    @Input() useCoreNewButton = false;
 
     @ViewChild('filesLessonReview') filesLessonReview: ElementRef;
 

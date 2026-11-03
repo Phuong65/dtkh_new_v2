@@ -407,7 +407,7 @@
                         </div>
                         <div class="discussion-section__body">
                             <open-file-manager-v2 [filesDefault]="fTl['files'].value" [formField]="fTl['files']"
-                                [showDelete]="canAdded ? true : false" ext="pdf,ppt,pptx">
+                                [showDelete]="canAdded ? true : false" [useCoreNewButton]="true" ext="pdf,ppt,pptx">
                             </open-file-manager-v2>
                         </div>
                     </section>
@@ -490,7 +490,7 @@
                                 </div>
                                 <p class="tailieu-upload-field__hint">Định dạng: PDF, PPT, PPTX</p>
                                 <open-file-manager-v2 [filesDefault]="fT['files'].value" [formField]="fT['files']"
-                                    [showDelete]="canAdded ? true : false" ext="pdf,ppt,pptx">
+                                    [showDelete]="canAdded ? true : false" [useCoreNewButton]="true" ext="pdf,ppt,pptx">
                                 </open-file-manager-v2>
                             </div>
 
@@ -500,7 +500,7 @@
                                 </div>
                                 <p class="tailieu-upload-field__hint">Định dạng: PPT, PPTX, PDF</p>
                                 <open-file-manager-v2 [filesDefault]="fT['slides'].value" [formField]="fT['slides']"
-                                    [showDelete]="canAdded ? true : false" ext="ppt,pptx,pdf">
+                                    [showDelete]="canAdded ? true : false" [useCoreNewButton]="true" ext="ppt,pptx,pdf">
                                 </open-file-manager-v2>
                             </div>
                         </div>
@@ -521,7 +521,7 @@
                                 <p class="tailieu-upload-field__hint">Định dạng: MP4, AVI, MOV</p>
                                 <open-file-manager-v2 [showDelete]="canAdded ? true : false"
                                     [isMultipleMode]="false" ext="mp4,avi,mov" [filesDefault]="fT['video'].value"
-                                    [formField]="fT['video']">
+                                    [formField]="fT['video']" [useCoreNewButton]="true">
                                 </open-file-manager-v2>
                             </div>
                             @if (app_configs.isDttx || keyServer === 'hvu') {

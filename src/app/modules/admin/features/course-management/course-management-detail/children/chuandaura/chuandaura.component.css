@@ -181,6 +181,17 @@
     background: transparent;
 }
 
+:host ::ng-deep .cdr-card app-nhanxet-noidung .nx-shell {
+    margin-top: 12px;
+    padding-top: 16px;
+    border-top: 1px solid var(--cdr-divider);
+    border-radius: 0;
+}
+
+:host ::ng-deep .cdr-card app-nhanxet-noidung .nx-toggle {
+    margin: 0 0 16px 16px;
+}
+
 .cdr-form-shell,
 .cdr-edit-workspace { padding: 0; }
 .cdr-ictu-form {
@@ -540,11 +551,19 @@
 }
 .cdr-card-status { display: flex; align-items: center; }
 .cdr-status-badge {
-    --ictu-badge-font-size: 14px;
-    --ictu-badge-padding: 5px 12px;
-    --ictu-badge-border-radius: 999px;
-    gap: 6px;
-    font-weight: 500;
+    display: inline-flex;
+    min-height: 30px;
+    align-items: center;
+    margin: 0;
+    padding: 4px 12px;
+    border: 1px solid #bbf7d0;
+    border-radius: 6px;
+    color: #166534;
+    background: #f0fdf4;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+    cursor: default;
 }
 .cdr-info-tag {
     display: flex;

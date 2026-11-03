@@ -2,7 +2,7 @@
 title: 'Đồng nhất nút nhận xét và badge trạng thái header Nội dung'
 type: 'bugfix'
 created: '2026-11-03'
-status: 'done'
+status: 'in-review'
 route: 'oneshot'
 review_loop_iteration: 0
 baseline_commit: 'd6f971529552a1946b0aef409971ec428658e975'
