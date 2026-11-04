@@ -163,6 +163,9 @@
         [ngClass]="course_form_duyet[typeTest] && course_form_duyet[typeTest]['status'] === 1?'form-da-duyet':''">
         <div class="form-tracnghiem-panel-content">
             <div class="form-tracnghiem-panel-content-table">
+                <header class="dg-lesson-card-header">
+                    <strong>{{typeTest | showlabel :list_tab:'key':'label'}}</strong>
+                </header>
                 @switch (selectedCourse.av) {
                 @default {
                 <div class="content-table-cauhoi">

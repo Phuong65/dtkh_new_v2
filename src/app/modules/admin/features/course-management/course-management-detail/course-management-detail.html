@@ -14,7 +14,7 @@
 
         <nav class="course-detail-tabs" role="tablist" aria-label="Thanh điều hướng học phần">
             <div class="course-detail-tabs__track">
-                @for (tab of tabs; track tab.id; let i = $index) {
+                @for (tab of visibleTabs(); track tab.id; let i = $index) {
                 <button #tabButton type="button" class="course-detail-tab" role="tab" [id]="'course-tab-' + tab.id"
                     [class.course-detail-tab--active]="activeTabId() === tab.id"
                     [attr.aria-selected]="activeTabId() === tab.id" [attr.aria-controls]="'course-panel-' + tab.id"
@@ -27,6 +27,22 @@
                 }
             </div>
         </nav>
+
+        <div class="course-detail-header__right">
+            <div class="course-detail-mode-switch" role="radiogroup" aria-label="Chế độ quản lý học phần">
+                @for (mode of modes; track mode.id; let i = $index) {
+                <button #modeButton type="button" class="course-detail-mode-btn" role="radio"
+                    [id]="'course-mode-' + mode.id"
+                    [class.course-detail-mode-btn--active]="activeModeId() === mode.id"
+                    [attr.aria-checked]="activeModeId() === mode.id"
+                    [attr.tabindex]="activeModeId() === mode.id ? 0 : -1"
+                    (click)="selectMode(mode.id)" (keydown)="onModeKeydown($event, i)">
+                    <i [class]="mode.icon" aria-hidden="true"></i>
+                    <span>{{ mode.label }}</span>
+                </button>
+                }
+            </div>
+        </div>
     </header>
 
     <main class="course-detail-body" [attr.aria-busy]="state() === 'loading'">
@@ -64,8 +80,8 @@
                 <app-monhoc-formde></app-monhoc-formde>
             </section>
             } @else if (activeTabId() === 'sinh-de') {
-            <section class="course-detail-tab-panel" role="tabpanel" id="course-panel-kiem-tra-danh-gia"
-                aria-labelledby="course-tab-kiem-tra-danh-gia" tabindex="0">
+            <section class="course-detail-tab-panel" role="tabpanel" id="course-panel-sinh-de"
+                aria-labelledby="course-tab-sinh-de" tabindex="0">
                 <app-monhoc-kiemtra-danhgia></app-monhoc-kiemtra-danhgia>
             </section>
             }

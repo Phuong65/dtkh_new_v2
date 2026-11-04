@@ -26,13 +26,13 @@
                     </div>
                 </div>
                 <button type="button" mat-flat-button
-                    class="btn ictu-badge-btn--secondary-reverse cdr-sidebar__close-btn"
+                    class="btn ictu-badge-btn--secondary-reverse ictu-admin-icon-button cdr-sidebar__close-btn"
                     (click)="closeLeftBody()"
                     aria-label="Thu gọn thông tin phân bổ CĐR"
                     [attr.aria-expanded]="!closeLeft"
-                    aria-controls="cdr-sidebar-content">
-                    <i class="ti ti-chevron-left" aria-hidden="true"></i>
-                    <span>Thu gọn</span>
+                    aria-controls="cdr-sidebar-content"
+                    pTooltip="Thu gọn thông tin phân bổ CĐR" tooltipPosition="left" appendTo="body">
+                    <i class="ti ti-chevrons-left" aria-hidden="true"></i>
                 </button>
             </header>
             <div id="cdr-sidebar-content" class="info-course cdr-sidebar__body">
@@ -99,7 +99,7 @@
                     @if (selectedCdr) {
                     <section class="cdr-condition-bottom cdr-sidebar__card cdr-sidebar__card--condition" aria-label="Điều kiện phân bổ câu hỏi">
                         <div class="cdr-sidebar__card-header-line">
-                            <span class="cdr-sidebar__condition-badge-icon" aria-hidden="true"><i class="ti ti-target-arrow"></i></span>
+                            <span class="cdr-sidebar__condition-badge-icon" aria-hidden="true"><i class="ti ti-target"></i></span>
                             <h3 class="cdr-sidebar__card-title mb-0">Điều kiện phân bổ câu hỏi</h3>
                         </div>
                         <div class="cdr-sidebar__condition-target-box">
@@ -128,23 +128,25 @@
         </aside>
 
         @if (closeLeft) {
-        <button type="button" mat-flat-button
-            class="btn ictu-badge-btn--secondary-reverse cdr-sidebar__floating-open-btn"
+        <button type="button"
+            class="cdr-sidebar__open-btn"
             (click)="closeLeftBody()"
             aria-label="Mở thông tin phân bổ CĐR"
             [attr.aria-expanded]="false"
             aria-controls="cdr-sidebar-content"
-            pTooltip="Mở thông tin phân bổ CĐR" tooltipPosition="right">
-            <i class="ti ti-chevron-right" aria-hidden="true"></i>
-            <span>Mở CĐR</span>
+            pTooltip="Mở thông tin phân bổ CĐR" tooltipPosition="right" appendTo="body">
+            <i class="ti ti-chevrons-right" aria-hidden="true"></i>
+            <span class="sr-only">Mở thông tin phân bổ CĐR</span>
         </button>
         }
         <div class="phanbo-cdr-layout-right">
             <section class="admin-wrap-table cdr-question-table-shell" aria-label="Ma trận câu hỏi theo CDR">
                 <header class="admin-wrap-table__head cdr-question-table-shell__head">
-                    <div>
-                        <h2 class="admin-wrap-table__heading">Ma trận câu hỏi/CĐR</h2>
-                        <p class="cdr-question-table-shell__description">Phân bổ số câu hỏi theo từng chuẩn đầu ra.</p>
+                    <div class="cdr-question-table-shell__heading">
+                        <div>
+                            <h2 class="admin-wrap-table__heading">Ma trận câu hỏi/CĐR</h2>
+                            <p class="cdr-question-table-shell__description">Phân bổ số câu hỏi theo từng chuẩn đầu ra.</p>
+                        </div>
                     </div>
                     <div class="cdr-question-table-actions">
                         <button [disabled]="list_cdr_cauhoi && list_cdr_cauhoi.length ? false : true"
