@@ -1086,7 +1086,10 @@ export class MonhocQuestionCdrComponent implements OnInit, AfterViewChecked, OnD
     openAutoCdr() {
         if (this.selectedCourse && this.selectedCourse.params && this.selectedCourse.params.cdr) {
             this.totalCdrCauhoi = null;
-            this.modalService.open(this.autoCdrQuestion, NORMAL_MODAL_OPTIONS);
+            this.modalService.open(this.autoCdrQuestion, {
+                ...NORMAL_MODAL_OPTIONS,
+                windowClass: 'ovic-modal-class cdr-allocation-modal-window'
+            });
         } else {
             this.notificationService.toastWarning("Môn học này chưa được cài đật mức CDR");
         }

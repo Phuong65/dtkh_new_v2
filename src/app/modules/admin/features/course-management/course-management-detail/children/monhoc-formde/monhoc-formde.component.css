@@ -623,15 +623,15 @@
     content: '';
 }
 
-.dg-lesson-card-header strong {
+.form-de-tab-panel--cc .dg-lesson-card-header strong {
     display: inline-flex;
-    min-height: 30px;
     align-items: center;
-    padding: 4px 11px;
-    border: 1px solid #93c5fd;
-    border-radius: 6px;
-    background: #ffffff;
-    color: #1e40af;
+    min-height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #1e3a8a;
     font-size: 14px;
     font-weight: 700;
     letter-spacing: .01em;

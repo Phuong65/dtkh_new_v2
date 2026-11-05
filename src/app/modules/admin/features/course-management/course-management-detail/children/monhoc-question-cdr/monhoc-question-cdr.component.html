@@ -22,7 +22,6 @@
                     <span class="cdr-sidebar__icon" aria-hidden="true"><i class="ti ti-chart-donut"></i></span>
                     <div class="cdr-sidebar__heading">
                         <strong>Thông tin phân bổ CĐR</strong>
-                        <small>Thống kê và điều kiện phân bổ</small>
                     </div>
                 </div>
                 <button type="button" mat-flat-button
@@ -145,17 +144,21 @@
                     <div class="cdr-question-table-shell__heading">
                         <div>
                             <h2 class="admin-wrap-table__heading">Ma trận câu hỏi/CĐR</h2>
-                            <p class="cdr-question-table-shell__description">Phân bổ số câu hỏi theo từng chuẩn đầu ra.</p>
                         </div>
                     </div>
                     <div class="cdr-question-table-actions">
-                        <button [disabled]="list_cdr_cauhoi && list_cdr_cauhoi.length ? false : true"
+                        <button type="button" mat-flat-button
+                            [disabled]="saving() || !list_cdr_cauhoi?.length"
                             ngbTooltip="Phân bổ thêm số lượng câu hỏi" container="body" placement="left"
-                            (click)="openAutoCdr()" class="btn btn-outline-primary btn-icon">
-                            <i class="fa fa-server"></i>
+                            (click)="openAutoCdr()"
+                            class="btn ictu-button-primary-light cdr-toolbar__allocate"
+                            aria-label="Phân bổ thêm số lượng câu hỏi">
+                            <i class="ti ti-server" aria-hidden="true"></i>
                         </button>
-                        <button (click)="saveCdrQuestion()" class="btn btn-primary">
-                            <i class="fa fa-floppy-o"></i>Lưu lại
+                        <button type="button" mat-flat-button [disabled]="saving() || !list_cdr_cauhoi?.length" (click)="saveCdrQuestion()"
+                            class="btn ictu-badge-btn--primary-reverse cdr-toolbar__save">
+                            <i class="ti ti-device-floppy" aria-hidden="true"></i>
+                            <span>Lưu lại</span>
                         </button>
                     </div>
                 </header>
@@ -231,43 +234,47 @@
 }
 
 <ng-template #autoCdrQuestion let-c="close" let-d="dismiss">
-    <div class="ovic-over-right-section">
-        <div class="ovic-over-right-section__head">
-            <h3 class="ovic-over-right-section__header">Bổ sung số lượng câu hỏi:</h3>
-            <button class="btn ovic-over-right-section__close-button" (click)="closeForm(d)"></button>
-        </div>
-        <div class="ovic-over-right-section__body users-layout-form" style="height: auto; font-size: 14px;">
-            <div class="ovic-vertical__inputs form-auto-cdr">
-                <div class="form-row" style="padding: 10px; background-color: #faedc4; border-radius: 6px;">
-                    <div style="line-height: 1.5;">
-                        <p>
-                            - Thầy/Cô nhập tổng số câu hỏi muốn thêm hoặc bổ sung.
-                            <br>
-                            - Hệ thống sẽ tự động phân bổ giúp các thầy cô, các thầy cô có thể sửa theo ý mình.
-                            <br>
-                            - Thầy/Cô lưu lại kết quả để hoàn thành việc phân bổ câu hỏi.
-                        </p>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <label for="name">Nhập vào tổng số câu hỏi dự kiến bổ sung/thêm mới: <span
-                            class="ovic-mark">*</span></label>
-                    <div class="p-inputgroup">
-                        <input style="width: auto; flex:1" #inputTotalQuestion
-                            (keydown)="pointQuestionKeyDown($event,inputTotalQuestion)" [(ngModel)]="totalCdrCauhoi"
-                            type="number" id="name" class="form-control">
-                        <span style="border-radius: 0px; border-left: 0px;" class="p-inputgroup-addon">
-                            {{returnPercent()}} %
-                        </span>
-                    </div>
+    <div class="cdr-allocation-dialog" role="dialog" aria-modal="true" aria-labelledby="cdr-allocation-title">
+        <header class="cdr-allocation-dialog__header">
+            <h3 id="cdr-allocation-title">
+                <i class="ti ti-server" aria-hidden="true"></i>
+                Bổ sung số lượng câu hỏi
+            </h3>
+            <button type="button" mat-flat-button
+                class="btn ictu-badge-btn--secondary-reverse ictu-admin-icon-button cdr-allocation-dialog__close"
+                (click)="closeForm(d)" aria-label="Đóng hộp thoại phân bổ câu hỏi">
+                <i class="ti ti-x" aria-hidden="true"></i>
+            </button>
+        </header>
+        <div class="cdr-allocation-dialog__body ictu-form">
+            <div class="cdr-allocation-dialog__notice" role="note">
+                <i class="ti ti-info-circle" aria-hidden="true"></i>
+                <p>Nhập số câu hỏi cần bổ sung. Hệ thống sẽ tự động phân bổ; bạn có thể chỉnh sửa trước khi lưu kết quả.</p>
+            </div>
+            <div class="ictu-form__row cdr-allocation-dialog__field">
+                <label class="ictu-form__label ictu-form__label--required" for="cdr-allocation-total">
+                    Số câu hỏi cần bổ sung
+                </label>
+                <div class="cdr-allocation-dialog__input-group">
+                    <input #inputTotalQuestion id="cdr-allocation-total" type="number" min="1" step="1"
+                        class="ictu-form__input-field" inputmode="numeric" [(ngModel)]="totalCdrCauhoi"
+                        (keydown)="pointQuestionKeyDown($event,inputTotalQuestion)">
+                    <span class="cdr-allocation-dialog__percent" aria-label="Tỷ lệ so với số câu hỏi hiện có">
+                        {{returnPercent()}}%
+                    </span>
                 </div>
             </div>
         </div>
-        <div class="ovic-over-right-section__foot-wrap-buttons flex-footer-right">
-            <!-- <button (click)="resetPhanbo()" type="button" class="btn btn-warning">Phân bổ lại</button> -->
-            <button (click)="saveAutoSetQuestionCdr(d)" type="button" class="btn btn-primary">
-                Bổ sung
+        <footer class="cdr-allocation-dialog__footer ictu-admin-drawer-footer">
+            <button type="button" mat-flat-button
+                class="btn ictu-badge-btn--secondary-reverse ictu-admin-footer-button" (click)="closeForm(d)">
+                Hủy
             </button>
-        </div>
+            <button type="button" mat-flat-button
+                class="btn ictu-badge-btn--primary-reverse ictu-admin-footer-button"
+                (click)="saveAutoSetQuestionCdr(d)">
+                <i class="ti ti-server" aria-hidden="true"></i>Phân bổ
+            </button>
+        </footer>
     </div>
 </ng-template>
