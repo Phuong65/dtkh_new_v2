@@ -66,6 +66,7 @@ describe('ChuandauraComponent presentation', () => {
 
     it('hiển thị header và nút thêm CPI', () => {
         expect(root.querySelector('.cdr-page-header__title')?.textContent).toContain('Chuẩn đầu ra - CPIs');
+        expect(root.querySelector('.cdr-page-header__icon.fa-list-alt')).not.toBeNull();
         expect(root.querySelector('.cdr-page-header__eyebrow')).toBeNull();
         expect(root.querySelector('.cdr-guidance')).toBeNull();
         expect(root.querySelector('.cdr-list-overview')).toBeNull();

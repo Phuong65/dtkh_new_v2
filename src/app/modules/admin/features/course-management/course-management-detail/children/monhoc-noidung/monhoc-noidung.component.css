@@ -129,6 +129,7 @@
 .course-content-shell .button-close-left-body:focus-visible { outline: 2px solid var(--content-primary); outline-offset: 2px; }
 .course-outline-header {
     flex: 0 0 auto;
+    min-height: 60px;
     padding: 14px 16px;
     border-bottom: 1px solid #bfdbfe;
     background: #ffffff;
@@ -205,6 +206,18 @@
     min-width: 0;
     box-sizing: border-box;
 }
+.lesson-content-right-monhoc-v2.lesson-content-right--tabbed { padding: 0; }
+.course-content-workspace { width: 100%; min-width: 0; }
+.course-content-subtabs { width: 100%; overflow: hidden; border-bottom: 1px solid var(--content-divider); border-radius: 0; background: var(--content-surface); }
+.course-content-subtabs__track { display: flex; width: 70%; margin: 0 auto; overflow-x: auto; scrollbar-width: thin; }
+.course-content-subtab { display: inline-flex; min-width: max-content; min-height: 60px; flex: 1 1 0; align-items: center; justify-content: center; gap: 8px; padding: 10px 24px; border: 0; border-bottom: 3px solid transparent; background: transparent; color: var(--content-muted); font: inherit; font-weight: 500; white-space: nowrap; cursor: pointer; transition: background-color var(--content-transition), color var(--content-transition), border-color var(--content-transition); }
+.course-content-subtab i { color: currentColor; font-size: 16px; }
+.course-content-subtab:not(.course-content-subtab--active):hover { background: var(--content-selected); color: var(--content-primary-hover); }
+.course-content-subtab--active { border-bottom-color: var(--content-primary); color: var(--content-primary-hover); font-weight: 600; }
+.course-content-subtab:focus-visible { outline: 2px solid var(--content-primary); outline-offset: -3px; }
+.course-content-subpanel { min-width: 0; padding: 16px 24px 24px; }
+.course-content-subpanel[hidden] { display: none; }
+.course-content-subpanel > .layout-panel { margin-bottom: 0; }
 .layout-panel { min-width: 0; margin-bottom: 20px; scroll-margin-top: 16px; }
 .course-big-card,
 .muctieu-layout,
@@ -605,6 +618,7 @@
 .lesson-content-right-monhoc-v2::-webkit-scrollbar-track { background: var(--content-subtle); }
 
 @media (max-width: 960px) {
+    .course-content-subtabs__track { width: 100%; }
     .lesson-baihocv2 { flex-direction: column; }
     .menu-lesson-baihocv2 { width: 100%; flex: 0 0 min(36vh, 300px); border-right: 0; border-bottom: 1px solid var(--content-divider); }
     .close-left-body .menu-lesson-baihocv2 { width: 100%; flex-basis: 0; border-bottom: 0; }
@@ -619,6 +633,8 @@
     }
     .course-outline-header { padding-right: 16px; }
     .lesson-content-right-monhoc-v2 { width: 100%; height: auto; padding: 0 16px 16px; }
+    .lesson-content-right-monhoc-v2.lesson-content-right--tabbed { padding: 0; }
+    .lesson-content-right--tabbed .course-content-subtabs { margin: 0; }
     .muctieu-primary-fields { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
     .course-outline-header-button.mdc-button { width: 36px; min-width: 36px; height: 36px; }
     .outline-icon-button.ictu-admin-icon-button { min-width: 40px; min-height: 40px; }
@@ -626,6 +642,9 @@
 
 @media (max-width: 640px) {
     .lesson-content-right-monhoc-v2 { padding: 16px 12px 12px; }
+    .lesson-content-right-monhoc-v2.lesson-content-right--tabbed { padding: 0; }
+    .lesson-content-right--tabbed .course-content-subtabs { margin: 0; }
+    .course-content-subtab { padding-inline: 12px; }
     .course-outline-header { padding: 12px; }
     .muctieu-workspace,
     .tailieu-workspace,
@@ -658,5 +677,6 @@
 @media (prefers-reduced-motion: reduce) {
     .menu-lesson-baihocv2,
     .course-content-shell button,
-    .course-content-modal button { transition: none; }
+    .course-content-modal button,
+    .course-content-subtab { transition: none; }
 }

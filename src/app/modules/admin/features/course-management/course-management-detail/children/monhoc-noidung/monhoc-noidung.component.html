@@ -106,35 +106,63 @@
             </nav>
         </aside>
 
-        <main class="lesson-content-right-monhoc-v2 content-form-lesson-right-top">
+        <main class="lesson-content-right-monhoc-v2 content-form-lesson-right-top"
+            [class.lesson-content-right--tabbed]="selectPlan && selectedCourse && selectPlan.week < 1000">
 
             @if (selectPlan && selectedCourse && selectPlan.week < 1000) {
-<div>
-                @for (plan of selectPlan.children; track plan) {
-<div>
-                    <div>
-@switch (plan.type) {
-                        @case ('MUCTIEU') {
-<ng-container [ngTemplateOutlet]="templateMuctieu"
+            <div class="course-content-workspace">
+                <nav class="course-content-subtabs" aria-label="Các phần nội dung bài học">
+                    <div class="course-content-subtabs__track" role="tablist" aria-label="Nội dung bài học">
+                        @for (tab of noiDungSubTabs; track tab.id; let i = $index) {
+                        <button #noiDungSubTabButton type="button" class="course-content-subtab" role="tab"
+                            [id]="'course-content-tab-' + tab.id"
+                            [class.course-content-subtab--active]="activeNoiDungSubTabId === tab.id"
+                            [attr.aria-selected]="activeNoiDungSubTabId === tab.id"
+                            [attr.aria-controls]="'course-content-panel-' + tab.id"
+                            [attr.tabindex]="activeNoiDungSubTabId === tab.id ? 0 : -1"
+                            (click)="selectNoiDungSubTab(tab.id)"
+                            (keydown)="onNoiDungSubTabKeydown($event, i)">
+                            <i [class]="tab.icon" aria-hidden="true"></i>
+                            <span>{{ tab.label }}</span>
+                        </button>
+                        }
+                    </div>
+                </nav>
+
+                <section class="course-content-subpanel" role="tabpanel" id="course-content-panel-muc-tieu"
+                    aria-labelledby="course-content-tab-muc-tieu" [hidden]="activeNoiDungSubTabId !== 'muc-tieu'" tabindex="0">
+                    @for (plan of selectPlan.children; track plan) {
+                        @if (plan.type === 'MUCTIEU') {
+                        <ng-container [ngTemplateOutlet]="templateMuctieu"
                             [ngTemplateOutletContext]="{ muctieuPlan: plan}">
                         </ng-container>
-}
-                        @case ('CDR') {
-<section class="layout-panel cdr-layout course-big-card" #cpisElm aria-label="Chuẩn đầu ra / CPIs">
+                        }
+                    }
+                </section>
+
+                <section class="course-content-subpanel" role="tabpanel" id="course-content-panel-cpis"
+                    aria-labelledby="course-content-tab-cpis" [hidden]="activeNoiDungSubTabId !== 'cpis'" tabindex="0">
+                    @for (plan of selectPlan.children; track plan) {
+                        @if (plan.type === 'CDR') {
+                        <section class="layout-panel cdr-layout course-big-card" aria-label="Chuẩn đầu ra / CPIs">
                             <app-chuandaura class="course-content-cpi" [canAdded]="canAdded" [coursePlanActivities]="selectPlan"
                                 [courses]="selectedCourse" (onBusy)="onChildBusy($event)">
                             </app-chuandaura>
                         </section>
-}
-                        @case ('ACTIVITY') {
-<ng-container [ngTemplateOutlet]="templateTailieu"
+                        }
+                    }
+                </section>
+
+                <section class="course-content-subpanel" role="tabpanel" id="course-content-panel-tai-lieu"
+                    aria-labelledby="course-content-tab-tai-lieu" [hidden]="activeNoiDungSubTabId !== 'tai-lieu'" tabindex="0">
+                    @for (plan of selectPlan.children; track plan) {
+                        @if (plan.type === 'ACTIVITY') {
+                        <ng-container [ngTemplateOutlet]="templateTailieu"
                             [ngTemplateOutletContext]="{ tailieuPlan: plan}">
                         </ng-container>
-}
+                        }
                     }
-</div>
-                </div>
-}
+                </section>
             </div>
 } @else {
 

@@ -2,7 +2,7 @@ import { ClassesService } from '@shared/services/classes.service';
 import { CourseCloService } from '@modules/shared/services/course-clo.service';
 import { CoursePlanCommentService } from '@modules/shared/services/course-plan-comment.service';
 import { CoursePlanActivitiesService } from '@modules/shared/services/course-plan-activities.service';
-import { AfterViewChecked, AfterViewInit, Component, DestroyRef, ElementRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, OnInit, ViewChild, computed, inject, signal, viewChildren } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { CHUAN_DAU_RA, ROLES, ROUTERS } from '@modules/shared/utils/syscat';
@@ -48,6 +48,14 @@ import { OvicCkeditorDocumentComponent } from '@modules/shared/components/ovic-c
 import { OvicDateTimePipe } from '@modules/shared/pipes/ovic-date-time.pipe';
 import { ShowLabelData } from '@modules/shared/pipes/show-label-data.pipe';
 
+type NoiDungSubTabId = 'muc-tieu' | 'cpis' | 'tai-lieu';
+
+interface NoiDungSubTab {
+    id: NoiDungSubTabId;
+    label: string;
+    icon: string;
+}
+
 @Component({
     selector: 'app-monhoc-noidung',
     standalone: true,
@@ -78,7 +86,7 @@ import { ShowLabelData } from '@modules/shared/pipes/show-label-data.pipe';
     templateUrl: './monhoc-noidung.component.html',
     styleUrls: ['./monhoc-noidung.component.css']
 })
-export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterViewInit {
+export class MonhocNoidungComponent implements OnInit {
     private readonly destroyRef = inject(DestroyRef);
     private auth = inject(AuthService);
     private notificationService = inject(NotificationService);
@@ -99,12 +107,6 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
     @ViewChild(ChuandauraComponent) chuandauraComponent: ChuandauraComponent;
 
     @ViewChild('formAddBaigiang') formAddBaigiang: ElementRef;
-
-    @ViewChild('muctieuElm') muctieuElm!: ElementRef;
-
-    @ViewChild('cpisElm') cpisElm!: ElementRef;
-
-    @ViewChild('tailieuElm') tailieuElm!: ElementRef;
 
     @ViewChild('appNhanxetMuctieu') appNhanxetMuctieu: NhanxetNoidungComponent;
 
@@ -163,8 +165,6 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
 
     activeIndex: number = 0;
 
-    keyScroll: string = null;
-
     selectedPlanActivity: CoursePlanActivities;
 
     formTailieu: FormGroup;
@@ -189,6 +189,35 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
     progressDialogOpened = false;
     displayComment: boolean = false;
     activeMuctieuTab: 'kienthuc' | 'kynang' = 'kienthuc';
+    readonly noiDungSubTabs: readonly NoiDungSubTab[] = [
+        { id: 'muc-tieu', label: 'Mục tiêu bài học', icon: 'fa fa-bullseye' },
+        { id: 'cpis', label: 'Chuẩn đầu ra/CPIs', icon: 'fa fa-list-alt' },
+        { id: 'tai-lieu', label: 'Tài liệu giảng dạy', icon: 'fa fa-folder-open' }
+    ];
+    readonly noiDungSubTabButtons = viewChildren<ElementRef<HTMLButtonElement>>('noiDungSubTabButton');
+    activeNoiDungSubTabId: NoiDungSubTabId = 'muc-tieu';
+
+    selectNoiDungSubTab(tabId: NoiDungSubTabId): void {
+        this.activeNoiDungSubTabId = tabId;
+        if (this.selectPlan?.week < 1000) {
+            const activityType = tabId === 'muc-tieu' ? 'MUCTIEU' : tabId === 'cpis' ? 'CDR' : 'ACTIVITY';
+            this.selectedPlanActivity = this.selectPlan.children?.find(child => child.type === activityType);
+        }
+    }
+
+    onNoiDungSubTabKeydown(event: KeyboardEvent, index: number): void {
+        let targetIndex: number | null = null;
+        switch (event.key) {
+            case 'ArrowRight': targetIndex = (index + 1) % this.noiDungSubTabs.length; break;
+            case 'ArrowLeft': targetIndex = (index - 1 + this.noiDungSubTabs.length) % this.noiDungSubTabs.length; break;
+            case 'Home': targetIndex = 0; break;
+            case 'End': targetIndex = this.noiDungSubTabs.length - 1; break;
+            default: return;
+        }
+        event.preventDefault();
+        this.selectNoiDungSubTab(this.noiDungSubTabs[targetIndex].id);
+        this.noiDungSubTabButtons()[targetIndex]?.nativeElement.focus();
+    }
 
     selectMuctieuTab(tab: 'kienthuc' | 'kynang'): void {
         this.activeMuctieuTab = tab;
@@ -546,22 +575,6 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
         }
     }
 
-    ngAfterViewChecked() {
-        if (this.keyScroll) {
-            setTimeout(() => {
-                this.scroll(this.keyScroll);
-                this.keyScroll = null;
-            }, 300)
-        }
-    }
-
-    ngAfterViewInit() {
-
-    }
-
-
-
-
     loadPlan() {
         this.beginBusy('Đang cập nhật nội dung học phần...');
         const condition_plan: ConditionOption = {
@@ -746,12 +759,12 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
                             c['icon'] = 'fa fa-book';
                             break;
                         case 'ACTIVITY':
-                            c['keyScroll'] = "tailieu";
-                            c['icon'] = c['video'] && Object.keys(c['video']).length ? 'fa fa-file-video-o' : 'fa fa-file-text-o';
+                            c['keyScroll'] = 'tailieu';
+                            c['icon'] = 'fa fa-folder-open';
                             break;
                         case 'MUCTIEU':
-                            c['keyScroll'] = "muctieu";
-                            c['icon'] = c['video'] && Object.keys(c['video']).length ? 'fa fa-file-video-o' : 'fa fa-file-text-o';
+                            c['keyScroll'] = 'muctieu';
+                            c['icon'] = 'fa fa-bullseye';
                             break;
                         default:
                             break;
@@ -849,12 +862,18 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
     }
 
     onChangePlan(plan: CoursePlanActivities, name: string, children?: CoursePlanActivities) {
+        if (plan === this.selectPlan && plan.week < 1000) {
+            this.selectedPlanActivity = children;
+            this.scroll(name);
+            return;
+        }
+
         this.selectPlan = plan;
         this.selectedPlanActivity = children;
-        this.keyScroll = name;
         this.activeMuctieuTab = 'kienthuc';
         this.planMuctieu = null;
         this.planTailieu = null;
+        this.scroll(name);
         if (plan.week < 1000) {
             this.resetForm();
             if (Array.isArray(plan.children)) {
@@ -999,30 +1018,12 @@ export class MonhocNoidungComponent implements OnInit, AfterViewChecked, AfterVi
         this.chuandauraComponent.onOpenAddCdr();
     }
     scroll(name: string) {
-        switch (name) {
-            case 'muctieu':
-                if (this.muctieuElm)
-                    this.muctieuElm.nativeElement.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                break;
-            case 'cpis':
-                if (this.cpisElm)
-                    this.cpisElm.nativeElement.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                break;
-            case 'tailieu':
-                if (this.tailieuElm)
-                    this.tailieuElm.nativeElement.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                break;
-            default:
-                break;
+        if (name === 'tailieu') {
+            this.activeNoiDungSubTabId = 'tai-lieu';
+        } else if (name === 'cpis') {
+            this.activeNoiDungSubTabId = 'cpis';
+        } else {
+            this.activeNoiDungSubTabId = 'muc-tieu';
         }
     }
 

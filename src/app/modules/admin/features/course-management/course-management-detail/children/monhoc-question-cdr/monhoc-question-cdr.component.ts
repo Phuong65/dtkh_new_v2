@@ -268,7 +268,8 @@ export class MonhocQuestionCdrComponent implements OnInit, AfterViewChecked, OnD
                         { conditionName: 'id', condition: OvicQueryCondition.equal, value: course_id.toString(), orWhere: 'and' },
                     ],
                     set: [
-                        { label: 'limit', value: '1' }
+                        { label: 'limit', value: '1' },
+                        { label: 'cursor', value: '0' }
                     ],
                     page: null
                 }
@@ -282,7 +283,8 @@ export class MonhocQuestionCdrComponent implements OnInit, AfterViewChecked, OnD
                         { conditionName: 'user_id', condition: OvicQueryCondition.equal, value: this.userId.toString(), orWhere: 'and' }
                     ],
                     set: [
-                        { label: 'limit', value: '1' }
+                        { label: 'limit', value: '1' },
+                        { label: 'cursor', value: '0' }
                     ],
                     page: null
                 }
@@ -297,12 +299,12 @@ export class MonhocQuestionCdrComponent implements OnInit, AfterViewChecked, OnD
                             return;
                         }
 
-                        if (_course.recordsFiltered) {
+                        if (_course.data?.length) {
 
                             this.selectedCourse = _course.data[0];
 
                             if (this.routerLanhdaokhoa) {
-                                if (_user_profile.recordsFiltered === 0 || this.selectedCourse.category_ids !== _user_profile.data[0].donvi_chuyenmon_id) {
+                                if (!_user_profile.data?.length || this.selectedCourse.category_ids !== _user_profile.data[0].donvi_chuyenmon_id) {
 
                                     this.errorMessage.set('Không tìm thấy môn học');
                                     this.state.set('error');
@@ -313,7 +315,7 @@ export class MonhocQuestionCdrComponent implements OnInit, AfterViewChecked, OnD
                             }
 
                             if (this.routerLanhdaobomon) {
-                                if (_user_profile.recordsFiltered === 0 || this.selectedCourse.nganh_bomon_id !== _user_profile.data[0].bomon_id) {
+                                if (!_user_profile.data?.length || this.selectedCourse.nganh_bomon_id !== _user_profile.data[0].bomon_id) {
 
                                     this.errorMessage.set('Không tìm thấy môn học');
                                     this.state.set('error');
@@ -384,6 +386,7 @@ export class MonhocQuestionCdrComponent implements OnInit, AfterViewChecked, OnD
             ],
             set: [
                 { label: 'limit', value: '-1' },
+                { label: 'cursor', value: '0' },
                 { label: 'include', value: 'ACTIVITY_CDR,PLAN' },
                 { label: 'include_by', value: 'type' },
                 { label: 'orderby', value: 'week' },
@@ -411,6 +414,7 @@ export class MonhocQuestionCdrComponent implements OnInit, AfterViewChecked, OnD
             ],
             set: [
                 { label: 'limit', value: '-1' },
+                { label: 'cursor', value: '0' },
                 { label: 'select', value: 'week,group_id,cdr,reference_id,id' }
             ],
             page: null
@@ -438,6 +442,7 @@ export class MonhocQuestionCdrComponent implements OnInit, AfterViewChecked, OnD
                         ],
                         set: [
                             { label: 'limit', value: '-1' },
+                            { label: 'cursor', value: '0' },
                             { label: 'include', value: ids.toString() },
                             { label: 'include_by', value: 'group_id' },
                             { label: 'select', value: 'week,group_id,cdr,reference_id,id' }
@@ -447,7 +452,7 @@ export class MonhocQuestionCdrComponent implements OnInit, AfterViewChecked, OnD
 
                     return this.courseQuestionsService.getCourseQuestionsByPageNew(condition_question_child).pipe(mergeMap(_child_question => {
                         _question.data = _question.data.concat(_child_question.data);
-                        _question.recordsFiltered = _question.recordsFiltered + _child_question.recordsFiltered;
+                        _question.recordsFiltered = _question.data.length;
                         return of(_question);
                     }))
                 }

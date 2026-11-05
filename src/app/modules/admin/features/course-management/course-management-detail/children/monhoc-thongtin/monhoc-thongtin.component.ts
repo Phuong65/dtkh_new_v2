@@ -1,4 +1,5 @@
 import { CtdtHocphanService } from '@shared/services/ctdt-hocphan.service';
+import { ElngUserProfile } from '@modules/shared/models/elng-user-profile';
 import { CtdtConfigService } from '@modules/shared/services/ctdt-config.service';
 import { CtdtService } from '@modules/shared/services/ctdt.service';
 import { DonViService } from '@modules/shared/services/don-vi.service';
@@ -13,12 +14,14 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SharedModule } from '@modules/shared/shared.module';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { User } from '@core/models/user';
+import { UserService } from '@core/services/user.service';
 import { ConditionOption } from '@modules/shared/models/condition-option';
 import { OvicQueryCondition } from '@core/models/dto';
 import { ElnKhoaHoc, EXAMFORMAT } from '@modules/shared/models/elng-khoa-hoc';
 import { AuthService } from '@core/services/auth.service';
 import { CHUAN_DAU_RA, DINHDANG_BAITRACNGHIEM, ROLES, ROUTERS, THUONGXUYEN_TEST_TYPE } from '@modules/shared/utils/syscat';
-import { firstValueFrom, forkJoin, Observable, distinctUntilChanged, map } from 'rxjs';
+import { firstValueFrom, forkJoin, Observable, catchError, distinctUntilChanged, map, of } from 'rxjs';
 import { ElnChuyenMuc } from '@modules/shared/models/Elng';
 import { DonVi } from '@modules/shared/models/don-vi';
 import { ElnChuyenMucService } from '@modules/shared/services/elearning-chuyen-muc.service';
@@ -46,6 +49,12 @@ interface ItemGroupExTend extends SelectItemGroup {
     hp_tienquyet?: number[];
     hp_songhanh?: number[];
 }
+
+interface QuickInfoProgram {
+    name: string;
+    knowledgeBlock: string;
+}
+
 @Component({
     selector: 'app-monhoc-thongtin',
     standalone: true,
@@ -72,6 +81,7 @@ export class MonhocThongtinComponent implements OnInit {
     private readonly destroyRef = inject(DestroyRef);
     private elnKhoaHocService = inject(ElnKhoaHocService);
     private auth = inject(AuthService);
+    private userService = inject(UserService);
     private elngUserProfileService = inject(ElngUserProfileService);
     private router = inject(Router);
     private notificationService = inject(NotificationService);
@@ -115,6 +125,16 @@ export class MonhocThongtinComponent implements OnInit {
 
     list_donvi_chuyenmon: DonVi[];
 
+    listGiangvien: (User & { showName: string })[] = [];
+
+    get canAssignTeacher(): boolean {
+        return this.isLanhDaoKhoa
+            || this.auth.userHasRole(ROLES.troly_pdt)
+            || this.auth.userHasRole(ROLES.chuyenvien_pdt)
+            || this.auth.userHasRole(ROLES.daotao_new)
+            || this.auth.userHasRole(ROLES.daotao_cv_1);
+    }
+
     slugIsValid: boolean = true;
 
     donvi_chuyenmon_id: number;
@@ -136,6 +156,11 @@ export class MonhocThongtinComponent implements OnInit {
     selectCtdts: ItemGroupExTend[] = [];
 
     selectedCtdtsId: number[] = [];
+
+    quickInfoPrograms: QuickInfoProgram[] = [];
+
+    quickInfoTeacher: User | null = null;
+
 
     activeDescTab: 'desc' | 'yeucau' = 'desc';
 
@@ -189,6 +214,7 @@ export class MonhocThongtinComponent implements OnInit {
                 kiemtra_dinhky: [''],
                 tuhoc: [''],
                 av: [''],
+                creator_plan_id: [''],
             }
         );
     }
@@ -196,6 +222,56 @@ export class MonhocThongtinComponent implements OnInit {
     get f() {
         return this.formKhoaHoc.controls;
     }
+
+    get quickInfoDepartment(): string {
+        const department = this.list_nganh_bomon?.find(item => item.id === this.selectedCourse?.nganh_bomon_id);
+        if (department?.title) return department.title;
+        return this.list_donvi_chuyenmon?.find(item => item.id === this.selectedCourse?.category_ids)?.title || '—';
+    }
+
+    get quickInfoCtdtNames(): string {
+        return this.quickInfoPrograms.length ? this.quickInfoPrograms.map(item => item.name).join(', ') : '—';
+    }
+
+    get quickInfoTeacherName(): string {
+        const selectedId = this.f['creator_plan_id'].value;
+        const teacher = this.listGiangvien.find(item => String(item.id) === String(selectedId))
+            || (String(this.quickInfoTeacher?.id) === String(selectedId) ? this.quickInfoTeacher : null);
+        return teacher?.display_name
+            || (String(this.selectedCourse?.creator_plan_id) === String(selectedId) ? this.selectedCourse?.creator_name : null)
+            || '—';
+    }
+
+    get quickInfoTeacherEmail(): string {
+        const selectedId = this.f['creator_plan_id'].value;
+        const teacher = this.listGiangvien.find(item => String(item.id) === String(selectedId))
+            || (String(this.quickInfoTeacher?.id) === String(selectedId) ? this.quickInfoTeacher : null);
+        return teacher?.email || '—';
+    }
+
+    private displayQuickValue(value: unknown, fallback = '—'): string {
+        if (value === null || value === undefined || String(value).trim() === '') return fallback;
+        return String(value);
+    }
+
+    private updateQuickInfoPrograms(): void {
+        this.quickInfoPrograms = this.selectCtdts.map(item => ({
+            name: this.displayQuickValue(item.label),
+            knowledgeBlock: item.items?.find(option => option.value === item.select_item)?.label || 'Chưa phân khối'
+        }));
+    }
+
+    private async loadQuickInfoTeacher(): Promise<void> {
+        if (this.quickInfoTeacher || !this.selectedCourse?.creator_plan_id) return;
+        try {
+            this.quickInfoTeacher = await firstValueFrom(
+                this.userService.getUser(this.selectedCourse.creator_plan_id, 'id,display_name,email,donvi_id')
+            );
+        } catch {
+            // The summary can fall back to the course creator name.
+        }
+    }
+
 
     ngOnInit(): void {
         this.activatedRoute.queryParamMap.pipe(
@@ -220,10 +296,12 @@ export class MonhocThongtinComponent implements OnInit {
     private loadCourse(course_id: string): void {
         this.state.set('loading');
         this.errorMessage.set('');
+        this.quickInfoPrograms = [];
+        this.quickInfoTeacher = null;
 
         const contition_course: ConditionOption = {
             condition: [{ conditionName: 'id', condition: OvicQueryCondition.equal, value: course_id, orWhere: 'and' }],
-            set: [{ label: 'limit', value: '1' }],
+            set: [{ label: 'limit', value: '1' }, { label: 'with', value: 'creatorPlan' }],
             page: null
         };
         if (this.routerGiangvien) {
@@ -249,6 +327,15 @@ export class MonhocThongtinComponent implements OnInit {
             set: [{ label: 'limit', value: '-1' }], page: null
         };
         const condition_ctdt: ConditionOption = { condition: [], set: [{ label: 'limit', value: '-1' }], page: null };
+        const condition_teacher: ConditionOption = {
+            condition: [{ conditionName: 'teacher', condition: OvicQueryCondition.equal, value: '1', orWhere: 'and' }],
+            set: [
+                { label: 'limit', value: '-1' },
+                { label: 'select', value: 'user_id' },
+                { label: 'with', value: 'user' }
+            ],
+            page: null
+        };
         const condition_ctdt_khoi_kienthuc: ConditionOption = {
             condition: [{ conditionName: 'GROUP', condition: OvicQueryCondition.equal, value: 'KHOI_KIEN_THUC', orWhere: 'and' }],
             set: [{ label: 'limit', value: '-1' }], page: null
@@ -260,9 +347,12 @@ export class MonhocThongtinComponent implements OnInit {
             this.donViService.getDonviByPageNew(condition_donvi),
             this.elnChuyenMucService.getChuyemucByPageNew(condition_nganh),
             this.ctdtService.getCtdtByPageNew(condition_ctdt),
-            this.ctdtConfigService.getCtdtConfigByPageNew(condition_ctdt_khoi_kienthuc)
+            this.ctdtConfigService.getCtdtConfigByPageNew(condition_ctdt_khoi_kienthuc),
+            this.elngUserProfileService.getUserProfileByPageNewV2(condition_teacher).pipe(
+                catchError(() => of({ data: [], recordsFiltered: 0 }))
+            )
         ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-            next: async ([_course, _user_profile, _donvi, _nganh, _ctdt, _ctdt_khoi_kienthuc]) => {
+            next: async ([_course, _user_profile, _donvi, _nganh, _ctdt, _ctdt_khoi_kienthuc, _teachers]) => {
                 if (!_course.recordsFiltered) {
                     this.state.set('error');
                     this.errorMessage.set('Không tìm thấy học phần.');
@@ -270,6 +360,8 @@ export class MonhocThongtinComponent implements OnInit {
                 }
 
                 this.selectedCourse = _course.data[0];
+                this.quickInfoTeacher = this.selectedCourse.creatorPlan || null;
+                await this.loadQuickInfoTeacher();
                 if (this.routerLanhdaokhoa && (_user_profile.recordsFiltered === 0 || this.selectedCourse.category_ids !== _user_profile.data[0].donvi_chuyenmon_id)) {
                     this.router.navigate(['/admin/content-none']);
                     return;
@@ -281,6 +373,13 @@ export class MonhocThongtinComponent implements OnInit {
 
                 this.list_nganh_bomon = _nganh.data;
                 this.list_donvi_chuyenmon = _donvi.data;
+                this.listGiangvien = (_teachers.data || []).filter((profile: ElngUserProfile) => profile.user).map((profile: ElngUserProfile) => {
+                    const teacher = profile.user as User;
+                    return { ...teacher, showName: `${teacher.display_name} - ${teacher.email || '—'}` };
+                });
+                if (this.quickInfoTeacher && !this.listGiangvien.some(teacher => teacher.id === this.quickInfoTeacher.id)) {
+                    this.listGiangvien = [{ ...this.quickInfoTeacher, showName: `${this.quickInfoTeacher.display_name} - ${this.quickInfoTeacher.email || '—'}` }, ...this.listGiangvien];
+                }
                 const khungTrinhDo = this.auth.getSysConfigParams('KHOI_KIEN_THUC');
                 this.group_ctdt = _ctdt.data.map(ctdt => {
                     const child = _ctdt_khoi_kienthuc.data.filter(item => item.ctdt_id === ctdt.id);
@@ -359,6 +458,7 @@ export class MonhocThongtinComponent implements OnInit {
             })
             this.selectedCtdtsId = select_ctdt_ids;
             this.selectCtdts = data_ctdt_select;
+            this.updateQuickInfoPrograms();
             this.resetForm();
             this.f['title'].setValue(this.selectedCourse.title);
             this.f['slug'].setValue(this.selectedCourse.slug);
@@ -380,6 +480,7 @@ export class MonhocThongtinComponent implements OnInit {
             this.f['nganh_bomon_id'].setValue(this.selectedCourse.nganh_bomon_id);
             this.f['av'].setValue(this.selectedCourse.av);
             this.f['yeucau_sinhvien'].setValue(this.selectedCourse.yeucau_sinhvien);
+            this.f['creator_plan_id'].setValue(this.selectedCourse.creator_plan_id || null);
             if (this.selectedCourse.params) {
                 this.f['sotinchi'].setValue(this.selectedCourse.params.sotinchi);
                 this.f['exam_format'].setValue(this.selectedCourse.params.exam_format);
@@ -482,6 +583,7 @@ export class MonhocThongtinComponent implements OnInit {
 
 
                 const data = { ...this.formKhoaHoc.getRawValue() };
+                if (!this.canAssignTeacher) delete data['creator_plan_id'];
 
                 data['maso'] = data['maso'] ? data['maso'].trim() : data['maso'];
 
@@ -528,6 +630,12 @@ export class MonhocThongtinComponent implements OnInit {
 
                 this.elnKhoaHocService.updateElnKhoaHoc(this.selectedCourse.id, data).subscribe({
                     next: () => {
+                        if (this.canAssignTeacher) {
+                            const creatorPlanId = this.f['creator_plan_id'].value || null;
+                            this.selectedCourse.creator_plan_id = creatorPlanId;
+                            this.quickInfoTeacher = this.listGiangvien.find(teacher => String(teacher.id) === String(creatorPlanId)) || null;
+                            this.selectedCourse.creator_name = this.quickInfoTeacher?.display_name || '';
+                        }
                         this.notificationService.toastSuccess('Sửa thông tin thành công');
                         this.isSaving.set(false);
                     },
@@ -877,5 +985,6 @@ export class MonhocThongtinComponent implements OnInit {
         } else {
             this.selectCtdts = [];
         }
+        this.updateQuickInfoPrograms();
     }
 }

@@ -225,11 +225,23 @@
     gap: 16px;
 }
 
-.mh-field input.admin-wrap-table__input {
+.mh-field input.admin-wrap-table__input,
+.mh-field ovic-dropdown {
+    display: block;
     width: 100%;
+    min-width: 0;
+}
+
+.mh-field input.admin-wrap-table__input {
     height: 42px !important;
     border-color: var(--mh-border) !important;
     color: var(--mh-text) !important;
+}
+
+.mh-field ovic-dropdown ::ng-deep .ovic-input-line-dropdown,
+.mh-field ovic-dropdown ::ng-deep .p-select {
+    width: 100%;
+    min-height: 42px;
 }
 
 .mh-field input.admin-wrap-table__input:hover:not(:disabled) {
@@ -489,13 +501,14 @@
 }
 
 .mh-overview > div {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 12px;
+    display: grid;
+    grid-template-columns: minmax(0, 42%) minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
     padding-bottom: 8px;
     border-bottom: 1px dashed var(--mh-border-light);
     font-size: 12.5px;
+    line-height: 1.45;
 }
 
 .mh-overview > div:last-child {
@@ -508,12 +521,31 @@
 }
 
 .mh-overview dd {
+    min-width: 0;
     margin: 0;
     color: var(--mh-ink);
     font-weight: 600;
-    text-align: right;
+    text-align: left;
     overflow-wrap: anywhere;
 }
+
+.mh-overview__multi dd {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-weight: 500;
+}
+
+.mh-overview__multi dd strong { color: var(--mh-text); font-weight: 700; }
+
+.mh-overview__teacher dd {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.mh-overview__teacher dd strong { color: var(--mh-ink); }
+.mh-overview__teacher dd small { color: var(--mh-muted); font-size: 12px; font-weight: 400; overflow-wrap: anywhere; }
 
 .mh-error {
     display: flex;

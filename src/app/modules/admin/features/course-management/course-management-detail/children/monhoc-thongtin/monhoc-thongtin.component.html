@@ -94,6 +94,18 @@
                                         [defaultValue]="f['nganh_bomon_id'].value" optionId="id" optionLabel="title"
                                         [formField]="f['nganh_bomon_id']" [filter]="true" filterBy="title"></ovic-dropdown>
                                 </div>
+                                <div class="mh-field mh-field--wide" role="group" aria-labelledby="teacher-label">
+                                    <span id="teacher-label" class="mh-field__label">Giảng viên phụ trách</span>
+                                    <ovic-dropdown [disabled]="!canAssignTeacher || isSaving()"
+                                        [attr.aria-describedby]="canAssignTeacher ? null : 'teacher-permission-help'"
+                                        placeholder="Chọn giảng viên phụ trách" [options]="listGiangvien"
+                                        [defaultValue]="f['creator_plan_id'].value" optionId="id" optionLabel="display_name"
+                                        [formField]="f['creator_plan_id']" [filter]="true" filterBy="showName"
+                                        [showClear]="true"></ovic-dropdown>
+                                    @if (!canAssignTeacher) {
+                                    <small id="teacher-permission-help" class="mh-field__help">Chỉ Đào tạo hoặc Lãnh đạo khoa được thay đổi giảng viên.</small>
+                                    }
+                                </div>
                                 <div class="mh-field mh-field--wide" role="group" aria-labelledby="exam-format-label">
                                     <span id="exam-format-label" class="mh-field__label">Định dạng bài kiểm tra trắc nghiệm</span>
                                     <ovic-dropdown placeholder="Chọn định dạng bài kiểm tra"
@@ -324,14 +336,17 @@
                     <section class="mh-aside-card" aria-labelledby="mh-summary-title">
                         <div class="mh-aside-card__header">
                             <i class="ti ti-file-info" aria-hidden="true"></i>
-                            <h2 id="mh-summary-title">Thông tin nhanh</h2>
+                            <h2 id="mh-summary-title">Thông tin tóm tắt</h2>
                         </div>
                         <dl class="mh-overview">
-                            <div><dt>Mã học phần</dt><dd>{{ f['maso'].value || 'Chưa cập nhật' }}</dd></div>
-                            <div><dt>Tổng tín chỉ</dt><dd>{{ f['sotinchi'].value || 0 }}</dd></div>
-                            <div><dt>TC thực hành</dt><dd>{{ f['sotinchi_th'].value || 0 }}</dd></div>
-                            <div><dt>Tổng số tiết</dt><dd>{{ f['tongsogio'].value || 0 }}</dd></div>
-                            <div><dt>Liên kết CTĐT</dt><dd>{{ selectCtdts?.length || 0 }}</dd></div>
+                            <div><dt>Môn học</dt><dd>{{ f['title'].value || '—' }}</dd></div>
+                            <div><dt>Tên tiếng Anh</dt><dd>—</dd></div>
+                            <div><dt>Mã học phần</dt><dd>{{ f['maso'].value || '—' }}</dd></div>
+                            <div><dt>Tín chỉ</dt><dd>{{ f['sotinchi'].value === null || f['sotinchi'].value === '' ? '—' : f['sotinchi'].value }}</dd></div>
+                            <div><dt>Chương trình sử dụng</dt><dd>{{ quickInfoCtdtNames }}</dd></div>
+                            <div class="mh-overview__multi"><dt>Khối kiến thức</dt><dd>@for (program of quickInfoPrograms; track program.name) {<span><strong>{{program.name}}:</strong> {{program.knowledgeBlock}}</span>} @empty {—}</dd></div>
+                            <div><dt>Đơn vị phụ trách</dt><dd>{{ quickInfoDepartment }}</dd></div>
+                            <div class="mh-overview__teacher"><dt>Giảng viên</dt><dd><strong>{{ quickInfoTeacherName }}</strong><small>{{ quickInfoTeacherEmail }}</small></dd></div>
                         </dl>
                     </section>
                 </aside>

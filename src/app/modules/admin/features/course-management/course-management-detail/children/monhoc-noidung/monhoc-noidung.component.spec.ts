@@ -210,6 +210,21 @@ describe('MonhocNoidungComponent presentation', () => {
         component.onChangePlan(selected, 'muctieu');
         fixture.detectChanges();
 
+        const subtabs = Array.from(root.querySelectorAll<HTMLButtonElement>('.course-content-subtab'));
+        expect(subtabs.map(tab => tab.textContent?.trim())).toEqual([
+            'Mục tiêu bài học',
+            'Chuẩn đầu ra/CPIs',
+            'Tài liệu giảng dạy'
+        ]);
+        expect(component.activeNoiDungSubTabId).toBe('muc-tieu');
+
+        const goalPanel = root.querySelector<HTMLElement>('#course-content-panel-muc-tieu');
+        const cpiPanel = root.querySelector<HTMLElement>('#course-content-panel-cpis');
+        const materialPanel = root.querySelector<HTMLElement>('#course-content-panel-tai-lieu');
+        expect(goalPanel?.hidden).toBeFalse();
+        expect(cpiPanel?.hidden).toBeTrue();
+        expect(materialPanel?.hidden).toBeTrue();
+
         const commentButtons = Array.from(root.querySelectorAll<HTMLButtonElement>('.content-comment-toggle'));
         expect(commentButtons.length).toBe(2);
         expect(commentButtons.map(button => button.querySelector('.content-comment-count')?.textContent?.trim())).toEqual(['2', '1']);
@@ -247,7 +262,7 @@ describe('MonhocNoidungComponent presentation', () => {
             }
             root.querySelectorAll<HTMLElement>(
                 '.content-panel-status .course-status-badge, .tailieu-header__status .course-status-badge'
-            ).forEach(badge => expect(getComputedStyle(badge).borderRadius).toBe('4px'));
+            ).forEach(badge => expect(getComputedStyle(badge).borderRadius).toBe(status === 1 ? '6px' : '4px'));
         }
 
         const goalCommentToggle = jasmine.createSpy('goalCommentToggle');
@@ -323,7 +338,82 @@ describe('MonhocNoidungComponent presentation', () => {
         expect(component.formMuctieu.controls['kienthuc'].value).toBe('Kiến thức');
         expect(component.formTailieu.controls['desc'].value).toBe('Học liệu');
         expect(component.formTailieu.controls['video'].value).toEqual([{ id: 9 }]);
-        component.keyScroll = null;
+    });
+
+    it('chia nội dung bài học thành ba tab con với panel ARIA tương ứng', () => {
+        const selected = plan(10, 1, [
+            { id: 11, type: 'MUCTIEU' } as CoursePlanActivities,
+            { id: 12, type: 'ACTIVITY' } as CoursePlanActivities
+        ]);
+        component.list_plan = [selected];
+        component.onChangePlan(selected, 'muctieu');
+        fixture.detectChanges();
+
+        const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('.course-content-subtab'));
+        expect(tabs.map(tab => tab.textContent?.trim())).toEqual([
+            'Mục tiêu bài học', 'Chuẩn đầu ra/CPIs', 'Tài liệu giảng dạy'
+        ]);
+        expect(tabs.map(tab => tab.querySelector('i')?.className)).toEqual([
+            'fa fa-bullseye', 'fa fa-list-alt', 'fa fa-folder-open'
+        ]);
+        expect(tabs.map(tab => tab.getAttribute('aria-controls'))).toEqual([
+            'course-content-panel-muc-tieu', 'course-content-panel-cpis', 'course-content-panel-tai-lieu'
+        ]);
+        expect(tabs.map(tab => tab.tabIndex)).toEqual([0, -1, -1]);
+        tabs.forEach(tab => expect(root.querySelector('#' + tab.getAttribute('aria-controls'))
+            ?.getAttribute('aria-labelledby')).toBe(tab.id));
+
+        const panels = Array.from(root.querySelectorAll<HTMLElement>('.course-content-subpanel'));
+        expect(panels.filter(panel => !panel.hidden).map(panel => panel.id))
+            .toEqual(['course-content-panel-muc-tieu']);
+
+        tabs[1].click();
+        fixture.detectChanges();
+        expect(component.activeNoiDungSubTabId).toBe('cpis');
+        expect(root.querySelector<HTMLElement>('#course-content-panel-cpis')?.hidden).toBeFalse();
+        expect(root.querySelector<HTMLElement>('#course-content-panel-muc-tieu')?.hidden).toBeTrue();
+
+        tabs[2].click();
+        fixture.detectChanges();
+        expect(component.activeNoiDungSubTabId).toBe('tai-lieu');
+        expect(root.querySelector<HTMLElement>('#course-content-panel-tai-lieu')?.hidden).toBeFalse();
+    });
+
+    it('điều hướng tab con bằng phím và giữ bản nháp khi đổi tab cùng bài', () => {
+        const selected = plan(10, 1, [
+            { id: 11, type: 'MUCTIEU' } as CoursePlanActivities,
+            { id: 12, type: 'ACTIVITY', desc: 'Tài liệu ban đầu' } as CoursePlanActivities
+        ]);
+        component.list_plan = [selected];
+        component.onChangePlan(selected, 'muctieu');
+        component.formMuctieu.controls['title'].setValue('Bản nháp');
+        fixture.detectChanges();
+
+        const tabs = root.querySelectorAll<HTMLButtonElement>('.course-content-subtab');
+        tabs[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+        fixture.detectChanges();
+        expect(component.activeNoiDungSubTabId).toBe('tai-lieu');
+        expect(document.activeElement).toBe(tabs[2]);
+
+        component.onChangePlan(selected, 'cpis');
+        fixture.detectChanges();
+        expect(component.activeNoiDungSubTabId).toBe('cpis');
+        expect(component.formMuctieu.controls['title'].value).toBe('Bản nháp');
+    });
+
+    it('đổi bài học sẽ nạp lại form và trở về tab được chọn từ mục lục', () => {
+        const first = plan(10, 1, [{ id: 11, type: 'MUCTIEU' } as CoursePlanActivities]);
+        const second = plan(20, 2, [{ id: 21, type: 'MUCTIEU' } as CoursePlanActivities]);
+        first.title = 'Bài cũ';
+        second.title = 'Bài mới';
+
+        component.onChangePlan(first, 'tailieu');
+        component.formMuctieu.controls['title'].setValue('Bản nháp cũ');
+        component.onChangePlan(second, 'muctieu');
+        fixture.detectChanges();
+
+        expect(component.activeNoiDungSubTabId).toBe('muc-tieu');
+        expect(component.formMuctieu.controls['title'].value).toBe('Bài mới');
     });
 
     it('lưu mục tiêu giữ hai payload và tải lại như trước', () => {
