@@ -612,10 +612,61 @@
 .cdr-outcome-list { line-height: 1.5; }
 .cdr-outcome-list { margin: 12px 0 0; padding-left: 20px; }
 
-.cdr-empty-state { display: flex; min-height: 220px; align-items: center; justify-content: center; flex-direction: column; padding: 24px; border: 1px dashed var(--cdr-border); border-radius: var(--cdr-radius); background: var(--cdr-surface); text-align: center; }
-.cdr-empty-state__icon { display: inline-flex; width: 48px; height: 48px; align-items: center; justify-content: center; margin-bottom: 12px; border-radius: var(--cdr-item-radius); color: var(--cdr-primary); background: var(--cdr-primary-light); font-size: 20px; }
-.cdr-empty-state h4 { margin: 0 0 4px; color: var(--cdr-ink); font-size: 16px; font-weight: 600; }
-.cdr-empty-state p { max-width: 400px; margin: 0 0 16px; color: var(--cdr-muted); }
+.cdr-empty-state {
+    display: flex;
+    min-height: 200px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 32px 24px;
+    border: 1px solid var(--cdr-divider);
+    border-radius: var(--cdr-radius);
+    background: #ffffff;
+    text-align: center;
+}
+
+.cdr-empty-state__icon {
+    display: inline-flex;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    border: 1px solid #bfdbfe;
+    border-radius: 4px;
+    color: var(--cdr-primary);
+    background: #eff6ff;
+    font-size: 20px;
+}
+
+.cdr-empty-state__icon i {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.cdr-empty-state h4 {
+    margin: 0 0 6px;
+    color: var(--cdr-ink);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.cdr-empty-state p {
+    max-width: 420px;
+    margin: 0 0 16px;
+    color: var(--cdr-muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.cdr-empty-state .cdr-empty-state__action {
+    width: auto;
+    min-width: 130px;
+    max-width: 100%;
+    border-radius: 4px !important;
+}
+
+.cdr-empty-state__action i { margin: 0; font-size: 16px; }
 
 /* Phiên bản side-form dùng chung formTemplateCdr. */
 .cdr-side-form { overflow: hidden; border-radius: var(--cdr-radius); background: var(--cdr-surface); }
@@ -628,6 +679,7 @@
 .cdr-side-form .ovic-over-right-section__foot-wrap-buttons { margin-left: auto; }
 
 .cdr-page-header button:focus-visible,
+.cdr-empty-state button:focus-visible,
 .cdr-form-shell button:focus-visible,
 .cdr-edit-workspace button:focus-visible,
 .cdr-side-form button:focus-visible { outline: 2px solid var(--cdr-primary); outline-offset: 2px; }
@@ -645,6 +697,7 @@
 }
 
 @media (max-width: 640px) {
+    .cdr-empty-state { min-height: 180px; padding: 24px 16px; }
     ::ng-deep .cdr-create-drawer .cdr-form-grid--identity,
     ::ng-deep .cdr-create-drawer .cdr-form-grid--teaching { grid-template-columns: minmax(0, 1fr); }
     ::ng-deep .cdr-create-drawer .cdr-form-field--full { grid-column: auto; }

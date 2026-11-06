@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { BehaviorSubject, of } from 'rxjs';
 import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
+import { Title } from '@angular/platform-browser';
 import { CourseManagementDetail } from './course-management-detail';
 
 @Component({ selector: 'app-loading-progress', standalone: true, template: '' })
@@ -33,13 +34,16 @@ describe('CourseManagementDetail - Mode Switching', () => {
     let queryParamMap$: BehaviorSubject<any>;
     let routerSpy: jasmine.SpyObj<Router>;
     let courseServiceSpy: jasmine.SpyObj<ElnKhoaHocService>;
+    let titleSpy: jasmine.SpyObj<Title>;
 
     beforeEach(async () => {
         queryParamMap$ = new BehaviorSubject(convertToParamMap({ code: '10' }));
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         courseServiceSpy = jasmine.createSpyObj('ElnKhoaHocService', ['getKhoaHocByPageNew_2']);
+        titleSpy = jasmine.createSpyObj('Title', ['getTitle', 'setTitle']);
+        titleSpy.getTitle.and.returnValue('ĐTKH');
         courseServiceSpy.getKhoaHocByPageNew_2.and.returnValue(
-            of({ data: [{ id: 10, title: 'Lập trình Web' }] } as any)
+            of({ data: [{ id: 10, maso: 'INT201', title: 'Lập trình Web' }] } as any)
         );
 
         await TestBed.configureTestingModule({
@@ -52,7 +56,8 @@ describe('CourseManagementDetail - Mode Switching', () => {
                     }
                 },
                 { provide: Router, useValue: routerSpy },
-                { provide: ElnKhoaHocService, useValue: courseServiceSpy }
+                { provide: ElnKhoaHocService, useValue: courseServiceSpy },
+                { provide: Title, useValue: titleSpy }
             ]
         })
             .overrideComponent(CourseManagementDetail, {
@@ -239,5 +244,22 @@ describe('CourseManagementDetail - Mode Switching', () => {
 
         const panel = root.querySelector<HTMLElement>('#course-panel-sinh-de');
         expect(panel?.getAttribute('aria-labelledby')).toBe('course-tab-sinh-de');
+    });
+
+    it('cập nhật tiêu đề tab trình duyệt theo dạng Mã - Tên HP và khôi phục khi destroy', () => {
+        expect(titleSpy.setTitle).toHaveBeenCalledWith('INT201 - Lập trình Web');
+
+        titleSpy.getTitle.and.returnValue('INT201 - Lập trình Web');
+        fixture.destroy();
+        expect(titleSpy.setTitle).toHaveBeenCalledWith('ĐTKH');
+    });
+
+    it('không ghi đè tiêu đề tab khi trang khác đã cập nhật', () => {
+        titleSpy.getTitle.and.returnValue('Trang khác');
+        titleSpy.setTitle.calls.reset();
+
+        fixture.destroy();
+
+        expect(titleSpy.setTitle).not.toHaveBeenCalled();
     });
 });

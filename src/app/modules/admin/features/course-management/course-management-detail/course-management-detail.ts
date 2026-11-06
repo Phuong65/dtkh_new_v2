@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnDestroy, OnInit, computed, inject, signal, viewChildren } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject as RxSubject, distinctUntilChanged, map, takeUntil } from 'rxjs';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
@@ -63,6 +64,9 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly courseService = inject(ElnKhoaHocService);
+    private readonly titleService = inject(Title);
+    private readonly initialPageTitle = this.titleService.getTitle();
+    private currentPageTitle: string | null = null;
     private readonly destroy$ = new RxSubject<void>();
 
     readonly tabButtons = viewChildren<ElementRef<HTMLButtonElement>>('tabButton');
@@ -128,9 +132,17 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
         if (id) this.loadCourse(id);
     }
 
+    private restorePageTitle(): void {
+        if (this.currentPageTitle && this.titleService.getTitle() === this.currentPageTitle) {
+            this.titleService.setTitle(this.initialPageTitle);
+        }
+        this.currentPageTitle = null;
+    }
+
     private loadCourse(id: number): void {
         this.reload$.next();
         this.selectedCourse.set(null);
+        this.restorePageTitle();
         this.errorMessage.set('');
 
         if (!Number.isSafeInteger(id) || id <= 0) {
@@ -154,6 +166,11 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
             next: response => {
                 const course = response.data?.[0] ?? null;
                 this.selectedCourse.set(course);
+                if (course) {
+                    this.currentPageTitle = [course.maso?.trim(), course.title?.trim()]
+                        .filter(Boolean).join(' - ') || 'Học phần';
+                    this.titleService.setTitle(this.currentPageTitle);
+                }
                 this.errorMessage.set(course ? '' : 'Không tìm thấy học phần.');
                 this.state.set(course ? 'success' : 'error');
             },
@@ -165,6 +182,7 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.restorePageTitle();
         this.destroy$.next();
         this.destroy$.complete();
         this.reload$.complete();

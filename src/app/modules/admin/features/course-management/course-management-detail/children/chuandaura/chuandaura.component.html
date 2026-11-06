@@ -183,18 +183,17 @@
 }
 
     @if (!listCDR || !listCDR.length) {
-<section class="cdr-empty-state" role="status">
-        <span class="cdr-empty-state__icon fa fa-bullseye" aria-hidden="true"></span>
-        <span class="cdr-empty-state__eyebrow">Chuẩn đầu ra bài học</span>
+<section class="cdr-empty-state" role="status" aria-label="Chưa có chuẩn đầu ra CPI">
+        <span class="cdr-empty-state__icon" aria-hidden="true"><i class="fa fa-list-alt"></i></span>
         <h4>Chưa có CPI</h4>
         <p>Thêm CPI để xác định yêu cầu người học cần đạt sau bài học.</p>
         @if (canAdded && !isOpenAddForm) {
-<button type="button" (click)="onOpenAddCdr()"
-            class="btn ictu-badge-btn--success-reverse cdr-add-button cdr-empty-state__action">
-            <span class="fa fa-plus" aria-hidden="true"></span>
-            Thêm CPI mới
+        <button type="button" mat-flat-button (click)="onOpenAddCdr()"
+            class="btn ictu-badge-btn--primary-reverse cdr-add-button cdr-empty-state__action">
+            <i class="ti ti-plus" aria-hidden="true"></i>
+            <span>Thêm CPI mới</span>
         </button>
-}
+        }
     </section>
 }
     </div>

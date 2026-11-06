@@ -96,7 +96,7 @@
     position: relative;
     z-index: 1;
     outline: 2px solid var(--course-primary);
-    outline-offset: 2px;
+    outline-offset: -3px;
 }
 
 .course-detail-mode-btn--active:focus-visible {
@@ -237,33 +237,37 @@
 .course-detail-mode-switch {
     display: inline-flex;
     max-width: 100%;
-    align-items: center;
-    gap: 3px;
-    padding: 3px;
+    align-items: stretch;
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
     border: 1px solid var(--course-header-border);
-    border-radius: 10px;
-    background: rgb(255 255 255 / 72%);
-    box-shadow: 0 1px 2px rgb(15 23 42 / 5%);
+    border-radius: 8px;
+    background: #ffffff;
 }
 
 .course-detail-mode-btn {
     display: inline-flex;
     min-width: 0;
-    height: 36px;
+    height: 38px !important;
     align-items: center;
     justify-content: center;
     gap: 7px;
-    padding: 0 12px;
+    padding: 0 14px;
     border: 0;
-    border-radius: 7px;
-    background: transparent;
+    border-radius: 0;
+    background: #ffffff;
     color: var(--course-text);
     font-family: inherit;
     font-size: 12.5px;
     font-weight: 600;
     white-space: nowrap;
     cursor: pointer;
-    transition: background-color .18s ease, color .18s ease, box-shadow .18s ease;
+    transition: background-color .18s ease, color .18s ease;
+}
+
+.course-detail-mode-btn + .course-detail-mode-btn {
+    border-left: 1px solid var(--course-header-border);
 }
 
 .course-detail-mode-btn i {
@@ -279,7 +283,6 @@
 
 .course-detail-mode-btn--active {
     background: var(--course-tab-active-bg);
-    box-shadow: 0 1px 3px rgb(30 64 175 / 22%);
     color: #ffffff;
 }
 
@@ -447,7 +450,7 @@
 
     .course-detail-mode-btn {
         flex: 1 1 0;
-        height: 44px;
+        height: 44px !important;
         padding: 0 6px;
         font-size: 12px;
         line-height: 1.35;
