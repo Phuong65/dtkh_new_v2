@@ -158,22 +158,153 @@
 
 .bo-cdr-col-percent { width: 130px; }
 .bo-cdr-col-actions { width: 180px; }
-.bo-cdr-table .ictu-admin-table-actions { flex-wrap: nowrap; }
-
-.bo-cdr-table .bo-cdr-add-pi {
-    width: 32px;
-    min-width: 32px !important;
-    height: 32px;
-    min-height: 32px;
-    aspect-ratio: 1;
-    padding: 0 !important;
-    border-radius: 4px !important;
+.bo-cdr-table .ictu-admin-table-actions {
+    display: inline-flex;
+    width: auto;
+    gap: 5px;
+    flex-wrap: nowrap;
 }
 
-.bo-cdr-row-plo { background: #f1f5f9; }
-.bo-cdr-row-plo:hover { background: #e2e8f0; }
+.bo-cdr-table .bo-cdr-add-pi,
+.bo-cdr-table .bo-cdr-toggle {
+    width: 30px;
+    min-width: 30px !important;
+    height: 30px;
+    min-height: 30px;
+    aspect-ratio: 1;
+    padding: 0 !important;
+    border-radius: 6px !important;
+}
+
+.bo-cdr-table .bo-cdr-add-pi i,
+.bo-cdr-table .bo-cdr-toggle i {
+    font-size: 14px;
+}
+
+.bo-cdr-table .bo-cdr-add-pi {
+    box-shadow: 0 1px 2px rgb(22 163 74 / 18%);
+}
+
+.bo-cdr-row-plo { background: #f8fafc; }
+.bo-cdr-row-plo:hover { background: #f1f5f9; }
 .bo-cdr-row-pi { background: #ffffff; }
 .bo-cdr-row-pi:hover { background: #f8fafc; }
+
+.bo-cdr-row-plo .ictu-admin-table-actions .ictu-admin-icon-button {
+    width: 30px;
+    min-width: 30px !important;
+    height: 30px;
+    min-height: 30px;
+    padding: 0 !important;
+    border-radius: 6px !important;
+}
+
+.bo-cdr-row-plo .ictu-admin-table-actions .ictu-admin-icon-button i {
+    font-size: 14px !important;
+}
+
+.bo-cdr-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    min-width: 30px !important;
+    height: 30px;
+    min-height: 30px;
+    padding: 0 !important;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px !important;
+    background: #eff6ff;
+    color: #2563eb;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgb(37 99 235 / 8%);
+    transition: all 0.15s ease;
+}
+
+.bo-cdr-toggle i {
+    display: inline-flex;
+    width: 14px;
+    height: 14px;
+    align-items: center;
+    justify-content: center;
+    margin: 0 !important;
+    font-size: 13px !important;
+    font-weight: 700;
+    line-height: 14px;
+    text-align: center;
+    transform-origin: center;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bo-cdr-toggle:hover:not(:disabled) {
+    background: #dbeafe;
+    border-color: #93c5fd;
+    color: #1d4ed8;
+    box-shadow: 0 2px 4px rgb(37 99 235 / 15%);
+}
+
+.bo-cdr-toggle.is-expanded {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 1px 3px rgb(37 99 235 / 30%);
+}
+
+.bo-cdr-toggle.is-expanded i {
+    transform: rotate(90deg);
+}
+
+.bo-cdr-toggle:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+.bo-cdr-toggle:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+/* Dòng PI: nút thao tác gọn gàng, tinh tế */
+.bo-cdr-row-pi .ictu-admin-table-actions {
+    gap: 5px;
+}
+
+.bo-cdr-row-pi .ictu-admin-table-actions .ictu-admin-icon-button {
+    width: 26px;
+    min-width: 26px !important;
+    height: 26px;
+    min-height: 26px;
+    padding: 0 !important;
+    border-radius: 5px !important;
+}
+
+.bo-cdr-row-pi .ictu-admin-table-actions .ictu-admin-icon-button i {
+    font-size: 12px !important;
+}
+
+.bo-cdr-row-pi .ictu-button-info-light {
+    border: 1px solid #e2e8f0 !important;
+    background: #f8fafc !important;
+    color: #475569 !important;
+}
+
+.bo-cdr-row-pi .ictu-button-info-light:hover:not(:disabled) {
+    border-color: #bfdbfe !important;
+    background: #eff6ff !important;
+    color: #2563eb !important;
+}
+
+.bo-cdr-row-pi .ictu-button-danger-light {
+    border: 1px solid #fee2e2 !important;
+    background: #fff5f5 !important;
+    color: #ef4444 !important;
+}
+
+.bo-cdr-row-pi .ictu-button-danger-light:hover:not(:disabled) {
+    border-color: #fca5a5 !important;
+    background: #fee2e2 !important;
+    color: #dc2626 !important;
+}
 
 .bo-cdr-pi-content {
     display: flex;
@@ -182,30 +313,6 @@
 }
 
 .bo-cdr-pi-content .bo-cdr-content { flex: 1 1 auto; min-width: 0; }
-
-.bo-cdr-toggle {
-    display: inline-flex;
-    flex: 0 0 32px;
-    width: 32px;
-    height: 32px;
-    align-items: center;
-    justify-content: center;
-}
-
-.bo-cdr-row-plo .ictu-admin-table-actions .bo-cdr-toggle {
-    width: 32px;
-    height: 32px;
-    min-height: 32px;
-    padding: 0;
-    border: 1px solid var(--bo-cdr-border);
-    border-radius: var(--bo-cdr-radius);
-    background: #fff;
-    color: var(--bo-cdr-text);
-    cursor: pointer;
-}
-
-.bo-cdr-row-plo .bo-cdr-toggle:hover { background: #e2e8f0; }
-.bo-cdr-row-plo .bo-cdr-toggle:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
 
 .bo-cdr-pi-content > .ti {
     flex: 0 0 auto;
@@ -309,10 +416,13 @@
 
 .bo-cdr-percent-control {
     display: flex;
+    width: 100%;
     align-items: stretch;
 }
 
 .bo-cdr-percent-control .ictu-form__input-field {
+    flex: 1 1 auto;
+    width: 100%;
     min-width: 0;
     border-radius: var(--bo-cdr-radius) 0 0 var(--bo-cdr-radius);
 }
@@ -334,7 +444,7 @@
 }
 
 .bo-cdr-field-full { grid-column: 1 / -1; }
-.bo-cdr-percent-row { max-width: 260px; margin-bottom: 16px; }
+.bo-cdr-percent-row { width: 100%; margin-bottom: 16px; }
 
 .bo-cdr-form-grid .ictu-form__row {
     display: flex;

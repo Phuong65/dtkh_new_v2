@@ -88,12 +88,12 @@
                                         </button>
                                         }
                                         @if (plo.children.length) {
-                                        <button type="button" class="btn ictu-button-primary-light" (click)="togglePlo(plo)"
+                                        <button type="button" class="btn bo-cdr-toggle" (click)="togglePlo(plo)"
+                                            [class.is-expanded]="isPloExpanded(plo)"
                                             [disabled]="busy" [attr.aria-expanded]="isPloExpanded(plo)"
                                             [attr.aria-label]="isPloExpanded(plo) ? 'Thu gọn các PI' : 'Mở các PI'"
                                             [pTooltip]="isPloExpanded(plo) ? 'Thu gọn PI' : 'Mở danh sách PI'" tooltipPosition="left">
-                                            <i class="ti" [class.ti-chevron-down]="isPloExpanded(plo)"
-                                                [class.ti-chevron-right]="!isPloExpanded(plo)" aria-hidden="true"></i>
+                                            <i class="ti ti-chevron-right" aria-hidden="true"></i>
                                         </button>
                                         }
                                     </div>
@@ -151,9 +151,6 @@
         <div class="ictu-p-drawer__content__body bo-cdr-drawer-body position-relative">
             @if (saving()) {
             <app-loading-progress heading="Đang lưu..." backdropFilter="none"></app-loading-progress>
-            }
-            @if (selectedParent()) {
-            <div class="bo-cdr-parent-context"><strong>PI</strong><span>thuộc PLO đã chọn</span></div>
             }
             <form id="bo-cdr-form" [formGroup]="form" (ngSubmit)="submit()">
                 <fieldset class="ictu-form bo-cdr-form-grid" [disabled]="busy" [attr.inert]="busy ? '' : null"
