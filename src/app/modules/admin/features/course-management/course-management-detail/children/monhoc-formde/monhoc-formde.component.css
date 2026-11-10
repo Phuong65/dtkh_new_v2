@@ -329,14 +329,14 @@
 :host ::ng-deep .tbl-danhSachUser th,
 :host ::ng-deep .tbl-danhSachUser td {
     padding: 7px 10px;
-    border: 1px solid #edf2f7 !important;
+    border: 1px solid var(--formde-table-border) !important;
     vertical-align: middle;
 }
 
 :host ::ng-deep .content-table-cauhoi table,
 :host ::ng-deep .dg-lesson-table table,
 :host ::ng-deep .tbl-danhSachUser table {
-    border: 1px solid #edf2f7 !important;
+    border: 1px solid var(--formde-table-border) !important;
     border-collapse: collapse !important;
 }
 
@@ -800,7 +800,7 @@
 
 .dg-lesson-empty {
     padding: 12px 14px;
-    border: 1px solid #edf2f7;
+    border: 1px solid var(--formde-table-border);
     border-top: 0;
     background: #ffffff;
     color: #64748b;

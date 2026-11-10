@@ -190,6 +190,58 @@
 .bo-ctdt-list__form-body .ictu-form__row > .ictu-form__input-field,
 .bo-ctdt-list__form-body .ictu-form__row > p-multiSelect { margin-top: 4px; }
 
+/* Drawer được append vào body nên scope theo class drawer, không theo :host. */
+::ng-deep .bo-ctdt-form-drawer .ictu-form__row .bo-ctdt-list__faculty-select .p-multiselect-label {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 4px;
+    overflow: hidden;
+    padding: 5px 8px;
+}
+
+::ng-deep .bo-ctdt-form-drawer .bo-ctdt-list__faculty-select .p-multiselect-chip-item {
+    min-width: 0;
+    max-width: 100%;
+}
+
+::ng-deep .bo-ctdt-form-drawer .bo-ctdt-list__faculty-select .p-multiselect-chip {
+    display: inline-flex;
+    max-width: 100%;
+    height: 24px;
+    min-height: 24px;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    padding: 0 6px;
+    border: 1px solid #dbeafe;
+    border-radius: 4px;
+    background: #f8fbff;
+    color: #1e3a8a;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    box-sizing: border-box;
+}
+
+::ng-deep .bo-ctdt-form-drawer .bo-ctdt-list__faculty-select .p-chip-label {
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    font-size: 12px;
+    line-height: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+::ng-deep .bo-ctdt-form-drawer .bo-ctdt-list__faculty-select .p-chip-remove-icon {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 14px;
+    margin: 0;
+    font-size: 14px;
+}
+
 :host ::ng-deep .bo-ctdt-subject-drawer .p-drawer-content {
     display: flex;
     min-height: 0;

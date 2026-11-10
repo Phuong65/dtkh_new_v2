@@ -91,9 +91,9 @@
 .assessment-card-head.admin-wrap-table__head {
     position: relative;
     display: flex;
-    min-height: 82px;
+    min-height: 52px;
     align-items: center;
-    padding: 13px 18px;
+    padding: 8px 14px;
     border: 0;
     border-bottom: 1px solid #cbd5e1;
     border-radius: var(--admin-wrap-table-element-radius, 4px) var(--admin-wrap-table-element-radius, 4px) 0 0;
@@ -103,7 +103,7 @@
 .assessment-card-head.admin-wrap-table__head::before {
     position: absolute;
     inset: 0 auto 0 0;
-    width: 5px;
+    width: 4px;
     border-top-left-radius: var(--admin-wrap-table-element-radius, 4px);
     background: #2563eb;
     content: '';
@@ -112,7 +112,7 @@
 .assessment-card-head .admin-wrap-table__heading {
     color: #334155;
     margin: 0;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
     letter-spacing: 0;
     line-height: 1.35;
@@ -121,28 +121,21 @@
 .assessment-card-title {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .assessment-card-title i {
     display: inline-flex;
-    width: 36px;
-    height: 36px;
-    flex: 0 0 36px;
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
     align-items: center;
     justify-content: center;
     border: 1px solid #dbeafe;
-    border-radius: 10px;
+    border-radius: 6px;
     background: #eff6ff;
     color: #2563eb;
-    font-size: 19px;
-}
-
-.assessment-card-head p {
-    margin: 5px 0 0 46px;
-    color: #64748b;
-    font-size: 13px;
-    line-height: 1.45;
+    font-size: 15px;
 }
 .assessment-table-scroll { overflow-x: auto; }
 :host ::ng-deep .assessment-grid-table { min-width: 920px; }

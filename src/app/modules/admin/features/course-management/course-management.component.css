@@ -140,8 +140,9 @@
 
 .course-management-col-index { width: 58px; }
 .course-management-col-code { width: 1%; }
-.course-management-col-number { width: 70px; }
+.course-management-col-number { width: 150px; white-space: nowrap; }
 .course-management-col-category { width: 180px; }
+.course-management-col-department { width: 180px; }
 .course-management-col-actions { width: 150px; }
 
 .course-management-table td:nth-child(2) {

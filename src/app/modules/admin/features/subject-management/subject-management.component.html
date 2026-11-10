@@ -1,3 +1,6 @@
+@if (templateSubject(); as template) {
+<app-subject-template-detail [subject]="template" [canUpdate]="canUpdate" (subjectUpdated)="updateTemplateSubject($event)" (back)="closeTemplate()"></app-subject-template-detail>
+} @else {
 <section class="admin-section--table ictu-admin-page position-relative" aria-labelledby="subject-list-title">
     @if (state() === 'loading') {
     <app-loading-progress heading="Đang tải danh sách môn học..." backdropFilter="none"></app-loading-progress>
@@ -20,12 +23,12 @@
                     aria-label="Tìm theo tên hoặc mã môn học">
                 <button (click)="emitEvent('DELETE_SELECTED_ROWS')" [disabled]="!canDelete || !table.someItemsChecked()"
                     class="btn ictu-button-danger-gradient ictu-admin-icon-button subject-toolbar-actions__btn" mat-flat-button
-                    aria-label="Xóa môn học đã chọn" title="Xóa mục đã chọn">
+                    aria-label="Xóa môn học đã chọn" pTooltip="Xóa mục đã chọn" tooltipPosition="left" appendTo="body">
                     <i class="ti ti-trash" aria-hidden="true"></i>
                 </button>
                 <button (click)="emitEvent('OPEN_FORM_ADD')" [disabled]="!canAdd" mat-flat-button
                     class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button subject-toolbar-actions__btn" aria-label="Thêm môn học"
-                    title="Thêm môn học">
+                    pTooltip="Thêm môn học" tooltipPosition="left" appendTo="body">
                     <i class="ti ti-plus" aria-hidden="true"></i>
                 </button>
             </div>
@@ -44,12 +47,11 @@
                                 </mat-checkbox>
                             </th>
                             <th scope="col" class="col-index text-center">#</th>
-                            <th scope="col" class="wid-120 text-center">Mã môn</th>
-                            <th scope="col" class="text-center">Tên môn học</th>
-                            <th scope="col" class="text-center">Mô tả</th>
-                            <th scope="col" class="wid-90 text-center">Số tín chỉ</th>
-                            <th scope="col" class="wid-100 text-center">TC thực hành</th>
-                            <th scope="col" class="wid-90 text-center px-0">Hành động</th>
+                            <th scope="col" class="subject-col-code text-left">Mã học phần</th>
+                            <th scope="col" class="subject-col-name text-center">Tên học phần</th>
+                            <th scope="col" class="subject-col-credits text-center">Tín chỉ</th>
+                            <th scope="col" class="subject-col-workload text-center">Khối lượng</th>
+                            <th scope="col" class="subject-col-actions text-center px-0">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -62,21 +64,30 @@
                                 </mat-checkbox>
                             </td>
                             <td class="col-index text-center">{{ table.paginator.startIndex() + i }}</td>
-                            <td>{{ row.code }}</td>
-                            <td class="text-left"><strong>{{ row.name }}</strong></td>
-                            <td class="subject-col-desc text-left" [title]="row.desc || ''">{{ row.desc || '—' }}</td>
-                            <td class="text-center">{{ row.sotinchi || 0 }}</td>
-                            <td class="text-center">{{ row.sotinchi_th || 0 }}</td>
-                            <td class="p-0 wid-90">
+                            <td class="subject-col-code text-left">{{ row.code || '—' }}</td>
+                            <td class="subject-col-name text-left"><strong class="subject-name" [title]="row.name">{{ row.name }}</strong></td>
+                            <td class="subject-col-credits text-center">
+                                <strong>{{ row.sotinchi ?? row.params?.sotinchi ?? 0 }}</strong>
+                                ({{ (row.sotinchi ?? row.params?.sotinchi ?? 0) - (row.sotinchi_th ?? row.params?.sotinchi_th ?? 0) }} LT /
+                                {{ row.sotinchi_th ?? row.params?.sotinchi_th ?? 0 }} TH)
+                            </td>
+                            <td class="subject-col-workload text-center">
+                                <span class="subject-workload" [pTooltip]="workloadTooltip(row)" tooltipPosition="left" appendTo="body">
+                                    @if (row.params?.tongsogio !== null && row.params?.tongsogio !== undefined) {
+                                    {{ row.params.tongsogio }} tiết
+                                    } @else { <span class="subject-muted">—</span> }
+                                </span>
+                            </td>
+                            <td class="p-0 subject-col-actions">
                                 <div class="admin-table__btn-actions ictu-admin-table-actions">
-                                    <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
-                                        (click)="emitEvent('OPEN_FORM_UPDATE', row)" [disabled]="!canUpdate"
-                                        [attr.aria-label]="'Sửa môn học ' + row.name" title="Sửa môn học">
-                                        <i class="ti ti-edit" aria-hidden="true"></i>
+                                    <button type="button" class="btn ictu-button-primary-light ictu-admin-icon-button"
+                                        (click)="openTemplate(row)"
+                                        [attr.aria-label]="'Cấu hình môn học ' + row.name" pTooltip="Cấu hình môn học" tooltipPosition="left" appendTo="body">
+                                        <i class="ti ti-settings" aria-hidden="true"></i>
                                     </button>
                                     <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
                                         (click)="emitEvent('DELETE_SINGLE_ROW', row)" [disabled]="!canDelete"
-                                        [attr.aria-label]="'Xóa môn học ' + row.name" title="Xóa môn học">
+                                        [attr.aria-label]="'Xóa môn học ' + row.name" pTooltip="Xóa môn học" tooltipPosition="left" appendTo="body">
                                         <i class="ti ti-trash" aria-hidden="true"></i>
                                     </button>
                                 </div>
@@ -84,7 +95,7 @@
                         </tr>
                         } @empty {
                         <tr>
-                            <td colspan="8" class="subject-empty">Không có bản ghi nào.</td>
+                            <td colspan="7" class="subject-empty">Không có bản ghi nào.</td>
                         </tr>
                         }
                     </tbody>
@@ -172,3 +183,4 @@
         </div>
     </div>
 </p-drawer>
+}

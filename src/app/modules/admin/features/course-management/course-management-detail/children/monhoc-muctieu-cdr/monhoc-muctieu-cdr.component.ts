@@ -78,7 +78,7 @@ export class MonhocMuctieuCdrComponent implements OnInit {
     readonly subTabs: readonly { id: MuctieuCdrSubTabId; label: string; icon: string }[] = [
         { id: 'muc-tieu-chung', label: 'Mục tiêu chung', icon: 'ti ti-target' },
         { id: 'co-clo', label: 'CO / CLO', icon: 'ti ti-list-check' },
-        { id: 'kiem-tra-danh-gia', label: 'Kiểm tra đánh giá', icon: 'ti ti-clipboard-check' }
+        { id: 'kiem-tra-danh-gia', label: 'Thiết lập đánh giá', icon: 'ti ti-clipboard-check' }
     ];
     readonly subTabButtons = viewChildren<ElementRef<HTMLButtonElement>>('subTabButton');
     @ViewChild('goalEditor') goalEditor?: ElementRef<HTMLTextAreaElement>;

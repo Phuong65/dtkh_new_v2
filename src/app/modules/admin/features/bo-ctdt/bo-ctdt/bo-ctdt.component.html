@@ -122,7 +122,7 @@
 
 <p-drawer #drawer [(visible)]="formControl.visible" [dismissible]="!saving()" [closable]="!saving()"
     [closeOnEscape]="!saving()" [header]="formControl.heading()" [style]="{ width: '420px', 'max-width': '100%' }"
-    appendTo="body" position="right" styleClass="ictu-p-drawer">
+    appendTo="body" position="right" styleClass="ictu-p-drawer bo-ctdt-form-drawer">
     <div class="ictu-p-drawer__content position-relative">
         @if (formLoading() || saving()) {
         <app-loading-progress [heading]="saving() ? 'Đang lưu bộ CTĐT...' : 'Đang tải danh mục Khoa...'"
@@ -152,9 +152,10 @@
                 </div>
                 <div class="ictu-form__row">
                     <label class="ictu-form__label ictu-form__label--required" for="bo-category">Khoa áp dụng</label>
-                    <p-multiSelect inputId="bo-category" [options]="boFormDonVi" optionLabel="title" optionValue="id"
-                        formControlName="category_ids" display="chip" [filter]="true" filterBy="title" appendTo="body"
-                        [maxSelectedLabels]="2" selectedItemsLabel="{0} Khoa được chọn" placeholder="Chọn Khoa"></p-multiSelect>
+                    <p-multiSelect inputId="bo-category" class="bo-ctdt-list__faculty-select" [options]="boFormDonVi"
+                        optionLabel="title" optionValue="id" formControlName="category_ids" display="chip" [filter]="true"
+                        filterBy="title" appendTo="body" [maxSelectedLabels]="2"
+                        selectedItemsLabel="{0} Khoa được chọn" placeholder="Chọn Khoa"></p-multiSelect>
                     @if (formLoadError()) {
                     <div class="admin-table__alert-danger text-center w-100">
                         Tải danh mục Khoa thất bại. Vui lòng <a href="javascript:" (click)="retryFormDonVi()">tải lại</a>.

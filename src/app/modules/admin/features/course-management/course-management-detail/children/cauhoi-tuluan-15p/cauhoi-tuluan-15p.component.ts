@@ -384,11 +384,13 @@ export class CauhoiTuluan15pComponent implements OnInit, OnChanges, OnDestroy {
     closeDrawer(reload = false): void {
         this.drawerVisible = false;
         this.drawerTemplate = null;
+        this.embeddedQuestionEditing = false;
         if (reload) this.loadCauhoi();
     }
 
     onDrawerHide(): void {
         this.drawerTemplate = null;
+        this.embeddedQuestionEditing = false;
         if (this.embeddedMode && this.formOnly && !this.closeFormDrawerOnHide && !this.destroyed) {
             this.closed.emit();
         }
@@ -398,6 +400,10 @@ export class CauhoiTuluan15pComponent implements OnInit, OnChanges, OnDestroy {
     get drawerBusy(): boolean {
         return this.isBusy() || this.displayModal || this.isSavingLessonForm || this.isSavingQuestion
             || this.isSavingCardRubric || this.isGeneratingAiRubric || this.isGeneratingCardRubric;
+    }
+
+    get drawerCanClose(): boolean {
+        return !this.drawerBusy && (!this.embeddedQuestionEditing || !this.formData.dirty);
     }
 
     get busy(): boolean {
@@ -1051,11 +1057,8 @@ export class CauhoiTuluan15pComponent implements OnInit, OnChanges, OnDestroy {
             this.f['cdr'].setValue(this.context.cdr);
         }
         this.selectedCauhoi = null;
-        if (this.embeddedMode) {
-            this.embeddedQuestionEditing = true;
-        } else {
-            this.openDrawer(this.templateQuestion, this.formTitle || 'Câu hỏi tự luận');
-        }
+        this.embeddedQuestionEditing = this.embeddedMode;
+        this.openDrawer(this.templateQuestion, this.formTitle || 'Câu hỏi tự luận');
     }
 
     formReset() {
@@ -1080,17 +1083,17 @@ export class CauhoiTuluan15pComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     cancelEmbeddedQuestionEdit(): void {
-        if (!this.embeddedQuestionEditing || this.isSavingQuestion) return;
+        if (!this.embeddedQuestionEditing || this.drawerBusy) return;
         if (this.formData.dirty) {
             firstValueFrom(this.notificationService.confirmDelete2({
                 heading: 'Hủy nhập câu hỏi?',
                 htmlMessage: 'Nội dung đang nhập chưa được lưu. Bạn có muốn hủy không?'
             })).then(confirmed => {
-                if (confirmed) this.embeddedQuestionEditing = false;
+                if (confirmed) this.closeDrawer();
             });
             return;
         }
-        this.embeddedQuestionEditing = false;
+        this.closeDrawer();
     }
 
     private syncQuestionPointByCdr(cdr: unknown) {
@@ -1118,11 +1121,8 @@ export class CauhoiTuluan15pComponent implements OnInit, OnChanges, OnDestroy {
         this.f['rubric_markdown'].setValue(cauhoi.rubric_markdown || '');
         this.f['cdr'].setValue(cauhoi.cdr);
         this.isUpdated = true;
-        if (this.embeddedMode) {
-            this.embeddedQuestionEditing = true;
-        } else {
-            this.openDrawer(this.templateQuestion, this.formTitle || 'Câu hỏi tự luận');
-        }
+        this.embeddedQuestionEditing = this.embeddedMode;
+        this.openDrawer(this.templateQuestion, this.formTitle || 'Câu hỏi tự luận');
     }
 
     generateAiRubric() {
@@ -1430,7 +1430,9 @@ export class CauhoiTuluan15pComponent implements OnInit, OnChanges, OnDestroy {
                         this.isSavingQuestion = false;
                         this.notificationService.toastSuccess("Thêm thành công");
                         this.formReset();
-                        this.embeddedQuestionEditing = false;
+                        if (this.embeddedMode) {
+                            this.closeDrawer();
+                        }
                         this.loadCauhoi();
                     },
                     error: () => {

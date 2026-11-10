@@ -37,7 +37,7 @@ const routes: Routes = [
     },
     {
         path: 'kehoach-hoctap',
-        
+
         loadComponent: () => import('@modules/admin/features/subject-management/subject-management.component').then(c => c.SubjectManagementComponent),
         // loadComponent: () => import('@modules/admin/features/quanly-kehoach-hoctap/quanly-kehoach-hoctap/quanly-kehoach-hoctap.component').then(c => c.QuanlyKehoachHoctapComponent),
         // loadComponent: () => import('@modules/admin/features/quanly-kehoach-hoctap/noidung-hoctap/noidung-hoctap.component').then(c => c.NoidungHoctapComponent),

@@ -7,6 +7,7 @@ import { MatButton } from '@angular/material/button';
 import { Drawer } from 'primeng/drawer';
 import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
+import { TooltipModule } from 'primeng/tooltip';
 import { Observable, Subject as RxSubject, filter, map, switchMap, takeUntil } from 'rxjs';
 import { IctuPaginatorComponent } from '@core-new/components/ictu-paginator/ictu-paginator.component';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
@@ -19,6 +20,7 @@ import { Subject } from '@modules/shared/models/subject';
 import { SubjectService } from '@modules/shared/services/subject.service';
 import { IctuDeletingAnimationControl } from '@core-new/models/ictu-deleting-animation-control';
 import { NotificationService } from '@core-new/service/notification.service';
+import { SubjectTemplateDetailComponent } from './subject-template-detail/subject-template-detail.component';
 
 function nonNegativeIntegerValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
@@ -60,9 +62,11 @@ function creditBalanceValidator(): ValidatorFn {
         Drawer,
         InputText,
         Textarea,
+        TooltipModule,
         IctuPaginatorComponent,
         LoadingProgressComponent,
-        MatButton
+        MatButton,
+        SubjectTemplateDetailComponent
     ],
     templateUrl: './subject-management.component.html',
     styleUrl: './subject-management.component.css'
@@ -82,6 +86,7 @@ export class SubjectManagementComponent implements OnInit, OnDestroy {
     readonly state = signal<AppState>('loading');
     readonly isSaving = signal<boolean>(false);
     readonly searchValue = signal<string>('');
+    readonly templateSubject = signal<Subject | null>(null);
 
     canAdd = true;
     canUpdate = true;
@@ -224,6 +229,25 @@ export class SubjectManagementComponent implements OnInit, OnDestroy {
             sotinchi_th: 0
         });
         this.formControl.openFormAdd();
+    }
+
+    openTemplate(item: Subject): void {
+        if (!item?.id) return;
+        this.templateSubject.set(item);
+    }
+
+    closeTemplate(): void {
+        this.templateSubject.set(null);
+    }
+
+    updateTemplateSubject(updated: Subject): void {
+        this.templateSubject.set(updated);
+        const index = this.table.data().findIndex(row => row.id === updated.id);
+        if (index >= 0) {
+            const rows = [...this.table.data()];
+            rows[index] = { ...rows[index], ...updated };
+            this.table.updateData(rows);
+        }
     }
 
     openEditDrawer(item: Subject): void {
@@ -372,7 +396,12 @@ export class SubjectManagementComponent implements OnInit, OnDestroy {
         this.table.selectRow(checked, index);
     }
 
+    workloadTooltip(subject: Subject): string {
+        const params = subject.params || {};
+        return `LT: ${params.lythuyet ?? 0} · TH: ${params.th_thinghiem ?? 0} · Thảo luận: ${params.thaoluan_baitap ?? 0} · Tự học: ${params.tuhoc ?? 0}`;
+    }
+
     trackById(_index: number, item: Subject): number {
         return item.id;
-    } 
+    }
 }

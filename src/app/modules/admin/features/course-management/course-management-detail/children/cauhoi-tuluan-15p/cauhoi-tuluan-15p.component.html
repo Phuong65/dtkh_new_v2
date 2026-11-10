@@ -16,15 +16,22 @@
             </div>
         </div>
         <div class="cauhoi-15p-embedded-header__actions">
+            <div class="cauhoi-15p-embedded-header__search ictu-form__row">
+                <label class="sr-only" for="cauhoi-15p-embedded-search">Tìm mã câu hỏi</label>
+                <i class="ti ti-search" aria-hidden="true"></i>
+                <input id="cauhoi-15p-embedded-search" pInputText class="ictu-form__input-field" [(ngModel)]="search_id_question" type="search"
+                    placeholder="Tìm mã câu hỏi" aria-label="Tìm mã câu hỏi">
+            </div>
+            <span class="ictu-badge ictu-badge--secondary cauhoi-15p-embedded-header__count">{{ (cdrFilteredQuestions | filter: search_id_question : ['id']).length }} câu hỏi</span>
             @if (!embeddedQuestionEditing) {
             <button type="button" mat-flat-button (click)="openAddCauhoi()"
-                class="btn ictu-badge-btn--primary-reverse cauhoi-15p-embedded-header__add"
+                class="btn ictu-badge-btn--success-reverse cauhoi-15p-embedded-header__add"
                 [disabled]="!hasLessonForm || isLoadingLessonForm || isSavingLessonForm || !embeddedCanEdit">
                 <i class="ti ti-plus" aria-hidden="true"></i>
                 <span>Thêm câu hỏi</span>
             </button>
             }
-            <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button cauhoi-15p-embedded-header__close"
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--danger-reverse ictu-admin-icon-button cauhoi-15p-embedded-header__close"
                 aria-label="Đóng" pTooltip="Đóng" tooltipPosition="left" appendTo="body"
                 [disabled]="drawerBusy" (click)="requestEmbeddedClose()">
                 <i class="ti ti-x" aria-hidden="true"></i>
@@ -71,23 +78,12 @@
         }
 
         <section class="cauhoi-15p-main">
-            @if (embeddedMode && !embeddedQuestionEditing) {
-            <div class="cauhoi-15p-embedded-subbar">
-                <div class="cauhoi-15p-embedded-subbar__title">
-                    <i class="ti ti-list-details" aria-hidden="true"></i>
-                    <strong>Danh sách câu hỏi</strong>
-                </div>
-                <span class="cauhoi-15p-embedded-subbar__count">{{ cdrFilteredQuestions.length }} câu hỏi</span>
-            </div>
-            }
             @if (embeddedError) {
             <div class="cauhoi-15p-empty-state cauhoi-15p-empty-state--error" role="alert">
                 <i class="ti ti-alert-circle" aria-hidden="true"></i>
                 <strong>{{embeddedError}}</strong>
                 <button type="button" mat-flat-button class="btn ictu-badge-btn--primary" (click)="retryLoadLessonData()">Tải lại</button>
             </div>
-            } @else if (embeddedQuestionEditing) {
-            <ng-container [ngTemplateOutlet]="templateQuestion"></ng-container>
             } @else if (selectedLesson && selectedCourse) {
             <ng-container [ngTemplateOutlet]="templateListCauhoi"></ng-container>
             } @else if (!isLoadingLessons) {
@@ -97,10 +93,9 @@
     </div>
     }
 
-    @if (!embeddedMode || formOnly) {
     <p-drawer [(visible)]="drawerVisible" position="right" [header]="drawerTitle"
         [style]="{ width: 'min(1024px, 100vw)', maxWidth: '100vw' }" appendTo="body" [blockScroll]="true"
-        [closable]="!drawerBusy" [dismissible]="!drawerBusy" [closeOnEscape]="!drawerBusy"
+        [closable]="drawerCanClose" [dismissible]="drawerCanClose" [closeOnEscape]="drawerCanClose"
         (onHide)="onDrawerHide()" styleClass="ictu-p-drawer cauhoi-15p-drawer">
         <div class="ictu-p-drawer__content cauhoi-15p-drawer__content">
             @if (drawerBusy) { <app-loading-progress [heading]="progressHeading" backdropFilter="blur(2px)"></app-loading-progress> }
@@ -109,7 +104,6 @@
             </div>
         </div>
     </p-drawer>
-    }
 
 <ng-template #templateListCauhoi>
     <section class="admin-wrap-table ictu-admin-table-shell cauhoi-15p-workspace">
@@ -267,13 +261,18 @@
                             <div class="cauhoi-15p-question-card__actions">
                                 <button type="button" (click)="editCauhoi(cauhoi)"
                                     mat-flat-button class="btn ictu-button-info-light cauhoi-15p-text-button"
-                                    [disabled]="embeddedMode && !embeddedCanEdit">
+                                    [disabled]="embeddedMode && !embeddedCanEdit"
+                                    [attr.aria-label]="'Sửa câu hỏi #' + cauhoi.id"
+                                    [pTooltip]="'Sửa câu hỏi #' + cauhoi.id" tooltipPosition="top" appendTo="body">
                                     <i class="ti ti-edit" aria-hidden="true"></i>
                                     <span>Sửa</span>
                                 </button>
                                 <button type="button" (click)="deleteCauhoi(cauhoi)"
                                     class="btn ictu-button-danger-light cauhoi-15p-text-button"
-                                    [disabled]="deletingQuestionId === cauhoi.id || (embeddedMode && !embeddedCanEdit)">
+                                    [disabled]="deletingQuestionId === cauhoi.id || (embeddedMode && !embeddedCanEdit)"
+                                    [attr.aria-label]="(deletingQuestionId === cauhoi.id ? 'Đang xóa câu hỏi #' : 'Xóa câu hỏi #') + cauhoi.id"
+                                    [pTooltip]="(deletingQuestionId === cauhoi.id ? 'Đang xóa câu hỏi #' : 'Xóa câu hỏi #') + cauhoi.id"
+                                    tooltipPosition="top" appendTo="body">
                                     <i [ngClass]="deletingQuestionId === cauhoi.id ? 'ti ti-loader cauhoi-15p-spin' : 'ti ti-trash'"
                                         aria-hidden="true"></i>
                                     <span>{{deletingQuestionId === cauhoi.id ? 'Đang xóa' : 'Xóa'}}</span>
@@ -287,16 +286,16 @@
                             </div>
                         </div>
                         @if (cauhoi.note) {
-<div class="cauhoi-15p-question-card__footer">
-                            <div class="cauhoi-15p-question-card__note-title">
+<details class="cauhoi-15p-question-card__footer">
+                            <summary class="cauhoi-15p-question-card__note-title">
                                 <i class="ti ti-wand" aria-hidden="true"></i>
-                                <strong>Hướng dẫn AI chấm</strong>
-                            </div>
+                                <strong>Hướng dẫn AI chấm</strong><i class="ti ti-chevron-down cauhoi-15p-question-card__note-chevron" aria-hidden="true"></i>
+                            </summary>
                             <div [appLoadMediaOnText]="cauhoi.id" class="ck ck-content ck-editor__editable ck-rounded-corners
                             ck-editor__editable_inline ck-blurred cauhoi-15p-question-card__note"
                                 [innerHTML]="cauhoi.note | safeHtml">
                             </div>
-                        </div>
+                        </details>
 }
                     </article>
 }

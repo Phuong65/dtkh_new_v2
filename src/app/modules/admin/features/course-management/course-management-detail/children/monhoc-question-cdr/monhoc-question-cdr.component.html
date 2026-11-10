@@ -90,7 +90,7 @@
                         </div>
                         <div class="cdr-sidebar__alert-body">
                             <strong>Chưa xác định CĐR</strong>
-                            <p>Môn học này chưa xác định CDR, vui lòng cập nhật lại CDR hoặc liên hệ <strong>PHÒNG ĐÀO TẠO</strong> để được hỗ trợ.</p>
+                            <p>Môn học chưa có thông tin CĐR. Vui lòng cập nhật CĐR hoặc liên hệ <strong>Phòng Đào tạo</strong> để được hỗ trợ.</p>
                         </div>
                     </div>
                     }
@@ -178,15 +178,19 @@
                             </tr>
                         </ng-template>
                         <ng-template pTemplate="body" let-row>
-                            <tr
-                                [ngClass]="!row['children'] || row['children'].length === 0?'require-cdr-backgroud-color':''">
+                            <tr>
                                 <th class="cdr-question-table__group-row" [colSpan]="8">
                                     <span>{{label_week +' '+row['week']}}</span>
-                                    @if (!row['children'] || row['children'].length === 0) {
-                                    <span>{{' - Chưa cập nhật CDR'}}</span>
-                                    }
                                 </th>
                             </tr>
+                            @if (!row['children'] || row['children'].length === 0) {
+                            <tr class="cdr-question-table__status-row">
+                                <td class="cdr-question-table__status-cell" [colSpan]="8">
+                                    <i class="ti ti-info-circle" aria-hidden="true"></i>
+                                    <span>Chưa cập nhật CĐR</span>
+                                </td>
+                            </tr>
+                            }
                             @for (child of row['children']; track child) {
                             <tr (click)="cdrGet(child)" [ngClass]="child.require_cdr?'require-cdr-backgroud-color':''">
                                 <td class="cdr-question-table__outcome">

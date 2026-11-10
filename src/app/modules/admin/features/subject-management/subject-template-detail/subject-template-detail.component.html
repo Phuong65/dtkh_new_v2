@@ -1,0 +1,376 @@
+<section class="subject-template" aria-label="Cấu hình môn học mẫu">
+    <header class="subject-template__header">
+        <div class="subject-template__identity">
+            <i class="ti ti-template subject-template__header-icon" aria-hidden="true"></i>
+            <h1 [title]="'Cấu hình môn học: ' + (selectedSubject()?.name || '')">
+                Cấu hình môn học: <span>{{ selectedSubject()?.name }}</span>
+            </h1>
+        </div>
+        <div class="subject-template__header-actions">
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--danger-reverse ictu-admin-icon-button subject-template__close-button"
+                [disabled]="isBusy()" (click)="close()" pTooltip="Đóng" tooltipPosition="left" appendTo="body">
+                <i class="ti ti-x" aria-hidden="true"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="subject-template__workspace">
+        <aside class="subject-template__sidebar" aria-label="Điều hướng cấu hình môn học">
+            @for (group of groups; track group.id) {
+            <section class="subject-template__group" [attr.aria-labelledby]="'subject-template-group-' + group.id">
+                <button type="button" class="subject-template__group-title"
+                    [class.subject-template__group-title--active]="activeGroupId() === group.id"
+                    (click)="toggleGroup(group.id)" [id]="'subject-template-group-' + group.id"
+                    [attr.aria-expanded]="!collapsedGroups().includes(group.id)"
+                    [attr.aria-controls]="'subject-template-items-' + group.id">
+                    <i [class]="group.icon" aria-hidden="true"></i>
+                    <span>{{ group.label }}</span>
+                    <i class="ti subject-template__group-chevron"
+                        [class.ti-chevron-down]="collapsedGroups().includes(group.id)"
+                        [class.ti-chevron-up]="!collapsedGroups().includes(group.id)" aria-hidden="true"></i>
+                </button>
+                @if (!collapsedGroups().includes(group.id)) {
+                <nav class="subject-template__items" [id]="'subject-template-items-' + group.id" [attr.aria-label]="group.label">
+                    @for (item of group.items; track item.id; let i = $index) {
+                    <button #sidebarButton [id]="'subject-template-item-' + item.id" type="button"
+                        class="subject-template__item" [class.subject-template__item--active]="activeItemId() === item.id"
+                        [attr.aria-current]="activeItemId() === item.id ? 'page' : null"
+                        (click)="selectItem(group.id, item.id)" (keydown)="onSidebarKeydown($event, group.id, i)">
+                        <i [class]="item.icon" aria-hidden="true"></i><span>{{ item.label }}</span>
+                    </button>
+                    }
+                </nav>
+                }
+            </section>
+            }
+            <p class="subject-template__sidebar-note">
+                <i class="ti ti-info-circle" aria-hidden="true"></i>
+                <span>Chọn mục bên trái, nhấn Lưu trong từng mục để cập nhật dữ liệu tương ứng.</span>
+            </p>
+        </aside>
+
+        <main class="subject-template__content" [attr.aria-label]="activeItem().label" [attr.inert]="isBusy() ? '' : null" [attr.aria-busy]="isBusy()">
+            @if (appState() === 'loading') {
+            <app-loading-progress [heading]="apiLoadingHeading()" backdropFilter="blur(2px)"></app-loading-progress>
+            }
+            @if (activeItemId() === 'subject-info') {
+            <section class="mh-card" aria-labelledby="template-info-title">
+                <div class="mh-card__header">
+                    <span class="mh-card__icon" aria-hidden="true"><i class="ti ti-id"></i></span>
+                    <div><h2 id="template-info-title">Thông tin cơ bản</h2><p>Định danh và tín chỉ của môn học.</p></div>
+                    <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-icon-button subject-template__save-button"
+                        [disabled]="isBusy() || subjectInfoInvalid()" (click)="saveSubjectInfo()" aria-label="Lưu thông tin môn học" pTooltip="Lưu thông tin môn học" tooltipPosition="left" appendTo="body"><i class="ti ti-device-floppy" aria-hidden="true"></i></button>
+                </div>
+                <div class="mh-card__body">
+                    <div class="mh-fields">
+                        <div class="mh-field mh-field--wide">
+                            <label for="template-name">Tên môn học <span class="mh-required">*</span></label>
+                            <input id="template-name" type="text" class="admin-wrap-table__input"
+                                [formControl]="form.controls.name" placeholder="Nhập tên môn học" autocomplete="off">
+                            @if (form.controls.name.touched && form.controls.name.invalid) {
+                            <span class="mh-field__error">Tên môn học là bắt buộc, tối đa 255 ký tự.</span>
+                            }
+                        </div>
+                        <div class="mh-field">
+                            <label for="template-code">Mã môn học <span class="mh-required">*</span></label>
+                            <input id="template-code" type="text" class="admin-wrap-table__input"
+                                [formControl]="form.controls.code" placeholder="Ví dụ: MH101" autocomplete="off">
+                            @if (form.controls.code.touched && form.controls.code.invalid) {
+                            <span class="mh-field__error">Mã môn học là bắt buộc, tối đa 50 ký tự.</span>
+                            }
+                        </div>
+                        <div class="mh-credit-fields">
+                            <div class="mh-field">
+                                <label for="template-credits">Tín chỉ <span class="mh-required">*</span></label>
+                                <input id="template-credits" type="number" min="0" step="1" inputmode="numeric"
+                                    class="admin-wrap-table__input" [formControl]="form.controls.sotinchi">
+                                @if (form.controls.sotinchi.touched && form.controls.sotinchi.invalid) {
+                                <span class="mh-field__error">Nhập số nguyên không âm.</span>
+                                }
+                            </div>
+                            <div class="mh-field">
+                                <label for="template-practice-credits">TC thực hành <span class="mh-required">*</span></label>
+                                <input id="template-practice-credits" type="number" min="0" step="1" inputmode="numeric"
+                                    class="admin-wrap-table__input" [formControl]="form.controls.sotinchi_th">
+                                @if (form.controls.sotinchi_th.touched && form.controls.sotinchi_th.invalid) {
+                                <span class="mh-field__error">Nhập số nguyên không âm.</span>
+                                }
+                            </div>
+                        </div>
+                        @if (form.hasError('practiceExceedsTotal')) {
+                        <span class="mh-field__error mh-field--wide">Tín chỉ thực hành không được lớn hơn tổng tín chỉ.</span>
+                        }
+                    </div>
+                </div>
+            </section>
+            } @else if (activeItemId() === 'exam-format') {
+            <section class="mh-card" aria-labelledby="template-format-title">
+                <div class="mh-card__header">
+                    <span class="mh-card__icon" aria-hidden="true"><i class="ti ti-clipboard-check"></i></span>
+                    <div><h2 id="template-format-title">Định dạng bài kiểm tra trắc nghiệm</h2></div>
+                    <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-icon-button subject-template__save-button"
+                        [disabled]="isBusy()" (click)="saveExamFormat()" aria-label="Lưu định dạng kiểm tra" pTooltip="Lưu định dạng kiểm tra" tooltipPosition="left" appendTo="body"><i class="ti ti-device-floppy" aria-hidden="true"></i></button>
+                </div>
+                <div class="mh-card__body">
+                    <div class="mh-field" role="group" aria-labelledby="template-format-label">
+                        <span id="template-format-label" class="mh-field__label">Định dạng bài kiểm tra trắc nghiệm</span>
+                        <ovic-dropdown placeholder="Chọn định dạng bài kiểm tra" [options]="examFormats"
+                            [defaultValue]="form.controls.av.value" optionId="key" optionLabel="label"
+                            [formField]="form.controls.av"></ovic-dropdown>
+                    </div>
+                </div>
+            </section>
+            } @else if (activeItemId() === 'learning-volume') {
+            <section class="mh-card" aria-labelledby="template-time-title">
+                <div class="mh-card__header">
+                    <span class="mh-card__icon" aria-hidden="true"><i class="ti ti-clock"></i></span>
+                    <div><h2 id="template-time-title">Khối lượng học tập</h2><p>Phân bổ số tiết theo từng hình thức tổ chức giảng dạy.</p></div>
+                    <span class="mh-card__count">{{ form.controls.tongsogio.value || 0 }} tiết tổng</span>
+                    <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-icon-button subject-template__save-button"
+                        [disabled]="isBusy()" (click)="saveLearningVolume()" aria-label="Lưu khối lượng học tập" pTooltip="Lưu khối lượng học tập" tooltipPosition="left" appendTo="body"><i class="ti ti-device-floppy" aria-hidden="true"></i></button>
+                </div>
+                <div class="mh-card__body">
+                    <div class="mh-time-grid">
+                        @for (field of workloadFields; track field.key) {
+                        <div class="mh-field">
+                            <label [for]="'template-' + field.key">{{ field.label }}</label>
+                            <input [id]="'template-' + field.key" type="number" min="0" step="1" inputmode="numeric"
+                                class="admin-wrap-table__input" [formControl]="form.controls[field.key]">
+                            <small class="mh-field__help">{{ field.help }}</small>
+                            @if (form.controls[field.key].touched && form.controls[field.key].invalid) {
+                            <span class="mh-field__error">Nhập số nguyên không âm.</span>
+                            }
+                        </div>
+                        }
+                    </div>
+                </div>
+            </section>
+            } @else if (activeItemId() === 'materials') {
+            <section class="mh-card" aria-labelledby="template-documents-title">
+                <div class="mh-card__header">
+                    <span class="mh-card__icon" aria-hidden="true"><i class="ti ti-folders"></i></span>
+                    <div><h2 id="template-documents-title">Tài liệu & học liệu</h2><p>Quản lý giáo trình, tệp tin và liên kết phục vụ giảng dạy.</p></div>
+                    <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-icon-button subject-template__save-button"
+                        [disabled]="isBusy()" (click)="saveMaterials()" aria-label="Lưu tài liệu" pTooltip="Lưu tài liệu" tooltipPosition="left" appendTo="body"><i class="ti ti-device-floppy" aria-hidden="true"></i></button>
+                </div>
+                <div class="mh-card__body mh-resource-grid">
+                    @for (resource of materialGroups; track resource.key) {
+                    <section class="mh-resource" [attr.aria-labelledby]="'template-resource-' + resource.key">
+                        <div class="mh-resource__header">
+                            <i [class]="resource.icon" aria-hidden="true"></i>
+                            <div><h3 [id]="'template-resource-' + resource.key">{{ resource.label }}</h3><p>{{ resource.help }}</p></div>
+                        </div>
+                        <div class="form-document-file-and-link">
+                            <div class="content-form-document-file-and-link">
+                                <div class="list-file-or-text">
+                                    @for (item of materials[resource.key]; track item.id) {
+                                    <div class="item-file-or-text">
+                                        <div class="single-file">
+                                            <i class="icon-in-open-download-file" [class.fa]="true"
+                                                [class.fa-file-o]="item.type === 'file'" [class.fa-globe]="item.type === 'link'" aria-hidden="true"></i>
+                                            <div class="info"><h4 class="name">{{ item.title }}</h4>
+                                                @if (item.type === 'file') {<p class="size">{{ item.file?.size }} bytes</p>}
+                                                @else if (item.link) {<p class="size">{{ item.link }}</p>}
+                                            </div>
+                                            <button type="button" class="btn btn-delete" (click)="removeMaterial(resource.key, item.id)"
+                                                [attr.aria-label]="'Xóa ' + item.title" [pTooltip]="'Xóa ' + item.title" tooltipPosition="left" appendTo="body"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                                        </div>
+                                    </div>
+                                    }
+                                </div>
+                                <div class="row">
+                                    <div class="col-6"><button type="button" class="btn btn-success" [disabled]="isBusy()" (click)="chooseMaterialFiles(resource.key)">Chọn tệp tin</button></div>
+                                    <div class="col-6"><button type="button" class="btn btn-primary" (click)="linkPopover.toggle($event)">Thêm link</button></div>
+                                </div>
+                            </div>
+                        </div>
+                        <p-popover #linkPopover>
+                            <ng-template #content>
+                                <div class="ovic-vertical__inputs">
+                                    <div class="row form-row form-row-flex-row"><div class="col-12 flex-div">
+                                        <label [for]="'template-link-title-' + resource.key">Tên tài liệu:</label>
+                                        <input [id]="'template-link-title-' + resource.key" type="text" class="ovic-input-field"
+                                            [(ngModel)]="materialLinkDrafts[resource.key].title" autocomplete="off">
+                                    </div></div>
+                                    <div class="row form-row form-row-flex-row"><div class="col-12 flex-div">
+                                        <label [for]="'template-link-url-' + resource.key">Link:</label>
+                                        <input [id]="'template-link-url-' + resource.key" type="url" class="ovic-input-field"
+                                            [(ngModel)]="materialLinkDrafts[resource.key].link" autocomplete="off">
+                                    </div></div>
+                                    <div class="row form-row form-row-flex-row"><div class="col-12 text-right">
+                                        <button type="button" class="btn btn-primary" [disabled]="isBusy() || (!materialLinkDrafts[resource.key].title.trim() && !materialLinkDrafts[resource.key].link.trim())"
+                                            (click)="addMaterialLink(resource.key); linkPopover.hide()">Thêm</button>
+                                    </div></div>
+                                </div>
+                            </ng-template>
+                        </p-popover>
+                    </section>
+                    }
+                </div>
+            </section>
+            } @else if (activeItemId() === 'outline') {
+            <section class="mh-card mh-card--editor" aria-labelledby="template-outline-title">
+                <div class="mh-card__header">
+                    <span class="mh-card__icon" aria-hidden="true"><i class="ti ti-file-text"></i></span>
+                    <div><h2 id="template-outline-title">Đề cương chi tiết</h2><p>Biên soạn mô tả học phần và yêu cầu dành cho sinh viên.</p></div>
+                    <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-icon-button subject-template__save-button"
+                        [disabled]="isBusy()" (click)="saveOutline()" aria-label="Lưu đề cương" pTooltip="Lưu đề cương" tooltipPosition="left" appendTo="body"><i class="ti ti-device-floppy" aria-hidden="true"></i></button>
+                </div>
+                <div class="mh-editor-tabs" role="tablist" aria-label="Nội dung đề cương">
+                    <button #descTab type="button" id="template-tab-desc" role="tab" aria-controls="template-panel-desc"
+                        [attr.aria-selected]="activeDescTab === 'desc'" [attr.tabindex]="activeDescTab === 'desc' ? 0 : -1"
+                        [class.is-active]="activeDescTab === 'desc'" (click)="selectDescTab('desc', descTab)"
+                        (keydown.arrowright)="selectDescTab('yeucau', yeucauTab)" (keydown.arrowleft)="selectDescTab('yeucau', yeucauTab)"
+                        (keydown.home)="selectDescTab('desc', descTab)" (keydown.end)="selectDescTab('yeucau', yeucauTab)">
+                        <i class="ti ti-notes" aria-hidden="true"></i><span>Mô tả môn học</span>
+                    </button>
+                    <button #yeucauTab type="button" id="template-tab-yeucau" role="tab" aria-controls="template-panel-yeucau"
+                        [attr.aria-selected]="activeDescTab === 'yeucau'" [attr.tabindex]="activeDescTab === 'yeucau' ? 0 : -1"
+                        [class.is-active]="activeDescTab === 'yeucau'" (click)="selectDescTab('yeucau', yeucauTab)"
+                        (keydown.arrowright)="selectDescTab('desc', descTab)" (keydown.arrowleft)="selectDescTab('desc', descTab)"
+                        (keydown.home)="selectDescTab('desc', descTab)" (keydown.end)="selectDescTab('yeucau', yeucauTab)">
+                        <i class="ti ti-user" aria-hidden="true"></i><span>Yêu cầu sinh viên</span>
+                    </button>
+                </div>
+                <div class="mh-editor-content">
+                    <div id="template-panel-desc" role="tabpanel" aria-labelledby="template-tab-desc" [hidden]="activeDescTab !== 'desc'">
+                        <ovic-editor height="240px" [formField]="form.controls.desc" [default]="form.controls.desc.value"></ovic-editor>
+                    </div>
+                    <div id="template-panel-yeucau" role="tabpanel" aria-labelledby="template-tab-yeucau" [hidden]="activeDescTab !== 'yeucau'">
+                        <ovic-editor height="240px" [formField]="form.controls.yeucau_sinhvien" [default]="form.controls.yeucau_sinhvien.value"></ovic-editor>
+                    </div>
+                </div>
+            </section>
+            } @else if (activeItemId() === 'general-objective') {
+            <section class="cdr-objective-card" aria-labelledby="template-objective-title">
+                <header class="cdr-section-header"><div class="cdr-section-title">
+                    <span class="cdr-header-icon" aria-hidden="true"><i class="ti ti-target"></i></span>
+                    <span id="template-objective-title">Mục tiêu chung</span>
+                </div><button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-icon-button subject-template__save-button"
+                    [disabled]="isBusy()" (click)="saveGeneralObjective()" aria-label="Lưu mục tiêu chung" pTooltip="Lưu mục tiêu chung" tooltipPosition="left" appendTo="body"><i class="ti ti-device-floppy" aria-hidden="true"></i></button></header>
+                <div class="cdr-objective-body">
+                    <ovic-editor height="180px" [formField]="form.controls.muctieu" [default]="form.controls.muctieu.value"></ovic-editor>
+                </div>
+            </section>
+            } @else if (activeItemId() === 'goals') {
+            <section class="admin-wrap-table ictu-admin-table-shell cdr-table-card" aria-labelledby="template-goals-title">
+                <header class="admin-wrap-table__head cdr-table-card__header">
+                    <span class="admin-wrap-table__heading cdr-table-card__title">
+                        <span class="cdr-header-icon" aria-hidden="true"><i class="ti ti-list-check"></i></span>
+                        <span id="template-goals-title">Mục tiêu chi tiết (CO)</span>
+                    </span>
+                    <div class="admin-wrap-table__head-actions cdr-table-card__actions">
+                        <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button"
+                            (click)="addGoal()" [disabled]="objectivesBlocked()" aria-label="Thêm mục tiêu" pTooltip="Thêm mục tiêu" tooltipPosition="left" appendTo="body"><i class="ti ti-plus" aria-hidden="true"></i></button>
+                        <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-icon-button subject-template__save-button"
+                            (click)="saveGoals()" [disabled]="objectivesBlocked() || !goals.length" aria-label="Lưu mục tiêu" pTooltip="Lưu mục tiêu" tooltipPosition="left" appendTo="body"><i class="ti ti-device-floppy" aria-hidden="true"></i></button>
+                    </div>
+                </header>
+                <div class="admin-wrap-table__body ictu-admin-table-shell__body"><div class="ictu-admin-table-scroll cdr-table-responsive">
+                    <p-table [value]="goals" (onRowReorder)="reorderRows('goals')" tableStyleClass="tbl admin-table cdr-grid-table">
+                        <ng-template #header><tr><th class="col-drag"></th><th class="col-code">Ký hiệu</th><th>Nội dung mục tiêu</th><th class="col-actions">Thao tác</th></tr></ng-template>
+                        <ng-template #body let-goal let-rowIndex="rowIndex">
+                            <tr [pReorderableRow]="rowIndex" [pReorderableRowDisabled]="objectivesBlocked() || hasObjectiveEditor()">
+                                <td class="cell-center"><i class="ti ti-grip-vertical drag-handle" pReorderableRowHandle></i></td>
+                                <td class="cell-center"><span class="plo-code-tag">{{ goal.kyhieu }}</span></td>
+                                <td class="editable-cell">
+                                    @if (editingGoalId() === goal.id) {
+                                    <textarea #goalEditor class="editor-in-table" [ngModel]="goalDraft" (ngModelChange)="goalDraft = $event"
+                                        (blur)="finishGoalEdit()" [attr.aria-label]="'Nội dung ' + goal.kyhieu" placeholder="Nhập nội dung mục tiêu"></textarea>
+                                    } @else {
+                                    <div class="table-content ql-editor" [class.is-empty]="!goalContent(goal)">{{ goalContent(goal) || 'Chưa nhập nội dung mục tiêu' }}</div>
+                                    }
+                                </td>
+                                <td class="cell-center"><div class="btn-group-actions">
+                                    <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button" [disabled]="objectivesBlocked() || hasObjectiveEditor()"
+                                        (click)="beginGoalEdit(goal)" [attr.aria-label]="'Sửa ' + goal.kyhieu" [pTooltip]="'Sửa ' + goal.kyhieu" tooltipPosition="left" appendTo="body"><i class="ti ti-edit" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button" [disabled]="objectivesBlocked() || hasObjectiveEditor()"
+                                        (click)="removeGoal(rowIndex)" [attr.aria-label]="'Xóa ' + goal.kyhieu" [pTooltip]="'Xóa ' + goal.kyhieu" tooltipPosition="left" appendTo="body"><i class="ti ti-trash" aria-hidden="true"></i></button>
+                                </div></td>
+                            </tr>
+                        </ng-template>
+                        <ng-template #emptymessage><tr><td colspan="4" class="cell-empty">Chưa có mục tiêu chi tiết.</td></tr></ng-template>
+                    </p-table>
+                </div></div>
+            </section>
+            } @else if (activeItemId() === 'outcomes') {
+            <section class="admin-wrap-table ictu-admin-table-shell cdr-table-card" aria-labelledby="template-outcomes-title">
+                <header class="admin-wrap-table__head cdr-table-card__header">
+                    <span class="admin-wrap-table__heading cdr-table-card__title">
+                        <span class="cdr-header-icon" aria-hidden="true"><i class="ti ti-certificate"></i></span>
+                        <span id="template-outcomes-title">Chuẩn đầu ra (CLO)</span>
+                    </span>
+                    <div class="admin-wrap-table__head-actions cdr-table-card__actions">
+                        <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button"
+                            (click)="addOutcome()" [disabled]="objectivesBlocked()" aria-label="Thêm chuẩn đầu ra" pTooltip="Thêm chuẩn đầu ra" tooltipPosition="left" appendTo="body"><i class="ti ti-plus" aria-hidden="true"></i></button>
+                        <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-icon-button subject-template__save-button"
+                            (click)="saveOutcomes()" [disabled]="objectivesBlocked() || !outcomes.length" aria-label="Lưu chuẩn đầu ra" pTooltip="Lưu chuẩn đầu ra" tooltipPosition="left" appendTo="body"><i class="ti ti-device-floppy" aria-hidden="true"></i></button>
+                    </div>
+                </header>
+                <div class="admin-wrap-table__body ictu-admin-table-shell__body"><div class="ictu-admin-table-scroll cdr-table-responsive">
+                    <p-table [value]="outcomes" (onRowReorder)="reorderRows('outcomes')" tableStyleClass="tbl admin-table cdr-grid-table clo-grid-table">
+                        <ng-template #header><tr><th class="col-drag"></th><th class="col-code">Ký hiệu</th><th>Nội dung CĐR</th><th class="col-actions">Thao tác</th></tr></ng-template>
+                        <ng-template #body let-outcome let-rowIndex="rowIndex">
+                            <tr [pReorderableRow]="rowIndex" [pReorderableRowDisabled]="objectivesBlocked() || hasObjectiveEditor()">
+                                <td class="cell-center"><i class="ti ti-grip-vertical drag-handle" pReorderableRowHandle></i></td>
+                                <td class="cell-center"><span class="pi-code-tag">{{ outcome.kyhieu }}</span></td>
+                                <td class="editable-cell">
+                                    @if (editingOutcomeId() === outcome.id) {
+                                    <textarea #outcomeEditor class="editor-in-table" [ngModel]="outcomeDraft" (ngModelChange)="outcomeDraft = $event"
+                                        (blur)="finishOutcomeEdit()" [attr.aria-label]="'Nội dung ' + outcome.kyhieu" placeholder="Nhập nội dung chuẩn đầu ra"></textarea>
+                                    } @else {
+                                    <div class="table-content ql-editor" [class.is-empty]="!outcomeContent(outcome)">{{ outcomeContent(outcome) || 'Chưa nhập nội dung chuẩn đầu ra' }}</div>
+                                    }
+                                </td>
+                                <td class="cell-center"><div class="btn-group-actions">
+                                    <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button" [disabled]="objectivesBlocked() || hasObjectiveEditor()"
+                                        (click)="beginOutcomeEdit(outcome)" [attr.aria-label]="'Sửa ' + outcome.kyhieu" [pTooltip]="'Sửa ' + outcome.kyhieu" tooltipPosition="left" appendTo="body"><i class="ti ti-edit" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button" [disabled]="objectivesBlocked() || hasObjectiveEditor()"
+                                        (click)="removeOutcome(rowIndex)" [attr.aria-label]="'Xóa ' + outcome.kyhieu" [pTooltip]="'Xóa ' + outcome.kyhieu" tooltipPosition="left" appendTo="body"><i class="ti ti-trash" aria-hidden="true"></i></button>
+                                </div></td>
+                            </tr>
+                        </ng-template>
+                        <ng-template #emptymessage><tr><td colspan="4" class="cell-empty">Chưa có chuẩn đầu ra.</td></tr></ng-template>
+                    </p-table>
+                </div></div>
+            </section>
+            } @else {
+            <section class="admin-wrap-table ictu-admin-table-shell cdr-table-card" aria-labelledby="template-links-title">
+                <header class="admin-wrap-table__head cdr-table-card__header">
+                    <span class="admin-wrap-table__heading cdr-table-card__title">
+                        <span class="cdr-header-icon" aria-hidden="true"><i class="ti ti-layout-grid"></i></span>
+                        <span id="template-links-title">Liên kết CO – CLO</span>
+                    </span>
+                    <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-icon-button subject-template__save-button"
+                        [disabled]="objectivesBlocked()" (click)="saveOutcomeLinks()" aria-label="Lưu liên kết" pTooltip="Lưu liên kết" tooltipPosition="left" appendTo="body"><i class="ti ti-device-floppy" aria-hidden="true"></i></button>
+                </header>
+                @if (!goals.length || !outcomes.length) {
+                <div class="matrix-empty-tip">Thêm CO và CLO trước khi thiết lập liên kết.</div>
+                } @else {
+                <div class="admin-wrap-table__body ictu-admin-table-shell__body"><div class="ictu-admin-table-scroll cdr-table-responsive">
+                    <p-table [value]="outcomes" tableStyleClass="tbl admin-table cdr-grid-table">
+                        <ng-template #header><tr><th class="col-code">CLO</th><th>Nội dung CĐR</th>@for (goal of goals; track goal.id) {<th class="col-link">{{ goal.kyhieu }}</th>}</tr></ng-template>
+                        <ng-template #body let-outcome>
+                            <tr>
+                                <td class="cell-center"><span class="pi-code-tag">{{ outcome.kyhieu }}</span></td>
+                                <td><div class="table-content ql-editor">{{ outcome.noidung || 'Chưa nhập nội dung chuẩn đầu ra' }}</div></td>
+                                @for (goal of goals; track goal.id) {
+                                <td class="matrix-cell matrix-cell--choice" [class.matrix-cell--checked]="outcomeGoal(outcome) === goal.id">
+                                    <button type="button" class="matrix-choice" [disabled]="objectivesBlocked() || hasObjectiveEditor()"
+                                        (click)="setOutcomeGoal(outcome, outcomeGoal(outcome) === goal.id ? null : goal.id)"
+                                        [attr.aria-pressed]="outcomeGoal(outcome) === goal.id" [attr.aria-label]="'Liên kết ' + outcome.kyhieu + ' với ' + goal.kyhieu" [pTooltip]="'Liên kết ' + outcome.kyhieu + ' với ' + goal.kyhieu" tooltipPosition="left" appendTo="body">
+                                        @if (outcomeGoal(outcome) === goal.id) {<i class="ti ti-check" aria-hidden="true"></i>}
+                                        @else {<span class="matrix-dash" aria-hidden="true">—</span>}
+                                    </button>
+                                </td>
+                                }
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div></div>
+                }
+            </section>
+            }
+        </main>
+    </div>
+</section>

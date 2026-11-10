@@ -48,9 +48,9 @@
                             <th class="course-management-col-index text-center">STT</th>
                             <th class="course-management-col-code text-center">Mã học phần</th>
                             <th class="text-center">Tên học phần</th>
-                            <th class="course-management-col-number text-center">TC</th>
-                            <th class="course-management-col-number text-center">TCTH</th>
+                            <th class="course-management-col-number text-center">Tín chỉ</th>
                             <th class="course-management-col-category text-center">Khoa quản lý</th>
+                            <th class="course-management-col-department text-center">Bộ môn</th>
                             <th class="course-management-col-actions text-center">Thao tác</th>
                         </tr>
                     </thead>
@@ -62,11 +62,15 @@
                             <td class="text-left">
                                 <a class="course-management-title" [routerLink]="['/hoc-phan']"
                                     [queryParams]="{ code: course.id }">{{ course.title || 'Chưa đặt tên' }}</a>
-                                <div class="course-management-subtitle">{{ course.teacherName }} - TC: {{ course.params?.sotinchi ?? 0 }} - {{ course.examFormatLabel }}</div>
+                                <div class="course-management-subtitle">{{ course.teacherName }}</div>
                             </td>
-                            <td class="text-center">{{ course.params?.sotinchi || 0 }}</td>
-                            <td class="text-center">{{ course.params?.sotinchi_th || 0 }}</td>
+                            <td class="course-management-col-number text-center">
+                                <strong>{{ course.params?.sotinchi ?? 0 }}</strong>
+                                ({{ (course.params?.sotinchi ?? 0) - (course.params?.sotinchi_th ?? 0) }} LT /
+                                {{ course.params?.sotinchi_th ?? 0 }} TH)
+                            </td>
                             <td class="text-center">{{ categoryName(course.category_ids) }}</td>
+                            <td class="text-center">{{ departmentName(course.nganh_bomon_id) }}</td>
                             <td class="text-center course-management-actions">
                                 @if (canDownload) {
                                 <button type="button" class="btn ictu-button-success-light ictu-admin-icon-button"

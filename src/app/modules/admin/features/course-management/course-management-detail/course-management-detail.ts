@@ -76,9 +76,9 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
 
     readonly tabs: readonly CourseManagementTabItem[] = [
         { id: 'thong-tin', label: 'Thông tin chung', icon: 'ti ti-info-circle', mode: 'ke-hoach-giang-day' },
-        { id: 'muc-tieu-cdr', label: 'Mục tiêu/CDR', icon: 'ti ti-target', mode: 'ke-hoach-giang-day' },
-        { id: 'noi-dung', label: 'Nội dung', icon: 'ti ti-book', mode: 'ke-hoach-giang-day' },
-        { id: 'phan-bo-cdr-cau-hoi', label: 'Phân bổ câu hỏi CDR', icon: 'ti ti-chart-donut', mode: 'kiem-tra-danh-gia' },
+        { id: 'muc-tieu-cdr', label: 'Khung mục tiêu', icon: 'ti ti-target', mode: 'ke-hoach-giang-day' },
+        { id: 'noi-dung', label: 'Nội dung giảng dạy', icon: 'ti ti-book', mode: 'ke-hoach-giang-day' },
+        { id: 'phan-bo-cdr-cau-hoi', label: 'Ma trận câu hỏi CĐR', icon: 'ti ti-chart-donut', mode: 'kiem-tra-danh-gia' },
         { id: 'form-de', label: 'Form đề', icon: 'ti ti-forms', mode: 'kiem-tra-danh-gia' },
         { id: 'sinh-de', label: 'Sinh đề', icon: 'ti ti-clipboard-check', mode: 'kiem-tra-danh-gia' }
     ];

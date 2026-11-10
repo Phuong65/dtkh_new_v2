@@ -30,15 +30,16 @@ import { NotificationService as IctuNotificationService } from '@core-new/servic
 import { AuthService } from '@core/services/auth.service';
 import { DonVi } from '@modules/shared/models/don-vi';
 import { Ctdt } from '@modules/shared/models/ctdt';
-import { ElnKhoaHoc, EXAMFORMAT } from '@modules/shared/models/elng-khoa-hoc';
+import { ElnKhoaHoc } from '@modules/shared/models/elng-khoa-hoc';
+import { ElnChuyenMuc } from '@modules/shared/models/Elng';
 import { ConditionOption } from '@modules/shared/models/condition-option';
 import { CtdtService } from '@modules/shared/services/ctdt.service';
 import { DonViService } from '@modules/shared/services/don-vi.service';
+import { ElnChuyenMucService } from '@modules/shared/services/elearning-chuyen-muc.service';
 import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
 
 interface CourseRow extends ElnKhoaHoc {
     teacherName?: string;
-    examFormatLabel?: string;
 }
 
 interface CourseDownloadDocument {
@@ -60,6 +61,7 @@ export class CourseManagementComponent {
     private readonly courseService = inject(ElnKhoaHocService);
     private readonly ctdtService = inject(CtdtService);
     private readonly donViService = inject(DonViService);
+    private readonly chuyenMucService = inject(ElnChuyenMucService);
     private readonly auth = inject(AuthService);
     private readonly userService = inject(UserService);
     private readonly notificationService = inject(NotificationService);
@@ -79,6 +81,7 @@ export class CourseManagementComponent {
     readonly ctdtId = signal<number | null>(null);
     readonly categories = signal<DonVi[]>([]);
     readonly programmes = signal<Ctdt[]>([]);
+    readonly departments = signal<ElnChuyenMuc[]>([]);
     readonly table = new IctuDataTable2<CourseRow>({ rows: 20, pageLinkSize: 5 });
     readonly cloneDrawerVisible = signal(false);
     readonly selectedCourse = signal<CourseRow | null>(null);
@@ -117,17 +120,29 @@ export class CourseManagementComponent {
             set: [{ label: 'limit', value: '-1' }, { label: 'orderby', value: 'ten' }, { label: 'order', value: 'ASC' }],
             page: null
         };
-        forkJoin({ categories: this.donViService.getDonviByPageNew(category), programmes: this.ctdtService.getCtdtByPageNew(programme) })
-            .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-                next: response => {
-                    this.categories.set(response.categories.data || []);
-                    this.programmes.set(response.programmes.data || []);
-                    this.filterState.set('success');
-                },
-                error: () => {
-                    this.filterState.set('error');
-                }
-            });
+        const department: ConditionOption = {
+            condition: [
+                { conditionName: 'status', condition: OvicQueryCondition.notEqual, value: '-1', orWhere: 'and' },
+                { conditionName: 'type', condition: OvicQueryCondition.equal, value: 'bomon', orWhere: 'and' }
+            ],
+            set: [{ label: 'limit', value: '-1' }, { label: 'orderby', value: 'title' }, { label: 'order', value: 'ASC' }],
+            page: null
+        };
+        forkJoin({
+            categories: this.donViService.getDonviByPageNew(category),
+            programmes: this.ctdtService.getCtdtByPageNew(programme),
+            departments: this.chuyenMucService.getChuyemucByPageNew(department)
+        }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+            next: response => {
+                this.categories.set(response.categories.data || []);
+                this.programmes.set(response.programmes.data || []);
+                this.departments.set(response.departments.data || []);
+                this.filterState.set('success');
+            },
+            error: () => {
+                this.filterState.set('error');
+            }
+        });
     }
 
     loadCourses(page = 1, resetPaginator = false): void {
@@ -176,7 +191,6 @@ export class CourseManagementComponent {
                 const courses = (response.data || []) as CourseRow[];
                 courses.forEach(course => {
                     course.teacherName = teacherNames.get(course.creator_plan_id) || 'Chưa phân quyền';
-                    course.examFormatLabel = this.examFormat(course);
                 });
                 const total = Number(response.recordsFiltered) || 0;
                 this.table.fillRawData({ data: courses, recordsFiltered: total, recordsTotal: total, draw: 1 }, { paged: page, resetPaginator });
@@ -188,12 +202,6 @@ export class CourseManagementComponent {
                 this.errorMessage.set('Không thể tải danh sách học phần. Vui lòng thử lại.');
             }
         });
-    }
-
-    private examFormat(course: ElnKhoaHoc): string {
-        const { exam_type, exam_format } = course.params || {};
-        return (EXAMFORMAT.find(format => format.id === exam_type)
-            || EXAMFORMAT.find(format => format.key === exam_format))?.label || 'Chưa cấu hình';
     }
 
     openClone(course: CourseRow): void {
@@ -382,6 +390,10 @@ export class CourseManagementComponent {
 
     categoryName(id: number): string {
         return this.categories().find(item => item.id === id)?.title || '—';
+    }
+
+    departmentName(id: number | null | undefined): string {
+        return this.departments().find(item => item.id === id)?.title || '—';
     }
 
     filteredProgrammes(): Ctdt[] {
