@@ -13,6 +13,7 @@ describe('CtdtNoidungComponent knowledge block credits', () => {
         state.deletingKhoi = signal(false);
         state.formKhoi = new FormGroup({
             title: new FormControl('Khối cơ sở'),
+            loai_khoi: new FormControl('BAT_BUOC', Validators.required),
             sotinchi_dukien: new FormControl(18, Validators.min(0))
         });
         state.list_khoikienthuc = [];
@@ -33,7 +34,10 @@ describe('CtdtNoidungComponent knowledge block credits', () => {
         component.saveKhoi();
 
         expect((component as any).ctdtConfigService.addCtdtConfig).toHaveBeenCalledWith(
-            jasmine.objectContaining({ group: 'KHOI_KIEN_THUC', sotinchi_dukien: 18 })
+            jasmine.objectContaining({
+                group: 'KHOI_KIEN_THUC',
+                params: { loai_khoi: 'BAT_BUOC', sotinchi_dukien: 18 }
+            })
         );
     });
 
@@ -48,28 +52,61 @@ describe('CtdtNoidungComponent knowledge block credits', () => {
 
     it('saves an edited default block credit when materializing programme-specific blocks', () => {
         const component = createComponent();
-        component.selectedKhoi = { ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'core', title: 'Khối cơ sở', sotinchi_dukien: 12 };
+        component.selectedKhoi = {
+            ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'core', title: 'Khối cơ sở',
+            params: { loai_khoi: 'BAT_BUOC', sotinchi_dukien: 12, extra: 'retained' }
+        };
         component.list_khoikienthuc = [
-            { ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'core', title: 'Khối cơ sở', sotinchi_dukien: 12 },
-            { ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'elective', title: 'Khối tự chọn', sotinchi_dukien: 9 }
+            {
+                ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'core', title: 'Khối cơ sở',
+                params: { loai_khoi: 'BAT_BUOC', sotinchi_dukien: 12, extra: 'retained' }
+            },
+            {
+                ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'elective', title: 'Khối tự chọn',
+                params: { loai_khoi: 'TU_CHON', sotinchi_dukien: 9 }
+            }
         ];
         component.formKhoi.controls['sotinchi_dukien'].setValue(15);
+        component.formKhoi.controls['loai_khoi'].setValue('TU_CHON');
 
         component.saveKhoi();
 
         const addConfig = (component as any).ctdtConfigService.addCtdtConfig;
-        expect(addConfig).toHaveBeenCalledWith(jasmine.objectContaining({ key: 'core', sotinchi_dukien: 15 }));
-        expect(addConfig).toHaveBeenCalledWith(jasmine.objectContaining({ key: 'elective', sotinchi_dukien: 9 }));
+        expect(addConfig).toHaveBeenCalledWith(jasmine.objectContaining({
+            key: 'core',
+            params: { loai_khoi: 'TU_CHON', sotinchi_dukien: 15, extra: 'retained' }
+        }));
+        expect(addConfig).toHaveBeenCalledWith(jasmine.objectContaining({
+            key: 'elective',
+            params: { loai_khoi: 'TU_CHON', sotinchi_dukien: 9 }
+        }));
     });
 
     it('keeps the saved credit value when grouping courses by block', () => {
         const component = createComponent();
-        component.list_khoikienthuc = [{ ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'core', title: 'Khối cơ sở', sotinchi_dukien: 18 }];
+        component.list_khoikienthuc = [{
+            ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'core', title: 'Khối cơ sở',
+            params: { loai_khoi: 'BAT_BUOC', sotinchi_dukien: 18 }
+        }];
         (component as any).list_course = [];
 
         (component as any).groupCourses();
 
-        expect(component.list_cdt_hocphan[0].sotinchi_dukien).toBe(18);
+        expect(component.list_cdt_hocphan[0].params?.sotinchi_dukien).toBe(18);
+        expect(component.list_cdt_hocphan[0].params?.loai_khoi).toBe('BAT_BUOC');
+    });
+
+    it('recognizes the default elective block and migrates legacy credits into params', () => {
+        const component = createComponent();
+        component.list_khoikienthuc = [{
+            ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'TUCHON', title: 'Môn tự chọn', sotinchi_dukien: 6
+        }];
+        (component as any).list_course = [];
+
+        (component as any).groupCourses();
+
+        expect(component.list_cdt_hocphan[0].params?.loai_khoi).toBe('TU_CHON');
+        expect(component.list_cdt_hocphan[0].params?.sotinchi_dukien).toBe(6);
     });
 });
 

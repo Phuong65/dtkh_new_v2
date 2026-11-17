@@ -68,7 +68,14 @@
                                         <strong>{{ khoi.title }}</strong>
                                         @if (khoi.key) {
                                         <span class="content-block-credit">
-                                            {{ khoi.sotinchi_dukien == null ? 'Chưa khai báo tín chỉ' : khoi.sotinchi_dukien + ' TC' }}
+                                            @if (khoi.params?.loai_khoi === 'TU_CHON') {
+                                            <span>Tự chọn</span>
+                                            @if (khoi.params?.sotinchi_dukien != null) {
+                                            <span>· {{ khoi.params?.sotinchi_dukien }} TC</span>
+                                            }
+                                            } @else {
+                                            <span>Bắt buộc</span>
+                                            }
                                         </span>
                                         }
                                     </div>
@@ -297,6 +304,12 @@
                         @if (formKhoi.controls['title'].touched && formKhoi.controls['title'].invalid) {
                         <span id="khoi-title-error" class="ictu-admin-form-error" role="alert">Nhập tên khối kiến thức.</span>
                         }
+                    </div>
+                    <div class="ictu-form__row">
+                        <label class="ictu-form__label ictu-form__label--required" for="khoi-loai">Phân loại khối</label>
+                        <p-select inputId="khoi-loai" formControlName="loai_khoi" [options]="khoiTypeOptions"
+                            optionLabel="label" optionValue="value" class="content-block-type-select"
+                            placeholder="Chọn phân loại" appendTo="body"></p-select>
                     </div>
                     <div class="ictu-form__row">
                         <label class="ictu-form__label" for="khoi-sotinchi-dukien">Số tín chỉ dự kiến</label>

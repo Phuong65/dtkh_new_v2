@@ -242,6 +242,19 @@
     white-space: nowrap;
 }
 
+.content-block-type-select {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    height: 43px;
+    box-sizing: border-box;
+    font-family: var(--primary-font-family), 'Be Vietnam Pro', 'Noto Sans', 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    --p-select-border-color: var(--p-inputtext-border-color);
+    --p-select-focus-border-color: var(--p-inputtext-focus-border-color);
+}
+
 .content-table-toolbar {
     position: relative;
     display: flex;

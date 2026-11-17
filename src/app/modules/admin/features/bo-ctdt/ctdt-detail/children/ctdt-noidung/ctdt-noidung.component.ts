@@ -27,6 +27,7 @@ import { CtdtConfig } from '@modules/shared/models/ctdt-config';
 import { CtdtConfigService } from '@modules/shared/services/ctdt-config.service';
 import { Drawer } from 'primeng/drawer';
 import { InputTextModule } from 'primeng/inputtext';
+import { Select } from 'primeng/select';
 import { MatButtonModule } from '@angular/material/button';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 import { IctuDeletingAnimationControl } from '@core-new/models/ictu-deleting-animation-control';
@@ -34,6 +35,12 @@ import { HelperService } from '@core/services/helper.service';
 import { TooltipModule } from 'primeng/tooltip';
 
 type CourseConditionKey = 'hp_hoctruoc' | 'hp_tienquyet' | 'hp_songhanh';
+type KnowledgeBlockType = 'BAT_BUOC' | 'TU_CHON';
+type KnowledgeBlockParams = {
+    loai_khoi?: KnowledgeBlockType;
+    sotinchi_dukien?: number | null;
+    [key: string]: unknown;
+};
 type CourseRow = Pick<ElnKhoaHoc, 'id' | 'title' | 'maso' | 'ctdt_ids'> & {
     params?: Pick<NonNullable<ElnKhoaHoc['params']>, 'sotinchi' | 'sotinchi_th'>;
     ctdt_hocphan_id?: number;
@@ -67,7 +74,7 @@ type SubjectSyncOperation =
 export interface typeCtdtHocphan {
     key: string;
     title: string;
-    sotinchi_dukien?: number | null;
+    params?: KnowledgeBlockParams;
     children: CourseRow[];
 }
 
@@ -75,7 +82,7 @@ export interface typeCtdtHocphan {
     selector: 'app-ctdt-noidung',
     standalone: true,
     imports: [CommonModule, TableModule, FormsModule, ReactiveFormsModule, PopoverModule,
-        Drawer, InputTextModule, MatButtonModule, LoadingProgressComponent, IctuPaginatorComponent, TooltipModule],
+        Drawer, InputTextModule, Select, MatButtonModule, LoadingProgressComponent, IctuPaginatorComponent, TooltipModule],
     templateUrl: './ctdt-noidung.component.html',
     styleUrls: ['./ctdt-noidung.component.css']
 })
@@ -109,8 +116,13 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
     userId = 0;
     list_khoikienthuc: CtdtConfig[] = [];
     list_cdt_hocphan: typeCtdtHocphan[] = [];
+    readonly khoiTypeOptions = [
+        { label: 'Bắt buộc', value: 'BAT_BUOC' as KnowledgeBlockType },
+        { label: 'Tự chọn', value: 'TU_CHON' as KnowledgeBlockType }
+    ];
     readonly formKhoi: FormGroup = this.formBuilder.group({
         title: ['', Validators.required],
+        loai_khoi: ['BAT_BUOC' as KnowledgeBlockType, Validators.required],
         sotinchi_dukien: [null, Validators.min(0)]
     });
     khoiDrawerVisible = false;
@@ -358,7 +370,7 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
             if (this.hasPendingChanges()) this.notificationService.toastWarning('Vui lòng lưu các thay đổi học phần trước khi thêm khối kiến thức.');
             return;
         }
-        this.formKhoi.reset({ title: '', sotinchi_dukien: null });
+        this.formKhoi.reset({ title: '', loai_khoi: 'BAT_BUOC', sotinchi_dukien: null });
         this.selectedKhoi = null;
         this.khoiFormHeading = 'Thêm khối kiến thức';
         this.khoiDrawerVisible = true;
@@ -371,7 +383,11 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
             return;
         }
         this.selectedKhoi = config;
-        this.formKhoi.reset({ title: config.title, sotinchi_dukien: config.sotinchi_dukien ?? null });
+        this.formKhoi.reset({
+            title: config.title,
+            loai_khoi: this.getKhoiType(config),
+            sotinchi_dukien: this.getPlannedCredits(config)
+        });
         this.khoiFormHeading = 'Sửa khối kiến thức';
         this.khoiDrawerVisible = true;
     }
@@ -385,6 +401,7 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         this.formKhoi.markAllAsTouched();
         const title = String(this.formKhoi.value.title || '').trim();
         if (this.formKhoi.invalid || !title) return;
+        const loai_khoi = this.formKhoi.value.loai_khoi as KnowledgeBlockType;
         const rawValue = this.formKhoi.value.sotinchi_dukien;
         const sotinchi_dukien = rawValue === '' || rawValue == null ? null : Number(rawValue);
         const programmeId = this.selectedCtdt.id;
@@ -402,7 +419,9 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
             this.notificationService.toastWarning('Khối kiến thức đã tồn tại hoặc không hợp lệ');
             return;
         }
-        const payload: CtdtConfig = { ctdt_id: programmeId, group: 'KHOI_KIEN_THUC', key, title, sotinchi_dukien,
+        const payload: CtdtConfig = {
+            ctdt_id: programmeId, group: 'KHOI_KIEN_THUC', key, title,
+            params: { ...this.getKhoiParams(selected), loai_khoi, sotinchi_dukien },
             ordering: selected?.ordering || this.list_khoikienthuc.length + 1, noidung: selected?.noidung || '' };
         this.savingKhoi.set(true);
         this.getKhoiConfig(programmeId).pipe(
@@ -416,7 +435,11 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
                     .map((item, index) => () => this.ctdtConfigService.addCtdtConfig({
                         ctdt_id: programmeId, group: 'KHOI_KIEN_THUC', key: item.key,
                         title: editing && item.key === key ? title : item.title,
-                        sotinchi_dukien: editing && item.key === key ? sotinchi_dukien : item.sotinchi_dukien ?? null,
+                        params: {
+                            ...this.getKhoiParams(item),
+                            loai_khoi: editing && item.key === key ? loai_khoi : this.getKhoiType(item),
+                            sotinchi_dukien: editing && item.key === key ? sotinchi_dukien : this.getPlannedCredits(item)
+                        },
                         ordering: item.ordering ?? index + 1, noidung: item.noidung || ''
                     }));
                 return (defaultsToMaterialize.length ? from(defaultsToMaterialize).pipe(concatMap(request => defer(request)), toArray()) : of([]))
@@ -502,7 +525,12 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         snapshot.filter(item => item.key !== blockKey && !real.some(saved => saved.key === item.key))
             .forEach((item, index) => requests.push(() => this.ctdtConfigService.addCtdtConfig({
                 ctdt_id: programmeId, group: 'KHOI_KIEN_THUC', key: item.key, title: item.title,
-                sotinchi_dukien: item.sotinchi_dukien ?? null, ordering: item.ordering ?? index + 1, noidung: item.noidung || ''
+                params: {
+                    ...this.getKhoiParams(item),
+                    loai_khoi: this.getKhoiType(item),
+                    sotinchi_dukien: this.getPlannedCredits(item)
+                },
+                ordering: item.ordering ?? index + 1, noidung: item.noidung || ''
             })));
         const remainingBlocks = new Set([...snapshot, ...real].filter(item => item.key !== blockKey).map(item => item.key));
         remainingLinks.forEach(link => {
@@ -550,7 +578,12 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
 
     private groupCourses(): void {
         this.list_cdt_hocphan = this.list_khoikienthuc.map(block => ({
-            key: block.key, title: block.title, sotinchi_dukien: block.sotinchi_dukien,
+            key: block.key, title: block.title,
+            params: {
+                ...this.getKhoiParams(block),
+                loai_khoi: this.getKhoiType(block),
+                sotinchi_dukien: this.getPlannedCredits(block)
+            },
             children: this.list_course.filter(course => course.khoikienthuc === block.key)
         }));
         const other = this.list_course.filter(course => !this.list_khoikienthuc.some(block => block.key === course.khoikienthuc));
@@ -572,6 +605,27 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
 
     getTotalPracticeCredits(): number {
         return this.list_cdt_hocphan.reduce((sum, block) => sum + this.getBlockPracticeCredits(block), 0);
+    }
+
+    private getKhoiParams(config: CtdtConfig | null): KnowledgeBlockParams {
+        const params = config?.params;
+        return params && typeof params === 'object' && !Array.isArray(params)
+            ? params as KnowledgeBlockParams : {};
+    }
+
+    private getKhoiType(config: CtdtConfig): KnowledgeBlockType {
+        const type = this.getKhoiParams(config).loai_khoi;
+        if (type === 'BAT_BUOC' || type === 'TU_CHON') return type;
+        const isElective = config.key?.toLocaleUpperCase('vi') === 'TUCHON'
+            || config.title?.trim().toLocaleLowerCase('vi') === 'môn tự chọn';
+        return isElective ? 'TU_CHON' : 'BAT_BUOC';
+    }
+
+    private getPlannedCredits(config: CtdtConfig): number | null {
+        const value: unknown = this.getKhoiParams(config).sotinchi_dukien ?? config.sotinchi_dukien;
+        if (value == null || value === '') return null;
+        const credits = Number(value);
+        return Number.isFinite(credits) && credits >= 0 ? credits : null;
     }
 
     getBlockCredits(block: typeCtdtHocphan): number {
