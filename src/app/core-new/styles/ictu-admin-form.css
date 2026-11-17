@@ -1122,9 +1122,8 @@ input.admin-wrap-table__input::placeholder,
 body:has(app-ctdt, app-ctdt-detail, app-bo-ctdt, app-subject-management, app-subject-template-detail, app-course-management, app-course-management-detail) .p-tooltip-text {
 	display: block;
 	max-width: calc(100vw - 2rem);
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+	overflow-wrap: anywhere;
+	white-space: normal;
 }
 
 .ictu-form__row--group-before {
