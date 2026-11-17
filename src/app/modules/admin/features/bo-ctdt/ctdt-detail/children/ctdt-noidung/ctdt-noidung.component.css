@@ -242,17 +242,18 @@
     white-space: nowrap;
 }
 
-.content-block-type-select {
-    display: flex;
-    width: 100%;
-    min-width: 0;
+.ictu-form__row select.content-block-type-select {
     height: 43px;
     box-sizing: border-box;
-    font-family: var(--primary-font-family), 'Be Vietnam Pro', 'Noto Sans', 'Segoe UI', sans-serif;
-    font-size: 14px;
-    line-height: 1.5;
-    --p-select-border-color: var(--p-inputtext-border-color);
-    --p-select-focus-border-color: var(--p-inputtext-focus-border-color);
+    padding: var(--ictu-input-padding-y, 10px) var(--ictu-input-padding-x, 10px);
+    border: 1px solid var(--p-inputtext-border-color, #cbd5e1);
+    background: var(--p-inputtext-background, #ffffff);
+}
+
+.ictu-form__row select.content-block-type-select:focus-visible {
+    border-color: var(--p-inputtext-focus-border-color, #0d59cf);
+    outline: none;
+    box-shadow: 0 0 0 2px rgb(13 89 207 / 12%);
 }
 
 .content-table-toolbar {

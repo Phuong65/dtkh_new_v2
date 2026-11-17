@@ -307,9 +307,16 @@
                     </div>
                     <div class="ictu-form__row">
                         <label class="ictu-form__label ictu-form__label--required" for="khoi-loai">Phân loại khối</label>
-                        <p-select inputId="khoi-loai" formControlName="loai_khoi" [options]="khoiTypeOptions"
-                            optionLabel="label" optionValue="value" class="content-block-type-select"
-                            placeholder="Chọn phân loại" appendTo="body"></p-select>
+                        <select id="khoi-loai" formControlName="loai_khoi" required
+                            class="ictu-form__input-field content-block-type-select"
+                            [attr.aria-invalid]="formKhoi.controls['loai_khoi'].touched && formKhoi.controls['loai_khoi'].invalid"
+                            [attr.aria-describedby]="formKhoi.controls['loai_khoi'].touched && formKhoi.controls['loai_khoi'].invalid ? 'khoi-loai-error' : null">
+                            <option value="BAT_BUOC">Bắt buộc</option>
+                            <option value="TU_CHON">Tự chọn</option>
+                        </select>
+                        @if (formKhoi.controls['loai_khoi'].touched && formKhoi.controls['loai_khoi'].invalid) {
+                        <span id="khoi-loai-error" class="ictu-admin-form-error" role="alert">Chọn phân loại khối.</span>
+                        }
                     </div>
                     <div class="ictu-form__row">
                         <label class="ictu-form__label" for="khoi-sotinchi-dukien">Số tín chỉ dự kiến</label>
