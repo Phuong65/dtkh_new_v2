@@ -1119,11 +1119,19 @@ input.admin-wrap-table__input::placeholder,
 	line-height: 1.5;
 }
 
+body:has(app-ctdt, app-ctdt-detail, app-bo-ctdt, app-subject-management, app-subject-template-detail, app-course-management, app-course-management-detail) .p-tooltip {
+	max-width: calc(100vw - 2rem);
+}
+
 body:has(app-ctdt, app-ctdt-detail, app-bo-ctdt, app-subject-management, app-subject-template-detail, app-course-management, app-course-management-detail) .p-tooltip-text {
 	display: block;
 	max-width: calc(100vw - 2rem);
-	overflow-wrap: anywhere;
-	white-space: normal;
+	overflow-x: auto;
+	overflow-y: hidden;
+	overflow-wrap: normal;
+	text-overflow: clip;
+	white-space: nowrap;
+	word-break: normal;
 }
 
 .ictu-form__row--group-before {
