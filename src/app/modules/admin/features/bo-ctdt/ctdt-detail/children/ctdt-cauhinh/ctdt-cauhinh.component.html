@@ -28,7 +28,7 @@
                         <button type="button" mat-flat-button
                             class="btn ictu-badge-btn--success-reverse cauhinh-add-button" (click)="addConfig(parent)"
                             [disabled]="busy" [attr.aria-label]="'Thêm mục cho ' + parent.title"
-                            [pTooltip]="'Thêm mục cấu hình cho ' + parent.title" tooltipPosition="top" appendTo="body">
+                            [pTooltip]="'Thêm mục cấu hình cho ' + parent.title" tooltipPosition="left" appendTo="body">
                             <i class="ti ti-plus" aria-hidden="true"></i>
                         </button>
                     </div>
@@ -54,7 +54,7 @@
                                     <!-- <td class="col-handle cell-center">
                                         <span class="p-datatable-reorderable-row-handle cauhinh-drag-handle" pReorderableRowHandle
                                             role="button" tabindex="0" aria-label="Kéo thả đổi thứ tự" pTooltip="Kéo thả để đổi thứ tự"
-                                            tooltipPosition="top" appendTo="body">
+                                            tooltipPosition="left" appendTo="body">
                                             <i class="ti ti-grip-vertical" aria-hidden="true"></i>
                                         </span> 
                                     </td>--> 
@@ -106,7 +106,7 @@
                                             <button class="btn ictu-button-danger-light ictu-admin-icon-button"
                                                 (click)="deleteConfig(parent, con, rowIndex)" [disabled]="busy"
                                                 [attr.aria-label]="'Xóa mục thứ ' + con.ordering" pTooltip="Xóa mục này"
-                                                tooltipPosition="top" appendTo="body">
+                                                tooltipPosition="left" appendTo="body">
                                                 <i class="ti ti-trash" aria-hidden="true"></i>
                                             </button>
                                         </div>
@@ -135,7 +135,7 @@
     <footer class="cauhinh-sticky-footer">
         <div class="cauhinh-sticky-footer__inner">
             <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse cauhinh-save-button"
-                (click)="saveConfig()" [disabled]="busy" pTooltip="Lưu toàn bộ thay đổi cấu hình" tooltipPosition="top"
+                (click)="saveConfig()" [disabled]="busy" pTooltip="Lưu toàn bộ thay đổi cấu hình" tooltipPosition="left"
                 appendTo="body">
                 <i class="ti ti-device-floppy" aria-hidden="true"></i>
                 <span>Lưu cấu hình</span>

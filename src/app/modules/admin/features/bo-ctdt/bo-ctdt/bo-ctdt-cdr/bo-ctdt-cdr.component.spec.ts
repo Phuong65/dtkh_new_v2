@@ -40,7 +40,8 @@ describe('BoCtdtCdrComponent', () => {
         service.create.and.returnValue(of({ ...plo, id: 20 }));
         service.update.and.returnValue(of(plo));
         service.delete.and.returnValue(of(true));
-        notification = jasmine.createSpyObj('NotificationService', ['toastWarning', 'toastSuccess', 'toastError', 'confirmDelete2', 'startDeleting']);
+        notification = jasmine.createSpyObj('NotificationService', ['toastWarning', 'toastSuccess', 'toastError', 'confirm', 'confirmDelete2', 'startDeleting']);
+        notification.confirm.and.returnValue(of(undefined));
         notification.confirmDelete2.and.returnValue(of(true));
         notification.startDeleting.and.callFake((progress: Observable<number>) => new Observable<boolean>(subscriber =>
             progress.subscribe({
@@ -213,6 +214,51 @@ describe('BoCtdtCdrComponent', () => {
         pending.next(plo);
         expect(component.saving()).toBeFalse();
         expect(component.rows()).toEqual([]);
+    });
+
+    it('embedded hides the standalone header and keeps the PLO table', () => {
+        const fixture = TestBed.createComponent(BoCtdtCdrComponent);
+        fixture.componentRef.setInput('selectedBo', bo);
+        fixture.componentRef.setInput('embedded', true);
+        fixture.detectChanges();
+        expect(fixture.nativeElement.querySelector('.bo-cdr-toolbar')).toBeNull();
+        expect(fixture.nativeElement.querySelector('.bo-cdr-page--embedded')).not.toBeNull();
+        expect(fixture.nativeElement.querySelector('.bo-cdr-table')).not.toBeNull();
+        fixture.destroy();
+    });
+
+    it('keeps a PI draft when discard is declined and blocks overwriting it', () => {
+        component.openEdit(component.rows()[0].children[0], component.rows()[0]);
+        component.f.noidung.setValue('Nháp PI');
+        component.f.percent_pi.setValue(55);
+        const pending = new Subject<any>();
+        notification.confirm.and.returnValue(pending);
+        component.closeDrawer();
+        expect(component.busy).toBeTrue();
+        expect(component.dirty).toBeTrue();
+        pending.next({ name: 'no' }); pending.complete();
+        component.openCreatePlo();
+        expect(component.editingRow()?.id).toBe(11);
+        expect(component.selectedParent()?.id).toBe(10);
+        expect(component.form.getRawValue()).toEqual({ noidung: 'Nháp PI', percent_pi: 55 });
+        notification.confirm.and.returnValue(of({ name: 'yes' } as any));
+        component.closeDrawer();
+        expect(component.drawerVisible()).toBeFalse();
+        expect(component.selectedParent()).toBeNull();
+    });
+
+    it('locks navigation while delete confirmation is pending', () => {
+        const pending = new Subject<boolean>();
+        notification.confirmDelete2.and.returnValue(pending);
+        const back = spyOn(component.back, 'emit');
+        component.deleteRow(component.rows()[0].children[0]);
+        expect(component.busy).toBeTrue();
+        component.goBack(); component.openCreatePlo(); component.deleteRow(component.rows()[0].children[0]);
+        expect(back).not.toHaveBeenCalled();
+        expect(notification.confirmDelete2).toHaveBeenCalledTimes(1);
+        pending.next(false); pending.complete();
+        expect(component.busy).toBeFalse();
+        expect(service.delete).not.toHaveBeenCalled();
     });
 
     it('blocks mutations for read-only users and allows returning to the table', () => {

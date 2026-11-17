@@ -69,7 +69,7 @@
                         </div>
                         <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse"
                             (click)="openAddDinhHuong()" [disabled]="busy" aria-label="Thêm định hướng"
-                            pTooltip="Thêm định hướng" tooltipPosition="top" appendTo="body">
+                            pTooltip="Thêm định hướng" tooltipPosition="left" appendTo="body">
                             <i class="ti ti-plus" aria-hidden="true"></i>
                         </button>
                     </header>
@@ -103,13 +103,13 @@
                                             <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
                                                 (click)="editDinhHuong(orientation)" [disabled]="busy"
                                                 [attr.aria-label]="'Sửa định hướng ' + orientation.title"
-                                                pTooltip="Sửa định hướng" tooltipPosition="top" appendTo="body">
+                                                pTooltip="Sửa định hướng" tooltipPosition="left" appendTo="body">
                                                 <i class="ti ti-edit" aria-hidden="true"></i>
                                             </button>
                                             <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
                                                 (click)="deleteDinhHuong(orientation)" [disabled]="busy"
                                                 [attr.aria-label]="'Xóa định hướng ' + orientation.title"
-                                                pTooltip="Xóa định hướng" tooltipPosition="top" appendTo="body">
+                                                pTooltip="Xóa định hướng" tooltipPosition="left" appendTo="body">
                                                 <i class="ti ti-trash" aria-hidden="true"></i>
                                             </button>
                                         </div>
@@ -138,7 +138,7 @@
                         </div>
                         <button mat-flat-button class="btn ictu-badge-btn--success-reverse" (click)="openAddKhungTrinhDo()"
                             [disabled]="busy || goalsState() === 'error'"
-                            aria-label="Thêm khung trình độ" pTooltip="Thêm khung trình độ" tooltipPosition="top"
+                            aria-label="Thêm khung trình độ" pTooltip="Thêm khung trình độ" tooltipPosition="left"
                             appendTo="body">
                             <i class="ti ti-plus" aria-hidden="true"></i><span>Thêm khung trình độ</span>
                         </button>
@@ -182,20 +182,20 @@
                                                     <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
                                                         (click)="editKhungTrinhDo(group)" [disabled]="busy || group.key === '__ungrouped__'"
                                                         [attr.aria-label]="'Sửa khung trình độ ' + group.title" pTooltip="Sửa khung trình độ"
-                                                        tooltipPosition="top" appendTo="body">
+                                                        tooltipPosition="left" appendTo="body">
                                                         <i class="ti ti-edit" aria-hidden="true"></i>
                                                     </button>
                                                     <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
                                                         (click)="deleteKhungTrinhDo(group)" [disabled]="busy || group.key === '__ungrouped__'"
                                                         [attr.aria-label]="'Xóa khung trình độ ' + group.title" pTooltip="Xóa khung trình độ"
-                                                        tooltipPosition="top" appendTo="body">
+                                                        tooltipPosition="left" appendTo="body">
                                                         <i class="ti ti-trash" aria-hidden="true"></i>
                                                     </button>
                                                 </div>
                                                 <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse"
                                                     (click)="addPeoToGroup(group)" [disabled]="busy || group.key === '__ungrouped__'"
                                                     [attr.aria-label]="'Thêm PEO vào ' + group.title" pTooltip="Thêm PEO"
-                                                    tooltipPosition="top" appendTo="body">
+                                                    tooltipPosition="left" appendTo="body">
                                                     <i class="ti ti-plus" aria-hidden="true"></i> Thêm PEO
                                                 </button>
                                             </div>
@@ -229,14 +229,14 @@
                                                 class="btn ictu-button-info-light ictu-admin-icon-button"
                                                 (click)="editMucTieuchuThe(goal)" [disabled]="busy"
                                                 [attr.aria-label]="'Sửa ' + goal.kyhieu" pTooltip="Sửa mục tiêu"
-                                                tooltipPosition="top" appendTo="body">
+                                                tooltipPosition="left" appendTo="body">
                                                 <i class="ti ti-edit" aria-hidden="true"></i>
                                             </button>
                                             <button type="button"
                                                 class="btn ictu-button-danger-light ictu-admin-icon-button"
                                                 (click)="deleteMuctieu(goal)" [disabled]="busy"
                                                 [attr.aria-label]="'Xóa ' + goal.kyhieu" pTooltip="Xóa mục tiêu"
-                                                tooltipPosition="top" appendTo="body">
+                                                tooltipPosition="left" appendTo="body">
                                                 <i class="ti ti-trash" aria-hidden="true"></i>
                                             </button>
                                         </div>

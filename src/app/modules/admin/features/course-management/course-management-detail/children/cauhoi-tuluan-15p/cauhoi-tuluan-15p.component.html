@@ -52,7 +52,7 @@
                 </div>
                 <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button cauhoi-15p-sidebar__toggle"
                     (click)="closeLeftBody()" [attr.aria-label]="closeLeft ? 'Mở danh sách bài học' : 'Thu gọn danh sách bài học'"
-                    [attr.aria-expanded]="!closeLeft" aria-controls="cauhoi-15p-lessons" pTooltip="Thu gọn/Mở danh sách bài học" tooltipPosition="right" appendTo="body">
+                    [attr.aria-expanded]="!closeLeft" aria-controls="cauhoi-15p-lessons" pTooltip="Thu gọn/Mở danh sách bài học" tooltipPosition="left" appendTo="body">
                     <i [class]="closeLeft ? 'ti ti-chevron-right' : 'ti ti-chevron-left'" aria-hidden="true"></i>
                 </button>
             </header>
@@ -263,7 +263,7 @@
                                     mat-flat-button class="btn ictu-button-info-light cauhoi-15p-text-button"
                                     [disabled]="embeddedMode && !embeddedCanEdit"
                                     [attr.aria-label]="'Sửa câu hỏi #' + cauhoi.id"
-                                    [pTooltip]="'Sửa câu hỏi #' + cauhoi.id" tooltipPosition="top" appendTo="body">
+                                    [pTooltip]="'Sửa câu hỏi #' + cauhoi.id" tooltipPosition="left" appendTo="body">
                                     <i class="ti ti-edit" aria-hidden="true"></i>
                                     <span>Sửa</span>
                                 </button>
@@ -272,7 +272,7 @@
                                     [disabled]="deletingQuestionId === cauhoi.id || (embeddedMode && !embeddedCanEdit)"
                                     [attr.aria-label]="(deletingQuestionId === cauhoi.id ? 'Đang xóa câu hỏi #' : 'Xóa câu hỏi #') + cauhoi.id"
                                     [pTooltip]="(deletingQuestionId === cauhoi.id ? 'Đang xóa câu hỏi #' : 'Xóa câu hỏi #') + cauhoi.id"
-                                    tooltipPosition="top" appendTo="body">
+                                    tooltipPosition="left" appendTo="body">
                                     <i [ngClass]="deletingQuestionId === cauhoi.id ? 'ti ti-loader cauhoi-15p-spin' : 'ti ti-trash'"
                                         aria-hidden="true"></i>
                                     <span>{{deletingQuestionId === cauhoi.id ? 'Đang xóa' : 'Xóa'}}</span>
@@ -716,7 +716,7 @@
                                                 </div>
                                                 <div>
                                                     <button type="button" mat-flat-button (click)="deleteTieuchi(item)"
-                                                        class="btn ictu-button-danger-light ictu-admin-icon-button" aria-label="Xóa tiêu chí" pTooltip="Xóa tiêu chí" tooltipPosition="top" appendTo="body">
+                                                        class="btn ictu-button-danger-light ictu-admin-icon-button" aria-label="Xóa tiêu chí" pTooltip="Xóa tiêu chí" tooltipPosition="left" appendTo="body">
                                                         <i class="ti ti-trash"></i>
                                                     </button>
                                                 </div>

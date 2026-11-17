@@ -1,15 +1,16 @@
-<section class="admin-section--table ictu-admin-page bo-cdr-page position-relative" aria-labelledby="bo-cdr-title">
+<section class="admin-section--table ictu-admin-page bo-cdr-page position-relative" [class.bo-cdr-page--embedded]="embedded" aria-label="Chuẩn đầu ra">
+    @if (!embedded) {
     <header class="admin-wrap-table__head bo-cdr-toolbar">
         <div class="bo-cdr-heading">
             <h1 id="bo-cdr-title" class="admin-wrap-table__heading">Chuẩn đầu ra</h1>
             <p>{{ selectedBo?.name }} · {{ selectedBo?.code }}</p>
         </div>
         <button type="button" mat-flat-button class="btn ictu-badge-btn--danger-reverse ictu-admin-icon-button bo-cdr-close-button"
-            (click)="goBack()" [disabled]="busy" aria-label="Đóng"
-            pTooltip="Đóng" tooltipPosition="left">
+            (click)="goBack()" [disabled]="busy" aria-label="Đóng" pTooltip="Đóng" tooltipPosition="left">
             <i class="ti ti-x"></i>
         </button>
     </header>
+    }
 
     <div class="bo-cdr-body position-relative" [attr.aria-busy]="state() === 'loading' || busy">
         @if (state() === 'loading') {
@@ -144,9 +145,18 @@
     </div>
 </section>
 
-<p-drawer [(visible)]="drawerVisible" [dismissible]="!busy" [closable]="!busy" [closeOnEscape]="!busy"
-    [header]="formTitle()" [blockScroll]="true" ariaCloseLabel="Đóng biểu"
+<p-drawer [visible]="drawerVisible()" [dismissible]="false" [closable]="false" [closeOnEscape]="false"
+    [blockScroll]="true" ariaCloseLabel="Đóng biểu"
     appendTo="body" position="right" [style]="{ width: 'min(700px, 100vw)' }" styleClass="ictu-p-drawer bo-cdr-drawer">
+    <ng-template #header>
+        <div class="bo-cdr-drawer-header">
+            <span class="p-drawer-title">{{ formTitle() }}</span>
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--danger-reverse ictu-admin-icon-button"
+                (click)="closeDrawer()" [disabled]="busy" aria-label="Đóng biểu mẫu PLO/PI" pTooltip="Đóng" tooltipPosition="left">
+                <i class="ti ti-x" aria-hidden="true"></i>
+            </button>
+        </div>
+    </ng-template>
     <div class="ictu-p-drawer__content bo-cdr-drawer-content">
         <div class="ictu-p-drawer__content__body bo-cdr-drawer-body position-relative">
             @if (saving()) {

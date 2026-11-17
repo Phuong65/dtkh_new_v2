@@ -45,6 +45,22 @@ export class BoCtdtCdrComponent implements OnChanges, OnDestroy {
     @Input() canUpdate = false;
     @Input() canDelete = false;
     @Output() back = new EventEmitter<void>();
+    @Input() embedded = false;
+    readonly confirmingDiscard = signal(false);
+    readonly confirmingDelete = signal(false);
+    get dirty(): boolean {
+        const value = this.form.getRawValue();
+        const editing = this.editingRow();
+        return this.drawerVisible() && (value.noidung !== (editing?.noidung || '')
+            || value.percent_pi !== (editing && this.isPiForm ? Number(editing.percent_pi) : null));
+    }
+    discardDraft(): void {
+        if (this.busy) return;
+        this.drawerVisible.set(false);
+        this.editingRow.set(null);
+        this.selectedParent.set(null);
+        this.resetForm();
+    }
 
     readonly state: WritableSignal<AppState> = signal('loading');
     readonly saving: WritableSignal<boolean> = signal(false);
@@ -65,7 +81,7 @@ export class BoCtdtCdrComponent implements OnChanges, OnDestroy {
     });
 
     get f() { return this.form.controls; }
-    get busy(): boolean { return this.saving() || this.deleting(); }
+    get busy(): boolean { return this.saving() || this.deleting() || this.confirmingDiscard() || this.confirmingDelete(); }
     get isPiForm(): boolean { return this.selectedParent() !== null; }
     decodeContent(value: string): string {
         return value ? this.helper.decodeHTML(value) : '';
@@ -144,7 +160,7 @@ export class BoCtdtCdrComponent implements OnChanges, OnDestroy {
     }
 
     openCreatePlo(): void {
-        if (!this.canAdd || !this.selectedBo?.id || this.busy || this.state() !== 'success') return;
+        if (!this.canAdd || !this.selectedBo?.id || this.busy || this.dirty || this.state() !== 'success') return;
         this.selectedParent.set(null);
         this.editingRow.set(null);
         this.formTitle.set('Thêm PLO');
@@ -153,7 +169,7 @@ export class BoCtdtCdrComponent implements OnChanges, OnDestroy {
     }
 
     openCreatePi(parent: BoCtdtCdrParent): void {
-        if (!this.canAdd || this.busy || this.state() !== 'success') return;
+        if (!this.canAdd || this.busy || this.dirty || this.state() !== 'success') return;
         const current = this.rows().find(row => row.id === parent.id);
         if (!current) return;
         this.selectedParent.set(current);
@@ -164,7 +180,7 @@ export class BoCtdtCdrComponent implements OnChanges, OnDestroy {
     }
 
     openEdit(row: BoCtdtCdr, parent: BoCtdtCdrParent | null = null): void {
-        if (!this.canUpdate || this.busy || this.state() !== 'success' || !this.findRow(row.id)) return;
+        if (!this.canUpdate || this.busy || this.dirty || this.state() !== 'success' || !this.findRow(row.id)) return;
         const currentParent = parent ? this.rows().find(item => item.id === parent.id) : null;
         if (parent && (!currentParent || !currentParent.children.some(child => child.id === row.id))) return;
         this.selectedParent.set(currentParent);
@@ -179,9 +195,15 @@ export class BoCtdtCdrComponent implements OnChanges, OnDestroy {
 
     closeDrawer(): void {
         if (this.busy) return;
-        this.drawerVisible.set(false);
-        this.editingRow.set(null);
-        this.selectedParent.set(null);
+        if (!this.dirty) { this.discardDraft(); return; }
+        const version = this.contextVersion;
+        this.confirmingDiscard.set(true);
+        this.notification.confirm({ heading: 'Bỏ thay đổi chưa lưu?', message: 'Nháp PLO/PI chưa lưu sẽ bị bỏ.',
+            buttons: [{ name: 'yes', label: 'Bỏ nháp' }, { name: 'no', label: 'Ở lại' }]
+        }).pipe(takeUntil(this.cancelContext$), takeUntil(this.destroy$), finalize(() => this.confirmingDiscard.set(false))).subscribe(button => {
+            this.confirmingDiscard.set(false);
+            if (button?.name === 'yes' && version === this.contextVersion && !this.destroyed) this.discardDraft();
+        });
     }
 
     private resetForm(): void {
@@ -194,7 +216,7 @@ export class BoCtdtCdrComponent implements OnChanges, OnDestroy {
     submit(): void {
         const boId = Number(this.selectedBo?.id);
         const editing = this.editingRow();
-        if (!(editing ? this.canUpdate : this.canAdd) || !boId || this.busy || this.state() !== 'success') return;
+        if (!(editing ? this.canUpdate : this.canAdd) || !boId || !this.drawerVisible() || this.busy || this.state() !== 'success') return;
         this.form.markAllAsTouched();
         if (this.form.invalid) return;
         const parent = this.selectedParent();
@@ -213,7 +235,7 @@ export class BoCtdtCdrComponent implements OnChanges, OnDestroy {
             next: () => {
                 if (version !== this.contextVersion || this.destroyed) return;
                 this.saving.set(false);
-                this.closeDrawer();
+                this.discardDraft();
                 this.notification.toastSuccess(editing ? 'Đã cập nhật chuẩn đầu ra.' : 'Đã thêm chuẩn đầu ra.', 'Thành công');
                 this.loadRows();
             },
@@ -246,9 +268,11 @@ export class BoCtdtCdrComponent implements OnChanges, OnDestroy {
         }
         const version = this.contextVersion;
         const kind = Number(row.parent_id) === 0 ? 'PLO' : 'PI';
+        this.confirmingDelete.set(true);
         this.notification.confirmDelete2({
             heading: 'Xác nhận xóa', htmlMessage: `Bạn có chắc muốn xóa ${kind} này?`
-        }).pipe(takeUntil(this.cancelContext$), takeUntil(this.destroy$)).subscribe(confirmed => {
+        }).pipe(takeUntil(this.cancelContext$), takeUntil(this.destroy$), finalize(() => this.confirmingDelete.set(false))).subscribe(confirmed => {
+            this.confirmingDelete.set(false);
             if (!confirmed || !this.canDelete || this.busy || this.destroyed || version !== this.contextVersion
                 || this.state() !== 'success' || !this.findRow(row.id)) return;
             if (this.rows().find(parent => parent.id === row.id)?.children.length) {

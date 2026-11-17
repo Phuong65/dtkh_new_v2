@@ -76,7 +76,7 @@
                                 <button type="button" class="btn ictu-button-success-light ictu-admin-icon-button"
                                     (click)="downloadDocuments(course)" [disabled]="downloadingCourseId() !== null"
                                     [attr.aria-label]="'Tải tài liệu giảng dạy ' + (course.title || '')"
-                                    pTooltip="Tải tài liệu giảng dạy" tooltipPosition="top" appendTo="body">
+                                    pTooltip="Tải tài liệu giảng dạy" tooltipPosition="left" appendTo="body">
                                     <i class="ti ti-file-download" aria-hidden="true"></i>
                                 </button>
                                 }
@@ -84,7 +84,7 @@
                                 <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
                                     (click)="openClone(course)" [disabled]="cloneDrawerVisible()"
                                     [attr.aria-label]="'Sao chép môn học ' + (course.title || '')"
-                                    pTooltip="Sao chép môn học" tooltipPosition="top" appendTo="body">
+                                    pTooltip="Sao chép môn học" tooltipPosition="left" appendTo="body">
                                     <i class="ti ti-copy" aria-hidden="true"></i>
                                 </button>
                                 }
@@ -92,7 +92,7 @@
                                 <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
                                     (click)="deleteCourse(course)" [disabled]="deletingCourseId() !== null"
                                     [attr.aria-label]="'Xóa học phần ' + (course.title || '')"
-                                    pTooltip="Xóa học phần" tooltipPosition="top" appendTo="body">
+                                    pTooltip="Xóa học phần" tooltipPosition="left" appendTo="body">
                                     <i class="ti ti-trash" aria-hidden="true"></i>
                                 </button>
                                 }

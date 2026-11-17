@@ -23,7 +23,7 @@
             </div>
             <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse content-add-block-button"
                 (click)="openAddKhoi()" [disabled]="blockActionsBusy || hasPendingChanges()"
-                aria-label="Thêm khối kiến thức" pTooltip="Thêm khối kiến thức" tooltipPosition="top">
+                aria-label="Thêm khối kiến thức" pTooltip="Thêm khối kiến thức" tooltipPosition="left">
                 <i class="ti ti-plus" aria-hidden="true"></i><span>Thêm khối kiến thức</span>
             </button>
         </div>
@@ -71,12 +71,12 @@
                                         <div class="content-block-secondary-actions">
                                             <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
                                                 (click)="openEditKhoi(khoi)" [disabled]="!khoi.key || blockActionsBusy || hasPendingChanges()"
-                                                [attr.aria-label]="'Sửa khối kiến thức ' + khoi.title" pTooltip="Sửa khối kiến thức" tooltipPosition="top">
+                                                [attr.aria-label]="'Sửa khối kiến thức ' + khoi.title" pTooltip="Sửa khối kiến thức" tooltipPosition="left">
                                                 <i class="ti ti-edit" aria-hidden="true"></i>
                                             </button>
                                             <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
                                                 (click)="deleteKhoi(khoi)" [disabled]="!khoi.key || blockActionsBusy || hasPendingChanges()"
-                                                [attr.aria-label]="'Xóa khối kiến thức ' + khoi.title" pTooltip="Xóa khối kiến thức" tooltipPosition="top">
+                                                [attr.aria-label]="'Xóa khối kiến thức ' + khoi.title" pTooltip="Xóa khối kiến thức" tooltipPosition="left">
                                                 <i class="ti ti-trash" aria-hidden="true"></i>
                                             </button>
                                         </div>
@@ -104,7 +104,7 @@
                                         (click)="removeCourseFromBlock(child, conditionPopover)"
                                         [disabled]="blockActionsBusy || !!courseLoadError"
                                         [attr.aria-label]="'Gỡ học phần ' + child.title + ' khỏi khối ' + khoi.title"
-                                        pTooltip="Gỡ học phần khỏi khối" tooltipPosition="top" appendTo="body">
+                                        pTooltip="Gỡ học phần khỏi khối" tooltipPosition="left" appendTo="body">
                                         <i class="ti ti-trash" aria-hidden="true"></i>
                                     </button>
                                 </div>

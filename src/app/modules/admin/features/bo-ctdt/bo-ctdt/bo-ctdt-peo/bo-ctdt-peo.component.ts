@@ -39,6 +39,18 @@ export class BoCtdtPeoComponent implements OnChanges, OnDestroy {
     @Input() canUpdate = false;
     @Input() canDelete = false;
     @Output() back = new EventEmitter<void>();
+    @Input() embedded = false;
+    readonly confirmingDiscard = signal(false);
+    readonly confirmingDelete = signal(false);
+    get dirty(): boolean {
+        return this.drawerVisible() && (this.f.noidung.value || '') !== (this.editingRow()?.noidung || '');
+    }
+    discardDraft(): void {
+        if (this.busy) return;
+        this.drawerVisible.set(false);
+        this.editingRow.set(null);
+        this.form.reset({ noidung: '' });
+    }
 
     readonly state = signal<AppState>('loading');
     readonly rows = signal<CtdtBoMuctieuCuthe[]>([]);
@@ -56,7 +68,7 @@ export class BoCtdtPeoComponent implements OnChanges, OnDestroy {
     });
 
     get f() { return this.form.controls; }
-    get busy(): boolean { return this.saving() || this.deleting(); }
+    get busy(): boolean { return this.saving() || this.deleting() || this.confirmingDiscard() || this.confirmingDelete(); }
 
     decodeContent(value: string): string { return value ? this.helper.decodeHTML(value) : ''; }
 
@@ -111,7 +123,7 @@ export class BoCtdtPeoComponent implements OnChanges, OnDestroy {
     }
 
     openCreate(): void {
-        if (!this.canAdd || !this.selectedBo?.id || this.busy || this.state() !== 'success') return;
+        if (!this.canAdd || !this.selectedBo?.id || this.busy || this.dirty || this.state() !== 'success') return;
         this.editingRow.set(null);
         this.formTitle.set('Thêm PEO');
         this.form.reset({ noidung: '' });
@@ -119,7 +131,7 @@ export class BoCtdtPeoComponent implements OnChanges, OnDestroy {
     }
 
     openEdit(row: CtdtBoMuctieuCuthe): void {
-        if (!this.canUpdate || this.busy || this.state() !== 'success') return;
+        if (!this.canUpdate || this.busy || this.dirty || this.state() !== 'success') return;
         const current = this.rows().find(item => item.id === row.id);
         if (!current) return;
         this.editingRow.set(current);
@@ -130,8 +142,15 @@ export class BoCtdtPeoComponent implements OnChanges, OnDestroy {
 
     closeDrawer(): void {
         if (this.busy) return;
-        this.drawerVisible.set(false);
-        this.editingRow.set(null);
+        if (!this.dirty) { this.discardDraft(); return; }
+        const version = this.contextVersion;
+        this.confirmingDiscard.set(true);
+        this.notification.confirm({ heading: 'Bỏ thay đổi chưa lưu?', message: 'Nháp PEO chưa lưu sẽ bị bỏ.',
+            buttons: [{ name: 'yes', label: 'Bỏ nháp' }, { name: 'no', label: 'Ở lại' }]
+        }).pipe(takeUntil(this.cancelContext$), takeUntil(this.destroy$), finalize(() => this.confirmingDiscard.set(false))).subscribe(button => {
+            this.confirmingDiscard.set(false);
+            if (button?.name === 'yes' && version === this.contextVersion && !this.destroyed) this.discardDraft();
+        });
     }
 
     submit(): void {
@@ -149,7 +168,7 @@ export class BoCtdtPeoComponent implements OnChanges, OnDestroy {
             next: () => {
                 if (version !== this.contextVersion || this.destroyed) return;
                 this.saving.set(false);
-                this.closeDrawer();
+                this.discardDraft();
                 this.notification.toastSuccess(editing ? 'Đã cập nhật PEO.' : 'Đã thêm PEO.', 'Thành công');
                 this.loadRows();
             },
@@ -164,8 +183,10 @@ export class BoCtdtPeoComponent implements OnChanges, OnDestroy {
     deleteRow(row: CtdtBoMuctieuCuthe): void {
         if (!this.canDelete || this.busy || this.state() !== 'success' || !this.rows().some(item => item.id === row.id)) return;
         const version = this.contextVersion;
+        this.confirmingDelete.set(true);
         this.notification.confirmDelete2({ heading: 'Xác nhận xóa', htmlMessage: 'Bạn có chắc muốn xóa mục tiêu PEO này?' })
-            .pipe(takeUntil(this.cancelContext$), takeUntil(this.destroy$)).subscribe(confirmed => {
+            .pipe(takeUntil(this.cancelContext$), takeUntil(this.destroy$), finalize(() => this.confirmingDelete.set(false))).subscribe(confirmed => {
+                this.confirmingDelete.set(false);
                 if (!confirmed || !this.canDelete || this.busy || this.destroyed || version !== this.contextVersion
                     || this.state() !== 'success' || !this.rows().some(item => item.id === row.id)) return;
                 this.deleting.set(true);

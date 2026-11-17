@@ -28,21 +28,21 @@
                     <div class="duan-action-group">
                         @if (test['status'] !== 1 && selectedActivity['ordering'] !== 0 && test['list_tieuchi'] && test['list_tieuchi'].length === 0) {
                         <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button" (click)="openListDuanTuCopyTieuchi(test)"
-                            aria-label="Sao chép tiêu chí" pTooltip="Sao chép tiêu chí từ dự án khác" tooltipPosition="top" appendTo="body"><i class="ti ti-copy" aria-hidden="true"></i></button>
+                            aria-label="Sao chép tiêu chí" pTooltip="Sao chép tiêu chí từ dự án khác" tooltipPosition="left" appendTo="body"><i class="ti ti-copy" aria-hidden="true"></i></button>
                         }
                         <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button" (click)="onViewTuluan(test)"
-                            aria-label="Xem dự án" pTooltip="Xem dự án" tooltipPosition="top" appendTo="body"><i class="ti ti-eye" aria-hidden="true"></i></button>
+                            aria-label="Xem dự án" pTooltip="Xem dự án" tooltipPosition="left" appendTo="body"><i class="ti ti-eye" aria-hidden="true"></i></button>
                         @if (test['status'] !== 1 && selectedActivity['ordering'] !== 0) {
                         <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button" (click)="openAddTieuchicham(test)"
-                            aria-label="Nhập tiêu chí chấm" pTooltip="Nhập tiêu chí chấm" tooltipPosition="top" appendTo="body"><i class="ti ti-list-check" aria-hidden="true"></i></button>
+                            aria-label="Nhập tiêu chí chấm" pTooltip="Nhập tiêu chí chấm" tooltipPosition="left" appendTo="body"><i class="ti ti-list-check" aria-hidden="true"></i></button>
                         }
                         @if (test['status'] !== 1 && selectedActivity['ordering'] === 0) {
                         <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button" (click)="editCodeTuluan(test)"
-                            aria-label="Sửa dự án" pTooltip="Sửa dự án" tooltipPosition="top" appendTo="body"><i class="ti ti-edit" aria-hidden="true"></i></button>
+                            aria-label="Sửa dự án" pTooltip="Sửa dự án" tooltipPosition="left" appendTo="body"><i class="ti ti-edit" aria-hidden="true"></i></button>
                         }
                         @if (test['status'] !== 1) {
                         <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button" (click)="deleteTuluan(test)"
-                            aria-label="Xóa dự án" pTooltip="Xóa dự án" tooltipPosition="top" appendTo="body"><i class="ti ti-trash" aria-hidden="true"></i></button>
+                            aria-label="Xóa dự án" pTooltip="Xóa dự án" tooltipPosition="left" appendTo="body"><i class="ti ti-trash" aria-hidden="true"></i></button>
                         }
                     </div>
                 </td>

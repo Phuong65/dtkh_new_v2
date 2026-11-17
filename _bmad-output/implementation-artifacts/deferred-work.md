@@ -43,3 +43,18 @@
 - source_spec: none
   summary: Đổi nút chọn tệp sang kiểu success của core-new.
   evidence: Đây là chỉnh sửa giao diện upload độc lập với trạng thái duyệt ở sidebar và header.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-admin-feature-tooltips-left-single-line.md`
+  summary: Khóa thao tác chọn môn học trong sidebar Bộ CTĐT theo quyền canSelectSubjects.
+  evidence: Nút môn học vẫn có thể bật khi canSelectSubjects là false, trong khi toggleSubject bỏ qua thao tác; đây là thay đổi sidebar đã staged trước task tooltip.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-admin-feature-tooltips-left-single-line.md`
+  summary: Hiển thị giải thích lỗi theo trường trong form cấu hình Bộ CTĐT.
+  evidence: Form staged chỉ khóa nút lưu khi invalid mà không chỉ ra trường cần sửa; không phát sinh từ thay đổi tooltip.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-admin-feature-tooltips-left-single-line.md`
+  summary: Bổ sung accessible name khi component PEO được nhúng.
+  evidence: Header chứa bo-peo-title bị ẩn ở chế độ embedded trong khi aria-labelledby vẫn tham chiếu ID đó; đây là markup staged trước task tooltip.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-admin-feature-tooltips-left-single-line.md`
+  summary: Bổ sung kiểm thử cho luồng sidebar cấu hình Bộ CTĐT.
+  evidence: Spec sidebar staged yêu cầu kiểm thử navigation, quyền, save/error và embedded behavior nhưng thay đổi staged chưa gồm test tương ứng; ngoài phạm vi chỉnh tooltip.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-core-new-tooltip-style-location.md`
+  summary: Đồng bộ trạng thái checklist trong spec sidebar Bộ CTĐT với phần triển khai đã staged.
+  evidence: Review phát hiện task thực thi trong spec sidebar vẫn chưa được đánh dấu hoàn tất; tài liệu này có sẵn trước thay đổi vị trí CSS tooltip.

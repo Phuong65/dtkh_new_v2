@@ -67,11 +67,23 @@ export class BoCtdtComponent implements OnInit, OnDestroy {
     private appliedSubjectSearch = '';
     private requestedSubjectPage = 1;
     private pendingSubjectSelection: ReadonlySet<number> | null = null;
+    private subjectBaselineLoaded = false;
     private requestedPage = 1;
     private destroyed = false;
     private readonly departmentTitles = new Map<number, string>();
-    readonly selectedTemplateBo = signal<BoCtdt | null>(null);
-    readonly selectedPeoBo = signal<BoCtdt | null>(null);
+    readonly configurationBo = signal<BoCtdt | null>(null);
+    readonly configurationSection = signal<'info' | 'subjects' | 'peo' | 'cdr'>('info');
+    readonly configurationSections = [
+        { id: 'info', label: 'Thông tin', icon: 'ti ti-info-circle' },
+        { id: 'subjects', label: 'Môn học', icon: 'ti ti-books' },
+        { id: 'peo', label: 'Mục tiêu cụ thể', icon: 'ti ti-target' },
+        { id: 'cdr', label: 'Chuẩn đầu ra', icon: 'ti ti-certificate' }
+    ] as const;
+    readonly peo = viewChild(BoCtdtPeoComponent);
+    readonly cdr = viewChild(BoCtdtCdrComponent);
+    readonly confirmingNavigation = signal(false);
+    private configurationVersion = 0;
+    private infoSnapshot = '';
 
     readonly drawer = viewChild<Drawer>('drawer');
     readonly table = new IctuDataTable2<BoCtdt>({ rows: 20, pageLinkSize: 5 });
@@ -84,8 +96,7 @@ export class BoCtdtComponent implements OnInit, OnDestroy {
     readonly nameSearch = signal('');
     private appliedNameSearch = '';
     readonly facultyFilter = signal<number | null>(null);
-    readonly subjectDrawerBo = signal<BoCtdt | null>(null);
-    readonly subjectDrawerVisible: WritableSignal<boolean> = signal(false);
+    readonly subjectBo = signal<BoCtdt | null>(null);
     readonly subjects = signal<Subject[]>([]);
     readonly subjectRelations = signal<SubjectCourseExtend[]>([]);
     readonly selectedSubjectIds = signal<ReadonlySet<number>>(new Set<number>());
@@ -193,7 +204,13 @@ export class BoCtdtComponent implements OnInit, OnDestroy {
         }).pipe(takeUntil(this.cancelLoad$), takeUntil(this.destroy$)).subscribe({
             next: response => {
                 const total = Number(response.totalRecords) || 0;
-                this.table.fillRawData({ data: response.data || [], recordsFiltered: total, recordsTotal: total, draw: 1 }, { paged: page, resetPaginator });
+                const lastPage = Math.max(1, Math.ceil(total / this.table.paginator.rows()));
+                if (page > lastPage) {
+                    this.loadBoCtdt(lastPage, resetPaginator);
+                    return;
+                }
+                this.table.paginator.reset(total);
+                this.table.fillRawData({ data: response.data || [], recordsFiltered: total, recordsTotal: total, draw: 1 }, { paged: page, resetPaginator: false });
                 this.state.set('success');
             },
             error: () => {
@@ -330,34 +347,105 @@ export class BoCtdtComponent implements OnInit, OnDestroy {
         });
     }
 
-    openCdrTemplate(item: BoCtdt): void {
-        if (this.saving() || this.deleting() || this.subjectSaving()) return;
-        this.selectedTemplateBo.set(item);
+    openConfiguration(item: BoCtdt): void {
+        if (this.configurationBo() || this.configurationBusy() || this.formControl.visible) return;
+        ++this.configurationVersion;
+        this.configurationBo.set(item);
+        this.configurationSection.set('info');
+        this.resetConfigurationInfo(item);
+        this.canUpdate ? this.boForm.enable() : this.boForm.disable();
+        this.loadFormDonVi();
     }
 
-    closeCdrTemplate(): void {
-        this.selectedTemplateBo.set(null);
+    closeConfiguration(): void {
+        this.guardConfigurationNavigation(() => {
+            ++this.configurationVersion;
+            this.configurationBo.set(null);
+            this.configurationSection.set('info');
+            this.endSubjectSession();
+            this.boForm.enable();
+            this.loadBoCtdt(this.table.paginator.paged());
+        }, true);
     }
 
-    openPeo(item: BoCtdt): void {
-        if (this.saving() || this.deleting() || this.subjectSaving()) return;
-        this.selectedPeoBo.set(item);
+    private resetConfigurationInfo(item: BoCtdt): void {
+        this.boForm.reset({ name: item.name || '', code: item.code || '', year: Number(item.year) || null,
+            category_ids: this.normalizeCategoryIds(item.category_ids) });
+        this.boForm.markAsPristine();
+        this.infoSnapshot = JSON.stringify(this.boForm.getRawValue());
     }
 
-    closePeo(): void {
-        this.selectedPeoBo.set(null);
+    private guardConfigurationNavigation(next: () => void, closing = false): void {
+        if (!this.configurationBo() || this.configurationBusy() || this.confirmingNavigation()) return;
+        const child = this.peo() || this.cdr();
+        const infoDirty = JSON.stringify(this.boForm.getRawValue()) !== this.infoSnapshot;
+        // Subject selections belong to the whole session, not to a mounted sidebar panel.
+        const dirty = infoDirty || !!child?.dirty || (closing && this.subjectsDirty);
+        if (!dirty) { next(); return; }
+        const version = this.configurationVersion;
+        this.confirmingNavigation.set(true);
+        this.notification.confirm({ heading: 'Bỏ thay đổi chưa lưu?',
+            message: 'Nháp chưa lưu sẽ bị bỏ. Bạn có muốn tiếp tục?', buttons: [
+                { name: 'yes', label: 'Bỏ nháp', class: 'p-button-danger' },
+                { name: 'no', label: 'Ở lại', class: 'p-button-secondary' }
+            ] }).pipe(takeUntil(this.destroy$), finalize(() => this.confirmingNavigation.set(false))).subscribe(button => {
+                this.confirmingNavigation.set(false);
+                if (button?.name !== 'yes' || this.destroyed || version !== this.configurationVersion || this.configurationBusy()) return;
+                if (infoDirty) this.resetConfigurationInfo(this.configurationBo());
+                child?.discardDraft();
+                next();
+            });
     }
 
-    openPrograms(item: BoCtdt): void {
-        const route = this.isFacultyRoute ? 'lanhdao-khoa' : 'dao-tao';
-        this.router.navigate([`/admin/${route}/chuongtrinh-daotao`], { queryParams: { bo_id: item.id } });
+    get subjectsDirty(): boolean {
+        if (!this.subjectBo()) return false;
+        const saved = new Set(this.subjectRelations().map(row => Number(row.subject_id)));
+        return saved.size !== this.selectedSubjectIds().size || [...saved].some(id => !this.selectedSubjectIds().has(id));
     }
 
-    openSubjectDrawer(bo: BoCtdt): void {
-        if (!this.canSelectSubjects || this.subjectSaving() || this.saving() || this.deleting()) return;
+    selectConfigurationSection(section: 'info' | 'subjects' | 'peo' | 'cdr'): void {
+        if (this.configurationSection() === section) return;
+        this.guardConfigurationNavigation(() => {
+            this.configurationSection.set(section);
+            const bo = this.configurationBo();
+            if (section === 'subjects' && bo && this.subjectBo()?.id !== bo.id) this.beginSubjectSession(bo);
+        });
+    }
+
+    configurationBusy(): boolean {
+        return this.confirmingNavigation() || this.saving() || this.deleting() || this.subjectSaving()
+            || !!this.peo()?.busy || !!this.cdr()?.busy;
+    }
+
+    submitConfigurationInfo(): void {
+        const item = this.configurationBo();
+        if (!item || !this.canUpdate || this.configurationBusy()) return;
+        this.boForm.markAllAsTouched();
+        const value = this.boForm.getRawValue();
+        const categoryIds = this.normalizeCategoryIds(value.category_ids);
+        if (this.boForm.invalid || !categoryIds.length || this.formLoading() || this.formLoadError()) return;
+        const version = this.configurationVersion;
+        this.saving.set(true);
+        const payload: Partial<BoCtdt> = { name: value.name?.trim() || '', code: value.code?.trim() || '',
+            year: Number(value.year), category_ids: categoryIds };
+        this.boService.update(item.id, payload).pipe(takeUntil(this.destroy$), finalize(() => this.saving.set(false))).subscribe({
+            next: () => {
+                if (version !== this.configurationVersion || !this.configurationBo()) return;
+                const updated = { ...item, ...payload };
+                this.configurationBo.set(updated);
+                if (this.subjectBo()?.id === item.id) this.subjectBo.set(updated);
+                this.table.data.update(rows => rows.map(row => row.id === item.id ? { ...row, ...updated } : row));
+                this.resetConfigurationInfo(updated);
+                this.notification.toastSuccess('Đã lưu bộ CTĐT', 'Thành công');
+            },
+            error: () => this.notification.toastError('Không thể lưu bộ CTĐT. Dữ liệu nhập được giữ lại.', 'Lỗi thao tác')
+        });
+    }
+
+    private beginSubjectSession(bo: BoCtdt): void {
         this.cancelSubject$.next();
         ++this.subjectSession;
-        this.subjectDrawerBo.set(bo);
+        this.subjectBo.set(bo);
         this.subjectRelations.set([]);
         this.subjects.set([]);
         this.selectedSubjectData.clear();
@@ -369,23 +457,23 @@ export class BoCtdtComponent implements OnInit, OnDestroy {
         this.subjectRelationsReady.set(false);
         this.pendingSubjectSelection = null;
         this.subjectPaginator.reset(0);
-        this.subjectDrawerVisible.set(true);
+        this.subjectBaselineLoaded = false;
         this.loadSubjectPicker(1);
     }
 
-    closeSubjectDrawer(): void {
-        if (this.subjectSaving()) return;
-        this.subjectDrawerVisible.set(false);
-        this.onSubjectDrawerHide();
+    openPrograms(item: BoCtdt): void {
+        const route = this.isFacultyRoute ? 'lanhdao-khoa' : 'dao-tao';
+        this.router.navigate([`/admin/${route}/chuongtrinh-daotao`], { queryParams: { bo_id: item.id } });
     }
 
-    onSubjectDrawerHide(): void {
-        if (this.subjectDrawerVisible() || this.subjectSaving()) return;
+    private endSubjectSession(): void {
+        if (this.subjectSaving()) return;
         this.cancelSubject$.next();
         ++this.subjectSession;
         this.subjectLoading.set(false);
         this.subjectRelationsReady.set(false);
-        this.subjectDrawerBo.set(null);
+        this.subjectBaselineLoaded = false;
+        this.subjectBo.set(null);
         this.pendingSubjectSelection = null;
         this.selectedSubjectData.clear();
     }
@@ -410,11 +498,13 @@ export class BoCtdtComponent implements OnInit, OnDestroy {
     }
 
     loadSubjectPicker(page: number, preservedSelectedIds: ReadonlySet<number> | null = null): void {
-        const bo = this.subjectDrawerBo();
-        if (!bo || !this.subjectDrawerVisible() || this.subjectSaving()) return;
+        const bo = this.subjectBo();
+        if (!bo || this.subjectSaving()) return;
         const session = this.subjectSession;
         const loadRelations = !this.subjectRelationsReady();
-        this.pendingSubjectSelection = preservedSelectedIds ? new Set(preservedSelectedIds) : null;
+        this.pendingSubjectSelection = this.subjectBaselineLoaded
+            ? new Set(preservedSelectedIds ?? this.pendingSubjectSelection ?? this.selectedSubjectIds())
+            : null;
         this.cancelSubject$.next();
         this.subjectLoading.set(true);
         this.subjectError.set('');
@@ -430,10 +520,12 @@ export class BoCtdtComponent implements OnInit, OnDestroy {
                 if (loadRelations) {
                     const relations = response.relations || [];
                     this.subjectRelations.set(relations);
+                    const persistedIds = new Set(relations.map(relation => Number(relation.subject_id)));
                     this.selectedSubjectIds.set(this.pendingSubjectSelection
                         ? new Set(this.pendingSubjectSelection)
-                        : new Set(relations.map(relation => Number(relation.subject_id))));
+                        : persistedIds);
                     this.pendingSubjectSelection = null;
+                    this.subjectBaselineLoaded = true;
                     this.subjectRelationsReady.set(true);
                 }
                 const subjects = response.subjects.data || [];
@@ -485,7 +577,7 @@ export class BoCtdtComponent implements OnInit, OnDestroy {
     }
 
     saveSubjects(): void {
-        const bo = this.subjectDrawerBo();
+        const bo = this.subjectBo();
         if (!bo || !this.canSelectSubjects || this.subjectSaving() || this.subjectLoading() || !this.subjectRelationsReady() || this.subjectError()) return;
         const existing = new Map<number, SubjectCourseExtend>();
         this.subjectRelations().forEach(relation => {
@@ -503,10 +595,7 @@ export class BoCtdtComponent implements OnInit, OnDestroy {
             ...adds.map(subjectId => ({ type: 'add' as const, subjectId })),
             ...deletes.map(relation => ({ type: 'delete' as const, relation }))
         ];
-        if (!operations.length) {
-            this.closeSubjectDrawer();
-            return;
-        }
+        if (!operations.length) return;
         const session = this.subjectSession;
         this.subjectSaving.set(true);
         this.subjectSaveError.set('');
@@ -521,7 +610,8 @@ export class BoCtdtComponent implements OnInit, OnDestroy {
                 if (session !== this.subjectSession) return;
                 this.subjectSaving.set(false);
                 this.notification.toastSuccess('Đã cập nhật môn học', 'Thành công');
-                this.closeSubjectDrawer();
+                this.subjectRelationsReady.set(false);
+                this.loadSubjectPicker(this.requestedSubjectPage, selected);
             },
             error: () => {
                 if (session !== this.subjectSession) return;

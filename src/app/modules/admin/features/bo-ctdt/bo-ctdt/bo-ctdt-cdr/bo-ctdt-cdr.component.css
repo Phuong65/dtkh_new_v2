@@ -27,6 +27,24 @@
     background: var(--bo-cdr-bg);
 }
 
+.bo-cdr-page.bo-cdr-page--embedded {
+    height: 100%;
+    background: transparent;
+}
+
+.bo-cdr-page--embedded .bo-cdr-body {
+    height: 100%;
+    padding: 0;
+}
+
+.bo-cdr-drawer-header {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
 .bo-cdr-toolbar {
     flex: 0 0 auto;
     flex-wrap: nowrap;

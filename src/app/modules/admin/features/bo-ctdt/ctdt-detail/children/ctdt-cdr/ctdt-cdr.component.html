@@ -20,7 +20,7 @@
                 <div class="admin-wrap-table__head-actions cdr-table-card__actions">
                     <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse cdr-add-button"
                         (click)="openAddCtdtCdr()" aria-label="Thêm chuẩn đầu ra PLO"
-                        pTooltip="Thêm chuẩn đầu ra PLO" tooltipPosition="bottom" appendTo="body">
+                        pTooltip="Thêm chuẩn đầu ra PLO" tooltipPosition="left" appendTo="body">
                         <i class="ti ti-plus" aria-hidden="true"></i>
                     </button>
                 </div>
@@ -70,7 +70,7 @@
                                         [class.percent-warn]="getPiPercentState(cdr) === 'under'"
                                         [class.percent-danger]="getPiPercentState(cdr) === 'over'"
                                         [pTooltip]="getPiPercentState(cdr) === 'complete' ? 'Tổng PI đạt 100%' : getPiPercentState(cdr) === 'under' ? 'Còn thiếu ' + getRemainingPiPercent(cdr) + '%' : 'Vượt quá ' + (getTotalPiPercent(cdr) - 100) + '%'"
-                                        tooltipPosition="top" appendTo="body">
+                                        tooltipPosition="left" appendTo="body">
                                         Tổng: {{ getTotalPiPercent(cdr) }}%
                                     </span>
                                     }
@@ -81,19 +81,19 @@
                                             class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button"
                                             (click)="openAddCtdtCdr(cdr)"
                                             [attr.aria-label]="'Thêm PI cho ' + cdr.kyhieu" pTooltip="Thêm PI con"
-                                            tooltipPosition="top" appendTo="body">
+                                            tooltipPosition="left" appendTo="body">
                                             <i class="ti ti-plus" aria-hidden="true"></i>
                                         </button>
                                         <button type="button" mat-flat-button
                                             class="btn  ictu-badge-btn--info-reverse ictu-admin-icon-button"
                                             (click)="editCtdtCdr(cdr)" [attr.aria-label]="'Sửa ' + cdr.kyhieu"
-                                            pTooltip="Sửa PLO" tooltipPosition="top" appendTo="body">
+                                            pTooltip="Sửa PLO" tooltipPosition="left" appendTo="body">
                                             <i class="ti ti-edit"></i>
                                         </button>
                                         <button type="button" mat-flat-button
                                             class="btn ictu-badge-btn--danger-reverse ictu-admin-icon-button"
                                             (click)="deleteCtdtCdr(cdr)" [attr.aria-label]="'Xóa ' + cdr.kyhieu"
-                                            pTooltip="Xóa PLO" tooltipPosition="top" appendTo="body">
+                                            pTooltip="Xóa PLO" tooltipPosition="left" appendTo="body">
                                             <i class="ti ti-trash" aria-hidden="true"></i>
                                         </button>
                                     </div>
@@ -123,13 +123,13 @@
                                         <button type="button" mat-flat-button
                                             class="btn ictu-button-info-light ictu-admin-icon-button"
                                             (click)="editCtdtCdr(child, cdr)" [attr.aria-label]="'Sửa ' + child.kyhieu"
-                                            pTooltip="Sửa PI" tooltipPosition="top" appendTo="body">
+                                            pTooltip="Sửa PI" tooltipPosition="left" appendTo="body">
                                             <i class="ti ti-edit"></i>
                                         </button>
                                         <button type="button" mat-flat-button
                                             class="btn ictu-button-danger-light ictu-admin-icon-button"
                                             (click)="deleteCtdtCdr(child)" [attr.aria-label]="'Xóa ' + child.kyhieu"
-                                            pTooltip="Xóa PI" tooltipPosition="top" appendTo="body">
+                                            pTooltip="Xóa PI" tooltipPosition="left" appendTo="body">
                                             <i class="ti ti-trash" aria-hidden="true"></i>
                                         </button>
                                     </div>
@@ -190,7 +190,7 @@
                     <tbody>
                         @for (peo of list_cdr_muctieu; track peo.id) {
                         <tr>
-                            <th class="matrix-th-row" [pTooltip]="getPeoTooltip(peo)" tooltipPosition="right"
+                            <th class="matrix-th-row" [pTooltip]="getPeoTooltip(peo)" tooltipPosition="left"
                                 appendTo="body">
                                 <b>{{ peo.kyhieu || 'PEO ' + peo.ordering }}</b>
                             </th>

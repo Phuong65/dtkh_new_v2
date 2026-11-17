@@ -414,8 +414,129 @@
 
 @media (max-width: 640px) {
     .bo-ctdt-list__filters .admin-wrap-table__head-actions__search,
-    .bo-ctdt-list__filter-select {
-        flex-basis: 100%;
-        width: 100%;
-    }
+    .bo-ctdt-list__filter-select { flex-basis: 100%; width: 100%; }
+}
+
+.bo-ctdt-config {
+    display: flex; height: calc(var(--device-height, 100vh) - var(--topbar-height, 60px)); min-height: 0;
+    flex-direction: column; background: #f8fafc; color: #172033;
+}
+.bo-ctdt-config__header { display: flex; flex: 0 0 auto; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px; border-bottom: 1px solid #dbe0e5; background: #fff; }
+.bo-ctdt-config__header h1 { margin: 0; font-size: 18px; font-weight: 700; }
+.bo-ctdt-config__header p { margin: 3px 0 0; color: #64748b; font-size: 12px; }
+.bo-ctdt-config__body { display: flex; flex: 1 1 auto; min-height: 0; }
+.bo-ctdt-config__nav {
+    position: relative;
+    display: flex;
+    width: 248px;
+    min-width: 0;
+    min-height: 0;
+    box-sizing: border-box;
+    overflow-y: auto;
+    flex: 0 0 248px;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 14px;
+    border-right: 1px solid #dbe3ef;
+    background: #ffffff;
+    box-shadow: 4px 0 14px rgb(15 23 42 / 3%);
+}
+.bo-ctdt-config__nav::before {
+    display: block;
+    margin: 0 8px 8px;
+    color: #94a3b8;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    content: 'Danh mục cấu hình';
+}
+.bo-ctdt-config__nav-item {
+    position: relative;
+    display: flex;
+    width: 100%;
+    min-height: 46px;
+    align-items: center;
+    gap: 11px;
+    padding: 8px 11px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: #475569;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 550;
+    line-height: 1.35;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .15s ease, background-color .15s ease, color .15s ease, box-shadow .15s ease;
+}
+.bo-ctdt-config__nav-item i {
+    display: inline-flex;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e2e8f0;
+    border-radius: 7px;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 16px;
+    text-align: center;
+    transition: border-color .15s ease, background-color .15s ease, color .15s ease;
+}
+.bo-ctdt-config__nav-item:hover:not(:disabled) {
+    border-color: #dbeafe;
+    background: #f8fbff;
+    color: #1d4ed8;
+}
+.bo-ctdt-config__nav-item:hover:not(:disabled) i {
+    border-color: #bfdbfe;
+    background: #eff6ff;
+    color: #2563eb;
+}
+.bo-ctdt-config__nav-item.is-active {
+    border-color: #bfdbfe;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-weight: 700;
+    box-shadow: inset 3px 0 0 #2563eb, 0 2px 5px rgb(37 99 235 / 8%);
+}
+.bo-ctdt-config__nav-item.is-active i {
+    border-color: #93c5fd;
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+.bo-ctdt-config__nav-item:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
+.bo-ctdt-config__nav-item:disabled { cursor: default; opacity: .65; }
+.bo-ctdt-config__nav-item span { min-width: 0; overflow-wrap: anywhere; }
+.bo-ctdt-config__panel { flex: 1 1 auto; min-width: 0; min-height: 0; overflow: auto; padding: 18px; }
+.bo-ctdt-config__card { position: relative; width: min(980px, 100%); min-height: 100%; margin: 0 auto; padding: 18px; border: 1px solid #dbe0e5; border-radius: 6px; background: #fff; }
+.bo-ctdt-config__card > header { margin: -18px -18px 18px; padding: 14px 18px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; }
+.bo-ctdt-config__card h2 { margin: 0; color: #0f172a; font-size: 16px; }
+.bo-ctdt-config__form { max-width: 720px; }
+.bo-ctdt-config__form fieldset.ictu-form { min-width: 0; margin: 0; padding: 0; border: 0; }
+.bo-ctdt-config__form .ictu-form__row { min-width: 0; }
+.bo-ctdt-config__form .ictu-form__label { margin: 0; }
+.bo-ctdt-config__form .ictu-form__input-field,
+.bo-ctdt-config__form .bo-ctdt-list__faculty-select { margin-top: 4px; }
+:host ::ng-deep .bo-ctdt-config__form .bo-ctdt-list__faculty-select .p-multiselect-label { min-width: 0; overflow: hidden; }
+.bo-ctdt-config__actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.bo-ctdt-config__subject-list { display: flex; flex-direction: column; gap: 8px; max-height: 52vh; overflow: auto; }
+.bo-ctdt-config__subjects .bo-ctdt-list__subject-search { margin-bottom: 14px; }
+.bo-ctdt-config__subjects > ictu-paginator { display: block; margin-top: 12px; }
+.bo-ctdt-config app-bo-ctdt-peo, .bo-ctdt-config app-bo-ctdt-cdr { display: block; min-height: 100%; }
+@media (prefers-reduced-motion: reduce) {
+    .bo-ctdt-config__nav-item,
+    .bo-ctdt-config__nav-item i { transition: none; }
+}
+
+@media (max-width: 700px) {
+    .bo-ctdt-config__body { flex-direction: column; }
+    .bo-ctdt-config__nav { width: 100%; flex-basis: auto; flex-direction: row; gap: 6px; overflow-x: auto; padding: 10px; border-right: 0; border-bottom: 1px solid #dbe0e5; box-shadow: none; }
+    .bo-ctdt-config__nav::before { display: none; }
+    .bo-ctdt-config__nav-item { width: auto; min-height: 40px; flex: 0 0 auto; gap: 8px; padding: 5px 9px; white-space: nowrap; }
+    .bo-ctdt-config__nav-item i { width: 28px; height: 28px; flex-basis: 28px; font-size: 15px; }
+    .bo-ctdt-config__panel { padding: 12px; }
 }

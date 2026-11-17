@@ -69,7 +69,7 @@
                                                     (click)="sinhDeByWeek(row)" [disabled]="busy || !canAdded"><i class="ti ti-sparkles" aria-hidden="true"></i>Sinh đề</button>
                                                 <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
                                                     (click)="deleteDeWeek(row)" [disabled]="busy || !canAdded || !row['has_test_cc']" aria-label="Xóa toàn bộ đề luyện tập"
-                                                    pTooltip="Xóa toàn bộ đề" tooltipPosition="top" appendTo="body"><i class="ti ti-trash" aria-hidden="true"></i></button>
+                                                    pTooltip="Xóa toàn bộ đề" tooltipPosition="left" appendTo="body"><i class="ti ti-trash" aria-hidden="true"></i></button>
                                                 </div>
                                                 } @else {
                                                 <span class="assessment-warning">Chưa đủ form đề hoặc câu hỏi duyệt</span>
@@ -88,7 +88,7 @@
                                                 (click)="sinhDe15pByWeek(row)" [disabled]="busy || !canAdded"><i class="ti ti-sparkles" aria-hidden="true"></i>Sinh đề</button>
                                             <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
                                                 (click)="delete15pDeByWeek(row)" [disabled]="busy || !canAdded || !row['has_test_dg']" aria-label="Xóa toàn bộ đề kiểm tra 15 phút"
-                                                pTooltip="Xóa toàn bộ đề" tooltipPosition="top" appendTo="body"><i class="ti ti-trash" aria-hidden="true"></i></button>
+                                                pTooltip="Xóa toàn bộ đề" tooltipPosition="left" appendTo="body"><i class="ti ti-trash" aria-hidden="true"></i></button>
                                             </div>
                                             } @else {
                                             <span class="assessment-warning">Chưa đủ form đề hoặc câu hỏi duyệt</span>

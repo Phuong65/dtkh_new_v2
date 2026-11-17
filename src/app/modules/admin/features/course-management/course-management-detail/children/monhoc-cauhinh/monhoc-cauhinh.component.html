@@ -25,12 +25,12 @@
                 <div class="admin-wrap-table__head-actions config-actions">
                     <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button"
                         (click)="addTestTx()" [disabled]="busy || !canEdit" aria-label="Thêm bài kiểm tra"
-                        pTooltip="Thêm bài kiểm tra" tooltipPosition="top" appendTo="body">
+                        pTooltip="Thêm bài kiểm tra" tooltipPosition="left" appendTo="body">
                         <i class="ti ti-plus" aria-hidden="true"></i>
                     </button>
                     <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse ictu-admin-icon-button"
                         (click)="saveTestKynang()" [disabled]="busy || !canEdit || !plan_kiemtra.children?.length"
-                        aria-label="Lưu bài kiểm tra" pTooltip="Lưu bài kiểm tra" tooltipPosition="top" appendTo="body">
+                        aria-label="Lưu bài kiểm tra" pTooltip="Lưu bài kiểm tra" tooltipPosition="left" appendTo="body">
                         <i class="ti ti-device-floppy" aria-hidden="true"></i>
                     </button>
                 </div>
@@ -68,7 +68,7 @@
                                     <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
                                         (click)="deleteItemKynang(test, rowIndex)" [disabled]="busy || !canEdit"
                                         [attr.aria-label]="'Xóa ' + test.title" pTooltip="Xóa bài kiểm tra"
-                                        tooltipPosition="top" appendTo="body">
+                                        tooltipPosition="left" appendTo="body">
                                         <i class="ti ti-trash" aria-hidden="true"></i>
                                     </button>
                                     }

@@ -42,29 +42,29 @@
                                     test['list_tieuchi'] && test['list_tieuchi'].length === 0) {
                                     <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
                                         (click)="openListDuanTuCopyTieuchi(test)" aria-label="Sao chép tiêu chí"
-                                        pTooltip="Sao chép tiêu chí từ dự án khác" tooltipPosition="top"
+                                        pTooltip="Sao chép tiêu chí từ dự án khác" tooltipPosition="left"
                                         appendTo="body"><i class="ti ti-copy" aria-hidden="true"></i></button>
                                     }
                                     <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
                                         (click)="onViewTuluan(test)" aria-label="Xem đề" pTooltip="Xem đề"
-                                        tooltipPosition="top" appendTo="body"><i class="ti ti-eye"
+                                        tooltipPosition="left" appendTo="body"><i class="ti ti-eye"
                                             aria-hidden="true"></i></button>
                                     @if (test['status'] !== 1) {
                                     <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
                                         (click)="openAddTieuchicham(test)" aria-label="Nhập tiêu chí chấm"
-                                        pTooltip="Nhập tiêu chí chấm" tooltipPosition="top" appendTo="body"><i
+                                        pTooltip="Nhập tiêu chí chấm" tooltipPosition="left" appendTo="body"><i
                                             class="ti ti-list-check" aria-hidden="true"></i></button>
                                     }
                                     @if (test['status'] !== 1) {
                                     <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
                                         (click)="editCodeTuluan(test)" aria-label="Sửa đề" pTooltip="Sửa đề"
-                                        tooltipPosition="top" appendTo="body"><i class="ti ti-edit"
+                                        tooltipPosition="left" appendTo="body"><i class="ti ti-edit"
                                             aria-hidden="true"></i></button>
                                     }
                                     @if (test['status'] !== 1) {
                                     <button type="button" class="btn ictu-button-danger-light ictu-admin-icon-button"
                                         (click)="deleteTuluan(test)" aria-label="Xóa đề" pTooltip="Xóa đề"
-                                        tooltipPosition="top" appendTo="body"><i class="ti ti-trash"
+                                        tooltipPosition="left" appendTo="body"><i class="ti ti-trash"
                                             aria-hidden="true"></i></button>
                                     }
                                 </div>
@@ -468,7 +468,7 @@
                                                 <div class="tuluan-criteria-form__action">
                                                     <button type="button" (click)="deleteTieuchi(item.id)"
                                                         class="btn ictu-button-danger-light ictu-admin-icon-button"
-                                                        aria-label="Xóa tiêu chí" pTooltip="Xóa tiêu chí" tooltipPosition="top" appendTo="body">
+                                                        aria-label="Xóa tiêu chí" pTooltip="Xóa tiêu chí" tooltipPosition="left" appendTo="body">
                                                         <i class="ti ti-trash" aria-hidden="true"></i>
                                                     </button>
                                                 </div>
