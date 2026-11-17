@@ -234,6 +234,14 @@
     letter-spacing: .01em;
 }
 
+.content-block-credit {
+    flex: 0 0 auto;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
 .content-table-toolbar {
     position: relative;
     display: flex;

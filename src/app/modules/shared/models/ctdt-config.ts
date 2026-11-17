@@ -6,6 +6,6 @@ export interface CtdtConfig {
     title: string;
     ordering?: number;
     noidung?: string;
-    value?: number;
+    value?: number | null;
     params?: any;
 }

@@ -67,6 +67,7 @@ type SubjectSyncOperation =
 export interface typeCtdtHocphan {
     key: string;
     title: string;
+    value?: number | null;
     children: CourseRow[];
 }
 
@@ -108,7 +109,10 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
     userId = 0;
     list_khoikienthuc: CtdtConfig[] = [];
     list_cdt_hocphan: typeCtdtHocphan[] = [];
-    readonly formKhoi: FormGroup = this.formBuilder.group({ title: ['', Validators.required] });
+    readonly formKhoi: FormGroup = this.formBuilder.group({
+        title: ['', Validators.required],
+        value: [null, Validators.min(0)]
+    });
     khoiDrawerVisible = false;
     khoiFormHeading = '';
     selectedKhoi: CtdtConfig | null = null;
@@ -354,7 +358,7 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
             if (this.hasPendingChanges()) this.notificationService.toastWarning('Vui lòng lưu các thay đổi học phần trước khi thêm khối kiến thức.');
             return;
         }
-        this.formKhoi.reset({ title: '' });
+        this.formKhoi.reset({ title: '', value: null });
         this.selectedKhoi = null;
         this.khoiFormHeading = 'Thêm khối kiến thức';
         this.khoiDrawerVisible = true;
@@ -367,7 +371,7 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
             return;
         }
         this.selectedKhoi = config;
-        this.formKhoi.reset({ title: config.title });
+        this.formKhoi.reset({ title: config.title, value: config.value ?? null });
         this.khoiFormHeading = 'Sửa khối kiến thức';
         this.khoiDrawerVisible = true;
     }
@@ -381,6 +385,8 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         this.formKhoi.markAllAsTouched();
         const title = String(this.formKhoi.value.title || '').trim();
         if (this.formKhoi.invalid || !title) return;
+        const rawValue = this.formKhoi.value.value;
+        const value = rawValue === '' || rawValue == null ? null : Number(rawValue);
         const programmeId = this.selectedCtdt.id;
         const hasPendingChanges = this.hasPendingChanges();
         if (hasPendingChanges) {
@@ -396,7 +402,7 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
             this.notificationService.toastWarning('Khối kiến thức đã tồn tại hoặc không hợp lệ');
             return;
         }
-        const payload: CtdtConfig = { ctdt_id: programmeId, group: 'KHOI_KIEN_THUC', key, title,
+        const payload: CtdtConfig = { ctdt_id: programmeId, group: 'KHOI_KIEN_THUC', key, title, value,
             ordering: selected?.ordering || this.list_khoikienthuc.length + 1, noidung: selected?.noidung || '' };
         this.savingKhoi.set(true);
         this.getKhoiConfig(programmeId).pipe(
@@ -410,6 +416,7 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
                     .map((item, index) => () => this.ctdtConfigService.addCtdtConfig({
                         ctdt_id: programmeId, group: 'KHOI_KIEN_THUC', key: item.key,
                         title: editing && item.key === key ? title : item.title,
+                        value: editing && item.key === key ? value : item.value ?? null,
                         ordering: item.ordering ?? index + 1, noidung: item.noidung || ''
                     }));
                 return (defaultsToMaterialize.length ? from(defaultsToMaterialize).pipe(concatMap(request => defer(request)), toArray()) : of([]))
@@ -495,7 +502,7 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
         snapshot.filter(item => item.key !== blockKey && !real.some(saved => saved.key === item.key))
             .forEach((item, index) => requests.push(() => this.ctdtConfigService.addCtdtConfig({
                 ctdt_id: programmeId, group: 'KHOI_KIEN_THUC', key: item.key, title: item.title,
-                ordering: item.ordering ?? index + 1, noidung: item.noidung || ''
+                value: item.value ?? null, ordering: item.ordering ?? index + 1, noidung: item.noidung || ''
             })));
         const remainingBlocks = new Set([...snapshot, ...real].filter(item => item.key !== blockKey).map(item => item.key));
         remainingLinks.forEach(link => {
@@ -543,7 +550,7 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
 
     private groupCourses(): void {
         this.list_cdt_hocphan = this.list_khoikienthuc.map(block => ({
-            key: block.key, title: block.title,
+            key: block.key, title: block.title, value: block.value,
             children: this.list_course.filter(course => course.khoikienthuc === block.key)
         }));
         const other = this.list_course.filter(course => !this.list_khoikienthuc.some(block => block.key === course.khoikienthuc));

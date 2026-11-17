@@ -1,6 +1,77 @@
 import { signal } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { of, Subject } from 'rxjs';
 import { CtdtNoidungComponent } from './ctdt-noidung.component';
+
+describe('CtdtNoidungComponent knowledge block credits', () => {
+    const createComponent = () => {
+        const component = Object.create(CtdtNoidungComponent.prototype) as CtdtNoidungComponent;
+        const state = component as any;
+        state.selectedCtdt = { id: 1 };
+        state.destroy$ = new Subject<void>();
+        state.savingKhoi = signal(false);
+        state.deletingKhoi = signal(false);
+        state.formKhoi = new FormGroup({
+            title: new FormControl('Khối cơ sở'),
+            value: new FormControl(18, Validators.min(0))
+        });
+        state.list_khoikienthuc = [];
+        state.emptyKhoiMarker = null;
+        state.helperService = { slugVietnamese: () => 'khoi-co-so' };
+        state.ctdtConfigService = {
+            addCtdtConfig: jasmine.createSpy('addCtdtConfig').and.returnValue(of({ id: 3 }))
+        };
+        state.getKhoiConfig = jasmine.createSpy('getKhoiConfig').and.returnValue(of([]));
+        state.hasPendingChanges = jasmine.createSpy('hasPendingChanges').and.returnValue(false);
+        state.refreshKhoiConfig = jasmine.createSpy('refreshKhoiConfig');
+        return state as CtdtNoidungComponent;
+    };
+
+    it('saves the entered credit value with a new knowledge block', () => {
+        const component = createComponent();
+
+        component.saveKhoi();
+
+        expect((component as any).ctdtConfigService.addCtdtConfig).toHaveBeenCalledWith(
+            jasmine.objectContaining({ group: 'KHOI_KIEN_THUC', value: 18 })
+        );
+    });
+
+    it('rejects negative credit values', () => {
+        const component = createComponent();
+        component.formKhoi.controls['value'].setValue(-1);
+
+        component.saveKhoi();
+
+        expect((component as any).ctdtConfigService.addCtdtConfig).not.toHaveBeenCalled();
+    });
+
+    it('saves an edited default block credit when materializing programme-specific blocks', () => {
+        const component = createComponent();
+        component.selectedKhoi = { ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'core', title: 'Khối cơ sở', value: 12 };
+        component.list_khoikienthuc = [
+            { ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'core', title: 'Khối cơ sở', value: 12 },
+            { ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'elective', title: 'Khối tự chọn', value: 9 }
+        ];
+        component.formKhoi.controls['value'].setValue(15);
+
+        component.saveKhoi();
+
+        const addConfig = (component as any).ctdtConfigService.addCtdtConfig;
+        expect(addConfig).toHaveBeenCalledWith(jasmine.objectContaining({ key: 'core', value: 15 }));
+        expect(addConfig).toHaveBeenCalledWith(jasmine.objectContaining({ key: 'elective', value: 9 }));
+    });
+
+    it('keeps the saved credit value when grouping courses by block', () => {
+        const component = createComponent();
+        component.list_khoikienthuc = [{ ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'core', title: 'Khối cơ sở', value: 18 }];
+        (component as any).list_course = [];
+
+        (component as any).groupCourses();
+
+        expect(component.list_cdt_hocphan[0].value).toBe(18);
+    });
+});
 
 describe('CtdtNoidungComponent remove course from block', () => {
     const createComponent = () => {

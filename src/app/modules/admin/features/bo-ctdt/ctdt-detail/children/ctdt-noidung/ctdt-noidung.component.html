@@ -19,7 +19,7 @@
         <div class="content-table-toolbar" aria-labelledby="content-table-title">
             <div class="content-table-toolbar__heading">
                 <span class="content-table-toolbar__icon" aria-hidden="true"><i class="ti ti-book"></i></span>
-                <h2 id="content-table-title">Cấu trúc học phần CTĐT</h2>
+                <h2 id="content-table-title">Khung chương trình</h2>
             </div>
             <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse content-add-block-button"
                 (click)="openAddKhoi()" [disabled]="blockActionsBusy || hasPendingChanges()"
@@ -66,6 +66,11 @@
                                     <div class="content-block-name">
                                         <span class="content-block-folder-icon" aria-hidden="true"><i class="ti ti-folder"></i></span>
                                         <strong>{{ khoi.title }}</strong>
+                                        @if (khoi.key) {
+                                        <span class="content-block-credit">
+                                            {{ khoi.value == null ? 'Chưa khai báo tín chỉ' : khoi.value + ' TC' }}
+                                        </span>
+                                        }
                                     </div>
                                     <div class="content-block-actions">
                                         <div class="content-block-secondary-actions">
@@ -291,6 +296,16 @@
                             aria-describedby="khoi-title-error">
                         @if (formKhoi.controls['title'].touched && formKhoi.controls['title'].invalid) {
                         <span id="khoi-title-error" class="ictu-admin-form-error" role="alert">Nhập tên khối kiến thức.</span>
+                        }
+                    </div>
+                    <div class="ictu-form__row">
+                        <label class="ictu-form__label" for="khoi-value">Số tín chỉ</label>
+                        <input pInputText id="khoi-value" type="number" min="0" step="any" formControlName="value"
+                            class="ictu-form__input-field" placeholder="Nhập số tín chỉ"
+                            [attr.aria-invalid]="formKhoi.controls['value'].touched && formKhoi.controls['value'].invalid"
+                            [attr.aria-describedby]="formKhoi.controls['value'].touched && formKhoi.controls['value'].hasError('min') ? 'khoi-value-error' : null">
+                        @if (formKhoi.controls['value'].touched && formKhoi.controls['value'].hasError('min')) {
+                        <span id="khoi-value-error" class="ictu-admin-form-error" role="alert">Số tín chỉ không được nhỏ hơn 0.</span>
                         }
                     </div>
                 </form>
