@@ -7,5 +7,6 @@ export interface CtdtConfig {
     ordering?: number;
     noidung?: string;
     value?: number | null;
+    sotinchi_dukien?: number | null;
     params?: any;
 }

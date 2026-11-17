@@ -68,7 +68,7 @@
                                         <strong>{{ khoi.title }}</strong>
                                         @if (khoi.key) {
                                         <span class="content-block-credit">
-                                            {{ khoi.value == null ? 'Chưa khai báo tín chỉ' : khoi.value + ' TC' }}
+                                            {{ khoi.sotinchi_dukien == null ? 'Chưa khai báo tín chỉ' : khoi.sotinchi_dukien + ' TC' }}
                                         </span>
                                         }
                                     </div>
@@ -299,13 +299,13 @@
                         }
                     </div>
                     <div class="ictu-form__row">
-                        <label class="ictu-form__label" for="khoi-value">Số tín chỉ</label>
-                        <input pInputText id="khoi-value" type="number" min="0" step="any" formControlName="value"
+                        <label class="ictu-form__label" for="khoi-sotinchi-dukien">Số tín chỉ dự kiến</label>
+                        <input pInputText id="khoi-sotinchi-dukien" type="number" min="0" step="any" formControlName="sotinchi_dukien"
                             class="ictu-form__input-field" placeholder="Nhập số tín chỉ"
-                            [attr.aria-invalid]="formKhoi.controls['value'].touched && formKhoi.controls['value'].invalid"
-                            [attr.aria-describedby]="formKhoi.controls['value'].touched && formKhoi.controls['value'].hasError('min') ? 'khoi-value-error' : null">
-                        @if (formKhoi.controls['value'].touched && formKhoi.controls['value'].hasError('min')) {
-                        <span id="khoi-value-error" class="ictu-admin-form-error" role="alert">Số tín chỉ không được nhỏ hơn 0.</span>
+                            [attr.aria-invalid]="formKhoi.controls['sotinchi_dukien'].touched && formKhoi.controls['sotinchi_dukien'].invalid"
+                            [attr.aria-describedby]="formKhoi.controls['sotinchi_dukien'].touched && formKhoi.controls['sotinchi_dukien'].hasError('min') ? 'khoi-sotinchi-dukien-error' : null">
+                        @if (formKhoi.controls['sotinchi_dukien'].touched && formKhoi.controls['sotinchi_dukien'].hasError('min')) {
+                        <span id="khoi-sotinchi-dukien-error" class="ictu-admin-form-error" role="alert">Số tín chỉ không được nhỏ hơn 0.</span>
                         }
                     </div>
                 </form>

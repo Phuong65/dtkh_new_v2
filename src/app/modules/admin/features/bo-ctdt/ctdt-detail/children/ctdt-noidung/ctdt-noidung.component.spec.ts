@@ -13,7 +13,7 @@ describe('CtdtNoidungComponent knowledge block credits', () => {
         state.deletingKhoi = signal(false);
         state.formKhoi = new FormGroup({
             title: new FormControl('Khối cơ sở'),
-            value: new FormControl(18, Validators.min(0))
+            sotinchi_dukien: new FormControl(18, Validators.min(0))
         });
         state.list_khoikienthuc = [];
         state.emptyKhoiMarker = null;
@@ -33,13 +33,13 @@ describe('CtdtNoidungComponent knowledge block credits', () => {
         component.saveKhoi();
 
         expect((component as any).ctdtConfigService.addCtdtConfig).toHaveBeenCalledWith(
-            jasmine.objectContaining({ group: 'KHOI_KIEN_THUC', value: 18 })
+            jasmine.objectContaining({ group: 'KHOI_KIEN_THUC', sotinchi_dukien: 18 })
         );
     });
 
     it('rejects negative credit values', () => {
         const component = createComponent();
-        component.formKhoi.controls['value'].setValue(-1);
+        component.formKhoi.controls['sotinchi_dukien'].setValue(-1);
 
         component.saveKhoi();
 
@@ -48,28 +48,28 @@ describe('CtdtNoidungComponent knowledge block credits', () => {
 
     it('saves an edited default block credit when materializing programme-specific blocks', () => {
         const component = createComponent();
-        component.selectedKhoi = { ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'core', title: 'Khối cơ sở', value: 12 };
+        component.selectedKhoi = { ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'core', title: 'Khối cơ sở', sotinchi_dukien: 12 };
         component.list_khoikienthuc = [
-            { ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'core', title: 'Khối cơ sở', value: 12 },
-            { ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'elective', title: 'Khối tự chọn', value: 9 }
+            { ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'core', title: 'Khối cơ sở', sotinchi_dukien: 12 },
+            { ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'elective', title: 'Khối tự chọn', sotinchi_dukien: 9 }
         ];
-        component.formKhoi.controls['value'].setValue(15);
+        component.formKhoi.controls['sotinchi_dukien'].setValue(15);
 
         component.saveKhoi();
 
         const addConfig = (component as any).ctdtConfigService.addCtdtConfig;
-        expect(addConfig).toHaveBeenCalledWith(jasmine.objectContaining({ key: 'core', value: 15 }));
-        expect(addConfig).toHaveBeenCalledWith(jasmine.objectContaining({ key: 'elective', value: 9 }));
+        expect(addConfig).toHaveBeenCalledWith(jasmine.objectContaining({ key: 'core', sotinchi_dukien: 15 }));
+        expect(addConfig).toHaveBeenCalledWith(jasmine.objectContaining({ key: 'elective', sotinchi_dukien: 9 }));
     });
 
     it('keeps the saved credit value when grouping courses by block', () => {
         const component = createComponent();
-        component.list_khoikienthuc = [{ ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'core', title: 'Khối cơ sở', value: 18 }];
+        component.list_khoikienthuc = [{ ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'core', title: 'Khối cơ sở', sotinchi_dukien: 18 }];
         (component as any).list_course = [];
 
         (component as any).groupCourses();
 
-        expect(component.list_cdt_hocphan[0].value).toBe(18);
+        expect(component.list_cdt_hocphan[0].sotinchi_dukien).toBe(18);
     });
 });
 

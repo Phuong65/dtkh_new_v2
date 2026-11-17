@@ -21,7 +21,7 @@ context: []
 ## Implementation Notes
 
 - Phạm vi tiêu đề là heading trong nội dung tab Học phần; giữ nguyên nhãn tab điều hướng “Học phần”.
-- `CtdtConfig` đã có `value?: number`; dùng trường này cho số tín chỉ của cấu hình `KHOI_KIEN_THUC`, không thay đổi API hay cộng tự động từ các học phần.
+- Số tín chỉ dự kiến lưu trong trường `sotinchi_dukien` của cấu hình `KHOI_KIEN_THUC`; không thay đổi API hay cộng tự động từ các học phần.
 - Form thêm/sửa khối kiến thức lưu số tín chỉ; hàng tiêu đề mỗi khối hiển thị giá trị đã lưu. Giữ nguyên giá trị này khi tạo cấu hình mặc định còn thiếu trong luồng lưu/xóa khối.
 - Trường tín chỉ không bắt buộc, chấp nhận số không âm (có thể lẻ); khối cũ chưa có giá trị hiển thị “Chưa khai báo tín chỉ”, còn khối tạm “Chưa xác định” không hiển thị trường này.
 - Kiểm thử component đạt 15/15; build Angular thành công.
