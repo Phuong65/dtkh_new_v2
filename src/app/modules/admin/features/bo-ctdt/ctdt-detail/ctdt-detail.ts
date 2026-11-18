@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, OnDestroy, OnInit, inject, signal, viewChildren } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, computed, inject, signal, viewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Tooltip } from 'primeng/tooltip';
 import { Subject as RxSubject, distinctUntilChanged, filter, map, switchMap, takeUntil } from 'rxjs';
@@ -48,6 +48,15 @@ export class CtdtDetail implements OnInit, OnDestroy {
     readonly loadingCtdt = signal(false);
     readonly ctdtLoadError = signal('');
     readonly programName = signal<string>('Chương trình đào tạo');
+    readonly programIdentity = computed(() => {
+        const ctdt = this.selectedCtdt();
+        if (!ctdt) return '';
+        const code = ctdt.madt?.trim();
+        return [code ? `[${code}]` : '', this.programName().trim()].filter(Boolean).join(' - ');
+    });
+    readonly programHeading = computed(() =>
+        this.programIdentity() ? `Chương trình đào tạo - ${this.programIdentity()}` : 'Chương trình đào tạo'
+    );
 
     get activeTab(): CtdtTabItem {
         return this.tabs.find(tab => tab.id === this.activeTabId()) ?? this.tabs[0];

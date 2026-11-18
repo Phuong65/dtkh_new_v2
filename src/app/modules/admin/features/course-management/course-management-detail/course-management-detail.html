@@ -6,8 +6,14 @@
                 <i class="ti ti-arrow-left" aria-hidden="true"></i>
             </button>
             <div class="course-detail-header-divider" aria-hidden="true"></div>
-            <div class="course-detail-name" [title]="selectedCourse()?.title || 'Học phần'">
-                {{ selectedCourse()?.title || 'Học phần' }}
+            <div class="course-detail-name" [title]="courseHeading()">
+                <span class="course-detail-kind">
+                    <span>Học phần</span>
+                </span>
+                @if (courseIdentity()) {
+                <span class="course-detail-name__separator" aria-hidden="true"></span>
+                <span class="course-detail-identity">{{ courseIdentity() }}</span>
+                }
             </div>
             <div class="course-detail-header-divider" aria-hidden="true"></div>
         </div>

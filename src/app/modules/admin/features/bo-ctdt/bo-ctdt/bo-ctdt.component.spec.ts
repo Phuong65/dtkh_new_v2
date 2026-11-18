@@ -128,6 +128,16 @@ describe('Phiên cấu hình Bộ CTĐT', () => {
         expect(component.boForm.pristine).toBeTrue();
     });
 
+    it('đặt nút lưu của Thông tin và Môn học cạnh nút đóng, không còn footer lưu', () => {
+        open();
+        expect(root.querySelector('.bo-ctdt-config__header [aria-label="Lưu thông tin Bộ CTĐT"]')).not.toBeNull();
+        expect(root.querySelector('.bo-ctdt-config__card .bo-ctdt-config__actions')).toBeNull();
+        section('subjects');
+        expect(root.querySelector('.bo-ctdt-config__header [aria-label="Lưu môn học"]')).not.toBeNull();
+        expect(root.querySelector('.bo-ctdt-config__subjects .bo-ctdt-config__actions')).toBeNull();
+        expect(root.querySelector('ictu-paginator')).not.toBeNull();
+    });
+
     it('đóng phiên sau lưu tải lại danh sách theo bộ lọc hiện hành', () => {
         open();
         const calls = boService.get.calls.count();

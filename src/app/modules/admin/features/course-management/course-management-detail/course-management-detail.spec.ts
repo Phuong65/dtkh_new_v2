@@ -254,6 +254,13 @@ describe('CourseManagementDetail - Mode Switching', () => {
         expect(titleSpy.setTitle).toHaveBeenCalledWith('ĐTKH');
     });
 
+    it('hiển thị loại, mã và tên học phần trong tiêu đề của thanh chi tiết', () => {
+        const heading = root.querySelector<HTMLElement>('.course-detail-name');
+        expect(heading?.querySelector('.course-detail-kind')?.textContent?.trim()).toBe('Học phần');
+        expect(heading?.querySelector('.course-detail-identity')?.textContent?.trim()).toBe('[INT201] - Lập trình Web');
+        expect(heading?.getAttribute('title')).toBe('Học phần - [INT201] - Lập trình Web');
+    });
+
     it('không ghi đè tiêu đề tab khi trang khác đã cập nhật', () => {
         titleSpy.getTitle.and.returnValue('Trang khác');
         titleSpy.setTitle.calls.reset();

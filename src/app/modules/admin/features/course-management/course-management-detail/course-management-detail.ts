@@ -92,6 +92,15 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
 
     readonly state = signal<AppState>('loading');
     readonly selectedCourse = signal<ElnKhoaHoc | null>(null);
+    readonly courseIdentity = computed(() => {
+        const course = this.selectedCourse();
+        const code = course?.maso?.trim();
+        const name = course?.title?.trim();
+        return [code ? `[${code}]` : '', name].filter(Boolean).join(' - ');
+    });
+    readonly courseHeading = computed(() =>
+        this.courseIdentity() ? `Học phần - ${this.courseIdentity()}` : 'Học phần'
+    );
     readonly errorMessage = signal('');
     readonly courseId = signal<number | null>(null);
     private readonly reload$ = new RxSubject<void>();

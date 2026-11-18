@@ -32,12 +32,15 @@
                 @if (!collapsedGroups().includes(group.id)) {
                 <nav class="subject-template__items" [id]="'subject-template-items-' + group.id" [attr.aria-label]="group.label">
                     @for (item of group.items; track item.id; let i = $index) {
-                    <button #sidebarButton [id]="'subject-template-item-' + item.id" type="button"
-                        class="subject-template__item" [class.subject-template__item--active]="activeItemId() === item.id"
-                        [attr.aria-current]="activeItemId() === item.id ? 'page' : null"
-                        (click)="selectItem(group.id, item.id)" (keydown)="onSidebarKeydown($event, group.id, i)">
-                        <i [class]="item.icon" aria-hidden="true"></i><span>{{ item.label }}</span>
-                    </button>
+                    <div class="subject-template__item-row" [class.subject-template__item-row--active]="activeItemId() === item.id">
+                        <i class="ti ti-corner-down-right subject-template__item-branch" aria-hidden="true"></i>
+                        <button #sidebarButton [id]="'subject-template-item-' + item.id" type="button"
+                            class="subject-template__item" [class.subject-template__item--active]="activeItemId() === item.id"
+                            [attr.aria-current]="activeItemId() === item.id ? 'page' : null"
+                            (click)="selectItem(group.id, item.id)" (keydown)="onSidebarKeydown($event, group.id, i)">
+                            <span>{{ item.label }}</span>
+                        </button>
+                    </div>
                     }
                 </nav>
                 }

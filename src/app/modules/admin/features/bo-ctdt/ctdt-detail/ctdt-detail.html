@@ -7,7 +7,15 @@
                 <i class="ti ti-arrow-left" aria-hidden="true"></i>
             </button>
             <div class="ctdt-header-divider" aria-hidden="true"></div>
-            <div class="ctdt-program-name" [title]="programName()">{{ programName() }}</div>
+            <div class="ctdt-program-name" [title]="programHeading()">
+                <span class="ctdt-program-kind">
+                    <span>Chương trình đào tạo</span>
+                </span>
+                @if (programIdentity()) {
+                <span class="ctdt-program-name__separator" aria-hidden="true"></span>
+                <span class="ctdt-program-identity">{{ programIdentity() }}</span>
+                }
+            </div>
             <div class="ctdt-header-divider" aria-hidden="true"></div>
         </div>
 

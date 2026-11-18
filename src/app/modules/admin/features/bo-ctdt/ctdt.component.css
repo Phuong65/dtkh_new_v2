@@ -222,16 +222,21 @@
 }
 
 .ctdt-shell__head {
-    flex: 0 0 auto;
-    min-height: 64px;
+    height: 55px;
+    min-height: 55px;
+    flex: 0 0 55px;
+    align-items: center;
     gap: 12px;
-    padding: 10px 16px;
+    padding: 0 16px;
     border: 0;
     border-bottom: 1px solid #e2e8f0;
 }
 
 .ctdt-shell__heading {
+    display: flex;
+    height: 35px;
     min-width: 0;
+    align-items: center;
 }
 
 .ctdt-shell__heading h1 {
@@ -241,17 +246,9 @@
     font-weight: 700;
 }
 
-.ctdt-shell__heading p {
-    overflow: hidden;
-    margin: 2px 0 0;
-    color: #64748b;
-    font-size: 12px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
 .ctdt-shell__actions {
     display: flex;
+    height: 35px;
     min-width: 0;
     align-items: center;
     gap: 8px;
@@ -377,6 +374,9 @@
     .ctdt-shell__head {
         align-items: stretch;
         flex-direction: column;
+        height: auto;
+        min-height: 0;
+        flex: 0 0 auto;
         padding: 12px;
     }
 

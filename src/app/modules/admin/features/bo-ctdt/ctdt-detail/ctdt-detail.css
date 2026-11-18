@@ -55,14 +55,43 @@
 }
 
 .ctdt-program-name {
+    display: flex;
     min-width: 0;
+    align-items: center;
     overflow: hidden;
     color: var(--ctdt-ink);
     font-size: 14px;
     font-weight: 650;
     letter-spacing: -.01em;
-    text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.ctdt-program-kind {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 4px;
+    background: var(--ctdt-tab-active-bg);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1.2;
+}
+
+.ctdt-program-name__separator {
+    width: 1px;
+    height: 20px;
+    flex: 0 0 1px;
+    margin: 0 10px;
+    background: var(--ctdt-header-border);
+}
+
+.ctdt-program-identity {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .ctdt-back-btn {

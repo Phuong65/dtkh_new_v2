@@ -5,16 +5,32 @@
             <h1 id="bo-ctdt-config-title">Cấu hình Bộ CTĐT</h1>
             <p>{{ configuredBo.name }} · {{ configuredBo.code }}</p>
         </div>
-        <button type="button" mat-flat-button class="btn ictu-badge-btn--danger-reverse ictu-admin-icon-button"
-            (click)="closeConfiguration()" [disabled]="configurationBusy()" aria-label="Đóng cấu hình" pTooltip="Đóng" tooltipPosition="left">
-            <i class="ti ti-x" aria-hidden="true"></i>
-        </button>
+        <div class="bo-ctdt-config__header-actions">
+            @if (configurationSection() === 'info') {
+            <button type="submit" form="bo-ctdt-config-info-form" mat-flat-button class="btn ictu-badge-btn--primary-reverse bo-ctdt-config__header-save"
+                [disabled]="!canUpdate || configurationBusy() || boForm.invalid || formLoading() || formLoadError()"
+                aria-label="Lưu thông tin Bộ CTĐT" pTooltip="Lưu thông tin" tooltipPosition="left">
+                <i class="ti ti-device-floppy" aria-hidden="true"></i><span>Lưu</span>
+            </button>
+            }
+            @if (configurationSection() === 'subjects') {
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse bo-ctdt-config__header-save"
+                (click)="saveSubjects()" [disabled]="!canSelectSubjects || configurationBusy() || subjectLoading() || !subjectRelationsReady() || !!subjectError()"
+                aria-label="Lưu môn học" pTooltip="Lưu môn học" tooltipPosition="left">
+                <i class="ti ti-device-floppy" aria-hidden="true"></i><span>Lưu</span>
+            </button>
+            }
+            <button type="button" mat-flat-button class="btn ictu-badge-btn--danger-reverse ictu-admin-icon-button"
+                (click)="closeConfiguration()" [disabled]="configurationBusy()" aria-label="Đóng cấu hình" pTooltip="Đóng" tooltipPosition="left">
+                <i class="ti ti-x" aria-hidden="true"></i>
+            </button>
+        </div>
     </header>
     <div class="bo-ctdt-config__body">
         <nav class="bo-ctdt-config__nav" aria-label="Mục cấu hình">
             @for (section of configurationSections; track section.id) {
             <button type="button" class="bo-ctdt-config__nav-item" [class.is-active]="configurationSection() === section.id"
-                [attr.aria-current]="configurationSection() === section.id ? 'page' : null"
+                [attr.data-section]="section.id" [attr.aria-current]="configurationSection() === section.id ? 'page' : null"
                 [disabled]="configurationBusy()" (click)="selectConfigurationSection(section.id)">
                 <i [class]="section.icon" aria-hidden="true"></i><span>{{ section.label }}</span>
             </button>
@@ -30,7 +46,7 @@
                 @if (formLoadError()) {
                 <div class="admin-table__alert-danger text-center w-100">Tải danh mục Khoa thất bại. Vui lòng <a href="javascript:" (click)="retryFormDonVi()">tải lại</a>.</div>
                 }
-                <form class="bo-ctdt-config__form" [formGroup]="boForm" (ngSubmit)="submitConfigurationInfo()">
+                <form id="bo-ctdt-config-info-form" class="bo-ctdt-config__form" [formGroup]="boForm" (ngSubmit)="submitConfigurationInfo()">
                     <fieldset class="ictu-form" [disabled]="!canUpdate || configurationBusy() || formLoading()"
                         [attr.inert]="configurationBusy() || formLoading() ? '' : null">
                         <div class="ictu-form__row">
@@ -55,15 +71,9 @@
                             <label class="ictu-form__label ictu-form__label--required" for="config-category">Khoa áp dụng</label>
                             <p-multiSelect inputId="config-category" class="bo-ctdt-list__faculty-select" [options]="boFormDonVi"
                                 optionLabel="title" optionValue="id" formControlName="category_ids" display="chip" [filter]="true"
-                                filterBy="title" appendTo="body" [maxSelectedLabels]="2" selectedItemsLabel="{0} Khoa được chọn" placeholder="Chọn Khoa"></p-multiSelect>
+                                filterBy="title" appendTo="body" [maxSelectedLabels]="null" placeholder="Chọn Khoa"></p-multiSelect>
                         </div>
                     </fieldset>
-                    <footer class="bo-ctdt-config__actions">
-                        <button type="submit" mat-flat-button class="btn ictu-badge-btn--primary-reverse"
-                            [disabled]="!canUpdate || configurationBusy() || boForm.invalid || formLoading() || formLoadError()">
-                            <i class="ti ti-device-floppy" aria-hidden="true"></i>Lưu thông tin
-                        </button>
-                    </footer>
                 </form>
             </section>
             } @else if (configurationSection() === 'subjects') {
@@ -100,12 +110,6 @@
                 <ictu-paginator [control]="subjectPaginator" (onChangePage)="loadSubjectPicker($event)"></ictu-paginator>
                 }
                 @if (subjectSaveError()) { <div class="bo-ctdt-list__save-error" role="alert">{{ subjectSaveError() }}</div> }
-                <footer class="bo-ctdt-config__actions">
-                    <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse" (click)="saveSubjects()"
-                        [disabled]="!canSelectSubjects || configurationBusy() || subjectLoading() || !subjectRelationsReady() || !!subjectError()">
-                        <i class="ti ti-device-floppy" aria-hidden="true"></i>Lưu môn học
-                    </button>
-                </footer>
             </section>
             } @else if (configurationSection() === 'peo') {
                 <app-bo-ctdt-peo [selectedBo]="configuredBo" [canAdd]="canAdd" [canUpdate]="canUpdate" [canDelete]="canDelete" [embedded]="true" [style.height]="'100%'"></app-bo-ctdt-peo>

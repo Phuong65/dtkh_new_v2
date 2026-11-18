@@ -75,7 +75,7 @@ export class BoCtdtComponent implements OnInit, OnDestroy {
     readonly configurationSection = signal<'info' | 'subjects' | 'peo' | 'cdr'>('info');
     readonly configurationSections = [
         { id: 'info', label: 'Thông tin', icon: 'ti ti-info-circle' },
-        { id: 'subjects', label: 'Môn học', icon: 'ti ti-books' },
+        { id: 'subjects', label: 'Môn học', icon: 'ti ti-book' },
         { id: 'peo', label: 'Mục tiêu cụ thể', icon: 'ti ti-target' },
         { id: 'cdr', label: 'Chuẩn đầu ra', icon: 'ti ti-certificate' }
     ] as const;

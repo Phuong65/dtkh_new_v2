@@ -148,7 +148,7 @@
 .bo-ctdt-list__name:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
 
 .bo-ctdt-list__actions {
-    width: 200px;
+    width: 96px;
     text-align: center;
     white-space: nowrap;
 }
@@ -422,110 +422,170 @@
     flex-direction: column; background: #f8fafc; color: #172033;
 }
 .bo-ctdt-config__header { display: flex; flex: 0 0 auto; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px; border-bottom: 1px solid #dbe0e5; background: #fff; }
+.bo-ctdt-config__header-actions { display: flex; flex: 0 0 auto; align-items: center; gap: 8px; }
+.bo-ctdt-config__header-actions > .ictu-admin-icon-button {
+    display: inline-flex !important;
+    box-sizing: border-box;
+    flex: 0 0 35px;
+    width: 35px !important;
+    min-width: 35px !important;
+    max-width: 35px;
+    height: 35px !important;
+    min-height: 35px !important;
+    max-height: 35px;
+    padding: 0 !important;
+    align-items: center;
+    justify-content: center;
+}
+.bo-ctdt-config__header-actions > .ictu-admin-icon-button i {
+    width: 16px;
+    height: 16px;
+    margin: 0 !important;
+    font-size: 16px;
+    line-height: 16px;
+}
+.bo-ctdt-config__header-save { display: inline-flex; min-width: 76px; height: 35px; min-height: 35px; align-items: center; justify-content: center; gap: 6px; padding: 0 12px !important; border-radius: 5px !important; }
+.bo-ctdt-config__header-save i { margin: 0 !important; }
 .bo-ctdt-config__header h1 { margin: 0; font-size: 18px; font-weight: 700; }
 .bo-ctdt-config__header p { margin: 3px 0 0; color: #64748b; font-size: 12px; }
 .bo-ctdt-config__body { display: flex; flex: 1 1 auto; min-height: 0; }
 .bo-ctdt-config__nav {
-    position: relative;
     display: flex;
-    width: 248px;
+    width: 232px;
     min-width: 0;
     min-height: 0;
     box-sizing: border-box;
     overflow-y: auto;
-    flex: 0 0 248px;
+    flex: 0 0 232px;
     flex-direction: column;
     gap: 6px;
-    padding: 18px 14px;
-    border-right: 1px solid #dbe3ef;
+    padding: 16px 12px;
+    border-right: 1px solid #e2e8f0;
     background: #ffffff;
-    box-shadow: 4px 0 14px rgb(15 23 42 / 3%);
-}
-.bo-ctdt-config__nav::before {
-    display: block;
-    margin: 0 8px 8px;
-    color: #94a3b8;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    content: 'Danh mục cấu hình';
 }
 .bo-ctdt-config__nav-item {
-    position: relative;
     display: flex;
+    box-sizing: border-box;
     width: 100%;
-    min-height: 46px;
+    height: auto;
+    min-height: 52px;
+    flex: 0 0 auto;
     align-items: center;
     gap: 11px;
-    padding: 8px 11px;
-    border: 1px solid transparent;
-    border-radius: 8px;
-    background: transparent;
-    color: #475569;
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-left: 3px solid #bfdbfe;
+    border-radius: 7px !important;
+    background: #ffffff;
+    color: #334155;
     font: inherit;
     font-size: 13px;
     font-weight: 550;
     line-height: 1.35;
     text-align: left;
     cursor: pointer;
-    transition: border-color .15s ease, background-color .15s ease, color .15s ease, box-shadow .15s ease;
+    transition: background-color .15s ease, color .15s ease, border-color .15s ease, box-shadow .15s ease;
 }
 .bo-ctdt-config__nav-item i {
     display: inline-flex;
-    width: 30px;
-    height: 30px;
-    flex: 0 0 30px;
+    box-sizing: border-box;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
     align-items: center;
     justify-content: center;
-    border: 1px solid #e2e8f0;
-    border-radius: 7px;
-    background: #f8fafc;
-    color: #64748b;
-    font-size: 16px;
-    text-align: center;
-    transition: border-color .15s ease, background-color .15s ease, color .15s ease;
-}
-.bo-ctdt-config__nav-item:hover:not(:disabled) {
-    border-color: #dbeafe;
-    background: #f8fbff;
-    color: #1d4ed8;
-}
-.bo-ctdt-config__nav-item:hover:not(:disabled) i {
-    border-color: #bfdbfe;
+    margin: 0;
+    border: 1px solid #dbeafe;
+    border-radius: 6px;
     background: #eff6ff;
     color: #2563eb;
+    font-size: 17px;
+    line-height: 1;
+    text-align: center;
+    transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+}
+.bo-ctdt-config__nav-item:hover:not(:disabled):not(.is-active) {
+    border-color: #bfdbfe;
+    border-left-color: #60a5fa;
+    background: #f8fbff;
+    color: #1d4ed8;
+    box-shadow: 0 2px 6px rgb(37 99 235 / 8%);
 }
 .bo-ctdt-config__nav-item.is-active {
-    border-color: #bfdbfe;
+    border-color: #93c5fd;
+    border-left-color: #2563eb;
     background: #eff6ff;
-    color: #1d4ed8;
+    color: #1e40af;
     font-weight: 700;
-    box-shadow: inset 3px 0 0 #2563eb, 0 2px 5px rgb(37 99 235 / 8%);
+    box-shadow: 0 2px 8px rgb(37 99 235 / 10%);
 }
 .bo-ctdt-config__nav-item.is-active i {
-    border-color: #93c5fd;
+    border-color: #bfdbfe;
     background: #dbeafe;
     color: #1d4ed8;
 }
 .bo-ctdt-config__nav-item:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
 .bo-ctdt-config__nav-item:disabled { cursor: default; opacity: .65; }
 .bo-ctdt-config__nav-item span { min-width: 0; overflow-wrap: anywhere; }
-.bo-ctdt-config__panel { flex: 1 1 auto; min-width: 0; min-height: 0; overflow: auto; padding: 18px; }
-.bo-ctdt-config__card { position: relative; width: min(980px, 100%); min-height: 100%; margin: 0 auto; padding: 18px; border: 1px solid #dbe0e5; border-radius: 6px; background: #fff; }
-.bo-ctdt-config__card > header { margin: -18px -18px 18px; padding: 14px 18px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; }
+.bo-ctdt-config__panel { display: flex; flex: 1 1 auto; min-width: 0; min-height: 0; overflow: hidden; padding: 18px; }
+.bo-ctdt-config__card { position: relative; display: flex; flex: 1 1 auto; width: 100%; min-width: 0; min-height: 0; height: 100%; flex-direction: column; margin: 0; padding: 18px; border: 1px solid #dbe0e5; border-radius: 6px; background: #fff; box-sizing: border-box; }
+.bo-ctdt-config__card > header { flex: 0 0 auto; margin: -18px -18px 18px; padding: 14px 18px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; }
 .bo-ctdt-config__card h2 { margin: 0; color: #0f172a; font-size: 16px; }
-.bo-ctdt-config__form { max-width: 720px; }
+.bo-ctdt-config__form { width: 100%; min-width: 0; max-width: none; overflow-y: auto; flex: 1 1 auto; }
 .bo-ctdt-config__form fieldset.ictu-form { min-width: 0; margin: 0; padding: 0; border: 0; }
 .bo-ctdt-config__form .ictu-form__row { min-width: 0; }
 .bo-ctdt-config__form .ictu-form__label { margin: 0; }
 .bo-ctdt-config__form .ictu-form__input-field,
 .bo-ctdt-config__form .bo-ctdt-list__faculty-select { margin-top: 4px; }
-:host ::ng-deep .bo-ctdt-config__form .bo-ctdt-list__faculty-select .p-multiselect-label { min-width: 0; overflow: hidden; }
+:host ::ng-deep .bo-ctdt-config__form .ictu-form__row .bo-ctdt-list__faculty-select,
+:host ::ng-deep .bo-ctdt-config__form .bo-ctdt-list__faculty-select .p-multiselect {
+    height: auto !important;
+    min-height: 43px !important;
+}
+:host ::ng-deep .bo-ctdt-config__form .bo-ctdt-list__faculty-select .p-multiselect-label {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    box-sizing: border-box;
+    padding: 10px 12px !important;
+    overflow: visible;
+    white-space: normal;
+}
+:host ::ng-deep .bo-ctdt-config__form .bo-ctdt-list__faculty-select .p-multiselect-chip-item {
+    display: inline-flex;
+    min-width: 0;
+    max-width: 100%;
+}
+:host ::ng-deep .bo-ctdt-config__form .bo-ctdt-list__faculty-select .p-multiselect-chip {
+    display: inline-flex;
+    max-width: 100%;
+    gap: 6px;
+    margin: 0;
+    padding: 4px 8px;
+    border: 1px solid #bfdbfe;
+    border-radius: 4px;
+    background: #eff6ff;
+    color: #1e40af;
+    font-size: 13px;
+}
+:host ::ng-deep .bo-ctdt-config__form .bo-ctdt-list__faculty-select .p-chip-label {
+    min-width: 0;
+    margin: 0;
+    line-height: 1.4;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+:host ::ng-deep .bo-ctdt-config__form .bo-ctdt-list__faculty-select .p-chip-remove-icon {
+    flex: 0 0 auto;
+}
 .bo-ctdt-config__actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
-.bo-ctdt-config__subject-list { display: flex; flex-direction: column; gap: 8px; max-height: 52vh; overflow: auto; }
-.bo-ctdt-config__subjects .bo-ctdt-list__subject-search { margin-bottom: 14px; }
-.bo-ctdt-config__subjects > ictu-paginator { display: block; margin-top: 12px; }
+.bo-ctdt-config__subject-list { display: flex; flex: 1 1 auto; min-height: 0; flex-direction: column; gap: 8px; overflow-y: auto; overscroll-behavior: contain; padding-right: 4px; }
+.bo-ctdt-config__subject-list .bo-ctdt-list__subject { flex: 0 0 auto; }
+.bo-ctdt-config__subjects .bo-ctdt-list__subject-search { flex: 0 0 auto; margin-bottom: 14px; }
+.bo-ctdt-config__subjects > ictu-paginator { display: block; flex: 0 0 auto; margin-top: auto; padding-top: 12px; border-top: 1px solid #e2e8f0; }
+.bo-ctdt-config__subjects .bo-ctdt-list__save-error { flex: 0 0 auto; }
 .bo-ctdt-config app-bo-ctdt-peo, .bo-ctdt-config app-bo-ctdt-cdr { display: block; min-height: 100%; }
 @media (prefers-reduced-motion: reduce) {
     .bo-ctdt-config__nav-item,
@@ -535,8 +595,11 @@
 @media (max-width: 700px) {
     .bo-ctdt-config__body { flex-direction: column; }
     .bo-ctdt-config__nav { width: 100%; flex-basis: auto; flex-direction: row; gap: 6px; overflow-x: auto; padding: 10px; border-right: 0; border-bottom: 1px solid #dbe0e5; box-shadow: none; }
-    .bo-ctdt-config__nav::before { display: none; }
-    .bo-ctdt-config__nav-item { width: auto; min-height: 40px; flex: 0 0 auto; gap: 8px; padding: 5px 9px; white-space: nowrap; }
+    .bo-ctdt-config__nav-item { width: auto; min-height: 44px; flex: 0 0 auto; gap: 8px; padding: 6px 10px; white-space: nowrap; }
     .bo-ctdt-config__nav-item i { width: 28px; height: 28px; flex-basis: 28px; font-size: 15px; }
     .bo-ctdt-config__panel { padding: 12px; }
+    .bo-ctdt-config__header { align-items: flex-start; flex-wrap: wrap; padding: 10px 12px; }
+    .bo-ctdt-config__header-actions { margin-left: auto; }
+    .bo-ctdt-config__header-save span { display: none; }
+    .bo-ctdt-config__header-save { width: 35px; min-width: 35px; padding: 0 !important; }
 }

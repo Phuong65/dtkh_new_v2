@@ -31,7 +31,7 @@
                 @for (bo of filteredBoOptions(); track bo.id) {
                 <button type="button" class="ctdt-master-item" [class.ctdt-master-item--active]="selectedBo()?.id === bo.id"
                     [attr.aria-pressed]="selectedBo()?.id === bo.id" (click)="selectBo(bo)">
-                    <span class="ctdt-master-item__mark" aria-hidden="true"><i class="ti ti-folder"></i></span>
+                    <span class="ctdt-master-item__mark" aria-hidden="true"><i class="ti ti-school"></i></span>
                     <span>{{ bo.name || 'Chưa đặt tên' }}</span>
                 </button>
                 } @empty {
@@ -54,7 +54,6 @@
                 <header class="admin-wrap-table__head ctdt-shell__head">
                     <div class="ctdt-shell__heading">
                         <h1 id="ctdt-title">Chương trình đào tạo</h1>
-                        @if (selectedBo(); as bo) { <p>{{ bo.name }}</p> }
                     </div>
                     <div class="admin-wrap-table__head-actions ctdt-shell__actions">
                         <input class="admin-wrap-table__head-actions__search" pInputText type="text"
