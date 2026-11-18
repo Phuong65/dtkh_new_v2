@@ -21,10 +21,12 @@ import { ElnChuyenMuc } from '@modules/shared/models/Elng';
 import { HeDt } from '@modules/shared/models/he-dt';
 import { BoCtdt } from '@modules/shared/models/bo-ctdt';
 import { Ctdt } from '@modules/shared/models/ctdt';
+import { CtdtConfig } from '@modules/shared/models/ctdt-config';
 import { CtdtHocphan } from '@modules/shared/models/ctdt_hocphan';
 import { ElnKhoaHoc } from '@modules/shared/models/elng-khoa-hoc';
 import { BoCtdtService } from '@modules/shared/services/bo-ctdt.service';
 import { CtdtService } from '@modules/shared/services/ctdt.service';
+import { CtdtConfigService } from '@modules/shared/services/ctdt-config.service';
 import { CtdtHocphanService } from '@modules/shared/services/ctdt-hocphan.service';
 import { DonViService } from '@modules/shared/services/don-vi.service';
 import { ElnChuyenMucService } from '@modules/shared/services/elearning-chuyen-muc.service';
@@ -55,6 +57,7 @@ export class CtdtComponent implements OnInit, OnDestroy {
     private readonly auth = inject(AuthService);
     private readonly boCtdtService = inject(BoCtdtService);
     private readonly ctdtService = inject(CtdtService);
+    private readonly ctdtConfigService = inject(CtdtConfigService);
     private readonly ctdtHocphanService = inject(CtdtHocphanService);
     private readonly courseService = inject(ElnKhoaHocService);
     private readonly donViService = inject(DonViService);
@@ -283,13 +286,27 @@ export class CtdtComponent implements OnInit, OnDestroy {
             set: [{ label: 'limit', value: '-1' }, { label: 'orderby', value: 'title' }, { label: 'order', value: 'ASC' }], page: null
         };
         const ctdtIds = validRows.map(row => Number(row.id));
+        let metadataErrorNotified = false;
+        const notifyMetadataError = () => {
+            if (metadataErrorNotified) return;
+            metadataErrorNotified = true;
+            this.notificationService.toastWarning('Không thể tải đầy đủ thông tin ngành, khoa hoặc hệ đào tạo');
+        };
         forkJoin({
-            nganh: this.nganhService.getChuyemucByPageNew(major),
-            khoa: this.donViService.getDonviByPageNew(unit),
-            heDaoTao: this.heDtService.getAllHeDt(),
+            nganh: this.nganhService.getChuyemucByPageNew(major).pipe(catchError(() => {
+                notifyMetadataError();
+                return of({ data: [] });
+            })),
+            khoa: this.donViService.getDonviByPageNew(unit).pipe(catchError(() => {
+                notifyMetadataError();
+                return of({ data: [] });
+            })),
+            heDaoTao: this.heDtService.getAllHeDt().pipe(catchError(() => {
+                notifyMetadataError();
+                return of([]);
+            })),
             credits: this.loadCtdtCredits(ctdtIds)
         }).pipe(
-            catchError(() => of({ nganh: { data: [] }, khoa: { data: [] }, heDaoTao: [], credits: null })),
             takeUntil(this.cancelCtdtMetaLoad$), takeUntil(this.destroy$)
         ).subscribe(({ nganh, khoa, heDaoTao, credits }) => {
             const nganhById = new Map((nganh.data || []).map(item => [Number(item.id), item.title]));
@@ -318,37 +335,106 @@ export class CtdtComponent implements OnInit, OnDestroy {
         };
         return this.loadAllCtdtHocphan(condition).pipe(
             switchMap(links => {
-                const courseIds = [...new Set(links.map(link => Number(link.course_id)).filter(id => Number.isInteger(id) && id > 0))];
-                if (!courseIds.length) return of({ links, courses: [] as ElnKhoaHoc[] });
-                const courseCondition: ConditionOption = {
-                    condition: [{ conditionName: 'status', condition: OvicQueryCondition.greaterThan, value: '-1' }],
-                    set: [{ label: 'limit', value: '-1' }, { label: 'include', value: courseIds.join(',') }, { label: 'include_by', value: 'id' }],
+                const configCondition: ConditionOption = {
+                    condition: [{ conditionName: 'group', condition: OvicQueryCondition.equal, value: 'KHOI_KIEN_THUC', orWhere: 'and' }],
+                    set: [
+                        { label: 'limit', value: '-1' },
+                        { label: 'include', value: ids.join(',') },
+                        { label: 'include_by', value: 'ctdt_id' },
+                        { label: 'orderby', value: 'ordering' },
+                        { label: 'order', value: 'ASC' }
+                    ],
                     page: null
                 };
-                return this.loadAllCourses(courseCondition).pipe(map(courses => ({ links, courses })));
+                return this.loadAllCtdtConfigs(configCondition).pipe(switchMap(configs => {
+                    const courseIds = [...new Set(links.map(link => Number(link.course_id)).filter(id => Number.isInteger(id) && id > 0))];
+                    if (!courseIds.length) return of({ links, courses: [] as ElnKhoaHoc[], configs });
+                    const courseCondition: ConditionOption = {
+                        condition: [{ conditionName: 'status', condition: OvicQueryCondition.greaterThan, value: '-1' }],
+                        set: [{ label: 'limit', value: '-1' }, { label: 'include', value: courseIds.join(',') }, { label: 'include_by', value: 'id' }],
+                        page: null
+                    };
+                    return this.loadAllCourses(courseCondition).pipe(map(courses => ({ links, courses, configs })));
+                }));
             }),
-            map(({ links, courses }) => {
-                const creditsByCourse = new Map(courses.map(course => [Number(course.id), Number(course.params?.sotinchi || 0)]));
+            map(({ links, courses, configs }) => {
+                const creditsByCourse = new Map(courses.map(course => {
+                    const credits = Number(course.params?.sotinchi);
+                    return [Number(course.id), Number.isFinite(credits) && credits >= 0 ? credits : 0] as const;
+                }));
+                const normalizeBlockKey = (key: string | null | undefined) => String(key || '').trim().toLocaleUpperCase('vi');
+                const electiveBlockByCtdt = new Map<string, boolean>();
+                const electiveCreditByCtdt = new Map<number, number>();
+                const countedElectiveBlocks = new Set<string>();
+                configs.forEach(config => {
+                    const ctdtId = Number(config.ctdt_id);
+                    if (!Number.isInteger(ctdtId)) return;
+                    const params = config.params && typeof config.params === 'object' && !Array.isArray(config.params)
+                        ? config.params as { loai_khoi?: string; sotinchi_dukien?: unknown }
+                        : {};
+                    const type = params.loai_khoi;
+                    const title = config.title?.trim().toLocaleLowerCase('vi');
+                    const isElective = type === 'TU_CHON' || (type !== 'BAT_BUOC' && (
+                        normalizeBlockKey(config.key) === 'TUCHON'
+                        || title === 'môn tự chọn'
+                        || title === 'học phần tự chọn'
+                    ));
+                    const blockKey = normalizeBlockKey(config.key);
+                    electiveBlockByCtdt.set(`${ctdtId}:${blockKey}`, isElective);
+                    if (!isElective) return;
+                    const blockId = `${ctdtId}:${blockKey}`;
+                    if (countedElectiveBlocks.has(blockId)) return;
+                    countedElectiveBlocks.add(blockId);
+                    const parseCredits = (value: unknown): number | null => {
+                        if (value == null || value === '') return null;
+                        const credits = Number(value);
+                        return Number.isFinite(credits) && credits >= 0 ? credits : null;
+                    };
+                    const credits = parseCredits(params.sotinchi_dukien)
+                        ?? parseCredits(config.sotinchi_dukien)
+                        ?? 0;
+                    electiveCreditByCtdt.set(ctdtId, (electiveCreditByCtdt.get(ctdtId) || 0) + credits);
+                });
                 const creditsByCtdt = new Map<number, number>();
-                const seenLinks = new Set<string>();
+                const courseLinksByPair = new Map<string, { ctdtId: number; courseId: number; required: boolean }>();
                 links.forEach(link => {
                     const ctdtId = Number(link.ctdt_id);
                     const courseId = Number(link.course_id);
                     if (!Number.isInteger(ctdtId) || !Number.isInteger(courseId)) return;
                     const pair = `${ctdtId}:${courseId}`;
-                    if (seenLinks.has(pair)) return;
-                    seenLinks.add(pair);
+                    const blockKey = normalizeBlockKey(link.khoikienthuc);
+                    const configuredType = electiveBlockByCtdt.get(`${ctdtId}:${blockKey}`);
+                    const required = !(configuredType ?? (blockKey === 'TUCHON'));
+                    const existing = courseLinksByPair.get(pair);
+                    if (existing) existing.required ||= required;
+                    else courseLinksByPair.set(pair, { ctdtId, courseId, required });
+                });
+                courseLinksByPair.forEach(({ ctdtId, courseId, required }) => {
+                    if (!required) return;
                     creditsByCtdt.set(ctdtId, (creditsByCtdt.get(ctdtId) || 0) + (creditsByCourse.get(courseId) || 0));
+                });
+                electiveCreditByCtdt.forEach((credits, ctdtId) => {
+                    creditsByCtdt.set(ctdtId, (creditsByCtdt.get(ctdtId) || 0) + credits);
                 });
                 return creditsByCtdt;
             }),
-            catchError(() => of(null))
+            catchError(() => {
+                this.notificationService.toastWarning('Không thể tính tổng tín chỉ CTĐT');
+                return of(null);
+            })
         );
     }
 
     private loadAllCtdtHocphan(option: ConditionOption): Observable<CtdtHocphan[]> {
         return this.ctdtHocphanService.getCtdtHocphanByPageNew(option).pipe(
             switchMap(first => this.loadRemainingPages<CtdtHocphan>(first, page => this.ctdtHocphanService.getCtdtHocphanByPageNew({ ...option, page: String(page) })).pipe(map(rest => [...(first.data || []), ...rest]))),
+            takeUntil(this.cancelCtdtMetaLoad$), takeUntil(this.destroy$)
+        );
+    }
+
+    private loadAllCtdtConfigs(option: ConditionOption): Observable<CtdtConfig[]> {
+        return this.ctdtConfigService.getCtdtConfigByPageNew(option).pipe(
+            switchMap(first => this.loadRemainingPages<CtdtConfig>(first, page => this.ctdtConfigService.getCtdtConfigByPageNew({ ...option, page: String(page) })).pipe(map(rest => [...(first.data || []), ...rest]))),
             takeUntil(this.cancelCtdtMetaLoad$), takeUntil(this.destroy$)
         );
     }

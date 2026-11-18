@@ -6,10 +6,12 @@ import { AuthService } from '@core/services/auth.service';
 import { NotificationService } from '@core-new/service/notification.service';
 import { BoCtdt } from '@modules/shared/models/bo-ctdt';
 import { Ctdt } from '@modules/shared/models/ctdt';
+import { CtdtConfig } from '@modules/shared/models/ctdt-config';
 import { CtdtHocphan } from '@modules/shared/models/ctdt_hocphan';
 import { ElnKhoaHoc } from '@modules/shared/models/elng-khoa-hoc';
 import { BoCtdtService } from '@modules/shared/services/bo-ctdt.service';
 import { CtdtService } from '@modules/shared/services/ctdt.service';
+import { CtdtConfigService } from '@modules/shared/services/ctdt-config.service';
 import { CtdtHocphanService } from '@modules/shared/services/ctdt-hocphan.service';
 import { DonViService } from '@modules/shared/services/don-vi.service';
 import { ElnChuyenMucService } from '@modules/shared/services/elearning-chuyen-muc.service';
@@ -25,6 +27,7 @@ describe('CtdtComponent sidebar Bộ CTĐT', () => {
     let component: CtdtComponent;
     let boService: jasmine.SpyObj<BoCtdtService>;
     let ctdtService: jasmine.SpyObj<CtdtService>;
+    let ctdtConfigService: jasmine.SpyObj<CtdtConfigService>;
     let ctdtHocphanService: jasmine.SpyObj<CtdtHocphanService>;
     let courseService: jasmine.SpyObj<ElnKhoaHocService>;
     let route: { snapshot: { queryParamMap: ReturnType<typeof convertToParamMap> } };
@@ -35,6 +38,8 @@ describe('CtdtComponent sidebar Bộ CTĐT', () => {
         boService.get.and.returnValue(of({ data: [boA, boB], totalRecords: 2, rows: 0 }));
         ctdtService = jasmine.createSpyObj('CtdtService', ['getCtdtByPageNew', 'addCtdt', 'deleteCtdt']);
         ctdtService.getCtdtByPageNew.and.returnValue(of({ data: [], recordsFiltered: 0 }));
+        ctdtConfigService = jasmine.createSpyObj('CtdtConfigService', ['getCtdtConfigByPageNew']);
+        ctdtConfigService.getCtdtConfigByPageNew.and.returnValue(of({ data: [], recordsFiltered: 0 }));
         ctdtHocphanService = jasmine.createSpyObj('CtdtHocphanService', ['getCtdtHocphanByPageNew']);
         ctdtHocphanService.getCtdtHocphanByPageNew.and.returnValue(of({ data: [], recordsFiltered: 0 }));
         courseService = jasmine.createSpyObj('ElnKhoaHocService', ['getKhoaHocByPageNew_2']);
@@ -50,6 +55,7 @@ describe('CtdtComponent sidebar Bộ CTĐT', () => {
                 { provide: AuthService, useValue: { hasRouter: () => false, userCanAdd: () => true, userCanDelete: () => true } },
                 { provide: BoCtdtService, useValue: boService },
                 { provide: CtdtService, useValue: ctdtService },
+                { provide: CtdtConfigService, useValue: ctdtConfigService },
                 { provide: CtdtHocphanService, useValue: ctdtHocphanService },
                 { provide: DonViService, useValue: { getDonviByPageNew: () => of({ data: [] }) } },
                 { provide: ElnChuyenMucService, useValue: { getChuyemucByPageNew: () => of({ data: [] }) } },
@@ -212,10 +218,18 @@ describe('CtdtComponent sidebar Bộ CTĐT', () => {
         expect(linksOption.set).toContain({ label: 'include_by', value: 'ctdt_id' });
         expect(linksOption.set).toContain({ label: 'limit', value: '-1' });
         expect(linksOption.page).toBeNull();
+        const configsOption = ctdtConfigService.getCtdtConfigByPageNew.calls.mostRecent().args[0];
+        expect(configsOption.condition).toContain(jasmine.objectContaining({ conditionName: 'group', value: 'KHOI_KIEN_THUC' }));
+        expect(configsOption.set).toContain({ label: 'include', value: '11,22,33' });
+        expect(configsOption.set).toContain({ label: 'include_by', value: 'ctdt_id' });
         const coursesOption = courseService.getKhoaHocByPageNew_2.calls.mostRecent().args[0];
         expect(coursesOption.set).toContain({ label: 'include', value: '100,101' });
         expect(coursesOption.set).toContain({ label: 'limit', value: '-1' });
         expect(coursesOption.page).toBeNull();
+        expect(coursesOption.condition).toContain(jasmine.objectContaining({
+            conditionName: 'status',
+            value: '-1'
+        }));
         expect(component.getCtdtMeta(rows[0]).tongTinChi).toBe(5);
         expect(component.getCtdtMeta(rows[1]).tongTinChi).toBe(3);
         expect(component.getCtdtMeta(rows[2]).tongTinChi).toBe(0);
@@ -244,6 +258,150 @@ describe('CtdtComponent sidebar Bộ CTĐT', () => {
         expect(component.getCtdtMeta(rows[1]).tongTinChi).toBe(2);
     });
 
+    it('sums mandatory course credits and planned elective credits instead of elective course credits', () => {
+        const row = { id: 11 } as Ctdt;
+        ctdtService.getCtdtByPageNew.and.returnValue(of({ data: [row], recordsFiltered: 1 }));
+        ctdtHocphanService.getCtdtHocphanByPageNew.and.returnValue(of({
+            data: [
+                { ctdt_id: 11, course_id: 100, khoikienthuc: 'core' },
+                { ctdt_id: 11, course_id: 101, khoikienthuc: 'TUCHON' },
+                { ctdt_id: 11, course_id: 102, khoikienthuc: 'core' },
+                { ctdt_id: 11, course_id: 100, khoikienthuc: 'core' }
+            ] as CtdtHocphan[],
+            recordsFiltered: 4
+        }));
+        courseService.getKhoaHocByPageNew_2.and.returnValue(of({
+            data: [
+                { id: 100, params: { sotinchi: 3 } },
+                { id: 101, params: { sotinchi: 9 } },
+                { id: 102, params: { sotinchi: 2 } }
+            ] as ElnKhoaHoc[],
+            recordsFiltered: 3
+        }));
+        ctdtConfigService.getCtdtConfigByPageNew.and.returnValue(of({
+            data: [
+                { ctdt_id: 11, group: 'KHOI_KIEN_THUC', key: 'core', title: 'Khối bắt buộc', params: { loai_khoi: 'BAT_BUOC' } },
+                { ctdt_id: 11, group: 'KHOI_KIEN_THUC', key: 'tuchon', title: 'Học phần tự chọn', params: { loai_khoi: 'TU_CHON', sotinchi_dukien: 12 } }
+            ] as CtdtConfig[],
+            recordsFiltered: 2
+        }));
+
+        fixture.detectChanges();
+
+        expect(component.getCtdtMeta(row).tongTinChi).toBe(17);
+    });
+
+    it('uses the legacy elective title and top-level planned-credit fallback', () => {
+        const row = { id: 11 } as Ctdt;
+        ctdtService.getCtdtByPageNew.and.returnValue(of({ data: [row], recordsFiltered: 1 }));
+        ctdtHocphanService.getCtdtHocphanByPageNew.and.returnValue(of({
+            data: [
+                { ctdt_id: 11, course_id: 100, khoikienthuc: 'required' },
+                { ctdt_id: 11, course_id: 101, khoikienthuc: 'elective-legacy' }
+            ] as CtdtHocphan[],
+            recordsFiltered: 2
+        }));
+        courseService.getKhoaHocByPageNew_2.and.returnValue(of({
+            data: [{ id: 100, params: { sotinchi: 4 } }, { id: 101, params: { sotinchi: 15 } }] as ElnKhoaHoc[],
+            recordsFiltered: 2
+        }));
+        ctdtConfigService.getCtdtConfigByPageNew.and.returnValue(of({
+            data: [{
+                ctdt_id: 11, group: 'KHOI_KIEN_THUC', key: 'elective-legacy',
+                title: 'Môn tự chọn', params: { sotinchi_dukien: '' }, sotinchi_dukien: 7
+            }] as CtdtConfig[],
+            recordsFiltered: 1
+        }));
+
+        fixture.detectChanges();
+
+        expect(component.getCtdtMeta(row).tongTinChi).toBe(11);
+    });
+
+    it('counts listed subjects as mandatory when an explicit required type overrides the elective key', () => {
+        const row = { id: 11 } as Ctdt;
+        ctdtService.getCtdtByPageNew.and.returnValue(of({ data: [row], recordsFiltered: 1 }));
+        ctdtHocphanService.getCtdtHocphanByPageNew.and.returnValue(of({
+            data: [{ ctdt_id: 11, course_id: 100, khoikienthuc: 'TUCHON' }] as CtdtHocphan[],
+            recordsFiltered: 1
+        }));
+        courseService.getKhoaHocByPageNew_2.and.returnValue(of({
+            data: [{ id: 100, params: { sotinchi: 5 } }] as ElnKhoaHoc[],
+            recordsFiltered: 1
+        }));
+        ctdtConfigService.getCtdtConfigByPageNew.and.returnValue(of({
+            data: [{
+                ctdt_id: 11, group: 'KHOI_KIEN_THUC', key: 'TUCHON',
+                title: 'TUCHON', params: { loai_khoi: 'BAT_BUOC' }
+            }] as CtdtConfig[],
+            recordsFiltered: 1
+        }));
+
+        fixture.detectChanges();
+
+        expect(component.getCtdtMeta(row).tongTinChi).toBe(5);
+    });
+
+    it('counts one course once as mandatory even if duplicate links place it in both block types', () => {
+        const row = { id: 11 } as Ctdt;
+        ctdtService.getCtdtByPageNew.and.returnValue(of({ data: [row], recordsFiltered: 1 }));
+        ctdtHocphanService.getCtdtHocphanByPageNew.and.returnValue(of({
+            data: [
+                { ctdt_id: 11, course_id: 100, khoikienthuc: 'TUCHON' },
+                { ctdt_id: 11, course_id: 100, khoikienthuc: 'CORE' }
+            ] as CtdtHocphan[],
+            recordsFiltered: 2
+        }));
+        courseService.getKhoaHocByPageNew_2.and.returnValue(of({
+            data: [{ id: 100, params: { sotinchi: 5 } }] as ElnKhoaHoc[],
+            recordsFiltered: 1
+        }));
+        ctdtConfigService.getCtdtConfigByPageNew.and.returnValue(of({
+            data: [
+                { ctdt_id: 11, group: 'KHOI_KIEN_THUC', key: 'TUCHON', title: 'Học phần tự chọn', params: { loai_khoi: 'TU_CHON', sotinchi_dukien: 8 } },
+                { ctdt_id: 11, group: 'KHOI_KIEN_THUC', key: 'CORE', title: 'Khối bắt buộc', params: { loai_khoi: 'BAT_BUOC' } }
+            ] as CtdtConfig[],
+            recordsFiltered: 2
+        }));
+
+        fixture.detectChanges();
+
+        expect(component.getCtdtMeta(row).tongTinChi).toBe(13);
+    });
+
+    it('does not add duplicate elective configuration credits more than once', () => {
+        const row = { id: 11 } as Ctdt;
+        ctdtService.getCtdtByPageNew.and.returnValue(of({ data: [row], recordsFiltered: 1 }));
+        ctdtConfigService.getCtdtConfigByPageNew.and.returnValue(of({
+            data: [
+                { ctdt_id: 11, group: 'KHOI_KIEN_THUC', key: 'TUCHON', title: 'Học phần tự chọn', params: { loai_khoi: 'TU_CHON', sotinchi_dukien: 8 } },
+                { ctdt_id: 11, group: 'KHOI_KIEN_THUC', key: 'tuchon', title: 'Học phần tự chọn', params: { loai_khoi: 'TU_CHON', sotinchi_dukien: 8 } }
+            ] as CtdtConfig[],
+            recordsFiltered: 2
+        }));
+
+        fixture.detectChanges();
+
+        expect(component.getCtdtMeta(row).tongTinChi).toBe(8);
+    });
+
+    it('treats invalid course-credit values as zero', () => {
+        const row = { id: 11 } as Ctdt;
+        ctdtService.getCtdtByPageNew.and.returnValue(of({ data: [row], recordsFiltered: 1 }));
+        ctdtHocphanService.getCtdtHocphanByPageNew.and.returnValue(of({
+            data: [{ ctdt_id: 11, course_id: 100, khoikienthuc: 'core' }] as CtdtHocphan[],
+            recordsFiltered: 1
+        }));
+        courseService.getKhoaHocByPageNew_2.and.returnValue(of({
+            data: [{ id: 100, params: { sotinchi: Number.NaN } }] as ElnKhoaHoc[],
+            recordsFiltered: 1
+        }));
+
+        fixture.detectChanges();
+
+        expect(component.getCtdtMeta(row).tongTinChi).toBe(0);
+    });
+
     it('does not request courses for programmes without links', () => {
         const rows = [{ id: 11 }, { id: 22 }] as Ctdt[];
         ctdtService.getCtdtByPageNew.and.returnValue(of({ data: rows, recordsFiltered: rows.length }));
@@ -262,6 +420,48 @@ describe('CtdtComponent sidebar Bộ CTĐT', () => {
         expect(component.ctdtState()).toBe('success');
         expect(component.getCtdtMeta(row).tongTinChi).toBeNull();
         expect(courseService.getKhoaHocByPageNew_2).not.toHaveBeenCalled();
+    });
+
+    it('keeps credit totals unavailable when block configuration fails', () => {
+        const row = { id: 11 } as Ctdt;
+        ctdtService.getCtdtByPageNew.and.returnValue(of({ data: [row], recordsFiltered: 1 }));
+        ctdtConfigService.getCtdtConfigByPageNew.and.returnValue(throwError(() => new Error('failed')));
+
+        fixture.detectChanges();
+
+        expect(component.getCtdtMeta(row).tongTinChi).toBeNull();
+    });
+
+    it('keeps credit totals available when unrelated programme metadata requests fail', () => {
+        const row = { id: 11 } as Ctdt;
+        ctdtService.getCtdtByPageNew.and.returnValue(of({ data: [row], recordsFiltered: 1 }));
+        ctdtHocphanService.getCtdtHocphanByPageNew.and.returnValue(of({
+            data: [{ ctdt_id: 11, course_id: 100, khoikienthuc: 'core' }] as CtdtHocphan[],
+            recordsFiltered: 1
+        }));
+        courseService.getKhoaHocByPageNew_2.and.returnValue(of({
+            data: [{ id: 100, params: { sotinchi: 5 } }] as ElnKhoaHoc[],
+            recordsFiltered: 1
+        }));
+        spyOn(TestBed.inject(ElnChuyenMucService), 'getChuyemucByPageNew').and.returnValue(throwError(() => new Error('failed')));
+
+        fixture.detectChanges();
+
+        expect(component.getCtdtMeta(row).tongTinChi).toBe(5);
+    });
+
+    it('keeps credit totals unavailable when linked courses cannot be loaded', () => {
+        const row = { id: 11 } as Ctdt;
+        ctdtService.getCtdtByPageNew.and.returnValue(of({ data: [row], recordsFiltered: 1 }));
+        ctdtHocphanService.getCtdtHocphanByPageNew.and.returnValue(of({
+            data: [{ ctdt_id: 11, course_id: 100, khoikienthuc: 'core' }] as CtdtHocphan[],
+            recordsFiltered: 1
+        }));
+        courseService.getKhoaHocByPageNew_2.and.returnValue(throwError(() => new Error('failed')));
+
+        fixture.detectChanges();
+
+        expect(component.getCtdtMeta(row).tongTinChi).toBeNull();
     });
 
     it('ignores metadata responses after switching Bộ', () => {
