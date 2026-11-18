@@ -5,6 +5,7 @@ describe('CtdtCauhinhComponent row reorder', () => {
     const createComponent = () => {
         const component = Object.create(CtdtCauhinhComponent.prototype) as CtdtCauhinhComponent;
         Object.defineProperty(component, 'state', { value: signal('success'), writable: false });
+        (component as any).selectedCtdt = { id: 1 };
         return component;
     };
 
@@ -36,5 +37,66 @@ describe('CtdtCauhinhComponent row reorder', () => {
         component.onConfigRowReorder(parent, { dragIndex: 0, dropIndex: 0 });
 
         expect(parent.ctdt_config[0].ordering).toBe(3);
+    });
+});
+
+describe('CtdtCauhinhComponent default knowledge blocks', () => {
+    const createComponent = () => {
+        const component = Object.create(CtdtCauhinhComponent.prototype) as CtdtCauhinhComponent;
+        (component as any).selectedCtdt = { id: 1 };
+        return component;
+    };
+
+    it('adds the elective block and retains default params when mapping knowledge blocks', () => {
+        const component = createComponent();
+
+        const configs = (component as any).mapDefaultConfigs('KHOI_KIEN_THUC', [{
+            key: 'core', title: 'Khối cơ sở', params: { sotinchi_dukien: 18, extra: 'retained' }
+        }]);
+
+        expect(configs).toEqual([
+            jasmine.objectContaining({
+                key: 'core',
+                params: { sotinchi_dukien: 18, extra: 'retained' }
+            }),
+            jasmine.objectContaining({
+                key: 'TUCHON',
+                title: 'Học phần tự chọn',
+                params: { loai_khoi: 'TU_CHON' }
+            })
+        ]);
+    });
+
+    it('supplies the elective block when no knowledge-block defaults are configured', () => {
+        const component = createComponent();
+
+        const configs = (component as any).mapDefaultConfigs('KHOI_KIEN_THUC', null);
+
+        expect(configs).toEqual([
+            jasmine.objectContaining({
+                key: 'TUCHON',
+                title: 'Học phần tự chọn',
+                params: { loai_khoi: 'TU_CHON' }
+            })
+        ]);
+    });
+
+    it('normalizes an existing elective default without duplicating it or dropping its credits', () => {
+        const component = createComponent();
+
+        const configs = (component as any).mapDefaultConfigs('KHOI_KIEN_THUC', [{
+            key: 'TUCHON',
+            title: 'Môn tự chọn',
+            sotinchi_dukien: 6,
+            params: { loai_khoi: 'BAT_BUOC', extra: 'retained' }
+        }]);
+
+        expect(configs).toHaveSize(1);
+        expect(configs[0]).toEqual(jasmine.objectContaining({
+            key: 'TUCHON',
+            title: 'Học phần tự chọn',
+            sotinchi_dukien: 6,
+            params: { loai_khoi: 'TU_CHON', extra: 'retained' }
+        }));
     });
 });

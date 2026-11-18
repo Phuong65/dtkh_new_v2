@@ -336,12 +336,43 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
 
     private applyKhoiConfig(rows: CtdtConfig[], defaults: unknown, ctdtId: number): void {
         this.emptyKhoiMarker = rows.find(item => item.group === this.emptyKhoiGroup) || null;
-        if (Array.isArray(defaults)) this.defaultKhoi = defaults;
+        const defaultBlocks: CtdtConfig[] = Array.isArray(defaults) ? defaults : [];
+        this.defaultKhoi = this.normalizeDefaultKhoi(defaultBlocks, ctdtId);
         const custom = rows.filter(item => item.group === 'KHOI_KIEN_THUC');
         this.list_khoikienthuc = custom.length ? custom : this.emptyKhoiMarker ? []
             : this.defaultKhoi.map((item, index) => ({ ...item, ctdt_id: ctdtId,
                 group: 'KHOI_KIEN_THUC', ordering: item.ordering ?? index + 1 }));
         this.groupCourses();
+    }
+
+    private normalizeDefaultKhoi(defaults: CtdtConfig[], ctdtId: number): CtdtConfig[] {
+        let hasElectiveBlock = false;
+        const normalized = defaults.map((item, index) => {
+            const isElective = item.key?.toLocaleUpperCase('vi') === 'TUCHON';
+            if (!isElective) {
+                return { ...item, ctdt_id: ctdtId, group: 'KHOI_KIEN_THUC', ordering: item.ordering ?? index + 1 };
+            }
+            hasElectiveBlock = true;
+            return {
+                ...item,
+                ctdt_id: ctdtId,
+                group: 'KHOI_KIEN_THUC',
+                title: 'Học phần tự chọn',
+                ordering: item.ordering ?? index + 1,
+                params: { ...this.getKhoiParams(item), loai_khoi: 'TU_CHON' as KnowledgeBlockType }
+            };
+        });
+        if (!hasElectiveBlock) {
+            normalized.push({
+                ctdt_id: ctdtId,
+                group: 'KHOI_KIEN_THUC',
+                key: 'TUCHON',
+                title: 'Học phần tự chọn',
+                ordering: normalized.length + 1,
+                params: { loai_khoi: 'TU_CHON' }
+            });
+        }
+        return normalized;
     }
 
     private getKhoiConfig(ctdtId: number): Observable<CtdtConfig[]> {
@@ -617,8 +648,10 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
     private getKhoiType(config: CtdtConfig): KnowledgeBlockType {
         const type = this.getKhoiParams(config).loai_khoi;
         if (type === 'BAT_BUOC' || type === 'TU_CHON') return type;
+        const title = config.title?.trim().toLocaleLowerCase('vi');
         const isElective = config.key?.toLocaleUpperCase('vi') === 'TUCHON'
-            || config.title?.trim().toLocaleLowerCase('vi') === 'môn tự chọn';
+            || title === 'môn tự chọn'
+            || title === 'học phần tự chọn';
         return isElective ? 'TU_CHON' : 'BAT_BUOC';
     }
 

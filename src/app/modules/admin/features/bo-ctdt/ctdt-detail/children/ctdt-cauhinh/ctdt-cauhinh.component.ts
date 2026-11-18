@@ -29,6 +29,16 @@ export interface CtdtConfiAll {
     ctdt_config: CtdtConfig[];
 }
 
+interface CtdtConfigDefaultItem {
+    key: string;
+    title: string;
+    ordering?: number;
+    noidung?: string;
+    value?: number | null;
+    sotinchi_dukien?: number | null;
+    params?: unknown;
+}
+
 @Component({
     selector: 'app-ctdt-cauhinh',
     standalone: true,
@@ -227,14 +237,7 @@ export class CtdtCauhinhComponent implements OnInit {
                         f.ctdt_config = [];
                     } else {
                         const defaults = this.list_config.find(config => config.config_key === f.group)?.params;
-                        f.ctdt_config = Array.isArray(defaults) ? defaults.map((item, index) => ({
-                            ctdt_id: this.selectedCtdt.id,
-                            key: item.key,
-                            group: f.group,
-                            title: item.title,
-                            ordering: item.ordering ?? index + 1,
-                            noidung: item.noidung
-                        })) : [];
+                        f.ctdt_config = this.mapDefaultConfigs(f.group, defaults);
                     }
                 });
                 this.list_ctdt_config = this.helperService.sort(data, 'title');
@@ -244,6 +247,42 @@ export class CtdtCauhinhComponent implements OnInit {
                 this.state.set('error');
             }
         })
+    }
+
+    private mapDefaultConfigs(group: string, defaults: unknown): CtdtConfig[] {
+        const items: CtdtConfigDefaultItem[] = Array.isArray(defaults) ? defaults : [];
+        const source = group === 'KHOI_KIEN_THUC' ? this.ensureElectiveDefault(items) : items;
+        return source.map((item, index) => ({
+            ctdt_id: this.selectedCtdt.id,
+            key: item.key,
+            group,
+            title: item.title,
+            ordering: item.ordering ?? index + 1,
+            noidung: item.noidung,
+            value: item.value,
+            sotinchi_dukien: item.sotinchi_dukien,
+            params: item.params
+        }));
+    }
+
+    private ensureElectiveDefault(defaults: CtdtConfigDefaultItem[]): CtdtConfigDefaultItem[] {
+        let hasElectiveBlock = false;
+        const normalized: CtdtConfigDefaultItem[] = defaults.map(item => {
+            if (item.key?.toLocaleUpperCase('vi') !== 'TUCHON') return item;
+            hasElectiveBlock = true;
+            const params = item.params && typeof item.params === 'object' && !Array.isArray(item.params)
+                ? item.params as Record<string, unknown> : {};
+            return { ...item, title: 'Học phần tự chọn', params: { ...params, loai_khoi: 'TU_CHON' } };
+        });
+        if (!hasElectiveBlock) {
+            normalized.push({
+                key: 'TUCHON',
+                title: 'Học phần tự chọn',
+                ordering: normalized.length + 1,
+                params: { loai_khoi: 'TU_CHON' }
+            });
+        }
+        return normalized;
     }
 
     addConfig(parent: CtdtConfiAll) {

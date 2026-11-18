@@ -16,8 +16,10 @@ describe('CtdtNoidungComponent knowledge block credits', () => {
             loai_khoi: new FormControl('BAT_BUOC', Validators.required),
             sotinchi_dukien: new FormControl(18, Validators.min(0))
         });
+        state.list_course = [];
         state.list_khoikienthuc = [];
         state.emptyKhoiMarker = null;
+        state.emptyKhoiGroup = 'KHOI_KIEN_THUC_EMPTY';
         state.helperService = { slugVietnamese: () => 'khoi-co-so' };
         state.ctdtConfigService = {
             addCtdtConfig: jasmine.createSpy('addCtdtConfig').and.returnValue(of({ id: 3 }))
@@ -107,6 +109,68 @@ describe('CtdtNoidungComponent knowledge block credits', () => {
 
         expect(component.list_cdt_hocphan[0].params?.loai_khoi).toBe('TU_CHON');
         expect(component.list_cdt_hocphan[0].params?.sotinchi_dukien).toBe(6);
+    });
+
+    it('adds a classified elective block when the default template omits it', () => {
+        const component = createComponent();
+
+        (component as any).applyKhoiConfig([], [{ key: 'core', title: 'Khối cơ sở' }], 1);
+
+        const elective = component.list_khoikienthuc.find(item => item.key === 'TUCHON');
+        expect(elective).toEqual(jasmine.objectContaining({
+            title: 'Học phần tự chọn',
+            params: { loai_khoi: 'TU_CHON' },
+            ordering: 2
+        }));
+        expect(component.list_cdt_hocphan.find(item => item.key === 'TUCHON')?.params?.loai_khoi).toBe('TU_CHON');
+    });
+
+    it('still supplies the elective block when the defaults payload is not an array', () => {
+        const component = createComponent();
+
+        (component as any).applyKhoiConfig([], null, 1);
+
+        expect(component.list_khoikienthuc).toEqual([
+            jasmine.objectContaining({
+                key: 'TUCHON',
+                title: 'Học phần tự chọn',
+                params: { loai_khoi: 'TU_CHON' }
+            })
+        ]);
+    });
+
+    it('renames and classifies an existing elective default while preserving its params', () => {
+        const component = createComponent();
+
+        (component as any).applyKhoiConfig([], [{
+            key: 'TUCHON',
+            title: 'Môn tự chọn',
+            params: { loai_khoi: 'BAT_BUOC', sotinchi_dukien: 6, extra: 'retained' }
+        }], 1);
+
+        expect(component.list_khoikienthuc).toHaveSize(1);
+        expect(component.list_khoikienthuc[0].title).toBe('Học phần tự chọn');
+        expect(component.list_khoikienthuc[0].params).toEqual({
+            loai_khoi: 'TU_CHON',
+            sotinchi_dukien: 6,
+            extra: 'retained'
+        });
+    });
+
+    it('does not inject default blocks into an explicitly empty or customized CTĐT', () => {
+        const component = createComponent();
+        const defaults = [{ key: 'TUCHON', title: 'Môn tự chọn' }];
+
+        (component as any).applyKhoiConfig([{
+            ctdt_id: 1, group: 'KHOI_KIEN_THUC_EMPTY', key: 'khoi_kien_thuc_empty',
+            title: 'Đã xóa toàn bộ khối kiến thức'
+        }], defaults, 1);
+        expect(component.list_khoikienthuc).toEqual([]);
+
+        (component as any).applyKhoiConfig([{
+            ctdt_id: 1, group: 'KHOI_KIEN_THUC', key: 'core', title: 'Khối cơ sở'
+        }], defaults, 1);
+        expect(component.list_khoikienthuc.map(item => item.key)).toEqual(['core']);
     });
 });
 

@@ -58,3 +58,9 @@
 - source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-core-new-tooltip-style-location.md`
   summary: Đồng bộ trạng thái checklist trong spec sidebar Bộ CTĐT với phần triển khai đã staged.
   evidence: Review phát hiện task thực thi trong spec sidebar vẫn chưa được đánh dấu hoàn tất; tài liệu này có sẵn trước thay đổi vị trí CSS tooltip.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-ctdt-default-elective-block.md`
+  summary: Tạo empty marker khi xóa hết khối kiến thức từ tab Cấu hình CTĐT.
+  evidence: `deleteConfig()` xóa khối cuối rồi tải lại; nếu không có `KHOI_KIEN_THUC_EMPTY`, tab sẽ hiển thị lại các khối mặc định. Đây là hành vi có sẵn, ngoài phạm vi chuẩn hóa mặc định cho CTĐT mới.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-ctdt-default-elective-block.md`
+  summary: Làm rõ cách xử lý lưu cấu hình CTĐT khi một số request add/update thất bại.
+  evidence: `saveConfig()` gửi nhiều request độc lập bằng `forkJoin`, nên request thành công có thể đã ghi dữ liệu dù request khác thất bại; đây là hạn chế có sẵn, cần thiết kế giao dịch/khôi phục riêng.

@@ -358,7 +358,7 @@ export const KHOI_KIEN_THUC = [
     { "label": "Cơ sở - nhóm ngành", "value": "COSO_NHOMNGANH" },
     { "label": "Chuyên ngành", "value": "CHUYENNGANH" },
     { "label": "Thực tập và tốt nghiệp", "value": "THUCTAP_TOTNGHIEP" },
-    { "label": "Môn tự chọn", "value": "TUCHON" },
+    { "label": "Học phần tự chọn", "value": "TUCHON" },
 ];
 
 export const TYPE_OF_RETURN = [
