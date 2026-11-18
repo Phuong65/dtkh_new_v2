@@ -305,14 +305,15 @@
                         <span id="khoi-title-error" class="ictu-admin-form-error" role="alert">Nhập tên khối kiến thức.</span>
                         }
                     </div>
-                    <div class="ictu-form__row">
-                        <span class="ictu-form__label ictu-form__label--required">Phân loại khối</span>
-                        <ovic-dropdown [options]="khoiTypeOptions" [defaultValue]="formKhoi.controls['loai_khoi'].value"
+                    <div class="ctdt-field">
+                        <span class="ctdt-field__label">Phân loại khối <span class="ctdt-required">*</span></span>
+                        <ovic-dropdown placeholder="Chọn phân loại khối" [options]="khoiTypeOptions"
+                            [defaultValue]="formKhoi.controls['loai_khoi'].value"
                             optionId="value" optionLabel="label" [formField]="formKhoi.controls['loai_khoi']"
-                            [showClear]="false" styleClass="content-block-type-select">
+                            [filter]="true" filterBy="label">
                         </ovic-dropdown>
                         @if (formKhoi.controls['loai_khoi'].touched && formKhoi.controls['loai_khoi'].invalid) {
-                        <span id="khoi-loai-error" class="ictu-admin-form-error" role="alert">Chọn phân loại khối.</span>
+                        <span class="ctdt-field__error">Chọn phân loại khối.</span>
                         }
                     </div>
                     <div class="ictu-form__row">
