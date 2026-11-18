@@ -32,6 +32,7 @@ import { LoadingProgressComponent } from '@core-new/components/loading-progress/
 import { IctuDeletingAnimationControl } from '@core-new/models/ictu-deleting-animation-control';
 import { HelperService } from '@core/services/helper.service';
 import { TooltipModule } from 'primeng/tooltip';
+import { OvicDropdownComponent } from '@modules/shared/components/ovic-dropdown/ovic-dropdown.component';
 
 type CourseConditionKey = 'hp_hoctruoc' | 'hp_tienquyet' | 'hp_songhanh';
 type KnowledgeBlockType = 'BAT_BUOC' | 'TU_CHON';
@@ -81,7 +82,8 @@ export interface typeCtdtHocphan {
     selector: 'app-ctdt-noidung',
     standalone: true,
     imports: [CommonModule, TableModule, FormsModule, ReactiveFormsModule, PopoverModule,
-        Drawer, InputTextModule, MatButtonModule, LoadingProgressComponent, IctuPaginatorComponent, TooltipModule],
+        Drawer, InputTextModule, MatButtonModule, LoadingProgressComponent, IctuPaginatorComponent, TooltipModule,
+        OvicDropdownComponent],
     templateUrl: './ctdt-noidung.component.html',
     styleUrls: ['./ctdt-noidung.component.css']
 })
@@ -115,6 +117,10 @@ export class CtdtNoidungComponent implements OnInit, OnChanges, OnDestroy {
     userId = 0;
     list_khoikienthuc: CtdtConfig[] = [];
     list_cdt_hocphan: typeCtdtHocphan[] = [];
+    readonly khoiTypeOptions = [
+        { label: 'Bắt buộc', value: 'BAT_BUOC' as KnowledgeBlockType },
+        { label: 'Tự chọn', value: 'TU_CHON' as KnowledgeBlockType }
+    ];
     readonly formKhoi: FormGroup = this.formBuilder.group({
         title: ['', Validators.required],
         loai_khoi: ['BAT_BUOC' as KnowledgeBlockType, Validators.required],
