@@ -5,10 +5,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subject as RxSubject, distinctUntilChanged, map, takeUntil } from 'rxjs';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 import { AppState } from '@core-new/models/app-state';
-import { OvicQueryCondition } from '@core/models/dto';
+import { OvicConditionParam, OvicQueryCondition } from '@core/models/dto';
+import { AuthService } from '@core/services/auth.service';
 import { ConditionOption } from '@modules/shared/models/condition-option';
 import { ElnKhoaHoc } from '@modules/shared/models/elng-khoa-hoc';
 import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
+import { ROLES } from '@modules/shared/utils/syscat';
 import { MonhocThongtinComponent } from './children/monhoc-thongtin/monhoc-thongtin.component';
 import { MonhocMuctieuCdrComponent } from './children/monhoc-muctieu-cdr/monhoc-muctieu-cdr.component';
 import { MonhocNoidungComponent } from './children/monhoc-noidung/monhoc-noidung.component';
@@ -64,6 +66,7 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly courseService = inject(ElnKhoaHocService);
+    private readonly auth = inject(AuthService);
     private readonly titleService = inject(Title);
     private readonly initialPageTitle = this.titleService.getTitle();
     private currentPageTitle: string | null = null;
@@ -73,6 +76,9 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
     readonly modeButtons = viewChildren<ElementRef<HTMLButtonElement>>('modeButton');
 
     readonly modes = COURSE_MANAGEMENT_MODES;
+    readonly isLecturer: boolean;
+    readonly lecturerModes = signal<readonly CourseManagementModeId[]>([]);
+    readonly availableModes = computed(() => this.isLecturer && !this.lecturerModes().length ? [] : this.modes);
 
     readonly tabs: readonly CourseManagementTabItem[] = [
         { id: 'thong-tin', label: 'Thông tin chung', icon: 'ti ti-info-circle', mode: 'ke-hoach-giang-day' },
@@ -86,9 +92,28 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
     readonly activeModeId = signal<CourseManagementModeId>('ke-hoach-giang-day');
     readonly activeTabId = signal<CourseManagementTabId>('thong-tin');
 
-    readonly visibleTabs = computed(() =>
-        this.tabs.filter(tab => tab.mode === this.activeModeId())
-    );
+    readonly visibleTabs = computed(() => {
+        const availableModeIds = this.availableModes().map(mode => mode.id);
+        return this.tabs.filter(tab => tab.mode === this.activeModeId() && availableModeIds.includes(tab.mode));
+    });
+    readonly activeModeAllowed = computed(() => !this.isLecturer
+        || this.lecturerModes().includes(this.activeModeId()));
+    private hasExplicitViewSelection = false;
+
+    constructor() {
+        const elevatedRoles = [
+            ROLES.admin,
+            ROLES.manager,
+            ROLES.troly_pdt,
+            ROLES.chuyenvien_pdt,
+            ROLES.daotao_new,
+            ROLES.daotao_cv_1,
+            ROLES.lanhdaokhoa,
+            ROLES.lanhdaobomon
+        ];
+        this.isLecturer = this.auth.userHasRole(ROLES.giangvien)
+            && !elevatedRoles.some(role => this.auth.userHasRole(role));
+    }
 
     readonly state = signal<AppState>('loading');
     readonly selectedCourse = signal<ElnKhoaHoc | null>(null);
@@ -109,9 +134,15 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
         this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
             const tabParam = params.get('tab');
             const modeParam = params.get('mode');
+            this.hasExplicitViewSelection = !!tabParam || !!modeParam;
 
             const requestedTab = this.tabs.find(tab => tab.id === tabParam);
             if (requestedTab) {
+                if (this.isLecturer && this.state() === 'success'
+                    && !this.availableModes().some(mode => mode.id === requestedTab.mode)) {
+                    this.selectFirstAvailableTab();
+                    return;
+                }
                 this.activeModeId.set(requestedTab.mode);
                 this.activeTabId.set(requestedTab.id);
                 return;
@@ -119,6 +150,11 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
 
             const requestedMode = this.modes.find(m => m.id === modeParam);
             if (requestedMode) {
+                if (this.isLecturer && this.state() === 'success'
+                    && !this.availableModes().some(mode => mode.id === requestedMode.id)) {
+                    this.selectFirstAvailableTab();
+                    return;
+                }
                 const firstTab = this.tabs.find(tab => tab.mode === requestedMode.id);
                 this.activeModeId.set(requestedMode.id);
                 this.activeTabId.set(firstTab?.id ?? 'thong-tin');
@@ -151,6 +187,7 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
     private loadCourse(id: number): void {
         this.reload$.next();
         this.selectedCourse.set(null);
+        this.lecturerModes.set([]);
         this.restorePageTitle();
         this.errorMessage.set('');
 
@@ -163,8 +200,19 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
 
         this.courseId.set(id);
         this.state.set('loading');
+        const conditions: OvicConditionParam[] = [
+            { conditionName: 'id', condition: OvicQueryCondition.equal, value: String(id), orWhere: 'and' }
+        ];
+        if (this.isLecturer) {
+            const userId = String(this.auth.user.id);
+            conditions.push(
+                { conditionName: 'creator_plan_id', condition: OvicQueryCondition.equal, value: userId, orWhere: 'and' },
+                { conditionName: 'id', condition: OvicQueryCondition.equal, value: String(id), orWhere: 'or' },
+                { conditionName: 'creator_exam_id', condition: OvicQueryCondition.equal, value: userId, orWhere: 'and' }
+            );
+        }
         const option: ConditionOption = {
-            condition: [{ conditionName: 'id', condition: OvicQueryCondition.equal, value: String(id) }],
+            condition: conditions,
             set: [{ label: 'limit', value: '1' }],
             page: null
         };
@@ -174,13 +222,18 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
         ).subscribe({
             next: response => {
                 const course = response.data?.[0] ?? null;
+                if (course && !this.resolveLecturerAccess(course)) {
+                    this.errorMessage.set('Bạn không được phân công vào học phần này.');
+                    this.state.set('error');
+                    return;
+                }
                 this.selectedCourse.set(course);
                 if (course) {
                     this.currentPageTitle = [course.maso?.trim(), course.title?.trim()]
                         .filter(Boolean).join(' - ') || 'Học phần';
                     this.titleService.setTitle(this.currentPageTitle);
                 }
-                this.errorMessage.set(course ? '' : 'Không tìm thấy học phần.');
+                this.errorMessage.set(course ? '' : 'Không tìm thấy học phần hoặc bạn không được phân công.');
                 this.state.set(course ? 'success' : 'error');
             },
             error: () => {
@@ -188,6 +241,33 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
                 this.state.set('error');
             }
         });
+    }
+
+    private selectFirstAvailableTab(): void {
+        const firstTab = this.tabs.find(tab =>
+            this.availableModes().some(mode => mode.id === tab.mode)
+        );
+        if (firstTab) this.selectTab(firstTab.id);
+    }
+
+    private resolveLecturerAccess(course: ElnKhoaHoc): boolean {
+        if (!this.isLecturer) return true;
+
+        const userId = String(this.auth.user.id);
+        const allowedModes: CourseManagementModeId[] = [];
+        if (String(course.creator_plan_id) === userId) allowedModes.push('ke-hoach-giang-day');
+        if (String(course.creator_exam_id) === userId) allowedModes.push('kiem-tra-danh-gia');
+        this.lecturerModes.set(allowedModes);
+        if (!allowedModes.length) return false;
+
+        if (!this.hasExplicitViewSelection) {
+            const firstAssignedTab = this.tabs.find(tab => tab.mode === allowedModes[0]);
+            if (firstAssignedTab) {
+                this.activeModeId.set(firstAssignedTab.mode);
+                this.activeTabId.set(firstAssignedTab.id);
+            }
+        }
+        return true;
     }
 
     ngOnDestroy(): void {
@@ -199,7 +279,7 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
 
     selectTab(tabId: CourseManagementTabId): void {
         const targetTab = this.tabs.find(t => t.id === tabId);
-        if (!targetTab) return;
+        if (!targetTab || !this.availableModes().some(mode => mode.id === targetTab.mode)) return;
 
         const targetMode = targetTab.mode;
         if (this.activeTabId() === tabId && this.activeModeId() === targetMode) return;
@@ -215,7 +295,7 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
     }
 
     selectMode(modeId: CourseManagementModeId): void {
-        if (this.activeModeId() === modeId) return;
+        if (this.activeModeId() === modeId || !this.availableModes().some(mode => mode.id === modeId)) return;
 
         const firstTab = this.tabs.find(tab => tab.mode === modeId);
         if (firstTab) this.selectTab(firstTab.id);
@@ -248,14 +328,15 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
     }
 
     onModeKeydown(event: KeyboardEvent, index: number): void {
+        const availableModes = this.availableModes();
         let targetIndex: number | null = null;
 
         switch (event.key) {
             case 'ArrowRight':
-                targetIndex = (index + 1) % this.modes.length;
+                targetIndex = (index + 1) % availableModes.length;
                 break;
             case 'ArrowLeft':
-                targetIndex = (index - 1 + this.modes.length) % this.modes.length;
+                targetIndex = (index - 1 + availableModes.length) % availableModes.length;
                 break;
             case 'Home':
                 targetIndex = 0;
@@ -268,11 +349,23 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
         }
 
         event.preventDefault();
-        this.selectMode(this.modes[targetIndex].id);
+        this.selectMode(availableModes[targetIndex].id);
         this.modeButtons()[targetIndex]?.nativeElement.focus();
     }
 
     goBack(): void {
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+        const allowedReturnUrls = [
+            '/admin/dao-tao/quanly-monhoc',
+            '/admin/giang-vien/quanly-monhoc',
+            '/admin/lanhdao-khoa/quanly-monhoc',
+            '/admin/lanhdao-bomon/quanly-monhoc',
+            '/admin/dao-tao/course-management'
+        ];
+        if (returnUrl && allowedReturnUrls.includes(returnUrl)) {
+            void this.router.navigateByUrl(returnUrl);
+            return;
+        }
         this.router.navigate(['/admin/dao-tao/course-management']);
     }
 }

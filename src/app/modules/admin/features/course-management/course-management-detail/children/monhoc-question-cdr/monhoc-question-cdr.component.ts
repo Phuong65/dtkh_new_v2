@@ -252,6 +252,10 @@ export class MonhocQuestionCdrComponent implements OnInit, AfterViewChecked, OnD
         })
     }
 
+    canEditExamContent(): boolean {
+        return this.isManager || this.canAdded;
+    }
+
     reloadData(): void {
         if (!this.courseId) {
             return;
@@ -272,10 +276,6 @@ export class MonhocQuestionCdrComponent implements OnInit, AfterViewChecked, OnD
                         { label: 'cursor', value: '0' }
                     ],
                     page: null
-                }
-
-                if (this.routerGiangvien) {
-                    contition_course.condition.push({ conditionName: 'creator_plan_id', condition: OvicQueryCondition.equal, value: this.userId.toString(), orWhere: 'and' })
                 }
 
                 const condition_user: ConditionOption = {
@@ -325,7 +325,7 @@ export class MonhocQuestionCdrComponent implements OnInit, AfterViewChecked, OnD
                                 }
                             }
 
-                            if (this.routerDaotao || this.routerLanhdaobomon || this.routerLanhdaokhoa || this.userId === this.selectedCourse.creator_plan_id) {
+                            if (this.routerDaotao || this.routerLanhdaobomon || this.routerLanhdaokhoa || String(this.userId) === String(this.selectedCourse.creator_exam_id)) {
                                 this.canAdded = true;
                             } else {
                                 this.canAdded = false;
@@ -352,6 +352,10 @@ export class MonhocQuestionCdrComponent implements OnInit, AfterViewChecked, OnD
     }
 
     pointQuestionKeyDown(event, inputPoint_quest) {
+        if (!this.canEditExamContent()) {
+            if (event) event.preventDefault();
+            return;
+        }
         if (event) {
             if (event.key === 'Tab') {
                 this.nextInput(inputPoint_quest)
@@ -534,6 +538,9 @@ export class MonhocQuestionCdrComponent implements OnInit, AfterViewChecked, OnD
     }
 
     setNumberCdrCauhoi(activity_cdr: PlanActivityCdr, check: boolean = false) {
+        if (!this.canEditExamContent()) {
+            return;
+        }
         if (this.selectedCourse.params && this.selectedCourse.params.cdr) {
 
             let s = 0;
@@ -822,6 +829,9 @@ export class MonhocQuestionCdrComponent implements OnInit, AfterViewChecked, OnD
     }
 
     saveCdrQuestion() {
+        if (!this.canEditExamContent()) {
+            return;
+        }
         if (this.selectedCourse.params && this.selectedCourse.params.cdr) {
 
             let check_require_cdr = false;
@@ -1084,6 +1094,9 @@ export class MonhocQuestionCdrComponent implements OnInit, AfterViewChecked, OnD
     }
 
     openAutoCdr() {
+        if (!this.canEditExamContent()) {
+            return;
+        }
         if (this.selectedCourse && this.selectedCourse.params && this.selectedCourse.params.cdr) {
             this.totalCdrCauhoi = null;
             this.modalService.open(this.autoCdrQuestion, {
@@ -1103,6 +1116,10 @@ export class MonhocQuestionCdrComponent implements OnInit, AfterViewChecked, OnD
         }, 0);
     }
     async saveAutoSetQuestionCdr(d) {
+        if (!this.canEditExamContent()) {
+            d(false);
+            return;
+        }
         console.log()
         const html = `
                 <div>
@@ -1149,6 +1166,9 @@ export class MonhocQuestionCdrComponent implements OnInit, AfterViewChecked, OnD
     }
 
     autoSetQuestionCdr(_cdr_cauhois: PlanActivityCdr[], _total_cdr_cauhoi: number) {
+        if (!this.canEditExamContent()) {
+            return;
+        }
         const cdr_mon = this.selectedCourse.params.cdr;
 
         const ng = Math.floor(_total_cdr_cauhoi / _cdr_cauhois.length);
@@ -1816,6 +1836,9 @@ export class MonhocQuestionCdrComponent implements OnInit, AfterViewChecked, OnD
 
 
     setNumberCdrCauhoi_v2(activity_cdr: PlanActivityCdr, check: boolean = false) {
+        if (!this.canEditExamContent()) {
+            return;
+        }
 
         let s = 0;
 

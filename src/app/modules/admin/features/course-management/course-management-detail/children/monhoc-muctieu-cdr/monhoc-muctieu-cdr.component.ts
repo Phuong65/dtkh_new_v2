@@ -169,10 +169,6 @@ export class MonhocMuctieuCdrComponent implements OnInit {
 
         try {
             const courseCondition = this.condition('id', code, '1');
-            if (this.routerGiangvien) {
-                courseCondition.condition.push({ conditionName: 'creator_plan_id', condition: OvicQueryCondition.equal,
-                    value: String(this.userId), orWhere: 'and' });
-            }
             const [course, profile, goals, clos, links] = await this.request(forkJoin([
                 this.elnKhoaHocService.getKhoaHocByPageNew_2(courseCondition),
                 this.elngUserProfileService.getUserProfileByPageNewV2(this.condition('user_id', String(this.userId), '1')),

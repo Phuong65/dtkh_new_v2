@@ -6,7 +6,7 @@ import { DonViService } from '@modules/shared/services/don-vi.service';
 import { NotificationService } from '@core/services/notification.service';
 import { ElngUserProfileService } from '@modules/shared/services/elearning-user-profile.service';
 import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
-import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LoadingProgressComponent } from '@core-new/components/loading-progress/loading-progress.component';
 import { AppState } from '@core-new/models/app-state';
@@ -39,7 +39,9 @@ import { Ctdt } from '@modules/shared/models/ctdt';
 import { CtdtHocphan } from '@modules/shared/models/ctdt_hocphan';
 import { OvicGroupsRadioV2Component } from '@modules/shared/components/ovic-groups-radio-v2/ovic-groups-radio-v2.component';
 import { FormDocumentFileAndLinkComponent } from '@modules/shared/components/form-document-file-and-link/form-document-file-and-link.component';
+import { OvicEditorComponent } from '@modules/shared/components/ovic-editor/ovic-editor.component';
 import { MatButtonModule } from '@angular/material/button';
+import { COURSE_DESCRIPTION_HEADINGS } from '@modules/shared/components/ovic-editor/protected-headings';
 
 
 interface ItemGroupExTend extends SelectItemGroup {
@@ -97,6 +99,7 @@ export class MonhocThongtinComponent implements OnInit {
     private ctdtConfigService = inject(CtdtConfigService);
     private ctdtHocphanService = inject(CtdtHocphanService);
 
+    @ViewChild('descriptionEditor') descriptionEditor?: OvicEditorComponent;
 
     isLanhDaoKhoa: boolean = false;
 
@@ -155,6 +158,8 @@ export class MonhocThongtinComponent implements OnInit {
     key_server = key_server;
 
     DINHDANG_BAITRACNGHIEM = DINHDANG_BAITRACNGHIEM;
+
+    readonly protectedDescriptionHeadings = COURSE_DESCRIPTION_HEADINGS;
 
     group_ctdt: ItemGroupExTend[] = [];
 
@@ -369,10 +374,6 @@ export class MonhocThongtinComponent implements OnInit {
             set: [{ label: 'limit', value: '1' }, { label: 'with', value: 'creatorPlan' }],
             page: null
         };
-        if (this.routerGiangvien) {
-            contition_course.condition.push({ conditionName: 'creator_plan_id', condition: OvicQueryCondition.equal, value: this.userId.toString(), orWhere: 'and' });
-        }
-
         const condition_user: ConditionOption = {
             condition: [{ conditionName: 'user_id', condition: OvicQueryCondition.equal, value: this.userId.toString(), orWhere: 'and' }],
             set: [{ label: 'limit', value: '1' }], page: null
@@ -536,15 +537,7 @@ export class MonhocThongtinComponent implements OnInit {
             this.f['title'].setValue(course.title);
             this.f['slug'].setValue(course.slug);
             this.f['maso'].setValue(course.maso);
-            if (course.desc) {
-                this.f['desc'].setValue(course.desc);
-            } else {
-                this.f['desc'].setValue(`
-                    <p>1) Quy định về điểm:</p>
-                    <p><br></p>
-                    <p>2) Điều kiện dự thi:</p>
-                `);
-            }
+            this.f['desc'].setValue(course.desc || '');
             this.f['category_ids'].setValue(course.category_ids ? course.category_ids : null);
             this.f['tailieu_chinh'].setValue(course.tailieu_chinh);
             this.f['tailieu_thamkhao'].setValue(course.tailieu_thamkhao);
@@ -634,6 +627,10 @@ export class MonhocThongtinComponent implements OnInit {
 
     async saveCourse() {
         if (this.isSaving()) return;
+        if (!this.descriptionEditor?.prepareProtectedValue()) {
+            this.notificationService.toastWarning('Đang khởi tạo cấu trúc mô tả học phần. Vui lòng thử lại.');
+            return;
+        }
         if (!this.formKhoaHoc.valid) {
             this.notificationService.toastError('Thông tin nhập vào chưa đúng, vui lòng kiểm tra lại', 'Lỗi nhập liệu');
             this.formKhoaHoc.markAllAsTouched();

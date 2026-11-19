@@ -262,10 +262,6 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                     page: null
                 }
 
-                if (this.routerGiangvien) {
-                    contition_course.condition.push({ conditionName: 'creator_plan_id', condition: OvicQueryCondition.equal, value: this.userId.toString(), orWhere: 'and' })
-                }
-
                 const condition_user: ConditionOption = {
                     condition: [
                         { conditionName: 'user_id', condition: OvicQueryCondition.equal, value: this.userId.toString(), orWhere: 'and' }
@@ -361,7 +357,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
                                 }
                             }
 
-                            if (this.routerDaotao || this.routerLanhdaobomon || this.routerLanhdaokhoa || this.userId === this.selectedCourse.creator_plan_id) {
+                            if (this.routerDaotao || this.routerLanhdaobomon || this.routerLanhdaokhoa || String(this.userId) === String(this.selectedCourse.creator_exam_id)) {
                                 this.canAdded = true;
                             } else {
                                 this.canAdded = false;
@@ -409,6 +405,10 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
             this.cancelTabLoad$.next();
             this.cancelTabLoad$.complete();
         });
+    }
+
+    canEditExamContent(): boolean {
+        return this.isManager || this.canAdded;
     }
 
     reloadData(): void {
@@ -592,6 +592,10 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     // }
 
     pointQuestionKeyDown(event, inputPoint_quest) {
+        if (!this.canEditExamContent()) {
+            if (event) event.preventDefault();
+            return;
+        }
         if (event) {
 
             if (event.key === 'Tab') {
@@ -636,6 +640,9 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
 
     saveFormCc() {
+        if (!this.canEditExamContent()) {
+            return;
+        }
         // this.loadAllCourseType0();
         //course_form_duyet
         if (!this.isEmptyObject(this.course_form_duyet)) {
@@ -874,6 +881,9 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     setNumberCdrCauhoi(parent: PlanActivityCdr, child: PlanActivityCdr, reRun: boolean = true) {
+        if (!this.canEditExamContent()) {
+            return;
+        }
 
         let require = false;
 
@@ -922,6 +932,9 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     saveFormCcType0() {
+        if (!this.canEditExamContent()) {
+            return;
+        }
         let check = false;
         const request: Observable<any>[] = [];
 
@@ -1162,6 +1175,9 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     setNumberPartQuestionType1(parent: PlanActivityCdr, child: PlanActivityCdr, reRun: boolean = true) {
+        if (!this.canEditExamContent()) {
+            return;
+        }
         let require = false;
 
         let s = 0;
@@ -1211,6 +1227,9 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     saveFormCcType1() {
+        if (!this.canEditExamContent()) {
+            return;
+        }
 
         let check = false;
 
@@ -1493,6 +1512,9 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     saveFormTx(test: PlanActivityCdr = null) {
+        if (!this.canEditExamContent()) {
+            return;
+        }
         switch (this.selectedCourse.av) {
             case 0:
                 this.saveFormTxType0(test);
@@ -1509,6 +1531,9 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     saveFormTxType0(test: PlanActivityCdr) {
+        if (!this.canEditExamContent()) {
+            return;
+        }
         let check = false;
 
         const request: Observable<any>[] = [];
@@ -1859,6 +1884,9 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     saveFormTxType1(test: PlanActivityCdr) {
+        if (!this.canEditExamContent()) {
+            return;
+        }
 
         if (test) {
 
@@ -2217,6 +2245,9 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     saveFormTxType2(test: PlanActivityCdr) {
+        if (!this.canEditExamContent()) {
+            return;
+        }
 
         if (test) {
             let check_require = false;
@@ -2301,6 +2332,9 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     addBaiGiangToTest(test: PlanActivityCdr) {
+        if (!this.canEditExamContent()) {
+            return;
+        }
         if (!test || !this.list_course_plan?.length) {
             this.notificationService.toastWarning('Chưa có danh sách bài học để chọn.');
             return;
@@ -2329,6 +2363,9 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     onSelectWeek(week: PlanActivityCdr) {
+        if (!this.canEditExamContent()) {
+            return;
+        }
         if (!week || !this.selectedTestTx) return;
         week['checked'] = !week['checked'];
 
@@ -2553,6 +2590,9 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     deleteWeek(week: PlanActivityCdr, test: PlanActivityCdr) {
+        if (!this.canEditExamContent()) {
+            return;
+        }
         this.selectedTestTx = test;
         switch (this.selectedCourse.av) {
             case 0:
@@ -2839,7 +2879,7 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
 
     canEditEssayForm(row: PlanActivityCdr): boolean {
         return !!row?.canEdit && this.course_form_duyet['DG']?.status !== 1
-            && (this.isManager || this.canAdded);
+            && this.canEditExamContent();
     }
 
     openEssayContext(row: PlanActivityCdr, action: Essay15pContext['action'], tuluanRow?: Tuluan15pRow): void {
@@ -3081,6 +3121,9 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     saveFormDg() {
+        if (!this.canEditExamContent()) {
+            return;
+        }
         switch (this.selectedCourse.av) {
             case 0:
                 this.saveFormDgType0();
@@ -3097,6 +3140,9 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     saveFormDgType0() {
+        if (!this.canEditExamContent()) {
+            return;
+        }
 
         let check = false;
 
@@ -3393,6 +3439,9 @@ export class MonhocFormdeComponent implements OnInit, AfterViewInit {
     }
 
     saveFormDgType1() {
+        if (!this.canEditExamContent()) {
+            return;
+        }
 
         let check = false;
 

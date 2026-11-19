@@ -24,23 +24,29 @@ import { HoidongThamdinhMonhocThanhvienService } from '@modules/shared/services/
 import { HoidongThamdinhService } from '@modules/shared/services/hoidong-thamdinh.service';
 import { MonhocFormdeComponent } from './monhoc-formde.component';
 import { PlanActivityCdr } from '../monhoc-question-cdr/monhoc-question-cdr.component';
+import { ROUTERS } from '@modules/shared/utils/syscat';
 
 describe('MonhocFormdeComponent essay integration', () => {
     let fixture: ComponentFixture<MonhocFormdeComponent>;
     let component: MonhocFormdeComponent;
     const code$ = new BehaviorSubject(convertToParamMap({ code: '1' }));
+    let courseService: jasmine.SpyObj<ElnKhoaHocService>;
 
     beforeEach(async () => {
+        courseService = jasmine.createSpyObj<ElnKhoaHocService>('ElnKhoaHocService', ['getKhoaHocByPageNew_2']);
+        courseService.getKhoaHocByPageNew_2.and.returnValue(
+            of({ recordsFiltered: 1, data: [{ id: 1, creator_plan_id: 1, creator_exam_id: 1, av: 99 }] } as any)
+        );
         await TestBed.configureTestingModule({
             imports: [MonhocFormdeComponent],
             providers: [
                 provideNoopAnimations(),
                 { provide: ActivatedRoute, useValue: { queryParamMap: code$, snapshot: { queryParamMap: convertToParamMap({ code: '1' }) } } },
                 { provide: Router, useValue: { navigate: jasmine.createSpy('navigate') } },
-                { provide: AuthService, useValue: { user: { id: 1 }, userHasRole: () => true, hasRouter: () => true } },
-                { provide: NotificationService, useValue: { toastSuccess: jasmine.createSpy(), toastError: jasmine.createSpy(), toastWarning: jasmine.createSpy() } },
+                { provide: AuthService, useValue: { user: { id: 1 }, userHasRole: () => false, hasRouter: (route: string) => route === ROUTERS.giangvien } },
+                { provide: NotificationService, useValue: { toastSuccess: jasmine.createSpy(), toastError: jasmine.createSpy(), toastWarning: jasmine.createSpy(), toastInfo: jasmine.createSpy() } },
                 { provide: HelperService, useValue: { sort: (items: unknown[]) => items } },
-                { provide: ElnKhoaHocService, useValue: { getKhoaHocByPageNew_2: () => of({ recordsFiltered: 1, data: [{ id: 1, creator_plan_id: 1, av: 0 }] }) } },
+                { provide: ElnKhoaHocService, useValue: courseService },
                 { provide: ElngUserProfileService, useValue: { getUserProfileByPageNewV2: () => of({ recordsFiltered: 0, data: [] }) } },
                 { provide: CourseFormDuyetService, useValue: { getCourseFormDuyetByPageNew: () => of({ recordsFiltered: 0, data: [] }) } },
                 { provide: HoidongThamdinhMonhocThanhvienService, useValue: { getHoidongThamdinhMonhocThanhvienByPageNew: () => of({ data: [] }) } },
@@ -128,5 +134,62 @@ describe('MonhocFormdeComponent essay integration', () => {
         const rowL2 = component.tuluan15pRows.find(r => r.coursePlanActivityId === 20);
         expect(rowL1?.questionCount).toBe(1);
         expect(rowL2?.questionCount).toBe(4);
+    });
+
+    it('tải được Form đề để xem nhưng chỉ cấp quyền sửa cho giảng viên khớp creator_exam_id', () => {
+        courseService.getKhoaHocByPageNew_2.and.returnValue(
+            of({ recordsFiltered: 1, data: [{ id: 1, creator_plan_id: 1, creator_exam_id: 1, av: 99 }] } as any)
+        );
+
+        (component as any).loadCourseData('1');
+
+        expect(component.canAdded).toBeTrue();
+        expect(courseService.getKhoaHocByPageNew_2.calls.mostRecent().args[0].condition)
+            .toEqual([jasmine.objectContaining({ conditionName: 'id', value: '1' })]);
+
+        courseService.getKhoaHocByPageNew_2.and.returnValue(
+            of({ recordsFiltered: 1, data: [{ id: 1, creator_plan_id: 1, creator_exam_id: 2, av: 99 }] } as any)
+        );
+        (component as any).loadCourseData('1');
+        expect(component.canAdded).toBeFalse();
+    });
+
+    it('chặn tất cả handler lưu Form đề khi giảng viên chưa được phân công', () => {
+        component.isManager = false;
+        component.canAdded = false;
+        component.selectedCourse = { id: 1, av: 0 } as any;
+        component.list_cdr_cauhoi = [{
+            children: [{ id: 10, require_cdr: false, question_take: { 1: 1 }, week: 1, require_part: false, parts: {} }]
+        }] as any;
+        component.list_test_dg = component.list_cdr_cauhoi;
+        component.list_test_tx = [{ id: 20, form_tx_ids: [1], weeks_test: [] }] as any;
+
+        component.saveFormCc();
+        component.saveFormCcType0();
+        component.saveFormCcType1();
+        component.saveFormDg();
+        component.saveFormDgType0();
+        component.saveFormDgType1();
+        component.saveFormTx(component.list_test_tx[0]);
+        component.saveFormTxType0(component.list_test_tx[0]);
+        component.saveFormTxType1(component.list_test_tx[0]);
+        component.saveFormTxType2(component.list_test_tx[0]);
+
+        expect(component.canEditExamContent()).toBeFalse();
+    });
+
+    it('cho phép handler lưu Form đề khi giảng viên được phân công', () => {
+        component.isManager = false;
+        component.canAdded = true;
+        component.selectedCourse = { id: 1, av: 0 } as any;
+        component.list_cdr_cauhoi = [] as any;
+        component.list_test_dg = [] as any;
+        component.list_test_tx = [] as any;
+
+        component.saveFormCc();
+        component.saveFormDg();
+        component.saveFormTx({ form_tx_ids: [], weeks_test: [] } as any);
+
+        expect(component.canEditExamContent()).toBeTrue();
     });
 });

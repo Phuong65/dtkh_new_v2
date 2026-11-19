@@ -62,6 +62,8 @@ export class FormDeKthpComponent implements OnInit, OnChanges {
 
     @Input() show_save_button: boolean = false;
 
+    @Input() canEditExamContent: boolean = true;
+
     @ViewChildren('inputNumberQuestion') inputNumberQuestion: QueryList<any>;
 
     label_week: string;
@@ -127,6 +129,9 @@ export class FormDeKthpComponent implements OnInit, OnChanges {
     }
 
     saveFormDetail() {
+        if (!this.canEditExamContent) {
+            return;
+        }
         switch (this._course.av) {
             case 0:
                 this.saveType0();
@@ -154,6 +159,10 @@ export class FormDeKthpComponent implements OnInit, OnChanges {
     }
 
     pointQuestionKeyDown(event, inputPoint_quest) {
+        if (!this.canEditExamContent) {
+            if (event) event.preventDefault();
+            return;
+        }
         if (event) {
             if (event.key === 'Tab') {
                 this.nextInput(inputPoint_quest)

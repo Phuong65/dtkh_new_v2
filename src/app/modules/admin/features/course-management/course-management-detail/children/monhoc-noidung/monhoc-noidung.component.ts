@@ -408,10 +408,6 @@ export class MonhocNoidungComponent implements OnInit {
                 page: null
             }
 
-            if (this.routerGiangvien) {
-                contition_course.condition.push({ conditionName: 'creator_plan_id', condition: OvicQueryCondition.equal, value: this.userId.toString(), orWhere: 'and' })
-            }
-
             const condition_user: ConditionOption = {
                 condition: [
                     { conditionName: 'user_id', condition: OvicQueryCondition.equal, value: this.userId.toString(), orWhere: 'and' }

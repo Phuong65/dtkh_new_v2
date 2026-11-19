@@ -147,7 +147,6 @@ export class MonhocKiemtraDanhgiaComponent implements OnInit {
         }
         try {
             const courseCondition = this.condition('id', code, '1');
-            if (this.routerGiangvien) courseCondition.condition.push({ conditionName: 'creator_plan_id', condition: OvicQueryCondition.equal, value: String(this.userId), orWhere: 'and' });
             const [course, profile] = await this.request(forkJoin([
                 this.elnKhoaHocService.getKhoaHocByPageNew_2(courseCondition),
                 this.elngUserProfileService.getUserProfileByPageNewV2(this.condition('user_id', String(this.userId), '1'))
@@ -167,7 +166,7 @@ export class MonhocKiemtraDanhgiaComponent implements OnInit {
                 return;
             }
             this.selectedCourse = selected;
-            this.canAdded = this.isManager || this.routerDaotao || this.routerLanhdaobomon || this.routerLanhdaokhoa || this.userId === selected.creator_plan_id;
+            this.canAdded = this.isManager || this.routerDaotao || this.routerLanhdaobomon || this.routerLanhdaokhoa || String(this.userId) === String(selected.creator_exam_id);
             if (this.tabIndex === 1) await this.loadThuongxuyen();
             else if (this.tabIndex === 0) await this.loadTest();
             if (version === this.loadVersion && !this.destroyRef.destroyed) this.state.set('success');

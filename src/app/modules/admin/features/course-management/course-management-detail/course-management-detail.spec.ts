@@ -2,8 +2,11 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { BehaviorSubject, of } from 'rxjs';
+import { AuthService } from '@core/services/auth.service';
 import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
+import { ROLES } from '@modules/shared/utils/syscat';
 import { Title } from '@angular/platform-browser';
+import { ConditionOption } from '@modules/shared/models/condition-option';
 import { CourseManagementDetail } from './course-management-detail';
 
 @Component({ selector: 'app-loading-progress', standalone: true, template: '' })
@@ -35,12 +38,19 @@ describe('CourseManagementDetail - Mode Switching', () => {
     let routerSpy: jasmine.SpyObj<Router>;
     let courseServiceSpy: jasmine.SpyObj<ElnKhoaHocService>;
     let titleSpy: jasmine.SpyObj<Title>;
+    let userRoles: Set<string>;
+    let authStub: Pick<AuthService, 'user' | 'userHasRole'>;
 
     beforeEach(async () => {
+        userRoles = new Set<string>();
         queryParamMap$ = new BehaviorSubject(convertToParamMap({ code: '10' }));
-        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+        routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl']);
         courseServiceSpy = jasmine.createSpyObj('ElnKhoaHocService', ['getKhoaHocByPageNew_2']);
         titleSpy = jasmine.createSpyObj('Title', ['getTitle', 'setTitle']);
+        authStub = {
+            user: { id: 10 } as AuthService['user'],
+            userHasRole: (role: string) => userRoles.has(role)
+        };
         titleSpy.getTitle.and.returnValue('ĐTKH');
         courseServiceSpy.getKhoaHocByPageNew_2.and.returnValue(
             of({ data: [{ id: 10, maso: 'INT201', title: 'Lập trình Web' }] } as any)
@@ -52,11 +62,13 @@ describe('CourseManagementDetail - Mode Switching', () => {
                 {
                     provide: ActivatedRoute,
                     useValue: {
-                        queryParamMap: queryParamMap$.asObservable()
+                        queryParamMap: queryParamMap$.asObservable(),
+                        snapshot: { queryParamMap: convertToParamMap({ code: '10' }) }
                     }
                 },
                 { provide: Router, useValue: routerSpy },
                 { provide: ElnKhoaHocService, useValue: courseServiceSpy },
+                { provide: AuthService, useValue: authStub },
                 { provide: Title, useValue: titleSpy }
             ]
         })
@@ -268,5 +280,118 @@ describe('CourseManagementDetail - Mode Switching', () => {
         fixture.destroy();
 
         expect(titleSpy.setTitle).not.toHaveBeenCalled();
+    });
+
+    it('giảng viên được xem mode chưa phân công dưới lớp phủ toàn vùng và mở được mode đã giao', () => {
+        fixture.destroy();
+        userRoles.add(ROLES.giangvien);
+        courseServiceSpy.getKhoaHocByPageNew_2.and.returnValue(
+            of({ data: [{ id: 10, creator_plan_id: 10, creator_exam_id: 20 }] } as any)
+        );
+        queryParamMap$.next(convertToParamMap({ code: '10', tab: 'form-de' }));
+
+        fixture = TestBed.createComponent(CourseManagementDetail);
+        component = fixture.componentInstance;
+        root = fixture.nativeElement;
+        fixture.detectChanges();
+
+        expect(component.availableModes().map(mode => mode.id)).toEqual(['ke-hoach-giang-day', 'kiem-tra-danh-gia']);
+        expect(component.activeTabId()).toBe('form-de');
+        expect(modeButtons().length).toBe(2);
+        expect(component.activeModeAllowed()).toBeFalse();
+        expect(root.querySelector('.course-detail-readonly-overlay')).not.toBeNull();
+        expect(root.querySelector('.course-detail-content__panel')?.hasAttribute('inert')).toBeTrue();
+        expect(root.querySelector('app-monhoc-formde')).not.toBeNull();
+        const option = courseServiceSpy.getKhoaHocByPageNew_2.calls.mostRecent().args[0] as ConditionOption;
+        expect(option.condition.map(condition => condition.conditionName)).toEqual([
+            'id', 'creator_plan_id', 'id', 'creator_exam_id'
+        ]);
+        expect(option.condition[1].value).toBe('10');
+        expect(option.condition[2].orWhere).toBe('or');
+
+        queryParamMap$.next(convertToParamMap({ code: '10', tab: 'form-de' }));
+        fixture.detectChanges();
+
+        expect(component.activeTabId()).toBe('form-de');
+        component.selectMode('ke-hoach-giang-day');
+        fixture.detectChanges();
+        expect(component.activeModeAllowed()).toBeTrue();
+        expect(root.querySelector('.course-detail-readonly-overlay')).toBeNull();
+    });
+
+    it('giảng viên được xem Kế hoạch giảng dạy dưới lớp phủ khi chỉ được giao Kiểm tra đánh giá', () => {
+        fixture.destroy();
+        userRoles.add(ROLES.giangvien);
+        courseServiceSpy.getKhoaHocByPageNew_2.and.returnValue(
+            of({ data: [{ id: 10, creator_plan_id: 20, creator_exam_id: 10 }] } as any)
+        );
+        queryParamMap$.next(convertToParamMap({ code: '10', tab: 'thong-tin' }));
+
+        fixture = TestBed.createComponent(CourseManagementDetail);
+        component = fixture.componentInstance;
+        root = fixture.nativeElement;
+        fixture.detectChanges();
+
+        expect(component.availableModes().map(mode => mode.id)).toEqual(['ke-hoach-giang-day', 'kiem-tra-danh-gia']);
+        expect(component.activeTabId()).toBe('thong-tin');
+        expect(component.activeModeAllowed()).toBeFalse();
+        expect(root.querySelector('.course-detail-readonly-overlay')).not.toBeNull();
+        expect(root.querySelector('app-monhoc-thongtin')).not.toBeNull();
+        const option = courseServiceSpy.getKhoaHocByPageNew_2.calls.mostRecent().args[0] as ConditionOption;
+        expect(option.condition.map(condition => condition.conditionName)).toEqual([
+            'id', 'creator_plan_id', 'id', 'creator_exam_id'
+        ]);
+        expect(option.condition[3].value).toBe('10');
+
+        component.selectMode('kiem-tra-danh-gia');
+        fixture.detectChanges();
+        expect(component.activeModeAllowed()).toBeTrue();
+        expect(root.querySelector('.course-detail-readonly-overlay')).toBeNull();
+    });
+
+    it('từ chối URL trực tiếp khi giảng viên không được phân công vào học phần', () => {
+        fixture.destroy();
+        userRoles.add(ROLES.giangvien);
+        courseServiceSpy.getKhoaHocByPageNew_2.and.returnValue(
+            of({ data: [{ id: 10, creator_plan_id: 20, creator_exam_id: 30 }] } as any)
+        );
+
+        fixture = TestBed.createComponent(CourseManagementDetail);
+        component = fixture.componentInstance;
+        root = fixture.nativeElement;
+        fixture.detectChanges();
+
+        expect(component.state()).toBe('error');
+        expect(component.errorMessage()).toBe('Bạn không được phân công vào học phần này.');
+        expect(component.availableModes()).toEqual([]);
+    });
+
+    it('không áp dụng giới hạn giảng viên khi tài khoản có role quản lý cao hơn', () => {
+        fixture.destroy();
+        userRoles.add(ROLES.giangvien);
+        userRoles.add(ROLES.admin);
+
+        fixture = TestBed.createComponent(CourseManagementDetail);
+        component = fixture.componentInstance;
+        root = fixture.nativeElement;
+        fixture.detectChanges();
+
+        expect(component.isLecturer).toBeFalse();
+        expect(component.availableModes().length).toBe(2);
+        expect(root.querySelector('.course-detail-readonly-overlay')).toBeNull();
+        expect(component.state()).toBe('success');
+        const option = courseServiceSpy.getKhoaHocByPageNew_2.calls.mostRecent().args[0] as ConditionOption;
+        expect(option.condition.map(condition => condition.conditionName)).toEqual(['id']);
+    });
+
+    it('returns to the allowlisted role-specific course list', () => {
+        const route = (component as any).route;
+        route.snapshot.queryParamMap = convertToParamMap({
+            returnUrl: '/admin/giang-vien/quanly-monhoc'
+        });
+
+        component.goBack();
+
+        expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/admin/giang-vien/quanly-monhoc');
     });
 });
