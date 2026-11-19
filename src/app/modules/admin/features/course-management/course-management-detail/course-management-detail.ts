@@ -111,8 +111,13 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
             ROLES.lanhdaokhoa,
             ROLES.lanhdaobomon
         ];
-        this.isLecturer = this.auth.userHasRole(ROLES.giangvien)
-            && !elevatedRoles.some(role => this.auth.userHasRole(role));
+        const hasLecturerRole = this.auth.userHasRole(ROLES.giangvien);
+        const hasElevatedRole = elevatedRoles.some(role => this.auth.userHasRole(role));
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+        const isLecturerRouteContext = returnUrl === '/admin/giang-vien/quanly-monhoc';
+
+        this.isLecturer = hasLecturerRole
+            && (!hasElevatedRole || isLecturerRouteContext);
     }
 
     readonly state = signal<AppState>('loading');

@@ -384,6 +384,74 @@ describe('CourseManagementDetail - Mode Switching', () => {
         expect(option.condition.map(condition => condition.conditionName)).toEqual(['id']);
     });
 
+    it('tài khoản vai trò kép áp dụng giới hạn giảng viên khi returnUrl là danh sách Giảng viên', () => {
+        fixture.destroy();
+        userRoles.add(ROLES.giangvien);
+        userRoles.add(ROLES.admin);
+        const route = TestBed.inject(ActivatedRoute) as any;
+        route.snapshot.queryParamMap = convertToParamMap({
+            code: '10',
+            tab: 'form-de',
+            returnUrl: '/admin/giang-vien/quanly-monhoc'
+        });
+        queryParamMap$.next(convertToParamMap({
+            code: '10',
+            tab: 'form-de',
+            returnUrl: '/admin/giang-vien/quanly-monhoc'
+        }));
+        courseServiceSpy.getKhoaHocByPageNew_2.and.returnValue(
+            of({ data: [{ id: 10, creator_plan_id: 10, creator_exam_id: 20 }] } as any)
+        );
+
+        fixture = TestBed.createComponent(CourseManagementDetail);
+        component = fixture.componentInstance;
+        root = fixture.nativeElement;
+        fixture.detectChanges();
+
+        expect(component.isLecturer).toBeTrue();
+        expect(component.activeTabId()).toBe('form-de');
+        expect(component.activeModeAllowed()).toBeFalse();
+        expect(root.querySelector('.course-detail-readonly-overlay')).not.toBeNull();
+        expect(root.querySelector('.course-detail-content__panel')?.hasAttribute('inert')).toBeTrue();
+
+        component.selectMode('ke-hoach-giang-day');
+        fixture.detectChanges();
+        expect(component.activeModeAllowed()).toBeTrue();
+        expect(root.querySelector('.course-detail-readonly-overlay')).toBeNull();
+    });
+
+    it('tài khoản vai trò kép không bị giới hạn giảng viên khi returnUrl thuộc luồng khác', () => {
+        fixture.destroy();
+        userRoles.add(ROLES.giangvien);
+        userRoles.add(ROLES.admin);
+        const route = TestBed.inject(ActivatedRoute) as any;
+        route.snapshot.queryParamMap = convertToParamMap({
+            code: '10',
+            tab: 'form-de',
+            returnUrl: '/admin/dao-tao/quanly-monhoc'
+        });
+        queryParamMap$.next(convertToParamMap({
+            code: '10',
+            tab: 'form-de',
+            returnUrl: '/admin/dao-tao/quanly-monhoc'
+        }));
+        courseServiceSpy.getKhoaHocByPageNew_2.and.returnValue(
+            of({ data: [{ id: 10, creator_plan_id: 20, creator_exam_id: 30 }] } as any)
+        );
+
+        fixture = TestBed.createComponent(CourseManagementDetail);
+        component = fixture.componentInstance;
+        root = fixture.nativeElement;
+        fixture.detectChanges();
+
+        expect(component.isLecturer).toBeFalse();
+        expect(component.availableModes().length).toBe(2);
+        expect(component.activeModeAllowed()).toBeTrue();
+        expect(root.querySelector('.course-detail-readonly-overlay')).toBeNull();
+        const option = courseServiceSpy.getKhoaHocByPageNew_2.calls.mostRecent().args[0] as ConditionOption;
+        expect(option.condition.map(condition => condition.conditionName)).toEqual(['id']);
+    });
+
     it('returns to the allowlisted role-specific course list', () => {
         const route = (component as any).route;
         route.snapshot.queryParamMap = convertToParamMap({
