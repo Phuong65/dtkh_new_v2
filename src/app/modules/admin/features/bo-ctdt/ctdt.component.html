@@ -38,6 +38,9 @@
                 <p class="ctdt-master-card__empty">{{ boSearchValue().trim() ? 'Không tìm thấy Bộ CTĐT phù hợp.' : 'Chưa có Bộ CTĐT.' }}</p>
                 }
             </div>
+            <footer class="ctdt-master-card__footer">
+                <ictu-paginator [control]="boTable.paginator" (onChangePage)="onBoPageChange($event)"></ictu-paginator>
+            </footer>
             }
         </aside>
 

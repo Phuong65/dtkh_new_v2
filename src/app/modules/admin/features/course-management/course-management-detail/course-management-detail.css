@@ -2,9 +2,9 @@
     --course-header-bg: #eaf2ff;
     --course-header-border: #bfdbfe;
     --course-tab-hover-bg: #dbeafe;
-    --course-tab-active-bg: #1d4ed8;
+    --course-tab-active-bg: #1282d5;
     --course-tab-indicator: #1e3a8a;
-    --course-primary: #2563eb;
+    --course-primary: #1282d5;
     --course-ink: #0f172a;
     --course-text: #334155;
     display: block;
@@ -238,21 +238,11 @@
 }
 
 .course-detail-tab__line {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 2;
-    height: 3px;
-    background: var(--course-tab-indicator);
-    opacity: 0;
-    transform: scaleX(.3);
-    transition: opacity .18s ease, transform .24s cubic-bezier(.4, 0, .2, 1);
+    display: none;
 }
 
 .course-detail-tab--active .course-detail-tab__line {
-    opacity: 1;
-    transform: scaleX(1);
+    display: none;
 }
 
 .course-detail-header__right {

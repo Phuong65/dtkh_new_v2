@@ -4,10 +4,10 @@
     --ctdt-header-border: #bfdbfe;
     --ctdt-back-hover-bg: #dbeafe;
     --ctdt-tab-hover-bg: #dbeafe;
-    --ctdt-tab-active-bg: #1d4ed8;
+    --ctdt-tab-active-bg: #1282d5;
     --ctdt-tab-indicator: #1e3a8a;
-    --ctdt-primary: #2563eb;
-    --ctdt-primary-hover: #1d4ed8;
+    --ctdt-primary: #1282d5;
+    --ctdt-primary-hover: #1282d5;
     --ctdt-blue: #2563eb;
     --ctdt-ink: #0f172a;
     --ctdt-text: #334155;
@@ -228,22 +228,11 @@
 }
 
 .ctdt-tab__line {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 2;
-    height: 3px;
-    border-radius: 0;
-    background: var(--ctdt-tab-indicator);
-    opacity: 0;
-    transform: scaleX(.3);
-    transition: opacity .18s ease, transform .24s cubic-bezier(.4, 0, .2, 1);
+    display: none;
 }
 
 .ctdt-tab--active .ctdt-tab__line {
-    opacity: 1;
-    transform: scaleX(1);
+    display: none;
 }
 
 /* Thân trang: panel nội dung hoặc placeholder */

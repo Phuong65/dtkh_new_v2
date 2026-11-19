@@ -76,13 +76,12 @@ export class CtdtComponent implements OnInit, OnDestroy {
     private creatingForBo: BoCtdt | null = null;
 
     readonly boOptions = signal<BoCtdt[]>([]);
+    readonly boTable = new IctuDataTable2<BoCtdt>({ rows: 10, pageLinkSize: 5 });
     readonly masterPanelCollapsed = signal(false);
     readonly boSearchValue = signal('');
     readonly filteredBoOptions = computed(() => {
         const query = this.boSearchValue().trim().toLocaleLowerCase('vi');
-        return query
-            ? this.boOptions().filter(bo => (bo.name || '').toLocaleLowerCase('vi').includes(query))
-            : this.boOptions();
+        return query ? this.boOptions().filter(bo => (bo.name || '').toLocaleLowerCase('vi').includes(query)) : this.boOptions();
     });
     readonly selectedBo = signal<BoCtdt | null>(null);
     readonly boState = signal<AppState>('loading');
@@ -165,21 +164,44 @@ export class CtdtComponent implements OnInit, OnDestroy {
         });
     }
 
-    loadBoCtdt(): void {
+    loadBoCtdt(page = 1, resetPaginator = false): void {
         if (this.isFacultyRoute && !this.facultyCategoryId) {
             this.loadFacultyProfile();
             return;
         }
         this.boState.set('loading');
-        const conditions: OvicConditionParam[] = this.isFacultyRoute
-            ? [{ conditionName: 'category_ids', condition: OvicQueryCondition.like, value: `%${this.facultyCategoryId}%`, orWhere: 'and' }]
-            : [];
+        const conditions: OvicConditionParam[] = [];
+        if (this.isFacultyRoute) {
+            conditions.push({ conditionName: 'category_ids', condition: OvicQueryCondition.like, value: `%${this.facultyCategoryId}%`, orWhere: 'and' });
+        }
+        const query = this.boSearchValue().trim();
+        if (query) {
+            conditions.push({ conditionName: 'name', condition: OvicQueryCondition.like, value: `%${query}%`, orWhere: 'and' });
+        }
         this.cancelBoLoad$.next();
-        this.boCtdtService.get(conditions, { limit: -1, orderby: 'name', order: 'ASC' }).pipe(
+        this.boCtdtService.get(conditions, {
+            limit: this.boTable.paginator.rows(),
+            paged: page,
+            orderby: 'name',
+            order: 'ASC'
+        }).pipe(
             takeUntil(this.cancelBoLoad$), takeUntil(this.destroy$)
         ).subscribe({
             next: response => {
                 const rows = Array.isArray(response.data) ? response.data : [];
+                const total = Number(response.totalRecords) || 0;
+                const lastPage = Math.max(1, Math.ceil(total / this.boTable.paginator.rows()));
+                if (page > lastPage) {
+                    this.loadBoCtdt(lastPage, true);
+                    return;
+                }
+                this.boTable.paginator.reset(total);
+                this.boTable.fillRawData({
+                    data: rows,
+                    recordsFiltered: total,
+                    recordsTotal: total,
+                    draw: 1
+                }, { paged: page, resetPaginator });
                 this.boOptions.set(rows);
                 const currentId = this.selectedBo()?.id ?? this.requestedBoId;
                 const selected = rows.find(bo => bo.id === currentId) || rows[0] || null;
@@ -210,6 +232,11 @@ export class CtdtComponent implements OnInit, OnDestroy {
 
     onBoSearchChange(event: Event): void {
         this.boSearchValue.set((event.target as HTMLInputElement).value || '');
+        this.loadBoCtdt(1, true);
+    }
+
+    onBoPageChange(page: number): void {
+        this.loadBoCtdt(page, false);
     }
 
     onBoSelectionChange(id: number | null): void {

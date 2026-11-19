@@ -128,6 +128,13 @@ p-select:has(.p-select-open) {
 
 .p-select .p-select-dropdown {
     flex: 0 0 auto;
+    color: #1282d5;
+}
+
+.p-select-overlay .p-select-option.p-select-option-selected,
+.ovic-input-line-dropdown-panel .p-select-option.p-select-option-selected {
+    background: #1282d5;
+    color: #ffffff;
 }
 
 .p-select-overlay {

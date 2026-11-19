@@ -64,3 +64,13 @@
 - source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-ctdt-default-elective-block.md`
   summary: Làm rõ cách xử lý lưu cấu hình CTĐT khi một số request add/update thất bại.
   evidence: `saveConfig()` gửi nhiều request độc lập bằng `forkJoin`, nên request thành công có thể đã ghi dữ liệu dù request khác thất bại; đây là hạn chế có sẵn, cần thiết kế giao dịch/khôi phục riêng.
+
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-course-content-exam-teachers.md`
+  summary: Ho?n thi?n backend contract cho creator_exam_id g?m l?u, ??c l?i, b? ph?n c?ng b?ng null, ki?m quy?n v? th? t? tri?n khai.
+  evidence: Review x?c nh?n frontend ch? g?i payload; backend ch?a ???c ki?m ch?ng v? n?m ngo?i ph?m vi n?y. C?n round-trip backend tr??c khi kh?ng ??nh ph?n c?ng ???c l?u b?n v?ng.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-course-content-exam-teachers.md`
+  summary: X?c ??nh v? tri?n khai ri?ng quy?n truy c?p h?c ph?n c?ng c?c consumer bi?u m?u ?? cho gi?ng vi?n ph? tr?ch ??.
+  evidence: Lu?ng hi?n t?i l?c h?c ph?n theo creator_plan_id v? m?t s? consumer bi?u m?u ?? c?ng d?ng creator_plan_id; thay ??i c?c l?c/lu?ng n?y n?m ngo?i goal hi?n t?i v? c? th? t?c ??ng quy?n truy c?p.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-course-content-exam-teachers.md`
+  summary: L?m cho c?p nh?t li?n k?t CT?T v? PUT h?c ph?n failure-atomic.
+  evidence: Review x?c nh?n flow CT?T c? s?n x?a/th?m li?n k?t tr??c PUT n?n l?i ? b??c sau c? th? ?? l?i li?n k?t d? dang; thay ??i giao d?ch n?y kh?ng thu?c scope g?n gi?ng vi?n.

@@ -55,6 +55,9 @@ interface QuickInfoProgram {
     knowledgeBlock: string;
 }
 
+type TeacherField = 'creator_plan_id' | 'creator_exam_id';
+type TeacherOption = Pick<User, 'id' | 'display_name' | 'email'> & { showName: string };
+
 @Component({
     selector: 'app-monhoc-thongtin',
     standalone: true,
@@ -125,7 +128,9 @@ export class MonhocThongtinComponent implements OnInit {
 
     list_donvi_chuyenmon: DonVi[];
 
-    listGiangvien: (User & { showName: string })[] = [];
+    listGiangvien: TeacherOption[] = [];
+
+    readonly teacherFields: readonly TeacherField[] = ['creator_plan_id', 'creator_exam_id'];
 
     get canAssignTeacher(): boolean {
         return this.isLanhDaoKhoa
@@ -159,8 +164,11 @@ export class MonhocThongtinComponent implements OnInit {
 
     quickInfoPrograms: QuickInfoProgram[] = [];
 
-    quickInfoTeacher: User | null = null;
+    quickInfoContentTeacher: User | null = null;
 
+    quickInfoExamTeacher: User | null = null;
+
+    private loadVersion = 0;
 
     activeDescTab: 'desc' | 'yeucau' = 'desc';
 
@@ -214,7 +222,8 @@ export class MonhocThongtinComponent implements OnInit {
                 kiemtra_dinhky: [''],
                 tuhoc: [''],
                 av: [''],
-                creator_plan_id: [''],
+                creator_plan_id: [null],
+                creator_exam_id: [null],
             }
         );
     }
@@ -233,20 +242,21 @@ export class MonhocThongtinComponent implements OnInit {
         return this.quickInfoPrograms.length ? this.quickInfoPrograms.map(item => item.name).join(', ') : '—';
     }
 
-    get quickInfoTeacherName(): string {
-        const selectedId = this.f['creator_plan_id'].value;
-        const teacher = this.listGiangvien.find(item => String(item.id) === String(selectedId))
-            || (String(this.quickInfoTeacher?.id) === String(selectedId) ? this.quickInfoTeacher : null);
-        return teacher?.display_name
-            || (String(this.selectedCourse?.creator_plan_id) === String(selectedId) ? this.selectedCourse?.creator_name : null)
-            || '—';
+    private teacherFor(field: TeacherField): TeacherOption | User | null {
+        const selectedId = this.f[field].value;
+        const quick = field === 'creator_plan_id' ? this.quickInfoContentTeacher : this.quickInfoExamTeacher;
+        return this.listGiangvien.find(item => String(item.id) === String(selectedId))
+            || (String(quick?.id) === String(selectedId) ? quick : null);
     }
 
-    get quickInfoTeacherEmail(): string {
-        const selectedId = this.f['creator_plan_id'].value;
-        const teacher = this.listGiangvien.find(item => String(item.id) === String(selectedId))
-            || (String(this.quickInfoTeacher?.id) === String(selectedId) ? this.quickInfoTeacher : null);
-        return teacher?.email || '—';
+    teacherName(field: TeacherField): string {
+        const teacher = this.teacherFor(field);
+        const selectedId = this.f[field].value;
+        return teacher?.display_name || (selectedId ? `Giảng viên #${selectedId}` : '—');
+    }
+
+    teacherEmail(field: TeacherField): string {
+        return this.teacherFor(field)?.email || '—';
     }
 
     private displayQuickValue(value: unknown, fallback = '—'): string {
@@ -261,15 +271,62 @@ export class MonhocThongtinComponent implements OnInit {
         }));
     }
 
-    private async loadQuickInfoTeacher(): Promise<void> {
-        if (this.quickInfoTeacher || !this.selectedCourse?.creator_plan_id) return;
+    private teacherOption(teacher: User): TeacherOption {
+        const id = this.normalizeTeacherId(teacher.id) || Number(teacher.id);
+        return { ...teacher, id, showName: `${teacher.display_name || `Giảng viên #${id}`} - ${teacher.email || '—'}` };
+    }
+
+    private addTeacherOption(teacher: User | null): void {
+        const id = this.normalizeTeacherId(teacher?.id);
+        if (!teacher || !id || this.listGiangvien.some(item => Number(item.id) === id)) return;
+        this.listGiangvien = [this.teacherOption({ ...teacher, id } as User), ...this.listGiangvien];
+    }
+
+    private normalizeTeacherId(value: unknown): number | null {
+        const id = Number(value);
+        return Number.isSafeInteger(id) && id > 0 ? id : null;
+    }
+
+    private isCurrentCourse(version: number, courseId: number): boolean {
+        return version === this.loadVersion && Number(this.selectedCourse?.id) === Number(courseId);
+    }
+
+    private async lookupTeacher(id: number | null, version: number, courseId: number): Promise<User | null> {
+        if (!id) return null;
+        const existing = this.listGiangvien.find(item => Number(item.id) === id);
+        if (existing) return existing as unknown as User;
         try {
-            this.quickInfoTeacher = await firstValueFrom(
-                this.userService.getUser(this.selectedCourse.creator_plan_id, 'id,display_name,email,donvi_id')
-            );
+            const teacher = await firstValueFrom(this.userService.getUser(id, 'id,display_name,email,donvi_id'));
+            if (!this.isCurrentCourse(version, courseId)) return null;
+            return teacher || { id, display_name: `Giảng viên #${id}`, email: '' } as User;
         } catch {
-            // The summary can fall back to the course creator name.
+            return this.isCurrentCourse(version, courseId)
+                ? { id, display_name: `Giảng viên #${id}`, email: '' } as User
+                : null;
         }
+    }
+
+    private async hydrateAssignedTeachers(version: number): Promise<void> {
+        const selectedCourse = this.selectedCourse;
+        if (!selectedCourse?.id) return;
+        const course = { ...selectedCourse };
+        const courseId = Number(course.id);
+        const contentId = this.normalizeTeacherId(course.creator_plan_id);
+        const examId = this.normalizeTeacherId(course.creator_exam_id);
+        const ids = [...new Set([contentId, examId].filter((id): id is number => id !== null))];
+        const teachers = await Promise.all(ids.map(async id => {
+            const relation = [this.quickInfoContentTeacher, this.quickInfoExamTeacher]
+                .find(teacher => Number(teacher?.id) === id);
+            return [id, relation || await this.lookupTeacher(id, version, courseId)] as const;
+        }));
+        if (!this.isCurrentCourse(version, courseId)) return;
+        const teachersById = new Map<number, User | null>(teachers);
+        const content = contentId ? teachersById.get(contentId) || null : null;
+        const exam = examId ? teachersById.get(examId) || null : null;
+        this.quickInfoContentTeacher = content;
+        this.quickInfoExamTeacher = exam;
+        this.addTeacherOption(content);
+        this.addTeacherOption(exam);
     }
 
 
@@ -282,6 +339,9 @@ export class MonhocThongtinComponent implements OnInit {
             if (code) {
                 this.loadCourse(code);
             } else {
+                this.loadVersion++;
+                this.selectedCourse = undefined;
+                this.isSaving.set(false);
                 this.state.set('error');
                 this.errorMessage.set('ID học phần không hợp lệ.');
             }
@@ -297,7 +357,12 @@ export class MonhocThongtinComponent implements OnInit {
         this.state.set('loading');
         this.errorMessage.set('');
         this.quickInfoPrograms = [];
-        this.quickInfoTeacher = null;
+        this.quickInfoContentTeacher = null;
+        this.quickInfoExamTeacher = null;
+        this.listGiangvien = [];
+        this.selectedCourse = undefined;
+        this.isSaving.set(false);
+        const version = ++this.loadVersion;
 
         const contition_course: ConditionOption = {
             condition: [{ conditionName: 'id', condition: OvicQueryCondition.equal, value: course_id, orWhere: 'and' }],
@@ -353,6 +418,7 @@ export class MonhocThongtinComponent implements OnInit {
             )
         ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
             next: async ([_course, _user_profile, _donvi, _nganh, _ctdt, _ctdt_khoi_kienthuc, _teachers]) => {
+                if (version !== this.loadVersion) return;
                 if (!_course.recordsFiltered) {
                     this.state.set('error');
                     this.errorMessage.set('Không tìm thấy học phần.');
@@ -360,8 +426,8 @@ export class MonhocThongtinComponent implements OnInit {
                 }
 
                 this.selectedCourse = _course.data[0];
-                this.quickInfoTeacher = this.selectedCourse.creatorPlan || null;
-                await this.loadQuickInfoTeacher();
+                const course = this.selectedCourse;
+                this.quickInfoContentTeacher = course.creatorPlan || null;
                 if (this.routerLanhdaokhoa && (_user_profile.recordsFiltered === 0 || this.selectedCourse.category_ids !== _user_profile.data[0].donvi_chuyenmon_id)) {
                     this.router.navigate(['/admin/content-none']);
                     return;
@@ -373,13 +439,16 @@ export class MonhocThongtinComponent implements OnInit {
 
                 this.list_nganh_bomon = _nganh.data;
                 this.list_donvi_chuyenmon = _donvi.data;
-                this.listGiangvien = (_teachers.data || []).filter((profile: ElngUserProfile) => profile.user).map((profile: ElngUserProfile) => {
-                    const teacher = profile.user as User;
-                    return { ...teacher, showName: `${teacher.display_name} - ${teacher.email || '—'}` };
-                });
-                if (this.quickInfoTeacher && !this.listGiangvien.some(teacher => teacher.id === this.quickInfoTeacher.id)) {
-                    this.listGiangvien = [{ ...this.quickInfoTeacher, showName: `${this.quickInfoTeacher.display_name} - ${this.quickInfoTeacher.email || '—'}` }, ...this.listGiangvien];
-                }
+                const teacherOptions = (_teachers.data || [])
+                    .filter((profile: ElngUserProfile) => profile.user)
+                    .map((profile: ElngUserProfile) => this.teacherOption({
+                        ...profile.user,
+                        id: Number(profile.user.id)
+                    } as User))
+                    .filter(teacher => this.normalizeTeacherId(teacher.id) !== null);
+                this.listGiangvien = [...new Map(teacherOptions.map(teacher => [Number(teacher.id), teacher])).values()];
+                await this.hydrateAssignedTeachers(version);
+                if (!this.isCurrentCourse(version, Number(course.id))) return;
                 const khungTrinhDo = this.auth.getSysConfigParams('KHOI_KIEN_THUC');
                 this.group_ctdt = _ctdt.data.map(ctdt => {
                     const child = _ctdt_khoi_kienthuc.data.filter(item => item.ctdt_id === ctdt.id);
@@ -390,14 +459,17 @@ export class MonhocThongtinComponent implements OnInit {
                 });
 
                 try {
-                    await this.editKhoaHoc();
+                    await this.editKhoaHoc(course, version);
+                    if (!this.isCurrentCourse(version, Number(course.id))) return;
                     this.state.set('success');
                 } catch {
+                    if (!this.isCurrentCourse(version, Number(course.id))) return;
                     this.state.set('error');
                     this.errorMessage.set('Không thể tải thông tin chi tiết học phần.');
                 }
             },
             error: () => {
+                if (version !== this.loadVersion) return;
                 this.state.set('error');
                 this.errorMessage.set('Không thể tải học phần. Vui lòng thử lại.');
             }
@@ -423,11 +495,11 @@ export class MonhocThongtinComponent implements OnInit {
         this.f['sotinchi_th'].setValue(0);
     }
 
-    async editKhoaHoc() {
-        if (this.selectedCourse) {
+    async editKhoaHoc(course = this.selectedCourse, version = this.loadVersion) {
+        if (course) {
             const condition_ctdt_hocphan: ConditionOption = {
                 condition: [
-                    { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: this.selectedCourse.id.toString(), orWhere: 'and' },
+                    { conditionName: 'course_id', condition: OvicQueryCondition.equal, value: course.id.toString(), orWhere: 'and' },
                 ],
                 set: [
                     { label: 'limit', value: '-1' }
@@ -436,6 +508,7 @@ export class MonhocThongtinComponent implements OnInit {
             }
 
             const request_ctdt_hocphan = await firstValueFrom(this.ctdtHocphanService.getCtdtHocphanByPageNew(condition_ctdt_hocphan));
+            if (!this.isCurrentCourse(version, Number(course.id))) return;
 
             const data_ctdt_select = [];
 
@@ -460,55 +533,54 @@ export class MonhocThongtinComponent implements OnInit {
             this.selectCtdts = data_ctdt_select;
             this.updateQuickInfoPrograms();
             this.resetForm();
-            this.f['title'].setValue(this.selectedCourse.title);
-            this.f['slug'].setValue(this.selectedCourse.slug);
-            this.f['maso'].setValue(this.selectedCourse.maso);
-            if (this.selectedCourse.desc) {
-                this.f['desc'].setValue(this.selectedCourse.desc);
+            this.f['title'].setValue(course.title);
+            this.f['slug'].setValue(course.slug);
+            this.f['maso'].setValue(course.maso);
+            if (course.desc) {
+                this.f['desc'].setValue(course.desc);
             } else {
-                setTimeout(() => {
-                    this.f['desc'].setValue(`
-                        <p>1) Quy định về điểm:</p>
-                        <p><br></p>
-                        <p>2) Điều kiện dự thi:</p>
-                    `);
-                })
+                this.f['desc'].setValue(`
+                    <p>1) Quy định về điểm:</p>
+                    <p><br></p>
+                    <p>2) Điều kiện dự thi:</p>
+                `);
             }
-            this.f['category_ids'].setValue(this.selectedCourse.category_ids ? this.selectedCourse.category_ids : null);
-            this.f['tailieu_chinh'].setValue(this.selectedCourse.tailieu_chinh);
-            this.f['tailieu_thamkhao'].setValue(this.selectedCourse.tailieu_thamkhao);
-            this.f['nganh_bomon_id'].setValue(this.selectedCourse.nganh_bomon_id);
-            this.f['av'].setValue(this.selectedCourse.av);
-            this.f['yeucau_sinhvien'].setValue(this.selectedCourse.yeucau_sinhvien);
-            this.f['creator_plan_id'].setValue(this.selectedCourse.creator_plan_id || null);
-            if (this.selectedCourse.params) {
-                this.f['sotinchi'].setValue(this.selectedCourse.params.sotinchi);
-                this.f['exam_format'].setValue(this.selectedCourse.params.exam_format);
-                this.f['cdr'].setValue(this.selectedCourse.params.cdr);
-                this.f['sotinchi_th'].setValue(this.selectedCourse.params.sotinchi_th);
-                this.f['exam_type'].setValue(this.selectedCourse.params.exam_type ? this.selectedCourse.params.exam_type : null);
-                this.f['tongsogio'].setValue(this.selectedCourse.params.tongsogio ? this.selectedCourse.params.tongsogio : null);
-                this.f['lythuyet'].setValue(this.selectedCourse.params.lythuyet ? this.selectedCourse.params.lythuyet : null);
-                this.f['thaoluan_baitap'].setValue(this.selectedCourse.params.thaoluan_baitap ? this.selectedCourse.params.thaoluan_baitap : null);
-                this.f['th_thinghiem'].setValue(this.selectedCourse.params.th_thinghiem ? this.selectedCourse.params.th_thinghiem : null);
-                this.f['kiemtra_dinhky'].setValue(this.selectedCourse.params.kiemtra_dinhky ? this.selectedCourse.params.kiemtra_dinhky : null);
-                this.f['tuhoc'].setValue(this.selectedCourse.params.tuhoc ? this.selectedCourse.params.tuhoc : null);
+            this.f['category_ids'].setValue(course.category_ids ? course.category_ids : null);
+            this.f['tailieu_chinh'].setValue(course.tailieu_chinh);
+            this.f['tailieu_thamkhao'].setValue(course.tailieu_thamkhao);
+            this.f['nganh_bomon_id'].setValue(course.nganh_bomon_id);
+            this.f['av'].setValue(course.av);
+            this.f['yeucau_sinhvien'].setValue(course.yeucau_sinhvien);
+            this.f['creator_plan_id'].setValue(this.normalizeTeacherId(course.creator_plan_id));
+            this.f['creator_exam_id'].setValue(this.normalizeTeacherId(course.creator_exam_id));
+            if (course.params) {
+                this.f['sotinchi'].setValue(course.params.sotinchi);
+                this.f['exam_format'].setValue(course.params.exam_format);
+                this.f['cdr'].setValue(course.params.cdr);
+                this.f['sotinchi_th'].setValue(course.params.sotinchi_th);
+                this.f['exam_type'].setValue(course.params.exam_type ? course.params.exam_type : null);
+                this.f['tongsogio'].setValue(course.params.tongsogio ? course.params.tongsogio : null);
+                this.f['lythuyet'].setValue(course.params.lythuyet ? course.params.lythuyet : null);
+                this.f['thaoluan_baitap'].setValue(course.params.thaoluan_baitap ? course.params.thaoluan_baitap : null);
+                this.f['th_thinghiem'].setValue(course.params.th_thinghiem ? course.params.th_thinghiem : null);
+                this.f['kiemtra_dinhky'].setValue(course.params.kiemtra_dinhky ? course.params.kiemtra_dinhky : null);
+                this.f['tuhoc'].setValue(course.params.tuhoc ? course.params.tuhoc : null);
             }
         }
     }
 
-    onCheckMaHpPromise(): Promise<any> {
+    onCheckMaHpPromise(courseId = this.selectedCourse.id, maso = this.f['maso'].value): Promise<any> {
         return new Promise((resolve, reject) => {
             const condition_monhoc: ConditionOption = {
                 condition: [
                     { conditionName: 'status', condition: OvicQueryCondition.greaterThan, value: '-1', orWhere: 'and' },
-                    { conditionName: "maso", condition: OvicQueryCondition.equal, value: this.f['maso'].value, orWhere: 'and' },
+                    { conditionName: "maso", condition: OvicQueryCondition.equal, value: maso, orWhere: 'and' },
                 ],
                 set: [],
                 page: null
             }
 
-            condition_monhoc.condition.push({ conditionName: 'id', condition: OvicQueryCondition.notEqual, value: this.selectedCourse.id.toString(), orWhere: 'and' })
+            condition_monhoc.condition.push({ conditionName: 'id', condition: OvicQueryCondition.notEqual, value: courseId.toString(), orWhere: 'and' })
 
             this.elnKhoaHocService.getKhoaHocByPageNew_2(condition_monhoc).subscribe({
                 next: (_monhoc) => {
@@ -526,132 +598,164 @@ export class MonhocThongtinComponent implements OnInit {
         });
     }
 
-    addCtdtHocPhan(_monhoc): Promise<any> {
-        return new Promise(async (resolve, reject) => {
-            const request: Observable<any>[] = [];
-            const index_cate = this.list_donvi_chuyenmon.findIndex(m => m.id === _monhoc.category_ids)
-            this.selectCtdts.forEach(f => {
-                const data: CtdtHocphan = {
-                    course_id: this.selectedCourse.id,
-                    course_name: _monhoc.title,
-                    khoikienthuc: f['select_item'] ? f['select_item'] : null,
-                    sotinchi: _monhoc.params.sotinchi,
-                    sotinchi_thuchanh: _monhoc.params.sotinchi_th,
-                    hocky: f.hocky ? f.hocky : null,
-                    category_title: index_cate !== -1 ? this.list_donvi_chuyenmon[index_cate].title : null,
-                    status: 1,
-                    category_id: _monhoc.category_ids,
-                    ctdt_id: f.value,
-                    hp_hoctruoc: f.hp_hoctruoc ? f.hp_hoctruoc : null,
-                    hp_tienquyet: f.hp_tienquyet ? f.hp_tienquyet : null,
-                    hp_songhanh: f.hp_songhanh ? f.hp_songhanh : null,
-                    ordering: 100
-                }
-                request.push(this.ctdtHocphanService.addCtdtHocphan(data));
-            })
+    async addCtdtHocPhan(
+        _monhoc,
+        course = this.selectedCourse,
+        selectedCtdts = this.selectCtdts,
+        departments = this.list_donvi_chuyenmon
+    ): Promise<any> {
+        const request: Observable<any>[] = [];
+        const index_cate = departments.findIndex(m => m.id === _monhoc.category_ids)
+        selectedCtdts.forEach(f => {
+            const data: CtdtHocphan = {
+                course_id: course.id,
+                course_name: _monhoc.title,
+                khoikienthuc: f['select_item'] ? f['select_item'] : null,
+                sotinchi: _monhoc.params.sotinchi,
+                sotinchi_thuchanh: _monhoc.params.sotinchi_th,
+                hocky: f.hocky ? f.hocky : null,
+                category_title: index_cate !== -1 ? departments[index_cate].title : null,
+                status: 1,
+                category_id: _monhoc.category_ids,
+                ctdt_id: f.value,
+                hp_hoctruoc: f.hp_hoctruoc ? f.hp_hoctruoc : null,
+                hp_tienquyet: f.hp_tienquyet ? f.hp_tienquyet : null,
+                hp_songhanh: f.hp_songhanh ? f.hp_songhanh : null,
+                ordering: 100
+            }
+            request.push(this.ctdtHocphanService.addCtdtHocphan(data));
+        })
 
-            await firstValueFrom(this.ctdtHocphanService.deleteCtdtHocphanByCol(this.selectedCourse.id, 'course_id'))
-
-            forkJoin(request).subscribe({
-                next: () => {
-                    resolve(true);
-                },
-                error: () => {
-                    resolve(null);
-                }
-            })
-        });
+        await firstValueFrom(this.ctdtHocphanService.deleteCtdtHocphanByCol(course.id, 'course_id'));
+        if (request.length) await firstValueFrom(forkJoin(request));
+        return true;
     }
 
 
     async saveCourse() {
         if (this.isSaving()) return;
-        if (this.formKhoaHoc.valid) {
-            this.isSaving.set(true);
+        if (!this.formKhoaHoc.valid) {
+            this.notificationService.toastError('Thông tin nhập vào chưa đúng, vui lòng kiểm tra lại', 'Lỗi nhập liệu');
+            this.formKhoaHoc.markAllAsTouched();
+            return;
+        }
 
+        const selectedCourse = this.selectedCourse;
+        if (!selectedCourse?.id) return;
+        const course = { ...selectedCourse };
+        const version = this.loadVersion;
+        const isCurrent = () => this.isCurrentCourse(version, Number(course.id));
+        const canAssignTeacher = this.canAssignTeacher;
+        const submittedValues = { ...this.formKhoaHoc.getRawValue() };
+        const data = { ...submittedValues };
+        const sentTeacherIds: Record<TeacherField, number | null> = {
+            creator_plan_id: this.normalizeTeacherId(submittedValues.creator_plan_id),
+            creator_exam_id: this.normalizeTeacherId(submittedValues.creator_exam_id)
+        };
+        const teacherOptions = [...this.listGiangvien];
+        const contentTeacherBeforeSave = this.quickInfoContentTeacher;
+        const examTeacherBeforeSave = this.quickInfoExamTeacher;
+        const selectedCtdts = (this.selectCtdts || []).map(item => ({
+            ...item,
+            hp_hoctruoc: item.hp_hoctruoc ? [...item.hp_hoctruoc] : item.hp_hoctruoc,
+            hp_tienquyet: item.hp_tienquyet ? [...item.hp_tienquyet] : item.hp_tienquyet,
+            hp_songhanh: item.hp_songhanh ? [...item.hp_songhanh] : item.hp_songhanh
+        }));
+        const departments = [...(this.list_donvi_chuyenmon || [])];
 
-            const checkMa = await this.onCheckMaHpPromise();
+        if (!canAssignTeacher) {
+            delete data['creator_plan_id'];
+            delete data['creator_exam_id'];
+        } else {
+            for (const field of this.teacherFields) {
+                const nextId = sentTeacherIds[field];
+                if (nextId === this.normalizeTeacherId(course[field])) delete data[field];
+                else data[field] = nextId;
+            }
+        }
 
+        data['maso'] = data['maso'] ? data['maso'].trim() : data['maso'];
+        data['slug'] = this.helperService.slugVietnamese(data['title']);
+        data['params'] = {
+            sotinchi: data['sotinchi'],
+            exam_format: data['exam_format'],
+            cdr: data['cdr'],
+            sotinchi_th: data['sotinchi_th'],
+            exam_type: data['exam_type'],
+            tongsogio: data['tongsogio'],
+            lythuyet: data['lythuyet'],
+            thaoluan_baitap: data['thaoluan_baitap'],
+            th_thinghiem: data['th_thinghiem'],
+            kiemtra_dinhky: data['kiemtra_dinhky'],
+            tuhoc: data['tuhoc'],
+        };
 
+        if (canAssignTeacher) {
+            for (const field of this.teacherFields) {
+                if (data[field] === undefined) sentTeacherIds[field] = this.normalizeTeacherId(course[field]);
+            }
+        }
+
+        if (selectedCtdts.some(item => !item.select_item)) {
+            this.notificationService.toastWarning("Vui lòng chọn Khung Trình Độ và Học Kỳ cho môn học ở Chương Trinh Đào Tạo");
+            return;
+        }
+
+        delete data['sotinchi'];
+        delete data['exam_format'];
+        delete data['cdr'];
+        delete data['sotinchi_th'];
+        delete data['exam_type'];
+        delete data['tongsogio'];
+        delete data['lythuyet'];
+        delete data['thaoluan_baitap'];
+        delete data['th_thinghiem'];
+        delete data['kiemtra_dinhky'];
+        delete data['tuhoc'];
+
+        this.isSaving.set(true);
+        try {
+            const checkMa = await this.onCheckMaHpPromise(course.id, submittedValues.maso);
+            if (!isCurrent()) return;
             if (checkMa === null) {
-                this.isSaving.set(false);
-                this.notificationService.toastError("Lỗi kết nối, vui lòng thử lại");
+                this.notificationService.toastError('Lỗi kết nối, vui lòng thử lại');
+                return;
+            }
+            if (!checkMa) {
+                this.notificationService.toastWarning('Mã học phần đã tồn tại, vui lòng thử lại');
                 return;
             }
 
-            if (checkMa) {
-
-
-                const data = { ...this.formKhoaHoc.getRawValue() };
-                if (!this.canAssignTeacher) delete data['creator_plan_id'];
-
-                data['maso'] = data['maso'] ? data['maso'].trim() : data['maso'];
-
-                data['slug'] = this.helperService.slugVietnamese(data['title']);
-
-                data['params'] = {
-                    sotinchi: data['sotinchi'],
-                    exam_format: data['exam_format'],
-                    cdr: data['cdr'],
-                    sotinchi_th: data['sotinchi_th'],
-                    exam_type: data['exam_type'],
-                    tongsogio: data['tongsogio'],
-                    lythuyet: data['lythuyet'],
-                    thaoluan_baitap: data['thaoluan_baitap'],
-                    th_thinghiem: data['th_thinghiem'],
-                    kiemtra_dinhky: data['kiemtra_dinhky'],
-                    tuhoc: data['tuhoc'],
-                }
-
-                if (this.selectCtdts.length) {
-                    const check = this.selectCtdts.filter(m => !m.select_item).length;
-                    if (check !== 0) {
-                        this.isSaving.set(false);
-                        return this.notificationService.toastWarning("Vui lòng chọn Khung Trình Độ và Học Kỳ cho môn học ở Chương Trinh Đào Tạo")
-                    }
-
-                    await this.addCtdtHocPhan(data);
-                } else {
-                    await firstValueFrom(this.ctdtHocphanService.deleteCtdtHocphanByCol(this.selectedCourse.id, 'course_id'));
-                }
-
-                delete data['sotinchi'];
-                delete data['exam_format'];
-                delete data['cdr'];
-                delete data['sotinchi_th'];
-                delete data['exam_type'];
-                delete data['tongsogio'];
-                delete data['lythuyet'];
-                delete data['thaoluan_baitap'];
-                delete data['th_thinghiem'];
-                delete data['kiemtra_dinhky'];
-                delete data['tuhoc'];
-
-
-                this.elnKhoaHocService.updateElnKhoaHoc(this.selectedCourse.id, data).subscribe({
-                    next: () => {
-                        if (this.canAssignTeacher) {
-                            const creatorPlanId = this.f['creator_plan_id'].value || null;
-                            this.selectedCourse.creator_plan_id = creatorPlanId;
-                            this.quickInfoTeacher = this.listGiangvien.find(teacher => String(teacher.id) === String(creatorPlanId)) || null;
-                            this.selectedCourse.creator_name = this.quickInfoTeacher?.display_name || '';
-                        }
-                        this.notificationService.toastSuccess('Sửa thông tin thành công');
-                        this.isSaving.set(false);
-                    },
-                    error: () => {
-                        this.notificationService.toastError('Sửa thông tin thất bại');
-                        this.isSaving.set(false);
-                    }
-                });
-
+            if (selectedCtdts.length) {
+                await this.addCtdtHocPhan(data, course, selectedCtdts, departments);
             } else {
-                this.isSaving.set(false);
-                this.notificationService.toastWarning("Mã học phần đã tồn tại, vui lòng thử lại");
+                await firstValueFrom(this.ctdtHocphanService.deleteCtdtHocphanByCol(course.id, 'course_id'));
             }
-        } else {
-            this.notificationService.toastError('Thông tin nhập vào chưa đúng, vui lòng kiểm tra lại', 'Lỗi nhập liệu');
-            return this.formKhoaHoc.markAllAsTouched();
+            if (!isCurrent()) return;
+
+            await firstValueFrom(this.elnKhoaHocService.updateElnKhoaHoc(course.id, data));
+            if (!isCurrent()) return;
+
+            if (canAssignTeacher) {
+                const teacherForSavedId = (field: TeacherField, id: number | null): User | null => {
+                    if (!id) return null;
+                    const option = teacherOptions.find(teacher => Number(teacher.id) === id);
+                    if (option) return option as unknown as User;
+                    const previous = field === 'creator_plan_id' ? contentTeacherBeforeSave : examTeacherBeforeSave;
+                    if (Number(previous?.id) === id) return previous;
+                    return { id, display_name: `Giảng viên #${id}`, email: '' } as User;
+                };
+                this.selectedCourse.creator_plan_id = sentTeacherIds.creator_plan_id;
+                this.selectedCourse.creator_exam_id = sentTeacherIds.creator_exam_id;
+                this.quickInfoContentTeacher = teacherForSavedId('creator_plan_id', sentTeacherIds.creator_plan_id);
+                this.quickInfoExamTeacher = teacherForSavedId('creator_exam_id', sentTeacherIds.creator_exam_id);
+                this.selectedCourse.creator_name = this.quickInfoContentTeacher?.display_name || '';
+            }
+            this.notificationService.toastSuccess('Sửa thông tin thành công');
+        } catch {
+            if (isCurrent()) this.notificationService.toastError('Sửa thông tin thất bại');
+        } finally {
+            if (isCurrent()) this.isSaving.set(false);
         }
     }
 

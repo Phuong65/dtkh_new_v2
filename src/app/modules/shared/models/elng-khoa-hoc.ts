@@ -42,6 +42,7 @@ export interface ElnKhoaHoc {
     type_test?: 'tienganh' | 'monkhac';
     params?: CourseParams;
     creator_plan_id?: number;
+    creator_exam_id?: number | null;
     av?: number;
     copy_course_id?: number;
     ctdt_ids?: number[];
