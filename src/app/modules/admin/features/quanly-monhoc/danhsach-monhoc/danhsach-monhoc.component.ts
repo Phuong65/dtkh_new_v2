@@ -989,6 +989,18 @@ export class DanhsachMonhocComponent implements OnInit {
         );
     }
 
+    categoryName(id: number | string | null | undefined): string {
+        return this.list_donvi_chuyenmon?.find(item => String(item.id) === String(id))?.title || '—';
+    }
+
+    categorySymbol(id: number | string | null | undefined): string {
+        const category = this.list_donvi_chuyenmon?.find(item => String(item.id) === String(id));
+        const code = category?.code?.trim();
+        if (code) return code;
+        const initials = category?.title?.trim().split(/\s+/).map(word => word[0]).join('').toLocaleUpperCase();
+        return initials || '—';
+    }
+
     private escapeHtml(value: string): string {
         return value
             .replace(/&/g, '&amp;')

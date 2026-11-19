@@ -58,9 +58,15 @@
             <ng-template pTemplate="body" let-row>
                 <tr [ngClass]="selectedKhoahoc && selectedKhoahoc.id === row.id?'focus-row-table':''">
                     @for (col of cols_course; track col) {
-                    <td [ngClass]="col['class']">
-                        @if (col['key'] !== 'title' && col['key'] !== 'editor_name') {
+                    <td [ngClass]="col['class']"
+                        [attr.aria-label]="col['key'] === 'category_name' ? 'Khoa quản lý: ' + categoryName(row.category_ids) : null">
+                        @if (col['key'] !== 'title' && col['key'] !== 'editor_name' && col['key'] !== 'category_name') {
                         <span>{{row[col['key']]}}</span>
+                        }
+                        @if (col['key'] === 'category_name') {
+                        <span [ngbTooltip]="categoryName(row.category_ids)" container="body" placement="top">
+                            {{categorySymbol(row.category_ids)}}
+                        </span>
                         }
                         @if (col['key'] === 'title') {
                         <div class="title-col-flex">

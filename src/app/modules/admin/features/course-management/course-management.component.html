@@ -69,8 +69,12 @@
                                 ({{ (course.params?.sotinchi ?? 0) - (course.params?.sotinchi_th ?? 0) }} LT /
                                 {{ course.params?.sotinchi_th ?? 0 }} TH)
                             </td>
-                            <td class="text-center">{{ categoryName(course.category_ids) }}</td>
-                            <td class="text-center">{{ departmentName(course.nganh_bomon_id) }}</td>
+                            <td class="text-center" [pTooltip]="categoryName(course.category_ids)"
+                                [attr.aria-label]="'Khoa quản lý: ' + categoryName(course.category_ids)"
+                                tooltipPosition="top" appendTo="body">{{ categorySymbol(course.category_ids) }}</td>
+                            <td class="text-center" [pTooltip]="departmentName(course.nganh_bomon_id)"
+                                [attr.aria-label]="'Bộ môn: ' + departmentName(course.nganh_bomon_id)"
+                                tooltipPosition="top" appendTo="body">{{ departmentSymbol(course.nganh_bomon_id) }}</td>
                             <td class="text-center course-management-actions">
                                 @if (canDownload) {
                                 <button type="button" class="btn ictu-button-success-light ictu-admin-icon-button"

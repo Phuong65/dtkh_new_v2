@@ -392,8 +392,23 @@ export class CourseManagementComponent {
         return this.categories().find(item => item.id === id)?.title || '—';
     }
 
+    categorySymbol(id: number): string {
+        return this.unitSymbol(this.categories().find(item => item.id === id));
+    }
+
     departmentName(id: number | null | undefined): string {
         return this.departments().find(item => item.id === id)?.title || '—';
+    }
+
+    departmentSymbol(id: number | null | undefined): string {
+        return this.unitSymbol(this.departments().find(item => item.id === id));
+    }
+
+    private unitSymbol(unit?: { code?: string; title?: string }): string {
+        const code = unit?.code?.trim();
+        if (code) return code;
+        const initials = unit?.title?.trim().split(/\s+/).map(word => word[0]).join('').toLocaleUpperCase();
+        return initials || '—';
     }
 
     filteredProgrammes(): Ctdt[] {
