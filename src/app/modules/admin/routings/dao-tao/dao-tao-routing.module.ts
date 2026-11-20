@@ -33,7 +33,7 @@ const routes: Routes = [
     },
     {
         path: 'quanly-monhoc',
-        loadChildren: () => import('@modules/admin/features/quanly-monhoc/quanly-monhoc.module').then(m => m.QuanlyMonhocModule)
+        loadComponent: () => import('@modules/admin/features/course-management/course-management.component').then(c => c.CourseManagementComponent)
     },
     {
         path: 'kehoach-hoctap',

@@ -99,6 +99,7 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
     readonly activeModeAllowed = computed(() => !this.isLecturer
         || this.lecturerModes().includes(this.activeModeId()));
     private hasExplicitViewSelection = false;
+    private readonlyTouchPosition: { identifier: number; x: number; y: number } | null = null;
 
     constructor() {
         const elevatedRoles = [
@@ -356,6 +357,146 @@ export class CourseManagementDetail implements OnInit, OnDestroy {
         event.preventDefault();
         this.selectMode(availableModes[targetIndex].id);
         this.modeButtons()[targetIndex]?.nativeElement.focus();
+    }
+
+    forwardReadonlyTabClick(event: MouseEvent): void {
+        const overlay = event.currentTarget as HTMLElement;
+        const panel = overlay.parentElement?.querySelector<HTMLElement>('[inert]');
+        if (!panel) return;
+
+        const previousPointerEvents = overlay.style.pointerEvents;
+        const wasInert = panel.inert;
+
+        try {
+            panel.inert = false;
+            overlay.style.pointerEvents = 'none';
+            const target = document.elementFromPoint(event.clientX, event.clientY);
+            const tab = target?.closest<HTMLButtonElement>('[role="tab"]');
+            if (!tab || !tab.closest('[role="tablist"]') || !panel.contains(tab)
+                || tab.disabled || tab.getAttribute('aria-disabled') === 'true') return;
+
+            event.preventDefault();
+            event.stopPropagation();
+            tab.click();
+        } finally {
+            overlay.style.pointerEvents = previousPointerEvents;
+            panel.inert = wasInert;
+        }
+    }
+
+    forwardReadonlyWheel(event: WheelEvent): void {
+        const overlay = event.currentTarget as HTMLElement;
+        const deltaX = this.normalizeWheelDelta(event.deltaX, event.deltaMode, 'x', overlay, event.clientX, event.clientY);
+        const deltaY = this.normalizeWheelDelta(event.deltaY, event.deltaMode, 'y', overlay, event.clientX, event.clientY);
+        const scrollX = deltaX ? this.findScrollableElement(overlay, event.clientX, event.clientY, 'x', deltaX) : null;
+        const scrollY = deltaY ? this.findScrollableElement(overlay, event.clientX, event.clientY, 'y', deltaY) : null;
+
+        if (!scrollX && !scrollY) return;
+        if (event.cancelable) event.preventDefault();
+        if (scrollX) scrollX.scrollLeft += deltaX;
+        if (scrollY) scrollY.scrollTop += deltaY;
+    }
+
+    startReadonlyTouchScroll(event: TouchEvent): void {
+        if (event.touches.length !== 1) {
+            this.readonlyTouchPosition = null;
+            return;
+        }
+
+        const touch = event.touches[0];
+        this.readonlyTouchPosition = {
+            identifier: touch.identifier,
+            x: touch.clientX,
+            y: touch.clientY
+        };
+    }
+
+    moveReadonlyTouchScroll(event: TouchEvent): void {
+        const previous = this.readonlyTouchPosition;
+        if (!previous || event.touches.length !== 1) return;
+
+        const touch = Array.from(event.touches).find(item => item.identifier === previous.identifier);
+        if (!touch) return;
+
+        const deltaX = previous.x - touch.clientX;
+        const deltaY = previous.y - touch.clientY;
+        const overlay = event.currentTarget as HTMLElement;
+        const scrollX = deltaX ? this.findScrollableElement(overlay, touch.clientX, touch.clientY, 'x', deltaX) : null;
+        const scrollY = deltaY ? this.findScrollableElement(overlay, touch.clientX, touch.clientY, 'y', deltaY) : null;
+
+        this.readonlyTouchPosition = {
+            identifier: touch.identifier,
+            x: touch.clientX,
+            y: touch.clientY
+        };
+
+        if (!scrollX && !scrollY) return;
+        if (event.cancelable) event.preventDefault();
+        if (scrollX) scrollX.scrollLeft += deltaX;
+        if (scrollY) scrollY.scrollTop += deltaY;
+    }
+
+    endReadonlyTouchScroll(): void {
+        this.readonlyTouchPosition = null;
+    }
+
+    private normalizeWheelDelta(
+        delta: number,
+        deltaMode: number,
+        axis: 'x' | 'y',
+        overlay: HTMLElement,
+        x: number,
+        y: number
+    ): number {
+        if (deltaMode === WheelEvent.DOM_DELTA_LINE) return delta * 16;
+        if (deltaMode !== WheelEvent.DOM_DELTA_PAGE) return delta;
+
+        const element = this.findScrollableElement(overlay, x, y, axis, delta);
+        return delta * (axis === 'x' ? element?.clientWidth ?? 0 : element?.clientHeight ?? 0);
+    }
+
+    private findScrollableElement(
+        overlay: HTMLElement,
+        x: number,
+        y: number,
+        axis: 'x' | 'y',
+        delta: number
+    ): HTMLElement | null {
+        const panel = overlay.parentElement?.querySelector<HTMLElement>('[inert]')
+            ?? overlay.closest('.course-detail-content')?.querySelector<HTMLElement>('.course-detail-content__panel');
+        if (!panel) return null;
+
+        const previousPointerEvents = overlay.style.pointerEvents;
+        const wasInert = panel.inert;
+        let target: HTMLElement | null = null;
+
+        try {
+            panel.inert = false;
+            overlay.style.pointerEvents = 'none';
+            const elementAtPoint = document.elementFromPoint(x, y);
+            if (elementAtPoint instanceof HTMLElement && panel.contains(elementAtPoint)) {
+                target = elementAtPoint;
+            }
+        } finally {
+            overlay.style.pointerEvents = previousPointerEvents;
+            panel.inert = wasInert;
+        }
+
+        for (let element = target; element && panel.contains(element); element = element.parentElement) {
+            const style = window.getComputedStyle(element);
+            const overflow = axis === 'x' ? style.overflowX : style.overflowY;
+            if (!['auto', 'scroll', 'overlay'].includes(overflow)) continue;
+
+            const position = axis === 'x' ? element.scrollLeft : element.scrollTop;
+            const extent = axis === 'x' ? element.scrollWidth : element.scrollHeight;
+            const viewport = axis === 'x' ? element.clientWidth : element.clientHeight;
+            const canScroll = delta > 0
+                ? position < extent - viewport - 1
+                : position > 0;
+            if (extent > viewport && canScroll) return element;
+        }
+
+        return null;
     }
 
     goBack(): void {

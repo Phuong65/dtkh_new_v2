@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -47,6 +47,12 @@ import { ThuongxuyenDuanComponent } from '../thuongxuyen-duan/thuongxuyen-duan.c
     styleUrls: ['./monhoc-kiemtra-danhgia.component.css']
 })
 export class MonhocKiemtraDanhgiaComponent implements OnInit {
+    @Input() readonlyMode = false;
+    @Output() readonlyWheel = new EventEmitter<WheelEvent>();
+    @Output() readonlyTouchstart = new EventEmitter<TouchEvent>();
+    @Output() readonlyTouchmove = new EventEmitter<TouchEvent>();
+    @Output() readonlyTouchend = new EventEmitter<void>();
+
     private readonly destroyRef = inject(DestroyRef);
     private readonly activatedRoute = inject(ActivatedRoute);
     private readonly router = inject(Router);

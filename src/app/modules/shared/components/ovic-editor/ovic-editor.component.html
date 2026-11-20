@@ -1,4 +1,5 @@
-<p-editor styleClass="ovic-editor" (onTextChange)="onTextChange($event)" [(ngModel)]="textContents"
+<p-editor styleClass="ovic-editor" (onInit)="onEditorInit($event)" (onTextChange)="onTextChange($event)"
+  (ngModelChange)="onModelChange($event)" [ngModel]="textContents" [readonly]="readonly"
   [style]="{'height': height }">
   <p-header>
     <span class="ql-formats">
@@ -135,3 +136,6 @@
   }
 </p-header>
 </p-editor>
+@if (protectedHeadings.length) {
+<p class="ovic-editor-protection-note" role="status" aria-live="polite">{{ protectionMessage }}</p>
+}

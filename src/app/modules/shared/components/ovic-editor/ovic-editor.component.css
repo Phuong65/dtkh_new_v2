@@ -1,0 +1,17 @@
+:host ::ng-deep .ovic-editor .ovic-protected-heading {
+    display: inline;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #000000;
+    font-weight: 700;
+    user-select: all;
+}
+
+.ovic-editor-protection-note {
+    margin: 8px 0 0;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+}

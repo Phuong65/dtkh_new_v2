@@ -448,7 +448,6 @@ export class DashboardV2Component implements OnInit {
     changeMenuTop(url: string) {
         const urls = [
             { urlKey: 'dao-tao/chuongtrinh-daotao', menuKey: 'menuTopV2' },
-            { urlKey: 'quanly-monhoc', menuKey: 'menuTopV2' },
             { urlKey: 'hoi-dong/thamdinh-celo', menuKey: 'menuTopV2' },
             { urlKey: 'hoi-dong/thamdinh-noidung', menuKey: 'menuTopV2' },
             { urlKey: 'hoi-dong/thamdinh-cauhoi', menuKey: 'menuTopV2' },
@@ -463,12 +462,6 @@ export class DashboardV2Component implements OnInit {
         const checkUrl = urls.findIndex(i => url.indexOf(i.urlKey) !== -1);
 
         const codeDirect = this.activatedRoute.snapshot.queryParamMap.get('code');
-
-        const config = JSON.parse(localStorage.getItem('--app_configs-' + APP_CONFIGS.realm));
-
-        const setting = config.find(m => m.config_key === 'SETTING')['params'];
-
-        const unLimitQuestion = setting && setting['form_question'] && this.key_server === 'tueba_dttx' ? setting['form_question']['unlimit'] : false;
 
         if (checkUrl !== -1) {
             const ar_url = url.split("/");
@@ -485,27 +478,6 @@ export class DashboardV2Component implements OnInit {
 
                     if (menu_ctdt.findIndex(m => m.routerLink[0] === url) !== -1) {
                         this.menuTopV2 = menu_ctdt;
-                        this.notificationService.setCloseLeftMenu(true);
-                        this.key_menu_top = urls[checkUrl].menuKey;
-                    }
-                    break;
-                case 'quanly-monhoc':
-                    const menu_monhoc = [
-                        { label: 'Thông tin chung', routerLink: [ar_url[0].concat('/', ar_url[1], '/monhoc-thongtin')], queryParams: { 'code': codeDirect } },
-                        { label: 'Mục tiêu/CDR', routerLink: [ar_url[0].concat('/', ar_url[1], '/monhoc-muctieu')], queryParams: { 'code': codeDirect } },
-                        { label: 'Nội dung', routerLink: [ar_url[0].concat('/', ar_url[1], '/monhoc-noidung')], queryParams: { 'code': codeDirect } },
-                        { label: 'Phân bổ câu hỏi CDR', routerLink: [ar_url[0].concat('/', ar_url[1], '/monhoc-question-cdr')], queryParams: { 'code': codeDirect } },
-                        { label: 'Form Đề', routerLink: [ar_url[0].concat('/', ar_url[1], '/monhoc-formde')], queryParams: { 'code': codeDirect } },
-                        { label: 'Kiểm tra, đánh giá', routerLink: [ar_url[0].concat('/', ar_url[1], '/monhoc-kiemtra-danhgia')], queryParams: { 'code': codeDirect } },
-                        { label: 'Cấu hình', routerLink: [ar_url[0].concat('/', ar_url[1], '/monhoc-cauhinh')], queryParams: { 'code': codeDirect } },
-                    ];
-
-                    if (unLimitQuestion) {
-                        menu_monhoc.splice(3, 1);
-                    }
-
-                    if (menu_monhoc.findIndex(m => m.routerLink[0] === url) !== -1) {
-                        this.menuTopV2 = menu_monhoc;
                         this.notificationService.setCloseLeftMenu(true);
                         this.key_menu_top = urls[checkUrl].menuKey;
                     }

@@ -287,8 +287,9 @@
                         <div class="mh-editor-content">
                             <div id="panel-desc" role="tabpanel" aria-labelledby="tab-desc"
                                 [hidden]="activeDescTab !== 'desc'">
-                                <ovic-editor height="240px" [formField]="f['desc']"
-                                    [default]="f['desc'].value"></ovic-editor>
+                                <ovic-editor #descriptionEditor height="240px" [formField]="f['desc']"
+                                    [default]="f['desc'].value" [protectedHeadings]="protectedDescriptionHeadings"
+                                    [contextKey]="selectedCourse?.id"></ovic-editor>
                             </div>
                             <div id="panel-yeucau" role="tabpanel" aria-labelledby="tab-yeucau"
                                 [hidden]="activeDescTab !== 'yeucau'">

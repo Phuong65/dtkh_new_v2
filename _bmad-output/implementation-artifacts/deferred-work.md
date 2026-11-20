@@ -74,3 +74,33 @@
 - source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-course-content-exam-teachers.md`
   summary: L?m cho c?p nh?t li?n k?t CT?T v? PUT h?c ph?n failure-atomic.
   evidence: Review x?c nh?n flow CT?T c? s?n x?a/th?m li?n k?t tr??c PUT n?n l?i ? b??c sau c? th? ?? l?i li?n k?t d? dang; thay ??i giao d?ch n?y kh?ng thu?c scope g?n gi?ng vi?n.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-migrate-quanly-monhoc-routes.md`
+  summary: Xác nhận thủ công luồng route, phạm vi vai trò và nút quay lại trên trình duyệt.
+  evidence: Review không có kiểm tra end-to-end trên trình duyệt; build và kiểm tra kiểu không xác nhận điều hướng hoặc dữ liệu thực tế theo từng vai trò.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-migrate-quanly-monhoc-routes.md`
+  summary: Bổ sung và chạy regression tests cho quyền sửa phần Kiểm tra đánh giá theo creator_exam_id.
+  evidence: Đã thêm case cho Form đề; MonhocQuestionCdrComponent và MonhocKiemtraDanhgiaComponent vẫn chưa có test riêng, còn spec cấm chạy test trong lần triển khai này.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-migrate-quanly-monhoc-routes.md`
+  summary: Chạy các regression tests mới sau khi được cho phép.
+  evidence: Test type-check thành công nhưng không chạy theo chỉ dẫn tại Verification; runtime assertions chưa được thực thi.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-course-management-lecturer-exam-edit-guards.md`
+  summary: Bổ sung kiểm thử kết quả thực tế cho bộ lọc danh sách học phần của Giảng viên.
+  evidence: Test hiện chỉ xác nhận tham số gửi vào service, chưa chứng minh kết quả loại học phần không được gán; cần backend contract hoặc HTTP stub để xác nhận dữ liệu trả về.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-course-management-lecturer-exam-edit-guards.md`
+  summary: Bổ sung kiểm thử điều hướng hồi quy cho các route quản lý học phần mới và route legacy.
+  evidence: Các route role-specific đã được migrate nhưng chưa có router test xác nhận component đích và việc route legacy không còn được kích hoạt.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-course-management-lecturer-exam-edit-guards.md`
+  summary: Bổ sung kiểm thử hành vi cho các guard ghi Form đề, Ma trận CĐR và Sinh đề.
+  evidence: Test hiện chưa khẳng định trực tiếp các service ghi không được gọi khi thiếu phân công; cần spy service ở các handler liên quan.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-course-management-lecturer-exam-edit-guards.md`
+  summary: Chặn lưu mô tả học phần cũ khi cấu trúc tiêu đề cần được rà soát.
+  evidence: `needsReview` chỉ kích hoạt thông báo, còn `prepareProtectedValue()` vẫn cho phép serialize và lưu; cần quyết định riêng về chính sách lưu dữ liệu cũ.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-course-management-lecturer-exam-edit-guards.md`
+  summary: Xác minh runtime các thao tác Quill có thể làm sai cấu trúc tiêu đề được bảo vệ.
+  evidence: Chưa có test runtime cho paste, undo, xóa ranh giới và thay đổi Delta; cần tái hiện các thao tác này để kết luận liệu guard có thể bị vượt qua hay không.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-course-management-lecturer-overlay-route-context.md`
+  summary: Xác nhận dữ liệu hồ sơ người dùng chỉ có một bản ghi khi áp dụng scope Khoa/Bộ môn.
+  evidence: Chưa rõ API có đảm bảo duy nhất hồ sơ theo user_id hay không; nếu có nhiều bản ghi, việc dùng phần tử đầu có thể áp sai phạm vi (medium, chưa xác minh). Cần kiểm tra ràng buộc dữ liệu hoặc hợp đồng API.
+- source_spec: `E:\New folder (3)\dtkh_new_v2\_bmad-output\implementation-artifacts\spec-course-management-lecturer-overlay-route-context.md`
+  summary: Chặn lưu mô tả học phần cũ khi cấu trúc tiêu đề cần được rà soát.
+  evidence: `needsReview` chỉ kích hoạt thông báo, còn `prepareProtectedValue()` cho phép tiếp tục serialize và lưu; cần quyết định riêng về chính sách lưu dữ liệu cũ.

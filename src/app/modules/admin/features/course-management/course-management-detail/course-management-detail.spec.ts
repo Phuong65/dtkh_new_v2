@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
+import { By } from '@angular/platform-browser';
 import { BehaviorSubject, of } from 'rxjs';
 import { AuthService } from '@core/services/auth.service';
 import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
@@ -24,11 +25,23 @@ class MockMonhocNoidungComponent {}
 @Component({ selector: 'app-monhoc-question-cdr', standalone: true, template: '' })
 class MockMonhocQuestionCdrComponent {}
 
-@Component({ selector: 'app-monhoc-formde', standalone: true, template: '' })
-class MockMonhocFormdeComponent {}
+@Component({
+    selector: 'app-monhoc-formde',
+    standalone: true,
+    template: '<div role="tablist"><button type="button" role="tab" (click)="childTabSelected = true">Tab con</button></div>'
+})
+class MockMonhocFormdeComponent {
+    childTabSelected = false;
+}
 
 @Component({ selector: 'app-monhoc-kiemtra-danhgia', standalone: true, template: '' })
-class MockMonhocKiemtraDanhgiaComponent {}
+class MockMonhocKiemtraDanhgiaComponent {
+    @Input() readonlyMode = false;
+    @Output() readonlyWheel = new EventEmitter<WheelEvent>();
+    @Output() readonlyTouchstart = new EventEmitter<TouchEvent>();
+    @Output() readonlyTouchmove = new EventEmitter<TouchEvent>();
+    @Output() readonlyTouchend = new EventEmitter<void>();
+}
 
 describe('CourseManagementDetail - Mode Switching', () => {
     let fixture: ComponentFixture<CourseManagementDetail>;
@@ -418,6 +431,83 @@ describe('CourseManagementDetail - Mode Switching', () => {
         fixture.detectChanges();
         expect(component.activeModeAllowed()).toBeTrue();
         expect(root.querySelector('.course-detail-readonly-overlay')).toBeNull();
+    });
+
+    it('giữ tab con của Sinh đề thao tác được nhưng khóa phần nội dung khi thiếu phân công', () => {
+        fixture.destroy();
+        userRoles.add(ROLES.giangvien);
+        const route = TestBed.inject(ActivatedRoute) as any;
+        route.snapshot.queryParamMap = convertToParamMap({
+            code: '10',
+            tab: 'sinh-de',
+            returnUrl: '/admin/giang-vien/quanly-monhoc'
+        });
+        queryParamMap$.next(convertToParamMap({
+            code: '10',
+            tab: 'sinh-de',
+            returnUrl: '/admin/giang-vien/quanly-monhoc'
+        }));
+        courseServiceSpy.getKhoaHocByPageNew_2.and.returnValue(
+            of({ data: [{ id: 10, creator_plan_id: 10, creator_exam_id: 20 }] } as any)
+        );
+
+        fixture = TestBed.createComponent(CourseManagementDetail);
+        component = fixture.componentInstance;
+        root = fixture.nativeElement;
+        fixture.detectChanges();
+
+        const assessment = fixture.debugElement.query(By.directive(MockMonhocKiemtraDanhgiaComponent))
+            .componentInstance as MockMonhocKiemtraDanhgiaComponent;
+        expect(component.activeModeAllowed()).toBeFalse();
+        expect(root.querySelector('.course-detail-readonly-overlay')).toBeNull();
+        expect(root.querySelector('.course-detail-content__panel')?.hasAttribute('inert')).toBeFalse();
+        expect(assessment.readonlyMode).toBeTrue();
+    });
+
+    it('chuyển tiếp thao tác bấm tab con qua lớp phủ chỉ đọc', () => {
+        fixture.destroy();
+        userRoles.add(ROLES.giangvien);
+        const route = TestBed.inject(ActivatedRoute) as any;
+        route.snapshot.queryParamMap = convertToParamMap({
+            code: '10',
+            tab: 'form-de',
+            returnUrl: '/admin/giang-vien/quanly-monhoc'
+        });
+        queryParamMap$.next(convertToParamMap({
+            code: '10',
+            tab: 'form-de',
+            returnUrl: '/admin/giang-vien/quanly-monhoc'
+        }));
+        courseServiceSpy.getKhoaHocByPageNew_2.and.returnValue(
+            of({ data: [{ id: 10, creator_plan_id: 10, creator_exam_id: 20 }] } as any)
+        );
+
+        fixture = TestBed.createComponent(CourseManagementDetail);
+        component = fixture.componentInstance;
+        root = fixture.nativeElement;
+        fixture.detectChanges();
+
+        const overlay = root.querySelector<HTMLElement>('.course-detail-readonly-overlay')!;
+        const tab = root.querySelector<HTMLButtonElement>(
+            '.course-detail-content__panel [role="tablist"] [role="tab"]'
+        )!;
+        spyOn(document, 'elementFromPoint').and.returnValue(tab);
+        const event = {
+            currentTarget: overlay,
+            clientX: 10,
+            clientY: 10,
+            preventDefault: jasmine.createSpy('preventDefault'),
+            stopPropagation: jasmine.createSpy('stopPropagation')
+        } as unknown as MouseEvent;
+
+        component.forwardReadonlyTabClick(event);
+        fixture.detectChanges();
+
+        const formde = fixture.debugElement.query(By.directive(MockMonhocFormdeComponent))
+            .componentInstance as MockMonhocFormdeComponent;
+        expect(formde.childTabSelected).toBeTrue();
+        expect(root.querySelector('.course-detail-content__panel')?.hasAttribute('inert')).toBeTrue();
+        expect(event.preventDefault).toHaveBeenCalled();
     });
 
     it('tài khoản vai trò kép không bị giới hạn giảng viên khi returnUrl thuộc luồng khác', () => {

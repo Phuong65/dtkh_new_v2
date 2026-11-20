@@ -23,6 +23,7 @@
             </button>
         </nav>
 
+        <div class="assessment-content" [attr.inert]="readonlyMode ? '' : null">
         <section id="assessment-panel-practice" class="assessment-panel" role="tabpanel" [hidden]="tabIndex !== 0">
             <div class="admin-wrap-table ictu-admin-table-shell assessment-table-card">
                 <header class="admin-wrap-table__head assessment-card-head">
@@ -161,7 +162,15 @@
             <div class="assessment-empty-state"><i class="ti ti-clipboard-x" aria-hidden="true"></i><strong>Chưa tạo bài kiểm tra thường xuyên</strong><p>Vào tab <b>Cấu hình</b> để thiết lập bài kiểm tra cho học phần.</p></div>
             }
         </section>
-
+        @if (readonlyMode) {
+        <div class="assessment-readonly-overlay" aria-hidden="true"
+            (wheel)="readonlyWheel.emit($event)"
+            (touchstart)="readonlyTouchstart.emit($event)"
+            (touchmove)="readonlyTouchmove.emit($event)"
+            (touchend)="readonlyTouchend.emit()"
+            (touchcancel)="readonlyTouchend.emit()"></div>
+        }
+        </div>
     </div>
     }
 </main>

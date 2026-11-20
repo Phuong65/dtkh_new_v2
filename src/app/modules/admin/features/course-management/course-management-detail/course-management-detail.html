@@ -61,7 +61,8 @@
         </div>
         } @else {
         <div class="course-detail-content">
-            <div class="course-detail-content__panel" [attr.inert]="activeModeAllowed() ? null : ''">
+            <div class="course-detail-content__panel"
+                [attr.inert]="!activeModeAllowed() && activeTabId() !== 'sinh-de' ? '' : null">
             @if (activeTabId() === 'thong-tin') {
             <section class="course-detail-tab-panel" role="tabpanel" id="course-panel-thong-tin"
                 aria-labelledby="course-tab-thong-tin" tabindex="0">
@@ -90,12 +91,22 @@
             } @else if (activeTabId() === 'sinh-de') {
             <section class="course-detail-tab-panel" role="tabpanel" id="course-panel-sinh-de"
                 aria-labelledby="course-tab-sinh-de" tabindex="0">
-                <app-monhoc-kiemtra-danhgia></app-monhoc-kiemtra-danhgia>
+                <app-monhoc-kiemtra-danhgia [readonlyMode]="!activeModeAllowed()"
+                    (readonlyWheel)="forwardReadonlyWheel($event)"
+                    (readonlyTouchstart)="startReadonlyTouchScroll($event)"
+                    (readonlyTouchmove)="moveReadonlyTouchScroll($event)"
+                    (readonlyTouchend)="endReadonlyTouchScroll()"></app-monhoc-kiemtra-danhgia>
             </section>
             }
             </div>
-            @if (!activeModeAllowed()) {
-            <div class="course-detail-readonly-overlay" aria-hidden="true"></div>
+            @if (!activeModeAllowed() && activeTabId() !== 'sinh-de') {
+            <div class="course-detail-readonly-overlay" aria-hidden="true"
+                (click)="forwardReadonlyTabClick($event)"
+                (wheel)="forwardReadonlyWheel($event)"
+                (touchstart)="startReadonlyTouchScroll($event)"
+                (touchmove)="moveReadonlyTouchScroll($event)"
+                (touchend)="endReadonlyTouchScroll()"
+                (touchcancel)="endReadonlyTouchScroll()"></div>
             }
         </div>
         }

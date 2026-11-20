@@ -37,6 +37,7 @@ import { CtdtService } from '@modules/shared/services/ctdt.service';
 import { DonViService } from '@modules/shared/services/don-vi.service';
 import { ElnChuyenMucService } from '@modules/shared/services/elearning-chuyen-muc.service';
 import { ElnKhoaHocService } from '@modules/shared/services/elearning-khoa-hoc.service';
+import { ElngUserProfileService } from '@modules/shared/services/elearning-user-profile.service';
 
 interface CourseRow extends ElnKhoaHoc {
     teacherName?: string;
@@ -62,6 +63,7 @@ export class CourseManagementComponent {
     private readonly ctdtService = inject(CtdtService);
     private readonly donViService = inject(DonViService);
     private readonly chuyenMucService = inject(ElnChuyenMucService);
+    private readonly userProfileService = inject(ElngUserProfileService);
     private readonly auth = inject(AuthService);
     private readonly userService = inject(UserService);
     private readonly notificationService = inject(NotificationService);
@@ -89,6 +91,16 @@ export class CourseManagementComponent {
     readonly deletingCourseId = signal<number | null>(null);
     readonly downloadProgress = signal(0);
     readonly downloadMessage = signal('');
+    readonly scopedCategoryId = signal<number | null>(null);
+    readonly scopedDepartmentId = signal<number | null>(null);
+
+    readonly isLecturer: boolean;
+    readonly isFacultyLeader: boolean;
+    readonly isDepartmentLeader: boolean;
+    readonly isTrainingOrAdmin: boolean;
+    readonly showCategoryFilter: boolean;
+    readonly showProgrammeFilter: boolean;
+    readonly courseListReturnUrl: string;
 
     readonly canClone: boolean;
     readonly canDelete: boolean;
@@ -96,8 +108,16 @@ export class CourseManagementComponent {
     private requestId = 0;
 
     constructor() {
-        const routePath = this.router.url.replace(/^\/admin\//, '').split('?')[0];
+        const routePath = this.router.url.replace(/^\/admin\//, '').split('?')[0].replace(/\/+$/, '');
+        const roleRoute = routePath.split('/')[0];
         const canManage = this.auth.hasRouter(ROUTERS.admin) || this.auth.hasRouter(ROUTERS.daotao);
+        this.isLecturer = roleRoute === ROUTERS.giangvien;
+        this.isFacultyLeader = roleRoute === ROUTERS.lanhdao_khoa;
+        this.isDepartmentLeader = roleRoute === ROUTERS.lanhdao_bomon;
+        this.isTrainingOrAdmin = roleRoute === ROUTERS.admin || roleRoute === ROUTERS.daotao;
+        this.showCategoryFilter = this.isTrainingOrAdmin;
+        this.showProgrammeFilter = this.isTrainingOrAdmin;
+        this.courseListReturnUrl = `/admin/${routePath}`;
         this.canClone = canManage && (this.auth.userCanEdit(routePath) || this.auth.userCanEdit('quanly-monhoc'));
         this.canDelete = canManage && (this.auth.userCanDelete(routePath) || this.auth.userCanDelete('quanly-monhoc'));
         this.canDownload = canManage || (key_server === 'hvu' && this.auth.userCanAccess(routePath));
@@ -105,7 +125,51 @@ export class CourseManagementComponent {
 
     ngOnInit(): void {
         this.loadFilterOptions();
+        this.loadRoleScope();
+    }
+
+    private loadRoleScope(): void {
+        this.state.set('loading');
+        this.errorMessage.set('');
+        if (this.isFacultyLeader || this.isDepartmentLeader) {
+            this.userProfileService.getElngUserProfileByCol('user_id', String(this.auth.user.id)).pipe(
+                takeUntilDestroyed(this.destroyRef)
+            ).subscribe({
+                next: profiles => {
+                    const profile = profiles?.[0];
+                    if (this.isFacultyLeader) {
+                        const categoryId = Number(profile?.donvi_chuyenmon_id);
+                        this.scopedCategoryId.set(Number.isSafeInteger(categoryId) && categoryId > 0 ? categoryId : null);
+                    }
+                    if (this.isDepartmentLeader) {
+                        const departmentId = Number(profile?.bomon_id);
+                        this.scopedDepartmentId.set(Number.isSafeInteger(departmentId) && departmentId > 0 ? departmentId : null);
+                    }
+                    if ((this.isFacultyLeader && this.scopedCategoryId() === null)
+                        || (this.isDepartmentLeader && this.scopedDepartmentId() === null)) {
+                        this.failRoleScope('Tài khoản chưa được phân công phạm vi Khoa hoặc Bộ môn trong hệ thống.');
+                        return;
+                    }
+                    this.loadCourses(1, true);
+                },
+                error: () => {
+                    this.scopedCategoryId.set(null);
+                    this.scopedDepartmentId.set(null);
+                    this.failRoleScope('Không thể xác định phạm vi dữ liệu. Vui lòng thử lại.');
+                }
+            });
+            return;
+        }
         this.loadCourses(1, true);
+    }
+
+    retryLoadCourses(): void {
+        this.loadRoleScope();
+    }
+
+    private failRoleScope(message: string): void {
+        this.state.set('error');
+        this.errorMessage.set(message);
     }
 
     private loadFilterOptions(): void {
@@ -147,15 +211,53 @@ export class CourseManagementComponent {
 
     loadCourses(page = 1, resetPaginator = false): void {
         const requestId = ++this.requestId;
+        if ((this.isFacultyLeader && this.scopedCategoryId() === null)
+            || (this.isDepartmentLeader && this.scopedDepartmentId() === null)) {
+            this.failRoleScope('Không thể xác định phạm vi dữ liệu. Vui lòng thử lại.');
+            return;
+        }
         this.state.set('loading');
         this.errorMessage.set('');
-        const conditions: OvicConditionParam[] = [
+        const commonConditions: OvicConditionParam[] = [
             { conditionName: 'status', condition: OvicQueryCondition.greaterThan, value: '-1', orWhere: 'and' }
         ];
         const query = this.searchValue().trim();
-        if (query) conditions.push({ conditionName: 'title', condition: OvicQueryCondition.like, value: `%${query}%`, orWhere: 'and' });
-        if (this.categoryId() !== null) conditions.push({ conditionName: 'category_ids', condition: OvicQueryCondition.equal, value: String(this.categoryId()), orWhere: 'and' });
-        if (this.ctdtId() !== null) conditions.push({ conditionName: 'ctdt_ids', condition: OvicQueryCondition.like, value: `%${this.ctdtId()}%`, orWhere: 'and' });
+        if (query) commonConditions.push({ conditionName: 'title', condition: OvicQueryCondition.like, value: `%${query}%`, orWhere: 'and' });
+        if (this.categoryId() !== null) commonConditions.push({ conditionName: 'category_ids', condition: OvicQueryCondition.equal, value: String(this.categoryId()), orWhere: 'and' });
+        if (this.ctdtId() !== null) commonConditions.push({ conditionName: 'ctdt_ids', condition: OvicQueryCondition.like, value: `%${this.ctdtId()}%`, orWhere: 'and' });
+
+        let conditions: OvicConditionParam[];
+        if (this.isLecturer) {
+            const userId = String(this.auth.user.id);
+            // Repeat shared filters so both sides of the assignment OR stay constrained.
+            const lecturerAssignmentConditions: OvicConditionParam[] = [
+                { conditionName: 'creator_plan_id', condition: OvicQueryCondition.equal, value: userId, orWhere: 'and' },
+                ...commonConditions.map((condition, index) => ({
+                    ...condition,
+                    orWhere: index === 0 ? 'or' : 'and'
+                })),
+                { conditionName: 'creator_exam_id', condition: OvicQueryCondition.equal, value: userId, orWhere: 'and' }
+            ];
+            conditions = [...commonConditions, ...lecturerAssignmentConditions];
+        } else {
+            conditions = [...commonConditions];
+        }
+        if (!this.isLecturer && this.isFacultyLeader) {
+            conditions.push({
+                conditionName: 'category_ids',
+                condition: OvicQueryCondition.equal,
+                value: String(this.scopedCategoryId()),
+                orWhere: 'and'
+            });
+        }
+        if (!this.isLecturer && this.isDepartmentLeader) {
+            conditions.push({
+                conditionName: 'nganh_bomon_id',
+                condition: OvicQueryCondition.equal,
+                value: String(this.scopedDepartmentId()),
+                orWhere: 'and'
+            });
+        }
         const option: ConditionOption = {
             condition: conditions,
             set: [{ label: 'limit', value: String(this.table.paginator.rows()) }, { label: 'orderby', value: 'title' }, { label: 'order', value: 'ASC' }],
@@ -164,7 +266,8 @@ export class CourseManagementComponent {
         this.courseService.getKhoaHocByPageNew_2(option).pipe(
             switchMap(response => {
                 const courses = (response.data || []) as CourseRow[];
-                const teacherIds = [...new Set(courses.map(course => course.creator_plan_id).filter((id): id is number => Number.isFinite(id)))];
+                const teacherIds = [...new Set(courses.flatMap(course => [course.creator_plan_id, course.creator_exam_id])
+                    .map(id => Number(id)).filter(id => Number.isSafeInteger(id) && id > 0))];
                 const teacherOption: ConditionOption = {
                     condition: [],
                     set: [
@@ -187,10 +290,13 @@ export class CourseManagementComponent {
         ).subscribe({
             next: ({ response, users }) => {
                 if (requestId !== this.requestId) return;
-                const teacherNames = new Map(users.map(user => [user.id, user.display_name]));
+                const teacherNames = new Map(users.map(user => [String(user.id), user.display_name]));
                 const courses = (response.data || []) as CourseRow[];
                 courses.forEach(course => {
-                    course.teacherName = teacherNames.get(course.creator_plan_id) || 'Chưa phân quyền';
+                    const teacherId = this.isLecturer && String(course.creator_exam_id) === String(this.auth.user.id)
+                        ? course.creator_exam_id
+                        : course.creator_plan_id;
+                    course.teacherName = teacherNames.get(String(teacherId)) || 'Chưa phân quyền';
                 });
                 const total = Number(response.recordsFiltered) || 0;
                 this.table.fillRawData({ data: courses, recordsFiltered: total, recordsTotal: total, draw: 1 }, { paged: page, resetPaginator });

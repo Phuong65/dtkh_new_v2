@@ -357,6 +357,7 @@
     z-index: 1;
     background: transparent;
     cursor: default;
+    touch-action: none;
 }
 
 .course-detail-tab-panel {
