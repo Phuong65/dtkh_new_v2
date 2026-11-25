@@ -621,6 +621,24 @@ input.admin-wrap-table__input::placeholder,
 	border-bottom: 1px solid #cbd5e1;
 }
 
+/* Paired with the full-border header; content determines the body height. */
+.ictu-assessment-body {
+	box-sizing: border-box;
+	width: 100%;
+	min-width: 0;
+	padding: 20px;
+	overflow-x: auto;
+	border: 1px solid #cbd5e1;
+	border-top: 0;
+	background: #ffffff;
+}
+
+@media (max-width: 640px) {
+	.ictu-assessment-body {
+		padding: 14px;
+	}
+}
+
 @media (max-width: 560px) {
 	.ictu-assessment-header {
 		flex-wrap: wrap;

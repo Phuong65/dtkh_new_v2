@@ -583,15 +583,9 @@
 
 .panel-text-av-tx,
 .dg-lesson-card {
-    overflow: hidden;
     margin: 0 0 14px;
-    border: 1px solid #cbd5e1;
-    border-radius: 4px;
     background: #ffffff;
-    box-shadow: none;
 }
-
-
 
 .form-de-tab-panel--dg .ictu-assessment-header .blue {
     display: inline-flex;

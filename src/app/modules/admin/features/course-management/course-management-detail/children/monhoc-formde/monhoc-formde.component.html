@@ -163,9 +163,10 @@
         [ngClass]="course_form_duyet[typeTest] && course_form_duyet[typeTest]['status'] === 1?'form-da-duyet':''">
         <div class="form-tracnghiem-panel-content">
             <div class="form-tracnghiem-panel-content-table">
-                <header class="ictu-assessment-header ictu-assessment-header--inside-card">
+                <header class="ictu-assessment-header">
                     <strong>{{typeTest | showlabel :list_tab:'key':'label'}}</strong>
                 </header>
+                <div class="ictu-assessment-body">
                 @switch (selectedCourse.av) {
                 @default {
                 <div class="content-table-cauhoi">
@@ -333,6 +334,7 @@
                 </div>
                 }
                 }
+                </div>
             </div>
             @if (!course_form_duyet[typeTest] || course_form_duyet[typeTest]['status'] !== 1) {
             <div class="form-tracnghiem-panel-content-footer">
@@ -428,12 +430,13 @@
                 <div class="content-table-cauhoi dg-lesson-card-list">
                     @for (row of list_test_dg; track row) {
                     <article class="dg-lesson-card">
-                        <header class="ictu-assessment-header ictu-assessment-header--inside-card">
+                        <header class="ictu-assessment-header">
                             <strong>{{label_week +' '+row['week']}}</strong>
                             @if (row['has_test']) {
                             <span class="cc-status-badge"><i class="ti ti-check"></i> Đã có đề</span>
                             }
                         </header>
+                        <div class="ictu-assessment-body">
                         <section class="dg-lesson-section">
                             <div class="dg-lesson-section-title">
                                 <div class="dg-question-heading">
@@ -563,6 +566,7 @@
                         <div class="dg-lesson-section-summary dg-lesson-total-summary">
                             Tổng số câu lấy: {{getDgLessonTotalTake(row)}}
                         </div>
+                        </div>
                     </article>
                     }
                 </div>
@@ -571,12 +575,13 @@
                 <div class="content-table-cauhoi dg-lesson-card-list">
                     @for (row of list_test_dg; track row) {
                     <article class="dg-lesson-card">
-                        <header class="ictu-assessment-header ictu-assessment-header--inside-card">
+                        <header class="ictu-assessment-header">
                             <strong>{{label_week +' '+row['week']}}</strong>
                             @if (row['has_test']) {
                             <span class="cc-status-badge"><i class="ti ti-check"></i> Đã có đề</span>
                             }
                         </header>
+                        <div class="ictu-assessment-body">
                         <section class="dg-lesson-section">
                             <div class="dg-lesson-section-title">
                                 <div class="dg-question-heading">
@@ -702,6 +707,7 @@
                         <div class="dg-lesson-section-summary dg-lesson-total-summary">
                             Tổng số câu lấy: {{getDgLessonTotalTake(row)}}
                         </div>
+                        </div>
                     </article>
                     }
                 </div>
@@ -742,7 +748,7 @@
                     <div class="panel-text-av-tx">
                         <p-panel>
                             <ng-template pTemplate="header">
-                                <div class="ictu-assessment-header ictu-assessment-header--inside-card">
+                                <div class="ictu-assessment-header">
                                     <strong style="flex:1;margin-right: 10px; display:flex; justify-content: space-between;">
                                         {{test.title}}
                                         @if (test['has_test']) {
@@ -773,7 +779,7 @@
                                     }
                                 </div>
                             </ng-template>
-                            <div class="panel-av-test-content">
+                            <div class="panel-av-test-content ictu-assessment-body">
                                 <p-table [value]="test['weeks_test']" styleClass="tbl-danhSachUser table-reBorder">
                                     <ng-template pTemplate="header">
                                         <tr>
@@ -878,7 +884,7 @@
                     <div class="panel-text-av-tx">
                         <p-panel>
                             <ng-template pTemplate="header">
-                                <div class="ictu-assessment-header ictu-assessment-header--inside-card">
+                                <div class="ictu-assessment-header">
                                     <strong style="flex:1;margin-right: 10px; display:flex; justify-content: space-between;">
                                         {{test.title}}
                                         @if (test['has_test']) {
@@ -909,7 +915,7 @@
                                     }
                                 </div>
                             </ng-template>
-                            <div class="panel-av-test-content">
+                            <div class="panel-av-test-content ictu-assessment-body">
                                 <p-table [value]="test['weeks_test']" styleClass="tbl-danhSachUser table-reBorder">
                                     <ng-template pTemplate="header">
                                         <tr>
@@ -1066,7 +1072,7 @@
                     <div class="panel-text-av-tx">
                         <p-panel>
                             <ng-template pTemplate="header">
-                                <div class="ictu-assessment-header ictu-assessment-header--inside-card">
+                                <div class="ictu-assessment-header">
                                     <strong style="flex:1;margin-right: 10px; display:flex; justify-content: space-between;">
                                         {{test.title}}
                                     </strong>
@@ -1097,7 +1103,7 @@
                                     }
                                 </div>
                             </ng-template>
-                            <div class="panel-av-test-content">
+                            <div class="panel-av-test-content ictu-assessment-body">
                                 <p-table [value]="test['weeks_test']" styleClass="tbl-danhSachUser table-reBorder">
                                     <ng-template pTemplate="header">
                                         <tr>
