@@ -394,7 +394,7 @@
 }
 
 .cc-status-badge,
-.form-de-tab-panel--tntx .test-card-header .cc-status-badge {
+.form-de-tab-panel--tntx .ictu-assessment-header .cc-status-badge {
     display: inline-flex;
     min-height: 24px;
     align-items: center;
@@ -533,19 +533,8 @@
 
 :host ::ng-deep .form-de-tab-panel--tntx .panel-text-av-tx .p-panel-header {
     padding: 0;
-    border-bottom: 0 !important;
-    background: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
-}
-
-:host ::ng-deep .form-de-tab-panel--tntx .p-panel-header .test-card-header strong {
-    display: inline-flex;
-    min-height: 30px;
-    align-items: center;
-    margin-right: 0 !important;
-    padding: 4px 11px;
-    border-radius: 6px;
-    color: #1e40af;
-    font-weight: 500 !important;
+    border: 0 !important;
+    background: transparent;
 }
 
 :host ::ng-deep .form-de-tab-panels .p-panel-content {
@@ -596,48 +585,15 @@
 .dg-lesson-card {
     overflow: hidden;
     margin: 0 0 14px;
-    border: 1px solid #edf2f7;
+    border: 1px solid #cbd5e1;
     border-radius: 4px;
     background: #ffffff;
     box-shadow: none;
 }
 
-.dg-lesson-card-header {
-    position: relative;
-    display: flex;
-    min-height: 48px;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 9px 14px 9px 18px;
-    border-bottom: 1px solid #bfdbfe;
-    background: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
-    color: #1e3a8a;
-}
 
-.dg-lesson-card-header::before {
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 5px;
-    background: #2563eb;
-    content: '';
-}
 
-.form-de-tab-panel--cc .dg-lesson-card-header strong {
-    display: inline-flex;
-    align-items: center;
-    min-height: 30px;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    color: #1e3a8a;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: .01em;
-}
-
-.dg-lesson-card-header .blue {
+.form-de-tab-panel--dg .ictu-assessment-header .blue {
     display: inline-flex;
     min-height: 26px;
     align-items: center;
@@ -650,41 +606,7 @@
     font-weight: 650;
 }
 
-.test-card-header,
-.dg-lesson-card-header {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    width: 100%;
-}
-
-.form-de-tab-panel--tntx .test-card-header {
-    min-height: 48px;
-    padding: 9px 14px 9px 18px;
-    border-bottom: 0;
-    background: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
-    color: #1e3a8a;
-    flex-wrap: wrap;
-}
-
-.form-de-tab-panel--tntx .test-card-header::before {
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 5px;
-    background: #2563eb;
-    content: '';
-}
-
-.test-card-header strong,
-.dg-lesson-card-header strong {
-    color: #334155;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.test-card-header>div {
+.form-de-tab-panel--tntx .ictu-assessment-header > div {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -699,7 +621,7 @@
     font-weight: 500 !important;
 }
 
-.form-de-tab-panel--tntx .test-card-header .blue {
+.form-de-tab-panel--tntx .ictu-assessment-header .blue {
     display: inline-flex;
     min-height: 24px;
     align-items: center;
@@ -713,7 +635,7 @@
     font-weight: 500;
 }
 
-.test-card-header .ictu-admin-icon-button {
+.form-de-tab-panel--tntx .ictu-assessment-header .ictu-admin-icon-button {
     width: 34px !important;
     min-width: 34px !important;
     height: 34px !important;
@@ -721,7 +643,7 @@
     border-radius: 4px !important;
 }
 
-.test-card-header .ictu-admin-icon-button i {
+.form-de-tab-panel--tntx .ictu-assessment-header .ictu-admin-icon-button i {
     font-size: 16px !important;
 }
 
@@ -1163,8 +1085,8 @@
     font-size: 14px !important;
 }
 
-:host ::ng-deep #formde-panel-DG :is(strong, b, th, label),
-:host ::ng-deep #formde-panel-DG :is(.dg-lesson-card-header strong, .dg-lesson-section-title, .dg-lesson-total-summary, .tuluan15p-total-score) {
+:host ::ng-deep #formde-panel-DG :is(strong:not(.ictu-assessment-header strong), b, th, label),
+:host ::ng-deep #formde-panel-DG :is(.dg-lesson-section-title, .dg-lesson-total-summary, .tuluan15p-total-score) {
     font-weight: 500 !important;
 }
 

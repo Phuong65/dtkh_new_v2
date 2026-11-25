@@ -163,7 +163,7 @@
         [ngClass]="course_form_duyet[typeTest] && course_form_duyet[typeTest]['status'] === 1?'form-da-duyet':''">
         <div class="form-tracnghiem-panel-content">
             <div class="form-tracnghiem-panel-content-table">
-                <header class="dg-lesson-card-header">
+                <header class="ictu-assessment-header ictu-assessment-header--inside-card">
                     <strong>{{typeTest | showlabel :list_tab:'key':'label'}}</strong>
                 </header>
                 @switch (selectedCourse.av) {
@@ -428,7 +428,7 @@
                 <div class="content-table-cauhoi dg-lesson-card-list">
                     @for (row of list_test_dg; track row) {
                     <article class="dg-lesson-card">
-                        <header class="dg-lesson-card-header">
+                        <header class="ictu-assessment-header ictu-assessment-header--inside-card">
                             <strong>{{label_week +' '+row['week']}}</strong>
                             @if (row['has_test']) {
                             <span class="cc-status-badge"><i class="ti ti-check"></i> Đã có đề</span>
@@ -571,7 +571,7 @@
                 <div class="content-table-cauhoi dg-lesson-card-list">
                     @for (row of list_test_dg; track row) {
                     <article class="dg-lesson-card">
-                        <header class="dg-lesson-card-header">
+                        <header class="ictu-assessment-header ictu-assessment-header--inside-card">
                             <strong>{{label_week +' '+row['week']}}</strong>
                             @if (row['has_test']) {
                             <span class="cc-status-badge"><i class="ti ti-check"></i> Đã có đề</span>
@@ -742,7 +742,7 @@
                     <div class="panel-text-av-tx">
                         <p-panel>
                             <ng-template pTemplate="header">
-                                <div class="test-card-header">
+                                <div class="ictu-assessment-header ictu-assessment-header--inside-card">
                                     <strong style="flex:1;margin-right: 10px; display:flex; justify-content: space-between;">
                                         {{test.title}}
                                         @if (test['has_test']) {
@@ -878,7 +878,7 @@
                     <div class="panel-text-av-tx">
                         <p-panel>
                             <ng-template pTemplate="header">
-                                <div class="test-card-header">
+                                <div class="ictu-assessment-header ictu-assessment-header--inside-card">
                                     <strong style="flex:1;margin-right: 10px; display:flex; justify-content: space-between;">
                                         {{test.title}}
                                         @if (test['has_test']) {
@@ -1066,7 +1066,7 @@
                     <div class="panel-text-av-tx">
                         <p-panel>
                             <ng-template pTemplate="header">
-                                <div class="test-card-header">
+                                <div class="ictu-assessment-header ictu-assessment-header--inside-card">
                                     <strong style="flex:1;margin-right: 10px; display:flex; justify-content: space-between;">
                                         {{test.title}}
                                     </strong>

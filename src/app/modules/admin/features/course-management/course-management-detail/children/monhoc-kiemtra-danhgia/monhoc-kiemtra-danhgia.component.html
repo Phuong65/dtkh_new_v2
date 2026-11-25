@@ -25,16 +25,16 @@
 
         <div class="assessment-content" [attr.inert]="readonlyMode ? '' : null">
         <section id="assessment-panel-practice" class="assessment-panel" role="tabpanel" [hidden]="tabIndex !== 0">
-            <div class="admin-wrap-table ictu-admin-table-shell assessment-table-card">
-                <header class="admin-wrap-table__head assessment-card-head">
-                    <div>
-                        <h2 class="admin-wrap-table__heading assessment-card-title">
-                            <i class="ti ti-clipboard-check" aria-hidden="true"></i>
-                            <span>Luyện tập tại nhà{{ !isDttx && key_server !== 'hvu' ? ' và kiểm tra 15 phút' : '' }}</span>
+            <section class="assessment-table-card course-detail-card"
+                aria-labelledby="assessment-practice-title">
+                <header class="course-detail-card__header ictu-assessment-header">
+                    <div class="course-detail-card__heading">
+                        <h2 id="assessment-practice-title" class="course-detail-card__title">
+                            Luyện tập tại nhà{{ !isDttx && key_server !== 'hvu' ? ' và kiểm tra 15 phút' : '' }}
                         </h2>
                     </div>
                 </header>
-                <div class="admin-wrap-table__body ictu-admin-table-shell__body">
+                <div class="course-detail-card__body">
                     <div class="ictu-admin-table-scroll assessment-table-scroll">
                         <p-table [value]="list_week" tableStyleClass="admin-table assessment-grid-table">
                             <ng-template pTemplate="header">
@@ -103,17 +103,24 @@
                         </p-table>
                     </div>
                 </div>
-            </div>
+            </section>
         </section>
 
         <section id="assessment-panel-regular" class="assessment-panel" role="tabpanel" [hidden]="tabIndex !== 1">
             @if (showTests) {
             <div class="assessment-test-workspace" [class.is-collapsed]="closeLeft">
-                <aside class="assessment-test-sidebar" aria-label="Danh sách bài kiểm tra">
-                    <header><span>Danh sách bài kiểm tra</span><button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
-                        (click)="closeLeftBody()" [attr.aria-label]="closeLeft ? 'Mở danh sách' : 'Thu gọn danh sách'">
-                        <i [class]="closeLeft ? 'ti ti-chevrons-right' : 'ti ti-chevrons-left'" aria-hidden="true"></i></button></header>
-                    <div class="assessment-test-list">
+                <aside class="assessment-test-sidebar course-detail-card" aria-labelledby="assessment-list-title">
+                    <header class="course-detail-card__header ictu-assessment-header">
+                        <div class="course-detail-card__heading">
+                            <h2 id="assessment-list-title" class="course-detail-card__title">Danh sách bài kiểm tra</h2>
+                        </div>
+                        <button type="button" class="btn ictu-button-info-light ictu-admin-icon-button"
+                            (click)="closeLeftBody()" [attr.aria-label]="closeLeft ? 'Mở danh sách' : 'Thu gọn danh sách'"
+                            [attr.aria-expanded]="!closeLeft" aria-controls="assessment-test-list">
+                            <i [class]="closeLeft ? 'ti ti-chevrons-right' : 'ti ti-chevrons-left'" aria-hidden="true"></i>
+                        </button>
+                    </header>
+                    <div id="assessment-test-list" class="assessment-test-list course-detail-card__body">
                         @for (parent of list_plan; track parent.id) {
                         <section class="assessment-test-group">
                             @if (parent.title) { <h3>{{ parent.title }}</h3> }
@@ -135,11 +142,13 @@
                     @case ('THUONGXUYEN_TULUAN') { <app-thuongxuyen-tuluan-v2 [courseSelected]="selectedCourse" [activity]="selectPlan"></app-thuongxuyen-tuluan-v2> }
                     @case ('THUONGXUYEN_DUAN') { <app-thuongxuyen-duan [courseSelected]="selectedCourse" [activity]="selectPlan"></app-thuongxuyen-duan> }
                     @case ('THUONGXUYEN_TRACNGHIEM') {
-                    <div class="assessment-mcq-card">
-                        <header class="admin-wrap-table__head top-tuluan-layout assessment-mcq-header">
-                            <h2 class="admin-wrap-table__heading">{{ selectPlan.title }}</h2>
+                    <div class="assessment-mcq-card course-detail-card" aria-labelledby="assessment-mcq-title">
+                        <header class="course-detail-card__header ictu-assessment-header">
+                            <div class="course-detail-card__heading">
+                                <h2 id="assessment-mcq-title" class="course-detail-card__title">{{ selectPlan.title }}</h2>
+                            </div>
                         </header>
-                        <div class="assessment-mcq-body">
+                        <div class="assessment-mcq-body course-detail-card__body">
                             <div class="assessment-mcq-statuses">
                                 <span class="assessment-chip assessment-chip--info">Câu hỏi duyệt: {{ selectPlan['has_question'] }}</span>
                                 <span class="assessment-chip" [class.is-ready]="selectPlan['has_form_test']">{{ selectPlan['has_form_test'] ? 'Đã tạo form đề' : 'Chưa tạo form đề' }}</span>

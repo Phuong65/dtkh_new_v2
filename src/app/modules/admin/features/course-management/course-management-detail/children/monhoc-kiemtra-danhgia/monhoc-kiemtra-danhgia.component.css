@@ -3,7 +3,7 @@
     height: 100%;
     min-height: 0;
     color: #334155;
-    font-family: var(--primary-font-family), 'Be Vietnam Pro', 'Noto Sans', sans-serif;
+    font-family: var(--primary-font-family), sans-serif;
     font-size: 14px;
 }
 
@@ -86,6 +86,7 @@
 
 .assessment-panel {
     flex: 1 1 auto;
+    min-width: 0;
     min-height: 0;
     height: 100%;
     box-sizing: border-box;
@@ -94,68 +95,7 @@
 }
 
 .assessment-panel[hidden] { display: none; }
-
-.assessment-table-card.ictu-admin-table-shell {
-    width: min(1180px, 100%);
-    height: auto !important;
-    min-height: 0 !important;
-    margin: 0 auto;
-    overflow: visible;
-    border: 1px solid #e2e8f0;
-    border-radius: var(--admin-wrap-table-element-radius, 4px);
-    background: #fff;
-    box-shadow: none;
-}
-
-.assessment-card-head.admin-wrap-table__head {
-    position: relative;
-    display: flex;
-    min-height: 52px;
-    align-items: center;
-    padding: 8px 14px;
-    border: 0;
-    border-bottom: 1px solid #cbd5e1;
-    border-radius: var(--admin-wrap-table-element-radius, 4px) var(--admin-wrap-table-element-radius, 4px) 0 0;
-    background: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
-}
-
-.assessment-card-head.admin-wrap-table__head::before {
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 4px;
-    border-top-left-radius: var(--admin-wrap-table-element-radius, 4px);
-    background: #2563eb;
-    content: '';
-}
-
-.assessment-card-head .admin-wrap-table__heading {
-    color: #334155;
-    margin: 0;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0;
-    line-height: 1.35;
-}
-
-.assessment-card-title {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.assessment-card-title i {
-    display: inline-flex;
-    width: 28px;
-    height: 28px;
-    flex: 0 0 28px;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #dbeafe;
-    border-radius: 6px;
-    background: #eff6ff;
-    color: #2563eb;
-    font-size: 15px;
-}
+.assessment-table-card { width: min(1180px, 100%); margin: 0 auto; }
 .assessment-table-scroll { overflow-x: auto; }
 :host ::ng-deep .assessment-grid-table { min-width: 920px; }
 :host ::ng-deep .assessment-grid-table .col-week { width: 110px; }
@@ -167,15 +107,9 @@
     border-bottom: 1px solid #eef2f7;
     vertical-align: middle;
 }
-
 :host ::ng-deep .assessment-grid-table th:first-child,
-:host ::ng-deep .assessment-grid-table td:first-child {
-    border-left: 0;
-}
-
-:host ::ng-deep .assessment-grid-table thead tr:first-child th {
-    border-top: 0;
-}
+:host ::ng-deep .assessment-grid-table td:first-child { border-left: 0; }
+:host ::ng-deep .assessment-grid-table thead tr:first-child th { border-top: 0; }
 .cell-center { text-align: center; }
 
 .assessment-week-badge,
@@ -194,20 +128,12 @@
     font-weight: 600;
     white-space: nowrap;
 }
-
 .assessment-week-badge { background: #eef2ff; color: #4f46e5; }
 .assessment-status.is-ready,
 .assessment-chip.is-ready { background: #dcfce7; color: #15803d; }
 .assessment-chip--info { background: #dbeafe; color: #1d4ed8; }
 .assessment-warning { color: #c2410c; font-size: 13px; line-height: 1.4; }
-
-.assessment-action-group {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-}
-
+.assessment-action-group { display: flex; align-items: center; justify-content: center; gap: 7px; }
 .assessment-action-cell {
     display: flex;
     min-height: 36px;
@@ -216,9 +142,7 @@
     justify-content: center;
     gap: 5px;
 }
-
 .assessment-action-cell .assessment-warning { text-align: center; }
-
 .assessment-action-group .mdc-button,
 .assessment-mcq-actions .mdc-button { min-height: 34px; font-size: 14px; }
 .assessment-empty { padding: 30px 16px !important; color: #64748b; text-align: center; }
@@ -228,38 +152,14 @@
     width: min(1280px, 100%);
     min-height: calc(100vh - 190px);
     grid-template-columns: 330px minmax(0, 1fr);
+    align-items: start;
     gap: 16px;
     margin: 0 auto;
-    background: transparent;
-    overflow: visible;
 }
-
-.assessment-test-sidebar {
-    min-width: 0;
-    border: 1px solid #e2e8f0;
-    border-radius: var(--admin-wrap-table-element-radius, 4px);
-    background: #fff;
-    overflow: hidden;
-    box-shadow: 0 1px 2px rgb(15 23 42 / 4%);
-}
-
-.assessment-test-sidebar > header {
-    display: flex;
-    min-height: 54px;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 8px 12px 8px 16px;
-    border-bottom: 1px solid #e2e8f0;
-    color: #334155;
-    font-weight: 650;
-}
-
-.assessment-test-list { max-height: calc(100vh - 225px); padding: 10px; overflow-y: auto; }
+.assessment-test-list { max-height: calc(100vh - 225px); overflow-y: auto; }
 .assessment-test-group { margin-bottom: 10px; border: 1px solid #e2e8f0; border-radius: 4px; overflow: hidden; }
 .assessment-test-group:last-child { margin-bottom: 0; }
 .assessment-test-group h3 { margin: 0; padding: 10px 12px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; color: #475569; font-size: 14px; font-weight: 650; }
-
 .assessment-test-item {
     display: grid;
     width: calc(100% - 12px);
@@ -277,36 +177,23 @@
     text-align: left;
     cursor: pointer;
 }
-
 .assessment-test-item:last-child { border-bottom: 1px solid #e2e8f0; }
 .assessment-test-item:hover:not(:disabled) { border-color: #bfdbfe; background: #f8fafc; color: #1d4ed8; }
 .assessment-test-item.is-active { border-color: #93c5fd; background: #eff6ff; color: #1d4ed8; font-weight: 600; box-shadow: inset 3px 0 0 #2563eb; }
 .assessment-test-item small { color: #94a3b8; font-size: 12px; }
-.assessment-test-content {
-    position: relative;
-    min-width: 0;
-    min-height: 550px;
-    padding: 16px;
-    border: 1px solid #e2e8f0;
-    border-radius: var(--admin-wrap-table-element-radius, 4px);
-    background: #f8fafc;
-    overflow: auto;
-    box-shadow: 0 1px 2px rgb(15 23 42 / 4%);
-}
+.assessment-test-content { position: relative; min-width: 0; min-height: 550px; }
 .assessment-test-content > app-thuongxuyen-tuluan-v2,
 .assessment-test-content > app-thuongxuyen-duan { display: block; min-height: 100%; }
-
 .assessment-test-content > app-thuongxuyen-tuluan-v2 ::ng-deep .tuluan-layout,
 .assessment-test-content > app-thuongxuyen-duan ::ng-deep .duan-layout {
     min-height: 0;
     padding: 0;
     background: transparent;
 }
-
-.assessment-test-workspace.is-collapsed { grid-template-columns: 55px minmax(0, 1fr); gap: 16px; }
-.assessment-test-workspace.is-collapsed .assessment-test-sidebar > header span,
+.assessment-test-workspace.is-collapsed { grid-template-columns: 55px minmax(0, 1fr); }
+.assessment-test-workspace.is-collapsed .assessment-test-sidebar .course-detail-card__heading,
 .assessment-test-workspace.is-collapsed .assessment-test-list { display: none; }
-.assessment-test-workspace.is-collapsed .assessment-test-sidebar > header { padding: 8px; justify-content: center; }
+.assessment-test-workspace.is-collapsed .assessment-test-sidebar > .course-detail-card__header { padding: 8px; justify-content: center; }
 
 .assessment-placeholder,
 .assessment-empty-state {
@@ -323,53 +210,12 @@
     color: #64748b;
     text-align: center;
 }
-
 .assessment-placeholder { min-height: 100%; border: 0; border-radius: 0; }
 .assessment-placeholder i,
 .assessment-empty-state > i { color: #94a3b8; font-size: 38px; }
 .assessment-empty-state strong { color: #334155; font-size: 16px; }
 .assessment-empty-state p { margin: 0; }
-
-.assessment-mcq-card {
-    width: 100%;
-    margin: 0;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    background: #fff;
-    overflow: hidden;
-}
-
-.assessment-mcq-header.admin-wrap-table__head {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-    min-height: 56px;
-    padding: 10px 16px 10px 20px;
-    border: 0;
-    border-bottom: 1px solid #cbd5e1;
-    background: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
-}
-
-.assessment-mcq-header.admin-wrap-table__head::before {
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 5px;
-    background: #2563eb;
-    content: '';
-}
-
-.assessment-mcq-header .admin-wrap-table__heading {
-    margin: 0;
-    min-width: 0;
-    color: #1e3a8a;
-    font-size: 15px;
-    font-weight: 700;
-    overflow-wrap: anywhere;
-}
-
-.assessment-mcq-body { padding: 20px; }
+.assessment-mcq-card { width: 100%; margin: 0; }
 .assessment-mcq-statuses,
 .assessment-mcq-actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; }
 .assessment-mcq-actions { margin-top: 16px; }
@@ -379,20 +225,15 @@
     .assessment-tabs button { min-width: max-content; }
     .assessment-test-workspace { grid-template-columns: 250px minmax(0, 1fr); }
 }
-
 @media (max-width: 680px) {
     .assessment-panel { padding: 10px; }
     .assessment-test-workspace,
     .assessment-test-workspace.is-collapsed { display: flex; min-height: auto; flex-direction: column; gap: 10px; }
-    .assessment-test-sidebar { border: 1px solid #e2e8f0; }
+    .assessment-test-sidebar,
+    .assessment-test-content { width: 100%; }
     .assessment-test-list { max-height: 260px; }
-    .assessment-test-workspace.is-collapsed .assessment-test-list { display: none; }
-    .assessment-test-content { min-height: 480px; padding: 10px; }
-    .assessment-mcq-header.admin-wrap-table__head { flex-wrap: wrap; }
-    .assessment-mcq-header .admin-wrap-table__heading { min-width: 0; overflow-wrap: anywhere; }
-    .assessment-mcq-body { padding: 16px; }
+    .assessment-test-content { min-height: 480px; }
 }
-
 @media (prefers-reduced-motion: reduce) {
     .assessment-tabs button,
     .assessment-test-item { transition: none; }

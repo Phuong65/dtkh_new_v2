@@ -13,18 +13,11 @@
     flex-wrap: nowrap;
     min-width: 0;
     border: 1px solid var(--cdr-border);
+    border-radius: var(--admin-wrap-table-element-radius, 4px);
     background: var(--cdr-surface);
     padding-left: 10px;
 }
 
-.cdr-question-table-shell__head {
-    gap: 12px;
-    padding: 14px 16px;
-    border: 0;
-    border-bottom: 1px solid var(--cdr-border);
-    border-radius: 8px 8px 0 0;
-    color: var(--cdr-heading);
-}
 
 .cdr-question-table-shell__heading {
     display: flex;
@@ -158,17 +151,17 @@
     transition: width 0.25s ease;
 }
 
-.cdr-sidebar__header {
+.cdr-sidebar__header:not(.ictu-assessment-header) {
     position: relative;
     z-index: 1;
     display: flex;
-    min-height: 64px;
+    min-height: 48px;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
-    padding: 10px 12px 10px 14px;
+    gap: 8px;
+    padding: 9px 14px 9px 18px;
     border-bottom: 1px solid #bfdbfe;
-    background: linear-gradient(135deg, #eaf3ff 0%, #f8fbff 70%, #ffffff 100%);
+    background: #eff6ff;
 }
 
 .cdr-sidebar__heading-group {

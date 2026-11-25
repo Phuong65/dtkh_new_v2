@@ -1,7 +1,7 @@
 <main class="duan-layout" [attr.aria-busy]="busy">
     @if (busy) { <app-loading-progress [heading]="progressHeading" backdropFilter="blur(2px)"></app-loading-progress> }
     <section class="admin-wrap-table ictu-admin-table-shell duan-table-card">
-    <header class="admin-wrap-table__head duan-table-head">
+    <header class="admin-wrap-table__head duan-table-head ictu-assessment-header">
         <span class="admin-wrap-table__heading">{{ activity.title }}</span>
         @if (activity && activity.ordering === 0) {
         <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse" (click)="createCodeTuluan()" [disabled]="state() === 'loading' || isSaving()"><i class="ti ti-plus"></i>Tạo dự án mới</button>

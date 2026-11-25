@@ -28,14 +28,15 @@
     <div class="cdr-workspace" [class.cdr-workspace--settings]="activeSubTabId() === 'kiem-tra-danh-gia'">
         <section id="cdr-panel-muc-tieu-chung" class="cdr-subpanel" role="tabpanel"
             aria-labelledby="cdr-tab-muc-tieu-chung" [hidden]="activeSubTabId() !== 'muc-tieu-chung'">
-        <section class="cdr-objective-card">
-            <header class="cdr-section-header">
-                <div class="cdr-section-title">
-                    <span class="cdr-header-icon" aria-hidden="true"><i class="ti ti-target"></i></span>
-                    <span>Mục tiêu chung</span>
+        <section class="cdr-objective-card course-detail-card" aria-labelledby="cdr-general-objective-title">
+            <header class="course-detail-card__header">
+                <span class="course-detail-card__icon" aria-hidden="true"><i class="ti ti-target"></i></span>
+                <div class="course-detail-card__heading">
+                    <h2 id="cdr-general-objective-title" class="course-detail-card__title">Mục tiêu chung</h2>
+                    <p class="course-detail-card__description">Xác định định hướng năng lực và kết quả mong đợi của học phần.</p>
                 </div>
             </header>
-            <div class="cdr-objective-body">
+            <div class="course-detail-card__body">
                 <ovic-editor height="180px" [formField]="generalObjectiveControl"
                     [default]="generalObjectiveControl.value"></ovic-editor>
                 <div class="cdr-section-footer">
@@ -51,13 +52,14 @@
 
         <section id="cdr-panel-co-clo" class="cdr-subpanel" role="tabpanel"
             aria-labelledby="cdr-tab-co-clo" [hidden]="activeSubTabId() !== 'co-clo'">
-        <section class="admin-wrap-table ictu-admin-table-shell cdr-table-card">
-            <header class="admin-wrap-table__head cdr-table-card__header">
-                <span class="admin-wrap-table__heading cdr-table-card__title">
-                    <span class="cdr-header-icon" aria-hidden="true"><i class="ti ti-list-check"></i></span>
-                    <span>Mục tiêu chi tiết (CO)</span>
-                </span>
-                <div class="admin-wrap-table__head-actions cdr-table-card__actions">
+        <section class="cdr-table-card course-detail-card" aria-labelledby="cdr-goals-title">
+            <header class="course-detail-card__header">
+                <span class="course-detail-card__icon" aria-hidden="true"><i class="ti ti-list-check"></i></span>
+                <div class="course-detail-card__heading">
+                    <h2 id="cdr-goals-title" class="course-detail-card__title">Mục tiêu chi tiết (CO)</h2>
+                    <p class="course-detail-card__description">Quản lý các mục tiêu cụ thể của học phần.</p>
+                </div>
+                <div class="course-detail-card__actions cdr-table-card__actions">
                     <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button"
                         (click)="addMuctieu()" [disabled]="isSaving()" aria-label="Thêm mục tiêu"
                         pTooltip="Thêm mục tiêu" tooltipPosition="left" appendTo="body">
@@ -70,7 +72,7 @@
                     </button>
                 </div>
             </header>
-            <div class="admin-wrap-table__body ictu-admin-table-shell__body">
+            <div class="course-detail-card__body">
                 <div class="ictu-admin-table-scroll cdr-table-responsive">
                     <p-table [value]="list_course_muctieu" [reorderableColumns]="true"
                         tableStyleClass="tbl admin-table cdr-grid-table">
@@ -107,13 +109,14 @@
             </div>
         </section>
 
-        <section class="admin-wrap-table ictu-admin-table-shell cdr-table-card">
-            <header class="admin-wrap-table__head cdr-table-card__header">
-                <span class="admin-wrap-table__heading cdr-table-card__title">
-                    <span class="cdr-header-icon" aria-hidden="true"><i class="ti ti-certificate"></i></span>
-                    <span>Chuẩn đầu ra học phần (CLO)</span>
-                </span>
-                <div class="admin-wrap-table__head-actions cdr-table-card__actions">
+        <section class="cdr-table-card course-detail-card" aria-labelledby="cdr-clo-title">
+            <header class="course-detail-card__header">
+                <span class="course-detail-card__icon" aria-hidden="true"><i class="ti ti-certificate"></i></span>
+                <div class="course-detail-card__heading">
+                    <h2 id="cdr-clo-title" class="course-detail-card__title">Chuẩn đầu ra học phần (CLO)</h2>
+                    <p class="course-detail-card__description">Thiết lập chuẩn đầu ra và liên kết với các mục tiêu học phần.</p>
+                </div>
+                <div class="course-detail-card__actions cdr-table-card__actions">
                     <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button"
                         (click)="addClo()" [disabled]="isSaving()" aria-label="Thêm chuẩn đầu ra"
                         pTooltip="Thêm chuẩn đầu ra" tooltipPosition="left" appendTo="body">
@@ -126,7 +129,7 @@
                     </button>
                 </div>
             </header>
-            <div class="admin-wrap-table__body ictu-admin-table-shell__body">
+            <div class="course-detail-card__body">
                 <div class="ictu-admin-table-scroll cdr-table-responsive">
                     <p-table [value]="list_course_clo" [reorderableColumns]="true"
                         tableStyleClass="tbl admin-table cdr-grid-table clo-grid-table">
@@ -179,15 +182,19 @@
             </div>
         </section>
 
-        <section class="cdr-matrix-card">
-            <header class="cdr-matrix-card__header">
-                <div class="cdr-matrix-card__title">
-                    <span class="cdr-header-icon" aria-hidden="true"><i class="ti ti-layout-grid"></i></span>
-                    <span>Ma trận đối chiếu CLO – PLO/PI</span>
+        <section class="cdr-matrix-card course-detail-card" aria-labelledby="cdr-matrix-title">
+            <header class="course-detail-card__header">
+                <span class="course-detail-card__icon" aria-hidden="true"><i class="ti ti-layout-grid"></i></span>
+                <div class="course-detail-card__heading">
+                    <h2 id="cdr-matrix-title" class="course-detail-card__title">Ma trận đối chiếu CLO – PLO/PI</h2>
+                    <p class="course-detail-card__description">Thiết lập liên kết giữa chuẩn đầu ra học phần và chương trình đào tạo.</p>
                 </div>
+                <div class="course-detail-card__actions">
                 <button type="button" mat-flat-button class="btn ictu-badge-btn--primary-reverse"
                     (click)="savePiOnClo()" [disabled]="isSaving() || !list_ctdt.length">Lưu liên kết</button>
+                </div>
             </header>
+            <div class="course-detail-card__body">
             @if (!list_ctdt.length || !list_course_clo.length) {
             <div class="matrix-empty-tip">Chưa đủ dữ liệu CTĐT hoặc CLO để hiển thị ma trận đối chiếu.</div>
             } @else {
@@ -207,6 +214,7 @@
                     </tr>}
                 </tbody></table>
             </div>}
+            </div>
         </section>
         </section>
 

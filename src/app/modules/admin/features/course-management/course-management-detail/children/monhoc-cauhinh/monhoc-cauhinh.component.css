@@ -188,8 +188,7 @@
     padding: 14px 16px;
     border: 1px solid #bfdbfe;
     border-radius: var(--admin-wrap-table-element-radius, 4px);
-    background: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
-    border-top: none;
+    background: #eff6ff;
 }
 
 .section-kicker {
@@ -227,10 +226,6 @@
 
 .config-setting-card {
     min-width: 0;
-    border: 1px solid #e2e8f0;
-    border-radius: var(--admin-wrap-table-element-radius, 4px);
-    background: #fff;
-    overflow: hidden;
     grid-column: span 2;
 }
 
@@ -238,8 +233,7 @@
     grid-column: span 2;
 }
 
-.config-card-header.admin-wrap-table__head,
-.config-setting-card>header {
+.config-card-header.admin-wrap-table__head {
     position: relative;
     display: flex;
     min-height: 48px;
@@ -247,11 +241,10 @@
     gap: 12px;
     padding: 9px 14px 9px 18px;
     border-bottom: 1px solid #cbd5e1;
-    background: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
+    background: #eff6ff;
 }
 
-.config-card-header::before,
-.config-setting-card>header::before {
+.config-card-header::before {
     position: absolute;
     inset: 0 auto 0 0;
     width: 5px;
@@ -259,13 +252,7 @@
     content: '';
 }
 
-.config-setting-card header>div {
-    flex: 1 1 auto;
-    min-width: 0;
-}
-
-.config-test-heading .config-card-subtitle,
-.config-setting-card header p {
+.config-test-heading .config-card-subtitle {
     margin: 2px 0 0;
     color: #64748b;
     font-size: 12px;

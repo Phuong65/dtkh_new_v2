@@ -32,7 +32,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { CourseClo } from '@modules/shared/models/course-clo';
 import { ClassPlanActivities } from '@modules/shared/models/class-plan-activities';
 import { NhanxetNoidungComponent } from "../nhanxet-noidung/nhanxet-noidung.component";
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { NORMAL_MODAL_OPTIONS } from '@core/utils/syscat';
 import { CourseQuestionsService } from '@modules/shared/services/course-questions.service';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -74,6 +74,7 @@ interface NoiDungSubTab {
         DragDropModule,
         MatIconModule,
         TooltipModule,
+        NgbTooltipModule,
         MatMenuModule,
         InputTextModule,
         LoadingProgressComponent,

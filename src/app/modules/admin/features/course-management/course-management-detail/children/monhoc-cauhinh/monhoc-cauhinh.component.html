@@ -11,18 +11,16 @@
     } @else if (selectedCourse && (mode === 'settings-only' || plan_kiemtra)) {
     <div class="config-workspace">
         @if (mode !== 'settings-only') {
-        <section class="admin-wrap-table ictu-admin-table-shell config-table-card" aria-labelledby="test-title">
-            <header class="admin-wrap-table__head config-card-header">
-                <div class="config-test-heading">
-                    <span class="setting-icon" aria-hidden="true"><i class="ti ti-clipboard-check"></i></span>
-                    <div>
-                        <span class="admin-wrap-table__heading" id="test-title">
-                            {{ isDttx ? 'Kiểm tra giữa kỳ' : 'Kiểm tra thường xuyên' }}
-                        </span>
-                        <p class="config-card-subtitle">Thiết lập loại và thứ tự các bài kiểm tra của học phần.</p>
-                    </div>
+        <section class="config-table-card course-detail-card" aria-labelledby="test-title">
+            <header class="course-detail-card__header">
+                <span class="course-detail-card__icon" aria-hidden="true"><i class="ti ti-clipboard-check"></i></span>
+                <div class="course-detail-card__heading">
+                    <h2 class="course-detail-card__title" id="test-title">
+                        {{ isDttx ? 'Kiểm tra giữa kỳ' : 'Kiểm tra thường xuyên' }}
+                    </h2>
+                    <p class="course-detail-card__description">Thiết lập loại và thứ tự các bài kiểm tra của học phần.</p>
                 </div>
-                <div class="admin-wrap-table__head-actions config-actions">
+                <div class="course-detail-card__actions config-actions">
                     <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse ictu-admin-icon-button"
                         (click)="addTestTx()" [disabled]="busy || !canEdit" aria-label="Thêm bài kiểm tra"
                         pTooltip="Thêm bài kiểm tra" tooltipPosition="left" appendTo="body">
@@ -35,7 +33,7 @@
                     </button>
                 </div>
             </header>
-            <div class="admin-wrap-table__body ictu-admin-table-shell__body">
+            <div class="course-detail-card__body">
                 <div class="ictu-admin-table-scroll config-table-scroll">
                     <p-table [value]="plan_kiemtra.children ?? []" tableStyleClass="admin-table config-grid-table">
                         <ng-template pTemplate="header">
@@ -103,9 +101,12 @@
             }
 
             <div class="config-card-grid">
-                <article class="config-setting-card">
-                    <header><span class="setting-icon"><i class="ti ti-chart-donut-4" aria-hidden="true"></i></span>
-                        <div><h3>Tỷ lệ điểm thành phần</h3><p>Tỷ lệ dùng để tính điểm trung bình (%)</p></div></header>
+                <article class="config-setting-card course-detail-card" aria-labelledby="config-score-title">
+                    <header class="course-detail-card__header">
+                        <span class="course-detail-card__icon" aria-hidden="true"><i class="ti ti-chart-donut-4"></i></span>
+                        <div class="course-detail-card__heading"><h2 id="config-score-title" class="course-detail-card__title">Tỷ lệ điểm thành phần</h2><p class="course-detail-card__description">Tỷ lệ dùng để tính điểm trung bình (%)</p></div>
+                    </header>
+                    <div class="course-detail-card__body">
                     @for (item of course_config_object['PERCENT_SCORE_SUMMARY'] ?? []; track item.key) {
                     <div class="setting-row">
                         <label [for]="'score-' + item.key">{{ item.title }}</label>
@@ -114,11 +115,15 @@
                             (input)="sanitizeNumericValue($event, item)" (keydown)="pointQuestionKeyDown($event)">
                     </div>
                     }
+                    </div>
                 </article>
 
-                <article class="config-setting-card">
-                    <header><span class="setting-icon"><i class="ti ti-list-numbers" aria-hidden="true"></i></span>
-                        <div><h3>Số lượng đề kiểm tra</h3><p>Số đề trắc nghiệm tạo trong mỗi lần</p></div></header>
+                <article class="config-setting-card course-detail-card" aria-labelledby="config-test-count-title">
+                    <header class="course-detail-card__header">
+                        <span class="course-detail-card__icon" aria-hidden="true"><i class="ti ti-list-numbers"></i></span>
+                        <div class="course-detail-card__heading"><h2 id="config-test-count-title" class="course-detail-card__title">Số lượng đề kiểm tra</h2><p class="course-detail-card__description">Số đề trắc nghiệm tạo trong mỗi lần</p></div>
+                    </header>
+                    <div class="course-detail-card__body">
                     @for (item of course_config_object['NUMOF_TEST_CCTX'] ?? []; track item.key) {
                     <div class="setting-row">
                         <label [for]="'test-count-' + item.key">{{ item.title }}</label>
@@ -127,11 +132,15 @@
                             (input)="sanitizeNumericValue($event, item)" (keydown)="pointQuestionKeyDown($event)">
                     </div>
                     }
+                    </div>
                 </article>
 
-                <article class="config-setting-card config-setting-card--wide">
-                    <header><span class="setting-icon"><i class="ti ti-clock" aria-hidden="true"></i></span>
-                        <div><h3>Luyện tập tại nhà</h3><p>Thiết lập thời hạn và thời gian làm bài</p></div></header>
+                <article class="config-setting-card config-setting-card--wide course-detail-card" aria-labelledby="config-practice-title">
+                    <header class="course-detail-card__header">
+                        <span class="course-detail-card__icon" aria-hidden="true"><i class="ti ti-clock"></i></span>
+                        <div class="course-detail-card__heading"><h2 id="config-practice-title" class="course-detail-card__title">Luyện tập tại nhà</h2><p class="course-detail-card__description">Thiết lập thời hạn và thời gian làm bài</p></div>
+                    </header>
+                    <div class="course-detail-card__body">
                     @for (item of course_config_object['PRACTICE_TIME_FOR_A_TEST'] ?? []; track item.key) {
                         @if (item.key !== 'EXCEPT') {
                         <div class="setting-row">
@@ -158,11 +167,15 @@
                         </div>
                         }
                     }
+                    </div>
                 </article>
 
-                <article class="config-setting-card">
-                    <header><span class="setting-icon"><i class="ti ti-calendar-off" aria-hidden="true"></i></span>
-                        <div><h3>Điểm danh</h3><p>Số ngày sinh viên được phép nghỉ (%)</p></div></header>
+                <article class="config-setting-card course-detail-card" aria-labelledby="config-attendance-title">
+                    <header class="course-detail-card__header">
+                        <span class="course-detail-card__icon" aria-hidden="true"><i class="ti ti-calendar-off"></i></span>
+                        <div class="course-detail-card__heading"><h2 id="config-attendance-title" class="course-detail-card__title">Điểm danh</h2><p class="course-detail-card__description">Số ngày sinh viên được phép nghỉ (%)</p></div>
+                    </header>
+                    <div class="course-detail-card__body">
                     @for (item of course_config_object['PERCENT_OF_LEAVE_ALLOWED'] ?? []; track item.key) {
                     <div class="setting-row">
                         <label [for]="'leave-' + item.key">{{ item.title }}</label>
@@ -180,6 +193,7 @@
                         </button>
                     </footer>
                     }
+                    </div>
                 </article>
             </div>
         </section>

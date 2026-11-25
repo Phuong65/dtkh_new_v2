@@ -257,16 +257,16 @@
                     <div>
 @switch (muctieuPlan.status) {
                         @case (0) {
-<span class="ictu-badge ictu-badge--warning course-status-badge">Chờ duyệt</span>
+<span class="course-status-text course-status-text--pending fa fa-clock-o" role="img" aria-label="Chờ duyệt" tabindex="0" container="body" ngbTooltip="Chờ duyệt"></span>
 }
                         @case (1) {
-<span class="ictu-badge ictu-badge--success course-status-badge">Đạt</span>
+<span class="course-status-text course-status-text--approved fa fa-check-circle-o" role="img" aria-label="Đạt" tabindex="0" container="body" ngbTooltip="Đạt"></span>
 }
                         @case (-1) {
-<span class="ictu-badge ictu-badge--danger course-status-badge">Yêu cầu sửa</span>
+<span class="course-status-text course-status-text--revision fa fa-times-circle-o" role="img" aria-label="Yêu cầu sửa" tabindex="0" container="body" ngbTooltip="Yêu cầu sửa"></span>
 }
                         @case (-2) {
-<span class="ictu-badge ictu-badge--primary course-status-badge">Đã sửa</span>
+<span class="course-status-text course-status-text--resubmitted fa fa-refresh" role="img" aria-label="Đã sửa" tabindex="0" container="body" ngbTooltip="Đã sửa"></span>
 }
                     }
 </div>
@@ -464,16 +464,16 @@
                 <div>
 @switch (tailieuPlan.status) {
                     @case (0) {
-<span class="ictu-badge ictu-badge--warning course-status-badge">Chờ duyệt</span>
+<span class="course-status-text course-status-text--pending fa fa-clock-o" role="img" aria-label="Chờ duyệt" tabindex="0" container="body" ngbTooltip="Chờ duyệt"></span>
 }
                     @case (1) {
-<span class="ictu-badge ictu-badge--success course-status-badge">Đạt</span>
+<span class="course-status-text course-status-text--approved fa fa-check-circle-o" role="img" aria-label="Đạt" tabindex="0" container="body" ngbTooltip="Đạt"></span>
 }
                     @case (-1) {
-<span class="ictu-badge ictu-badge--danger course-status-badge">Yêu cầu sửa</span>
+<span class="course-status-text course-status-text--revision fa fa-times-circle-o" role="img" aria-label="Yêu cầu sửa" tabindex="0" container="body" ngbTooltip="Yêu cầu sửa"></span>
 }
                     @case (-2) {
-<span class="ictu-badge ictu-badge--primary course-status-badge">Đã sửa</span>
+<span class="course-status-text course-status-text--resubmitted fa fa-refresh" role="img" aria-label="Đã sửa" tabindex="0" container="body" ngbTooltip="Đã sửa"></span>
 }
                 }
 </div>
@@ -627,10 +627,10 @@
 }
                 <span class="parent-title-wrap">
                     @if (parent.week !== 0 && parent.week < 1000) {
-<span class="parent-title">{{label_parent_kehoach}} {{parent.week}}</span>
+<span class="parent-title" container="body" placement="top" [ngbTooltip]="parent.title">{{label_parent_kehoach}} {{parent.week}}: {{parent.title}}</span>
 }
                     @if (parent.week === 0 || parent.week >= 1000) {
-<span class="parent-title">{{parent.title}}</span>
+<span class="parent-title" container="body" placement="top" [ngbTooltip]="parent.title">{{parent.title}}</span>
 }
                 </span>
             </button>
@@ -640,16 +640,16 @@
                 <div class="parent-status">
 @switch (parent['status']) {
                     @case (0) {
-<span class="course-status-text course-status-text--pending">Chờ duyệt</span>
+<span class="course-status-text course-status-text--pending fa fa-clock-o" role="img" aria-label="Chờ duyệt" tabindex="0" container="body" ngbTooltip="Chờ duyệt"></span>
 }
                     @case (1) {
-<span class="course-status-text course-status-text--approved">Đạt</span>
+<span class="course-status-text course-status-text--approved fa fa-check-circle-o" role="img" aria-label="Đạt" tabindex="0" container="body" ngbTooltip="Đạt"></span>
 }
                     @case (-1) {
-<span class="course-status-text course-status-text--revision">Chưa đạt</span>
+<span class="course-status-text course-status-text--revision fa fa-times-circle-o" role="img" aria-label="Chưa đạt" tabindex="0" container="body" ngbTooltip="Chưa đạt"></span>
 }
                     @case (-2) {
-<span class="course-status-text course-status-text--resubmitted">Đã sửa, đề nghị duyệt</span>
+<span class="course-status-text course-status-text--resubmitted fa fa-refresh" role="img" aria-label="Đã sửa, đề nghị duyệt" tabindex="0" container="body" ngbTooltip="Đã sửa, đề nghị duyệt"></span>
 }
                 }
 </div>
@@ -701,16 +701,16 @@
 <div>
 @switch (children['status']) {
                             @case (0) {
-<span class="course-status-text course-status-text--pending">Chờ duyệt</span>
+<span class="course-status-text course-status-text--pending fa fa-clock-o" role="img" aria-label="Chờ duyệt" tabindex="0" container="body" ngbTooltip="Chờ duyệt"></span>
 }
                             @case (1) {
-<span class="course-status-text course-status-text--approved">Đạt</span>
+<span class="course-status-text course-status-text--approved fa fa-check-circle-o" role="img" aria-label="Đạt" tabindex="0" container="body" ngbTooltip="Đạt"></span>
 }
                             @case (-1) {
-<span class="course-status-text course-status-text--revision">Chưa đạt</span>
+<span class="course-status-text course-status-text--revision fa fa-times-circle-o" role="img" aria-label="Chưa đạt" tabindex="0" container="body" ngbTooltip="Chưa đạt"></span>
 }
                             @case (-2) {
-<span class="course-status-text course-status-text--resubmitted">Yêu cầu duyệt</span>
+<span class="course-status-text course-status-text--resubmitted fa fa-refresh" role="img" aria-label="Yêu cầu duyệt" tabindex="0" container="body" ngbTooltip="Yêu cầu duyệt"></span>
 }
                         }
 </div>

@@ -18,7 +18,7 @@
     --cdr-surface: #ffffff;
     --cdr-bg: #f3f4f6;
     --cdr-head-bg: #f1f5f9;
-    --cdr-header-gradient: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
+    --cdr-header-gradient: #eff6ff;
     --cdr-plo-bg: #e2e8f0;
     --cdr-radius: var(--admin-wrap-table-element-radius, 4px);
     font-family: var(--primary-font-family), 'Be Vietnam Pro', 'Noto Sans', 'Segoe UI', sans-serif;
@@ -110,15 +110,9 @@
 .cdr-subpanel[hidden] { display: none; }
 .cdr-settings-panel { min-width: 0; }
 
-.cdr-table-card.ictu-admin-table-shell {
-    height: auto !important;
-    min-height: 0 !important;
-    overflow: visible !important;
+.cdr-table-card.course-detail-card {
+    min-height: 0;
     margin-top: 18px;
-    border: 1px solid var(--cdr-divider);
-    border-radius: var(--cdr-radius);
-    background: var(--cdr-surface);
-    box-shadow: none;
 }
 
 .cdr-table-card__header.admin-wrap-table__head,
@@ -248,7 +242,7 @@
 
 .cdr-objective-card,
 .cdr-matrix-card {
-    border: 1px solid var(--cdr-divider);
+    border: 1px solid #cbd5e1;
     border-radius: var(--cdr-radius);
     background: var(--cdr-surface);
 }

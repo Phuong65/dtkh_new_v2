@@ -4,7 +4,7 @@
     --content-primary: #2563eb;
     --content-primary-hover: #1d4ed8;
     --content-selected: #eff6ff;
-    --content-card-header-gradient: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
+    --content-card-header-gradient: #eff6ff;
     --content-header-text: #1e3a8a;
     --content-header-muted: #64748b;
     --content-header-icon-bg: #eff6ff;
@@ -169,12 +169,14 @@
 .parent-name-layout { min-height: 54px; padding: 10px 12px; }
 .pi-arrows-alt { flex-shrink: 0; color: #64748b; cursor: grab; }
 .parent-order { display: inline-flex; flex: 0 0 28px; width: 28px; height: 28px; align-items: center; justify-content: center; border-radius: 6px; color: #1d4ed8; background: #dbeafe; font-size: 14px; font-weight: 700; }
-.parent-title-wrap { display: flex; min-width: 0; flex-direction: column; }
+.parent-title-wrap { display: flex; flex: 1 1 auto; min-width: 0; flex-direction: column; }
 .parent-title { color: #1e3a5f; font-size: 14px; font-weight: 650; }
 .parent-title,
-.child-title { overflow-wrap: anywhere; }
+.child-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .action-menu { display: flex; flex-shrink: 0; align-items: center; gap: 4px; padding-right: 10px; }
-.parent-status { display: inline-flex; max-width: 128px; min-width: 0; justify-content: flex-end; padding: 0 4px; text-align: right; }
+.child-action-menu > div { display: inline-flex; width: 24px; align-items: center; justify-content: center; }
+.parent-action-menu { padding-right: 17px; }
+.parent-status { display: inline-flex; order: 1; width: 24px; min-width: 24px; align-items: center; justify-content: center; padding: 0; text-align: center; }
 .outline-icon-button { flex-shrink: 0; }
 .parent-desc { padding: 8px 12px; border-bottom: 1px solid var(--content-divider); }
 .parent-desc-content { max-height: 72px; overflow: auto; color: var(--content-muted); font-size: 14px; }
@@ -188,11 +190,11 @@
 .child-icon { display: inline-flex; flex: 0 0 22px; width: 22px; height: 22px; align-items: center; justify-content: center; border-radius: 5px; color: #3974bd; background: #e6f0ff; font-size: 14px; }
 .child-title { color: #365a80; font-weight: 500; }
 .child-indicator { color: #64748b; font-size: 14px; }
-.course-status-text { display: inline; padding: 0; border: 0; border-radius: 0; background: transparent; font-size: 13px; font-weight: 600; line-height: inherit; white-space: normal; }
-.course-status-text--pending { color: #8a5a16; }
-.course-status-text--approved { color: var(--content-success); }
-.course-status-text--revision { color: #b91c1c; }
-.course-status-text--resubmitted { color: #1d4ed8; }
+.course-status-text { display: inline-flex; width: 24px; height: 24px; align-items: center; justify-content: center; padding: 0; border: 0; border-radius: 50%; background: transparent; font-size: 18px; line-height: 1; cursor: help; }
+.course-status-text--pending { color: rgb(var(--c2-warning)); }
+.course-status-text--approved { color: rgb(var(--c2-success)); }
+.course-status-text--revision { color: rgb(var(--c2-danger)); }
+.course-status-text--resubmitted { color: rgb(var(--c2-primary)); }
 .outline-empty-child { padding: 16px; color: var(--content-muted); text-align: center; font-size: 14px; }
 .example-custom-placeholder { min-height: 52px; border: 1px dashed var(--content-primary); border-radius: var(--content-item-radius); background: var(--content-selected); }
 :host ::ng-deep .cdk-drag-preview.parent-lesson-layout { box-sizing: border-box; background: var(--content-surface, #ffffff); border: 1px solid var(--content-divider, #e2e8f0); border-radius: 8px; }
@@ -224,7 +226,7 @@
 .tailieu-layout,
 .discussion-layout {
     overflow: hidden;
-    border: 1px solid var(--content-divider);
+    border: 1px solid var(--content-border);
     border-radius: var(--content-radius);
     background: var(--content-surface);
     box-shadow: var(--content-shadow);

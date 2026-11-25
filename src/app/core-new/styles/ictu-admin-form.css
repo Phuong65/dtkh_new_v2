@@ -467,6 +467,166 @@ input.admin-wrap-table__input::placeholder,
 /*    --admin-table-border-color: var(--accent-300, #dbe0e5);*/
 /*}*/
 
+.course-detail-card {
+	--course-card-primary: #2563eb;
+	--course-card-border: #cbd5e1;
+	--course-card-radius: 4px;
+	--course-card-surface: #ffffff;
+	--course-card-header-bg: #eff6ff;
+	--course-card-heading: #1e3a8a;
+	--course-card-muted: #64748b;
+	--course-card-icon-border: #bfdbfe;
+	--course-card-ink: #0f172a;
+	--course-card-shadow: 0 1px 3px rgb(15 23 42 / 4%);
+
+	min-width: 0;
+	border: 1px solid var(--course-card-border);
+	border-radius: var(--course-card-radius);
+	background: var(--course-card-surface);
+	box-shadow: var(--course-card-shadow);
+	flex-shrink: 0;
+	scroll-margin-top: 16px;
+	color: var(--course-card-ink);
+	font-family: var(--primary-font-family), sans-serif;
+}
+
+.course-detail-card__header {
+	position: relative;
+	display: flex;
+	min-height: 48px;
+	align-items: center;
+	gap: 12px;
+	padding: 9px 14px 9px 18px;
+	border: 0;
+	border-bottom: 1px solid var(--course-card-border);
+	background: var(--course-card-header-bg);
+}
+
+.course-detail-card__header::before {
+	position: absolute;
+	inset: 0 auto 0 0;
+	width: 5px;
+	background: var(--course-card-primary);
+	content: '';
+}
+
+.course-detail-card__heading {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.course-detail-card__icon {
+	display: inline-flex;
+	flex: 0 0 34px;
+	width: 34px;
+	height: 34px;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid var(--course-card-icon-border);
+	border-radius: var(--course-card-radius);
+	background: var(--course-card-header-bg);
+	color: var(--course-card-primary);
+	font-size: 17px;
+}
+
+.course-detail-card__title {
+	margin: 0;
+	color: var(--course-card-heading);
+	font-size: 15px;
+	font-weight: 700;
+	line-height: 1.3;
+}
+
+.course-detail-card__description {
+	margin: 2px 0 0;
+	color: var(--course-card-muted);
+	font-size: 12px;
+	line-height: 1.4;
+}
+
+.course-detail-card__actions {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 8px;
+	margin-left: auto;
+}
+
+.course-detail-card__body {
+	min-width: 0;
+	padding: 20px;
+}
+
+@media (max-width: 640px) {
+	.course-detail-card__header,
+	.course-detail-card__body {
+		padding: 14px;
+	}
+
+	.course-detail-card__header {
+		padding-left: 18px;
+	}
+}
+
+@media (max-width: 560px) {
+	.course-detail-card__header {
+		flex-wrap: wrap;
+	}
+
+	.course-detail-card__actions {
+		width: 100%;
+		flex-wrap: wrap;
+	}
+}
+
+/* Compact content headers in assessment tabs. */
+.ictu-assessment-header {
+	position: relative;
+	display: flex;
+	width: 100%;
+	min-width: 0;
+	min-height: 48px;
+	box-sizing: border-box;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 9px 14px 9px 18px;
+	border: 1px solid #cbd5e1;
+	background: #eff6ff;
+	color: #1e3a8a;
+}
+
+.ictu-assessment-header > strong,
+.ictu-assessment-header h2,
+.ictu-assessment-header .admin-wrap-table__heading,
+.ictu-assessment-header > .course-detail-card__heading > .course-detail-card__title {
+	margin: 0;
+	color: inherit;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.35;
+}
+
+.ictu-assessment-header::before {
+	position: absolute;
+	inset: 0 auto 0 0;
+	width: 5px;
+	background: #2563eb;
+	content: '';
+}
+
+.ictu-assessment-header--inside-card {
+	border: 0;
+	border-bottom: 1px solid #cbd5e1;
+}
+
+@media (max-width: 560px) {
+	.ictu-assessment-header {
+		flex-wrap: wrap;
+	}
+}
+
 .admin-table {
 	border-collapse: collapse;
 	width: 100%;

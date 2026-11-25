@@ -4,7 +4,7 @@
     --cdr-primary: #2563eb;
     --cdr-primary-hover: #1d4ed8;
     --cdr-primary-light: #eff6ff;
-    --cdr-header-gradient: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
+    --cdr-header-gradient: #eff6ff;
     --cdr-header-text: #1e3a8a;
     --cdr-header-muted: #64748b;
     --cdr-header-icon-bg: #eff6ff;
@@ -48,7 +48,7 @@
     background: transparent;
 }
 
-/* Gradient chỉ áp dụng cho header; các vùng nhập liệu giữ nền trắng. */
+/* Header dùng nền xanh nhạt; các vùng nhập liệu giữ nền trắng. */
 .cdr-page-header {
     display: flex;
     min-width: 0;
@@ -116,7 +116,7 @@
 /* Form tạo CPI trong drawer dùng chung primitive ICTU. */
 .cdr-create-drawer {
     --cdr-primary: #2563eb;
-    --cdr-header-gradient: linear-gradient(105deg, #dbeafe 0%, #eff6ff 62%, #ffffff 100%);
+    --cdr-header-gradient: #eff6ff;
     --cdr-header-text: #1e3a8a;
     --cdr-text: #334155;
     --cdr-muted: #64748b;
