@@ -37,7 +37,7 @@
                     aria-labelledby="settings-tab-muc-tieu-chung"
                     [hidden]="activeSettingsTabId() !== 'muc-tieu-chung'">
                     <section class="goals-card" aria-labelledby="goal-general-heading">
-                        <header class="goals-card__header">
+                        <header class="ictu-assessment-header">
                             <div class="goals-card__heading">
                                 <span class="goals-card__icon" aria-hidden="true"><i class="ti ti-compass"></i></span>
                                 <h2 id="goal-general-heading">Mục tiêu chung</h2>
@@ -48,7 +48,7 @@
                                 {{ savingGeneral ? 'Đang lưu...' : 'Lưu mục tiêu chung' }}
                             </button>
                         </header>
-                        <div class="goals-card__body">
+                        <div class="ictu-assessment-body">
                             <div class="goals-editor" role="group" aria-labelledby="goal-general-heading">
                                 <ovic-editor height="220px" (changeText)="onMucTieuChungChange($event)"
                                     [default]="generalEditorInitialValue"></ovic-editor>
@@ -62,7 +62,7 @@
                 <div class="settings-tab-panel" role="tabpanel" id="settings-panel-dinh-huong"
                     aria-labelledby="settings-tab-dinh-huong" [hidden]="activeSettingsTabId() !== 'dinh-huong'">
                 <section class="goals-card goals-identity-card" aria-labelledby="goal-identity-heading">
-                    <header class="goals-card__header">
+                    <header class="ictu-assessment-header">
                         <div class="goals-card__heading">
                             <span class="goals-card__icon" aria-hidden="true"><i class="ti ti-arrows-left-right"></i></span>
                             <h2 id="goal-identity-heading">Định hướng</h2>
@@ -73,6 +73,7 @@
                             <i class="ti ti-plus" aria-hidden="true"></i>
                         </button>
                     </header>
+                    <div class="ictu-assessment-body goals-identity-body">
                     @if (list_tuongthich.length) {
                     <div class="goals-identity-table-wrap">
                         <table class="goals-identity-table">
@@ -122,6 +123,7 @@
                     } @else {
                     <div class="goals-inline-state"><i class="ti ti-info-circle" aria-hidden="true"></i>Chưa có định hướng cơ sở đào tạo.</div>
                     }
+                    </div>
                 </section>
 
                 </div>
@@ -131,7 +133,7 @@
                     [hidden]="activeSettingsTabId() !== 'muc-tieu-cu-the'">
                 <section class="goals-card goals-peo-card" aria-labelledby="goal-peo-heading"
                     [attr.aria-busy]="goalsState() === 'loading'">
-                    <header class="goals-card__header goals-peo-card__header">
+                    <header class="ictu-assessment-header">
                         <div class="goals-card__heading">
                             <span class="goals-card__icon" aria-hidden="true"><i class="ti ti-target"></i></span>
                             <h2 id="goal-peo-heading">Mục tiêu đào tạo của chương trình</h2>
@@ -143,6 +145,7 @@
                             <i class="ti ti-plus" aria-hidden="true"></i><span>Thêm khung trình độ</span>
                         </button>
                     </header>
+                    <div class="ictu-assessment-body">
                     @if (goalsState() === 'loading') {
                     <div class="goals-inline-state" role="status">Đang cập nhật danh sách mục tiêu...</div>
                     } @else if (goalsState() === 'error') {
@@ -262,10 +265,11 @@
                         </table>
                     </div>
                     }
+                    </div>
                 </section>
 
                 <section class="goals-card goals-matrix-card" aria-labelledby="goal-matrix-heading">
-                    <header class="goals-matrix-card__header">
+                    <header class="ictu-assessment-header">
                         <button type="button" class="goals-matrix-card__toggle"
                             (click)="isMatrixExpanded = !isMatrixExpanded" [attr.aria-expanded]="isMatrixExpanded"
                             aria-controls="goal-matrix-panel">
@@ -274,7 +278,7 @@
                             <i class="ti" [class.ti-chevron-down]="!isMatrixExpanded" [class.ti-chevron-up]="isMatrixExpanded" aria-hidden="true"></i>
                         </button>
                     </header>
-                    <div id="goal-matrix-panel" [hidden]="!isMatrixExpanded">
+                    <div id="goal-matrix-panel" class="ictu-assessment-body" [hidden]="!isMatrixExpanded">
                         @if (isMatrixExpanded) {
                         @if (goalsState() === 'loading') {
                         <div class="goals-inline-state" role="status">Đang cập nhật ma trận...</div>

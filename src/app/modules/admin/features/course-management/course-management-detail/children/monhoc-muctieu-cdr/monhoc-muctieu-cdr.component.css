@@ -115,6 +115,11 @@
     margin-top: 18px;
 }
 
+.cdr-table-card:has(> .ictu-assessment-header) {
+    min-width: 0;
+    margin-top: 18px;
+}
+
 .cdr-table-card__header.admin-wrap-table__head,
 .cdr-section-header,
 .cdr-matrix-card__header {
@@ -240,6 +245,7 @@
 
 :host ::ng-deep .cdr-grid-table .cell-empty { text-align: center; padding: 32px 16px; color: var(--cdr-muted); }
 
+
 .cdr-objective-card,
 .cdr-matrix-card {
     border: 1px solid #cbd5e1;
@@ -281,7 +287,6 @@
 .cdr-section-title .cdr-header-icon i,
 .cdr-matrix-card__title .cdr-header-icon i,
 .cdr-table-card__title .cdr-header-icon i { color: #2563eb; font-size: 17px; }
-.cdr-objective-body { padding: 16px; }
 .cdr-section-footer { display: flex; justify-content: flex-end; padding-top: 12px; }
 .cdr-section-footer button { display: inline-flex; align-items: center; gap: 8px; }
 .matrix-scroll-wrap { overflow-x: auto; overflow-y: visible; }

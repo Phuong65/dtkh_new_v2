@@ -193,7 +193,7 @@
 .assessment-test-workspace.is-collapsed { grid-template-columns: 55px minmax(0, 1fr); }
 .assessment-test-workspace.is-collapsed .assessment-test-sidebar .course-detail-card__heading,
 .assessment-test-workspace.is-collapsed .assessment-test-list { display: none; }
-.assessment-test-workspace.is-collapsed .assessment-test-sidebar > .course-detail-card__header { padding: 8px; justify-content: center; }
+.assessment-test-workspace.is-collapsed .assessment-test-sidebar > .ictu-assessment-header { padding: 8px; justify-content: center; }
 
 .assessment-placeholder,
 .assessment-empty-state {

@@ -6,8 +6,8 @@
     <div class="admin-table__alert-danger text-center w-100">Không thể tải danh sách đề. <button type="button"
             (click)="loadTuluan()" class="admin-table__alert-danger__btn-reload">Tải lại</button>.</div>
     }
-    <section class="admin-wrap-table ictu-admin-table-shell tuluan-table-card">
-        <header class="admin-wrap-table__head top-tuluan-layout ictu-assessment-header">
+    <section class="tuluan-table-card">
+        <header class="ictu-assessment-header">
             <span class="admin-wrap-table__heading">{{ activity.title }}</span>
             @if (!hideAddButton) {
             <button type="button" mat-flat-button class="btn ictu-badge-btn--success-reverse"
@@ -16,7 +16,7 @@
             </button>
             }
         </header>
-        <div class="admin-wrap-table__body ictu-admin-table-shell__body body-tuluan-layout">
+        <div class="ictu-assessment-body">
             <div class="ictu-admin-table-scroll">
                 <p-table [value]="list_tuluan" tableStyleClass="admin-table">
                     <ng-template pTemplate="header">

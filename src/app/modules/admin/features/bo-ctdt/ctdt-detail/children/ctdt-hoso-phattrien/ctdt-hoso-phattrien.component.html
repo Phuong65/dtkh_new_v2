@@ -2,7 +2,7 @@
     @if (isSaving()) {
     <app-loading-progress heading="Đang lưu hồ sơ phát triển..." backdropFilter="blur(2px)"></app-loading-progress>
     }
-    <header class="profile-card__header">
+    <header class="ictu-assessment-header">
         <div class="profile-card__heading">
             <span class="profile-card__icon" aria-hidden="true"><i class="ti ti-file-text"></i></span>
             <h2 id="profile-heading">Hồ sơ & định hướng phát triển</h2>
@@ -13,6 +13,7 @@
             {{ isSaving() ? 'Đang lưu...' : 'Lưu hồ sơ phát triển' }}
         </button>
     </header>
+    <div class="ictu-assessment-body ctdt-profile-body">
     <div class="profile-tabs" role="tablist" aria-label="Nội dung hồ sơ">
         <button type="button" role="tab" id="profile-tab-mota" class="profile-tab"
             [class.profile-tab--active]="activeEditorTab() === 'mota'"
@@ -59,4 +60,5 @@
             </div>
         </div>
     </form>
+    </div>
 </section>

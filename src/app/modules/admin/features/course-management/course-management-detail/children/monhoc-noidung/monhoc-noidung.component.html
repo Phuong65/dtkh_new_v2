@@ -50,8 +50,7 @@
                 @if (canAdded && (dragDropLesson || isDttx)) {
 <div class="course-outline-actions">
                     @if (dragDropLesson) {
-<button type="button" (click)="saveOrderingLesson()" class="btn ictu-badge-btn--primary-reverse course-outline-action"
-                       >
+<button type="button" mat-flat-button (click)="saveOrderingLesson()" class="btn ictu-badge-btn--primary-reverse course-outline-action">
                         <i class="fa fa-floppy-o" aria-hidden="true"></i>
                         <span>Lưu thứ tự</span>
                     </button>

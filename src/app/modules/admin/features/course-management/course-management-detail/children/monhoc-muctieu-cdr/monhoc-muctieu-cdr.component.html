@@ -28,15 +28,15 @@
     <div class="cdr-workspace" [class.cdr-workspace--settings]="activeSubTabId() === 'kiem-tra-danh-gia'">
         <section id="cdr-panel-muc-tieu-chung" class="cdr-subpanel" role="tabpanel"
             aria-labelledby="cdr-tab-muc-tieu-chung" [hidden]="activeSubTabId() !== 'muc-tieu-chung'">
-        <section class="cdr-objective-card course-detail-card" aria-labelledby="cdr-general-objective-title">
-            <header class="course-detail-card__header">
+        <section class="cdr-objective-card" aria-labelledby="cdr-general-objective-title">
+            <header class="ictu-assessment-header">
                 <span class="course-detail-card__icon" aria-hidden="true"><i class="ti ti-target"></i></span>
                 <div class="course-detail-card__heading">
                     <h2 id="cdr-general-objective-title" class="course-detail-card__title">Mục tiêu chung</h2>
                     <p class="course-detail-card__description">Xác định định hướng năng lực và kết quả mong đợi của học phần.</p>
                 </div>
             </header>
-            <div class="course-detail-card__body">
+            <div class="ictu-assessment-body">
                 <ovic-editor height="180px" [formField]="generalObjectiveControl"
                     [default]="generalObjectiveControl.value"></ovic-editor>
                 <div class="cdr-section-footer">
@@ -52,8 +52,8 @@
 
         <section id="cdr-panel-co-clo" class="cdr-subpanel" role="tabpanel"
             aria-labelledby="cdr-tab-co-clo" [hidden]="activeSubTabId() !== 'co-clo'">
-        <section class="cdr-table-card course-detail-card" aria-labelledby="cdr-goals-title">
-            <header class="course-detail-card__header">
+        <section class="cdr-table-card" aria-labelledby="cdr-goals-title">
+            <header class="ictu-assessment-header">
                 <span class="course-detail-card__icon" aria-hidden="true"><i class="ti ti-list-check"></i></span>
                 <div class="course-detail-card__heading">
                     <h2 id="cdr-goals-title" class="course-detail-card__title">Mục tiêu chi tiết (CO)</h2>
@@ -72,7 +72,7 @@
                     </button>
                 </div>
             </header>
-            <div class="course-detail-card__body">
+            <div class="ictu-assessment-body">
                 <div class="ictu-admin-table-scroll cdr-table-responsive">
                     <p-table [value]="list_course_muctieu" [reorderableColumns]="true"
                         tableStyleClass="tbl admin-table cdr-grid-table">
@@ -109,8 +109,8 @@
             </div>
         </section>
 
-        <section class="cdr-table-card course-detail-card" aria-labelledby="cdr-clo-title">
-            <header class="course-detail-card__header">
+        <section class="cdr-table-card" aria-labelledby="cdr-clo-title">
+            <header class="ictu-assessment-header">
                 <span class="course-detail-card__icon" aria-hidden="true"><i class="ti ti-certificate"></i></span>
                 <div class="course-detail-card__heading">
                     <h2 id="cdr-clo-title" class="course-detail-card__title">Chuẩn đầu ra học phần (CLO)</h2>
@@ -129,7 +129,7 @@
                     </button>
                 </div>
             </header>
-            <div class="course-detail-card__body">
+            <div class="ictu-assessment-body">
                 <div class="ictu-admin-table-scroll cdr-table-responsive">
                     <p-table [value]="list_course_clo" [reorderableColumns]="true"
                         tableStyleClass="tbl admin-table cdr-grid-table clo-grid-table">
@@ -182,8 +182,8 @@
             </div>
         </section>
 
-        <section class="cdr-matrix-card course-detail-card" aria-labelledby="cdr-matrix-title">
-            <header class="course-detail-card__header">
+        <section class="cdr-matrix-card" aria-labelledby="cdr-matrix-title">
+            <header class="ictu-assessment-header">
                 <span class="course-detail-card__icon" aria-hidden="true"><i class="ti ti-layout-grid"></i></span>
                 <div class="course-detail-card__heading">
                     <h2 id="cdr-matrix-title" class="course-detail-card__title">Ma trận đối chiếu CLO – PLO/PI</h2>
@@ -194,7 +194,7 @@
                     (click)="savePiOnClo()" [disabled]="isSaving() || !list_ctdt.length">Lưu liên kết</button>
                 </div>
             </header>
-            <div class="course-detail-card__body">
+            <div class="ictu-assessment-body">
             @if (!list_ctdt.length || !list_course_clo.length) {
             <div class="matrix-empty-tip">Chưa đủ dữ liệu CTĐT hoặc CLO để hiển thị ma trận đối chiếu.</div>
             } @else {

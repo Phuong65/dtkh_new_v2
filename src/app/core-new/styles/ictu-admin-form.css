@@ -626,7 +626,7 @@ input.admin-wrap-table__input::placeholder,
 	box-sizing: border-box;
 	width: 100%;
 	min-width: 0;
-	padding: 20px;
+	padding: 10px;
 	overflow-x: auto;
 	border: 1px solid #cbd5e1;
 	border-top: 0;
@@ -635,7 +635,7 @@ input.admin-wrap-table__input::placeholder,
 
 @media (max-width: 640px) {
 	.ictu-assessment-body {
-		padding: 14px;
+		/* padding: 14px; */
 	}
 }
 

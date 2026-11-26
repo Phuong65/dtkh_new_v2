@@ -60,50 +60,8 @@
     background: #f8fafc;
 }
 
-.tuluan-table-card.ictu-admin-table-shell {
-    height: auto !important;
-    min-height: 0 !important;
-    border: 1px solid #cbd5e1;
-    border-radius: var(--admin-wrap-table-element-radius, 4px);
-    background: #fff;
-    overflow: hidden;
-}
-
-.top-tuluan-layout.admin-wrap-table__head:not(.ictu-assessment-header) {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    min-height: 48px;
-    padding: 9px 14px 9px 18px;
-    border: 0;
-    border-bottom: 1px solid #cbd5e1;
-    background: #eff6ff;
-}
-
-.top-tuluan-layout.admin-wrap-table__head:not(.ictu-assessment-header)::before {
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 5px;
-    background: #2563eb;
-    content: '';
-}
-
-.top-tuluan-layout .admin-wrap-table__heading {
-    margin: 0;
-    color: #1e3a8a;
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 1.35;
-}
-
-@media (max-width: 560px) {
-    .top-tuluan-layout.admin-wrap-table__head:not(.ictu-assessment-header) { flex-wrap: wrap; }
-    .top-tuluan-layout .admin-wrap-table__heading { min-width: 0; overflow-wrap: anywhere; }
-}
-
-.body-tuluan-layout { background: #fff; }
+.tuluan-table-card { min-width: 0; }
+.tuluan-table-card .admin-wrap-table__heading { min-width: 0; overflow-wrap: anywhere; }
 :host ::ng-deep .tuluan-table-card .p-datatable-wrapper { overflow-x: auto; }
 .tuluan-legacy-caption { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; font-size: 14px; }
 .tuluan-title-cell { display: flex; min-width: 0; align-items: center; gap: 10px; }
@@ -674,14 +632,4 @@ textarea:focus {
 
 .text-open-huong-dancham:hover {
     text-decoration: underline;
-}
-
-.top-tuluan-layout:not(.ictu-assessment-header) {
-    padding: 5px;
-    border-bottom: 1px solid #c8c8c8;
-}
-
-.body-tuluan-layout {
-    height: calc(100% - 41px);
-    padding: 5px;
 }

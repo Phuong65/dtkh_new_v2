@@ -25,16 +25,15 @@
 
         <div class="assessment-content" [attr.inert]="readonlyMode ? '' : null">
         <section id="assessment-panel-practice" class="assessment-panel" role="tabpanel" [hidden]="tabIndex !== 0">
-            <section class="assessment-table-card course-detail-card"
-                aria-labelledby="assessment-practice-title">
-                <header class="course-detail-card__header ictu-assessment-header">
+            <section class="assessment-table-card" aria-labelledby="assessment-practice-title">
+                <header class="ictu-assessment-header">
                     <div class="course-detail-card__heading">
                         <h2 id="assessment-practice-title" class="course-detail-card__title">
                             Luyện tập tại nhà{{ !isDttx && key_server !== 'hvu' ? ' và kiểm tra 15 phút' : '' }}
                         </h2>
                     </div>
                 </header>
-                <div class="course-detail-card__body">
+                <div class="ictu-assessment-body">
                     <div class="ictu-admin-table-scroll assessment-table-scroll">
                         <p-table [value]="list_week" tableStyleClass="admin-table assessment-grid-table">
                             <ng-template pTemplate="header">
@@ -109,8 +108,8 @@
         <section id="assessment-panel-regular" class="assessment-panel" role="tabpanel" [hidden]="tabIndex !== 1">
             @if (showTests) {
             <div class="assessment-test-workspace" [class.is-collapsed]="closeLeft">
-                <aside class="assessment-test-sidebar course-detail-card" aria-labelledby="assessment-list-title">
-                    <header class="course-detail-card__header ictu-assessment-header">
+                <aside class="assessment-test-sidebar" aria-label="Danh sách bài kiểm tra">
+                    <header class="ictu-assessment-header">
                         <div class="course-detail-card__heading">
                             <h2 id="assessment-list-title" class="course-detail-card__title">Danh sách bài kiểm tra</h2>
                         </div>
@@ -120,7 +119,7 @@
                             <i [class]="closeLeft ? 'ti ti-chevrons-right' : 'ti ti-chevrons-left'" aria-hidden="true"></i>
                         </button>
                     </header>
-                    <div id="assessment-test-list" class="assessment-test-list course-detail-card__body">
+                    <div id="assessment-test-list" class="assessment-test-list ictu-assessment-body">
                         @for (parent of list_plan; track parent.id) {
                         <section class="assessment-test-group">
                             @if (parent.title) { <h3>{{ parent.title }}</h3> }
@@ -142,13 +141,13 @@
                     @case ('THUONGXUYEN_TULUAN') { <app-thuongxuyen-tuluan-v2 [courseSelected]="selectedCourse" [activity]="selectPlan"></app-thuongxuyen-tuluan-v2> }
                     @case ('THUONGXUYEN_DUAN') { <app-thuongxuyen-duan [courseSelected]="selectedCourse" [activity]="selectPlan"></app-thuongxuyen-duan> }
                     @case ('THUONGXUYEN_TRACNGHIEM') {
-                    <div class="assessment-mcq-card course-detail-card" aria-labelledby="assessment-mcq-title">
-                        <header class="course-detail-card__header ictu-assessment-header">
+                    <div class="assessment-mcq-card" aria-labelledby="assessment-mcq-title">
+                        <header class="ictu-assessment-header">
                             <div class="course-detail-card__heading">
                                 <h2 id="assessment-mcq-title" class="course-detail-card__title">{{ selectPlan.title }}</h2>
                             </div>
                         </header>
-                        <div class="assessment-mcq-body course-detail-card__body">
+                        <div class="assessment-mcq-body ictu-assessment-body">
                             <div class="assessment-mcq-statuses">
                                 <span class="assessment-chip assessment-chip--info">Câu hỏi duyệt: {{ selectPlan['has_question'] }}</span>
                                 <span class="assessment-chip" [class.is-ready]="selectPlan['has_form_test']">{{ selectPlan['has_form_test'] ? 'Đã tạo form đề' : 'Chưa tạo form đề' }}</span>

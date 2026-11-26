@@ -35,43 +35,8 @@
     background: #f8fafc;
 }
 
-.duan-table-card.ictu-admin-table-shell {
-    height: auto !important;
-    min-height: 0 !important;
-    border: 1px solid #cbd5e1;
-    border-radius: var(--admin-wrap-table-element-radius, 4px);
-    background: #fff;
-    overflow: hidden;
-}
-
-.duan-table-head.admin-wrap-table__head:not(.ictu-assessment-header) {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    min-height: 48px;
-    padding: 9px 14px 9px 18px;
-    border: 0;
-    border-bottom: 1px solid #cbd5e1;
-    background: #eff6ff;
-}
-
-.duan-table-head.admin-wrap-table__head:not(.ictu-assessment-header)::before {
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 5px;
-    background: #2563eb;
-    content: '';
-}
-
-.duan-table-head .admin-wrap-table__heading {
-    margin: 0;
-    color: #1e3a8a;
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 1.35;
-}
+.duan-table-card { min-width: 0; }
+.duan-table-card .admin-wrap-table__heading { min-width: 0; overflow-wrap: anywhere; }
 
 :host ::ng-deep .duan-table-card .admin-table { min-width: 780px; }
 :host ::ng-deep .duan-table-card th,
